@@ -744,7 +744,7 @@ function drawHuman(cx, cfg, P){
     G(); ell(cx, hand, cfg.handWrap ? 2.4 : 2.2, cfg.handWrap ? 2.4 : 2.2, M[cfg.handWrap || cfg.skinM || 'skin'], {});
     return {hand, dir:nrm([hand[0] - el[0], hand[1] - el[1], hand[2] - el[2]])};
   };
-  const grip2 = !P.noWeapon && !ride && !P.sheathed && (cfg.twoHand || cfg.katana) && (cfg.weapon === 'sword' || cfg.weapon === 'staff' || cfg.weapon === 'dagger') && !(cfg.weapon === 'staff' && P.ring >= 0);
+  const grip2 = !P.noWeapon && !ride && !cfg.sheathed && (cfg.twoHand || cfg.katana) && (cfg.weapon === 'sword' || cfg.weapon === 'staff' || cfg.weapon === 'dagger') && !(cfg.weapon === 'staff' && P.ring >= 0);
   let AR, AL;
   if (grip2){
     const wa = P.wLeft ? P.armL + P.elbL * .7 : P.armR + P.elbR * .7, wd = nrm(upper(rotX([0, -1, 0], -(wa + P.wpn - .1))));
@@ -929,17 +929,44 @@ function drawHuman(cx, cfg, P){
   if (cfg.fangs){ for (const sd of [-1, 1]){ G(); cap(cx, add(hc, [sd * 2.2, -4.4, 9.6]), add(hc, [sd * 2.5, -7.6, 9.4]), .9, .35, M.white, {}); } }
   if (cfg.wings){ const fl = ride ? 0 : Math.sin((P.sway || 0) * 1.3 + (P.bob || 0)) * .25;
     for (const sd of [-1, 1]){ G(); for (let i = 0; i < 5; i++){ const k = i / 4; ell(cx, lean([hipC[0] + sd * (4 + k * 9), 21 + B + k * 4 - k * k * 6 + fl * 6 * k, -5.5 - k * 2]), 5.4 - k * 2.2, 2.2, M[cfg.wings], {rz:4.5 - k * 2, tex:n => (n[1] < -.3 ? {m:M[cfg.wingTip || cfg.wings], t:1} : undefined)}); } } }
+  // (v159) out of combat, and always while riding, the weapon and shield ride on the back: a blade or staff across the
+  // back from the right shoulder to the left hip (hilt up), a bow upright between the shoulder blades, a dagger at the
+  // hip, a shield flat on the back under the blade
+  const stow = !P.noWeapon && (cfg.sheathed || !!ride);
+  if (stow){
+    const back = (dx, dy, dz) => lean([hipC[0] + dx, dy + B, dz]), shOn = cfg.shield && !cfg.twoHand && cfg.weapon !== 'bow';
+    if (shOn){ const sh = cfg.shield, big = (sh[3] || 1) * .92, c = back(0, 16.8, -6.9);
+      G(); ell(cx, c, 5.3 * big, 6.3 * big, M[sh[0]], {rz:1.1});
+      G(); ell(cx, add(c, [0, 0, -.5]), 4.4 * big, 5.4 * big, M[sh[1]], {rz:1.1, tex:sh[4] ? (n => (Math.abs(n[0]) < .12 || Math.abs(n[1] - .1) < .1 ? {m:M[sh[4]], t:1} : undefined)) : undefined});
+      if (sh[2]){ G(); ell(cx, add(c, [0, .3, -1.4]), 1.5 * big, 1.5 * big, M[sh[2]]); } }
+    const w = cfg.weapon;
+    if (w && w !== 'fist'){
+      const P2 = {...P, ring:-1, draw:0, arrow:false, glow:-1}, dz = shOn ? -9.1 : -7.4;
+      if (w === 'bow'){
+        // the bow slung across the back, limbs bowed outward, the string straight: drawn in the plane of the back so it
+        // reads from behind as a bow, not as a stick seen edge-on
+        const c = back(0, 18, -7.6), ax = nrm(upper([.55, -1, 0])), bx = nrm(upper([1, .55, 0])), BW = 10 * WPN_BIG * .92, bw = cfg.wTier ?? -1;
+        const limbM = M[['wood', 'wood', 'lacquer', 'charcoal', 'teal', 'gold'][bw] || 'wood'], pts = [];
+        for (let i = 0; i <= 16; i++){ const yy = BW - i / 16 * BW * 2; pts.push(add(add(c, mul(ax, yy)), mul(bx, 2.2 * (1 - (yy / BW) ** 2)))); }
+        G(); for (let i = 0; i < pts.length - 1; i++) cap(cx, pts[i], pts[i + 1], .95 + (i > 6 && i < 10 ? .25 : 0), .95, i < 2 || i > pts.length - 4 ? M.steel : limbM, {});
+        G(); line(cx, pts[0], pts[pts.length - 1], M.white, {t:1});
+      }
+      else if (w === 'dagger' && !cfg.katana){ P2.wdir = nrm(upper([-.15, -1, .35])); const h = back(-5.6, 12.2, -2.4); drawWeapon(cx, w, P2, h, h, () => (cx.gid = gid++), {...cfg, offWeapon:false}); }
+      else if (w === 'staff'){ P2.wdir = nrm(upper([-.5, 1, -.04])); const h = back(4.4, 12.5, dz); drawWeapon(cx, w, P2, h, h, () => (cx.gid = gid++), cfg); }   // head up over the right shoulder
+      else { P2.wdir = nrm(upper([.8, -1, -.04])); const h = back(-4.8, 26.5, dz); drawWeapon(cx, w, P2, h, h, () => (cx.gid = gid++), cfg); }   // hilt over the right shoulder
+    }
+  }
   // weapon follows the forearm
-  if (!P.noWeapon){
+  if (!P.noWeapon && !stow){
     const wa = P.wLeft ? P.armL + P.elbL * .7 : P.armR + P.elbR * .7;
     P.wdir = nrm(upper(rotX([0, -1, 0], -(wa + P.wpn - .1))));
     drawWeapon(cx, cfg.weapon, P, P.wLeft ? handL : handR, P.wLeft ? handR : handL, () => (cx.gid = gid++), cfg);
   }
   // a second one-handed weapon in the free hand
-  if (cfg.offWeapon && !P.noWeapon && !cfg.twoHand){ const wa2 = P.wLeft ? P.armR + P.elbR * .7 : P.armL + P.elbL * .7, wd0 = P.wdir;
+  if (cfg.offWeapon && !P.noWeapon && !stow && !cfg.twoHand){ const wa2 = P.wLeft ? P.armR + P.elbR * .7 : P.armL + P.elbL * .7, wd0 = P.wdir;
     P.wdir = nrm(upper(rotX([0, -1, 0], -(wa2 + P.wpn * .6 - .1)))); drawWeapon(cx, cfg.weapon, P, P.wLeft ? handR : handL, P.wLeft ? handL : handR, () => (cx.gid = gid++), {...cfg, wTier:cfg.offTier ?? cfg.wTier}); P.wdir = wd0; }
   // a shield on the free hand (only beside a one-handed weapon): rim behind, face in front, a boss in the middle
-  if (cfg.shield && !P.noWeapon && !cfg.twoHand){ const sh = cfg.shield, side = P.wLeft ? -1 : 1, c = add(P.wLeft ? handR : handL, [side * 2.0, 1.6, 1.6]), big = sh[3] || 1;
+  if (cfg.shield && !P.noWeapon && !stow && !cfg.twoHand){ const sh = cfg.shield, side = P.wLeft ? -1 : 1, c = add(P.wLeft ? handR : handL, [side * 2.0, 1.6, 1.6]), big = sh[3] || 1;
     G(); ell(cx, c, 5.3 * big, 6.3 * big, M[sh[0]], {rz:1.2, dz:-.6});
     G(); ell(cx, c, 4.4 * big, 5.4 * big, M[sh[1]], {rz:1.5, tex:sh[4] ? (n => (Math.abs(n[0]) < .12 || Math.abs(n[1] - .1) < .1 ? {m:M[sh[4]], t:1} : undefined)) : undefined});
     if (sh[2]){ G(); ell(cx, add(c, [0, .3, 1.2]), 1.5 * big, 1.5 * big, M[sh[2]]); }
@@ -1416,10 +1443,10 @@ const b36 = n => (n | 0).toString(36);
 function lookKey(lk){
   if (!lk) return 'm00';
   const f = lk.sex === 'f', hs = (lk.hair | 0) % (f ? HAIR_F : HAIR_M).length, ci = Math.max(0, HAIR_COLORS.indexOf(lk.color || '')), ei = Math.max(0, IRIS_COLORS.indexOf(lk.eye || ''));
-  return `${f ? 'f' : 'm'}${hs}${b36(ci)}${ei ? 'e' + b36(ei) : ''}${lk.rft > 0 ? 'r' + Math.min(4, lk.rft | 0) : ''}`;
+  return `${f ? 'f' : 'm'}${hs}${b36(ci)}${ei ? 'e' + b36(ei) : ''}${lk.rft > 0 ? 'r' + Math.min(4, lk.rft | 0) : ''}${lk.sh ? 's' : ''}`;
 }
 function parseLookKey(k){
-  const m = typeof k === 'string' && /^([mf])([0-9])([0-9a-z])(?:e([0-9a-z]))?(?:r([0-4]))?$/.exec(k); if (!m) return null;
+  const m = typeof k === 'string' && /^([mf])([0-9])([0-9a-z])(?:e([0-9a-z]))?(?:r([0-4]))?s?$/.exec(k); if (!m) return null;
   return {sex:m[1], hair:+m[2], color:HAIR_COLORS[parseInt(m[3], 36)] || '', eye:m[4] ? IRIS_COLORS[parseInt(m[4], 36)] || '' : ''};
 }
 function applyLook(cfg, lk){
@@ -1443,6 +1470,7 @@ function heroKey(job, gear = {}, look = null){
   const cfg = {...base};
   if (lk !== 'm00') applyLook(cfg, look);
   cfg.rfTier = look && look.rft > 0 ? Math.min(4, look.rft | 0) : 0;   // a refined weapon glows (sys/refinefx.js picks the tier)
+  cfg.sheathed = !!(look && look.sh);   // (v159) out of combat: weapon and shield carried on the back
   for (const id of ids){ const lk = GEAR_LOOK[id]; if (lk) Object.assign(cfg, lk); }
   // a wardrobe top re-colours the skirt too (the class skirt keeps its cut; heroines get one in the costume colours)
   if (cfg.cosTop){ if (base.skirt) cfg.skirt = [...base.skirt.slice(0, 4), cfg.skirtM || cfg.top, cfg.skirtT || cfg.belt || cfg.top];
