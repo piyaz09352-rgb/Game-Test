@@ -511,7 +511,7 @@ const BEAST = (() => {
     // no two species alike: each key nudges its own proportions a little (length, legs, head, tail)
     const kh = [...key].reduce((a, c) => a * 31 + c.charCodeAt(0) | 0, 7), J = i => 1 + (h3(kh % 997, i, 9) - .5) * .16;
     const len = (s.len ?? 1) * J(1), legK = (s.leg ?? 1) * J(2), gir = s.girth ?? 1, tailK = J(4);
-    const Lb = F.Lb * len, rc = F.rc * gir, rh = F.rh * gir, LL = F.leg * legK, lt = F.lt * gir, hr = F.hr * Math.sqrt(gir) * J(3);
+    const gb = 1 + (gir - 1) * .55, Lb = F.Lb * len * (1 + (gir - 1) * .25), rc = F.rc * gb, rh = F.rh * gb, LL = F.leg * legK, lt = F.lt * gir, hr = F.hr * Math.sqrt(gir) * J(3);
     const sprawl = !!F.sprawl, ele = fam === 'elephant';
     const cat = fam === 'cat', clouded = cat && s.spots && ST, tiger = cat && ST && !s.spots, spotted = !cat && s.spots;
     /* the coat: one function for every part; t runs along the part, nn is the surface direction */
@@ -535,7 +535,7 @@ const BEAST = (() => {
       if (SO && part === 'leg' && t > .55) return {m:SO};
       if (HO && part === 'leg' && t > .92) return {m:HO};
       // fur grain: a few darker flecks, more on a shaggy coat
-      if (h3(Math.floor(t * 30), Math.floor((ang + 4) * 9), part.length) > (s.shaggy || fam === 'bear' ? .72 : .86)) return {dt:1};
+      { const strand = Math.floor((ang + 4) * 14), along = t * 26 + h3(strand, 3, part.length) * 3; if (Math.abs(Math.sin(along * Math.PI)) < (s.shaggy || fam === 'bear' ? .22 : .1) && h3(strand, Math.floor(along), 5) > .35) return {dt:1}; }   // (v157) fur in strands along the body, not static
       return undefined;
     };
     /* limbs and the torso are chains of spheres; lit sphere by sphere they look ribbed, so their light is taken from
@@ -586,8 +586,13 @@ const BEAST = (() => {
         const sh = add(chest, [sd * rc * .62, -rc * .35, rc * .25]), el2 = add(sh, rotX([sd * .3, -2.6 * gir, 1.2 * gir], sw)), hd2 = add(el2, rotX([0, -.4, 2.2 * gir], sw));
         cap(cx, sh, el2, .95 * gir, .7 * gir, SK, {}); cap(cx, el2, hd2, .7 * gir, .45 * gir, SK, {}); cap(cx, hd2, add(hd2, [0, -.8, .9]), .4, .15, AC, {}); } }
       // torso: hips → waist → chest, one smooth chain
-      cx.gid = 1; cap(cx, hip, mid, rh, (rh + rc) * .47, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'torso', t * .5)});
-      cx.gid = 2; cap(cx, mid, chest, (rh + rc) * .47, rc, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'torso', .5 + t * .5)});
+      // (v157) real torsos are deeper than they are wide: a back row and a belly row of smaller spheres instead of one
+      // round barrel (which made bears, buffalo and elephants look like balloons); the back dips a little at the waist
+      { const k = .74, dy = .3, ch = (rh + rc) * .47, up = (p, r) => add(p, [0, r * dy, 0]), dn = (p, r) => add(p, [0, -r * dy, 0]);
+        cx.gid = 1; cap(cx, up(hip, rh), up(add(mid, [0, -F.dip * .4, 0]), ch), rh * k, ch * k, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'torso', t * .5)});
+        cap(cx, dn(hip, rh), dn(mid, ch), rh * k * .96, ch * k * 1.02, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'torso', t * .5)});
+        cx.gid = 2; cap(cx, up(add(mid, [0, -F.dip * .4, 0]), ch), up(chest, rc), ch * k, rc * k, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'torso', .5 + t * .5)});
+        cap(cx, dn(mid, ch), dn(chest, rc), ch * k * 1.02, rc * k * .98, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'torso', .5 + t * .5)}); }
       if (F.hump){ cx.gid = 3; ell(cx, add(chest, [0, rc * .55, -rc * .5]), rc * .8, rc * .55, SK, {tex:nn => coat(nn, .8, 'torso')}); }
       if (F.dew){ cx.gid = 3; cap(cx, add(chest, [0, -rc * .3, rc * .5]), add(chest, [0, -rc * .95, rc * .35]), rc * .38, rc * .2, SK, {}); }   // the dewlap of cattle
       if (F.scutes){ cx.gid = 4; for (let i = 0; i < 9; i++){ const k = i / 8, p = lerp3(hip, chest, k); for (const sd of [-1, 1]) ell(cx, add(p, [sd * .9, (k < .5 ? rh : rc) * .92, 0]), .7, .55, ST || DK, {}); } }
