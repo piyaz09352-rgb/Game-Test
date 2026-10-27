@@ -157,6 +157,44 @@ const W4_LOREMAP = {
   dragondemonking:['ราชันมังกรอสูร ผู้เป็นทั้งมังกรและปีศาจ มันหลอมวิญญาณมังกรเข้ากับเลือดอสูรจนเป็นอมตะ และรอวันที่ผนึกวายราจะพังลง', 'The Dragon-Demon Sovereign, both dragon and demon. It forged a dragon\'s soul with demon blood to become deathless, and waits for the Vayra seal to break.']
 };
 
+/* ---------- colour for the monsters that had almost none (v153) ----------
+   26 monsters were drawn in near-greys (a slate buffalo, a white yeti, a grey tiger, stone statues in plain stone).
+   Each now keeps what it is but wears believable colour: the warm hide and pink nose of a real animal, the painted
+   red, green and gold of temple stucco, ice that is blue rather than white, ghosts with a sickly tint and a glow. */
+const W4_RECOLOR = {
+  wildbuffalo:{skin:'#4e4250', belly:'#7a6a62', muzzle:'#b08a80', acc:'#ece0c0'},
+  pierrat:{skin:'#8a6a52', belly:'#e8d0b4', nose:'#e8909a'},
+  stuccoyaksha:{skin:'#2e8a5a', top:'#c8382a', pants:'#e3b04b', hair:'#1a1a1a', hatCol:'#e3b04b'},
+  lankypreta:{skin:'#9aae86', top:'#4a3a62', pants:'#3a2e4a', hair:'#22201e'},
+  serow:{skin:'#4a382a', belly:'#c8a882', mane:'#f2ede2', stripe:'#2a1e16'},
+  mistspirit:{col:'#a8d6ee'},
+  phipop:{skin:'#8c9e78', top:'#7a2638', pants:'#3a2a2a', hair:'#121212'},
+  stoneapsara:{skin:'#d8a888', top:'#b0622e', pants:'#c88a3a', hair:'#3a2a1e'},
+  carvedmonkey:{skin:'#b8865a', belly:'#6e8a4a'},
+  ghostcrab:{shell:'#e6cf9c', acc:'#e88a4a'},
+  skylotus:{col:'#f4b6d2', topCol:'#f0d070'},
+  misttiger:{skin:'#7488a2', stripe:'#26304a', belly:'#dfe6f0', eyeGlow:'#9ae0ff'},
+  snowdeva:{col:'#c8e4ff'},
+  smokewisp:{col:'#9a8676', dark:'#3a1e10', glow:'#ff7a2a'},
+  ashghoul:{skin:'#6e5a4c', top:'#3a1a10', hair:'#c8a088'},
+  snowowl:{body:'#f6f4ec', bars:'#4a4038', eyeGlow:'#ffcc3a'},
+  iceworm:{skin:'#9ccbe6', belly:'#e4f2fa', tailTip:'#4a98d4'},
+  yeti:{skin:'#8aa6c0', top:'#c2d6ea', pants:'#a8c0d8', hair:'#e8f0f8', iris:'irisBl'},
+  iceslime:{col:'#96d4f0', eye:'#1a4a6a'},
+  dvarapala:{skin:'#c8a070', top:'#2a6a3a', pants:'#b8322a', hatCol:'#e3b04b'},
+  elderpop:{skin:'#86987a', top:'#5a1a2a', hair:'#eeeeea'},
+  // the new lands' own animals, given living colours (bands, a pale belly, a coloured frill or plates)
+  phuwiangosaurus:{skin:'#4e7a72', stripe:'#2a4a46', belly:'#e6d8b0'},
+  isanosaurus:{skin:'#b07a44', stripe:'#6a3a1e', belly:'#f0e0b8'},
+  triceratops:{skin:'#8c6a42', stripe:'#4a3220', belly:'#e2c898', frill:'#d8642a'},
+  ankylosaurus:{skin:'#7e6a3a', stripe:'#4a381e', belly:'#d8c490', acc:'#c89a5a'},
+  greenstego:{skin:'#6a8a3a', stripe:'#3a5a22', belly:'#e8e0b0', plates:'#e0662a'},
+  sirindhorna:{skin:'#5a8e4a', stripe:'#2e5a2e', belly:'#ecebc4'}
+};
+function W4_RECOLOR_APPLY(){
+  for (const row of [...SPECIES, ...BOSSES]){ const o = W4_RECOLOR[row[0]]; if (o) row[5] = {...row[5], ...o}; }
+}
+
 function WORLD_DRAGON(){
   if (MAPS.some(m => m.w4)) return;
   W4_MAPS.forEach(([key, th, en, road, biome, hue, land, bgm, pic, raw, dth, den]) => {
@@ -167,4 +205,5 @@ function WORLD_DRAGON(){
     ROADS[road].push(id);                // on past the end of its road
     ROAD_LV_RAW[road].push(raw.slice()); // raw levels: the layout stretches them with LVMAP like the rest of the road
   });
+  W4_RECOLOR_APPLY();
 }
