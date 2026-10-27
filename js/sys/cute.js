@@ -21,16 +21,16 @@ const CUTE_THEME = b => (['primeval', 'amberfen'].includes(b) ? 'primeval' : ['d
   : ['glacier', 'frozenlake', 'icecave', 'frostcitadel', 'kailash'].includes(b) ? 'snow' : ['cemetery', 'cave', 'badan', 'demonthrone'].includes(b) ? 'dark'
   : ['tavatimsa', 'meru', 'anodat', 'himmapan', 'innerhim'].includes(b) ? 'heaven' : !b ? 'town' : 'lush');
 const CUTE_KINDS = {
-  primeval:[['tuft', 4], ['pebble', 3], ['clover', 2], ['bone', 1]],   // the Early Cretaceous had almost no flowers (data/world4.js)
-  lush:[['flower', 1], ['clover', 3], ['pebble', 3], ['mush', 1], ['tuft', 4], ['bud', 1]],   // (v154) far fewer cartoon flowers: the ground has its own detail now (world/ground2.js)
+  primeval:[['tuft', 4], ['pebble', 3], ['clover', 1]],   // the Early Cretaceous had almost no flowers (data/world4.js)
+  lush:[['flower', 1], ['clover', 2], ['pebble', 3], ['mush', 1], ['tuft', 4]],   // (v154) far fewer cartoon flowers: the ground has its own detail now (world/ground2.js)
   town:[['pot', 2], ['flower', 4], ['clover', 2], ['bud', 3]],
-  dry:[['tuft', 5], ['pebble', 4], ['cactus', 2], ['bone', 1]],
+  dry:[['tuft', 5], ['pebble', 4], ['cactus', 1]],
   fire:[['ember', 4], ['cinder', 5]],   
-  snow:[['snowdrop', 4], ['crystal', 3], ['pebble', 2]],
+  snow:[['snowdrop', 3], ['pebble', 3]],
   dark:[['glowmush', 5], ['pebble', 3], ['wisp', 1]],
-  heaven:[['flower', 4], ['bud', 3], ['glint', 3], ['crystal', 1]]
+  heaven:[['flower', 2], ['tuft', 3], ['pebble', 2], ['glint', 1]]
 };
-const PETALS = {lush:['#ff8fb4', '#ffd84a', '#ffffff', '#b98cff', '#ff9a5a', '#7fc8ff'], town:['#ff7aa8', '#ffd84a', '#ff9a5a', '#ffffff'], heaven:['#ffd0e8', '#e8d8ff', '#fff2b0', '#c8f0ff']};
+const PETALS = {lush:['#e8dfc8', '#e8c84a', '#c890b8', '#f0ece0'], town:['#ff7aa8', '#ffd84a', '#ff9a5a', '#ffffff'], heaven:['#f0e4c8', '#e8c8d8', '#f4ecd0']};
 function cuteRng(seed){ let h = seed >>> 0 || 1; return () => { h ^= h << 13; h ^= h >>> 17; h ^= h << 5; return (h >>> 0) / 4294967296; }; }
 function cuteBuild(){
   CUTE.map = MAP_ID; CUTE.decor = [];
@@ -55,7 +55,7 @@ function cuteBuild(){
    instead of ~200 vector shapes every frame; the ones that glow or twinkle are still drawn live */
 const CUTE_STATIC = new Set(['flower', 'bud', 'clover', 'pebble', 'mush', 'pot', 'tuft', 'cactus', 'bone', 'cinder', 'sulfur', 'snowdrop']), CUTE_SPR = new Map();
 function cuteSprite(d, sw, R){
-  const key = `${d.k}|${d.c}|${Math.round(d.s * 10)}|${sw}|${R}`; let c = CUTE_SPR.get(key); if (c) return c;
+  const key = `${d.k}|${d.c}|${d.k === 'tuft' ? MAP_ID : ''}|${Math.round(d.s * 10)}|${sw}|${R}`; let c = CUTE_SPR.get(key); if (c) return c;
   if (CUTE_SPR.size > 900) CUTE_SPR.clear();
   const s = Math.round(d.s * 10) / 10, hw = 8 * s + 3, top = 11 * s + 3, bot = 3, k = R / 4;   // R: device pixels per world unit, ×4
   c = document.createElement('canvas'); c.width = Math.ceil(hw * 2 * k); c.height = Math.ceil((top + bot) * k);
@@ -82,16 +82,16 @@ function cuteShape(g, d, sw, night, x, y){
         g.fillStyle = '#ffe36a'; g.beginPath(); g.arc(cx, cy, .9 * s, 0, 7); g.fill(); break; }
       case 'bud': { g.strokeStyle = '#4a9a3e'; g.lineWidth = .8; g.beginPath(); g.moveTo(x, y); g.lineTo(x + sw * .6, y - 3.5 * s); g.stroke();
         g.fillStyle = d.c; g.beginPath(); g.ellipse(x + sw * .6, y - 4.2 * s, 1.1 * s, 1.5 * s, 0, 0, 7); g.fill(); g.fillStyle = 'rgba(255,255,255,.6)'; g.fillRect(x + sw * .6 - .5, y - 5 * s, .7, .7); break; }
-      case 'clover': { g.fillStyle = '#4fa646'; for (let i = 0; i < 3; i++){ const a = i * 2.094 - 1.57 + sw * .05; g.beginPath(); g.arc(x + Math.cos(a) * 1.4, y - 1.5 + Math.sin(a) * 1, 1.25 * s, 0, 7); g.fill(); }
-        g.fillStyle = '#7fd06a'; g.fillRect(x - .4, y - 2.2, .8, .8); break; }
+      case 'clover': { g.fillStyle = '#3c6a30'; for (let i = 0; i < 3; i++){ const a = i * 2.094 - 1.57 + sw * .05; g.beginPath(); g.arc(x + Math.cos(a) * 1.4, y - 1.5 + Math.sin(a) * 1, 1.25 * s, 0, 7); g.fill(); }
+        g.fillStyle = '#5a8a42'; g.fillRect(x - .4, y - 2.2, .8, .8); break; }
       case 'pebble': { g.fillStyle = 'rgba(0,0,0,.14)'; g.beginPath(); g.ellipse(x + .4, y + .5, 2.2 * s, .9 * s, 0, 0, 7); g.fill();
         g.fillStyle = '#b9b0a2'; g.beginPath(); g.ellipse(x, y - .4, 2 * s, 1.3 * s, 0, 0, 7); g.fill(); g.fillStyle = '#e4ddd0'; g.beginPath(); g.ellipse(x - .5, y - .9, .8 * s, .45 * s, 0, 0, 7); g.fill(); break; }
-      case 'mush': { g.fillStyle = '#f4ead8'; g.fillRect(x - .7, y - 2.6 * s, 1.4, 2.6 * s); g.fillStyle = '#e8463c'; g.beginPath(); g.ellipse(x, y - 2.8 * s, 2.4 * s, 1.6 * s, 0, Math.PI, 0); g.fill();
+      case 'mush': { g.fillStyle = '#e8dcc4'; g.fillRect(x - .7, y - 2.6 * s, 1.4, 2.6 * s); g.fillStyle = '#9a6a3e'; g.beginPath(); g.ellipse(x, y - 2.8 * s, 2.4 * s, 1.6 * s, 0, Math.PI, 0); g.fill();
         g.fillStyle = '#fff'; g.fillRect(x - 1.2, y - 3.6 * s, .8, .8); g.fillRect(x + .6, y - 3.2 * s, .7, .7); break; }
       case 'pot': { g.fillStyle = 'rgba(0,0,0,.18)'; g.beginPath(); g.ellipse(x, y + .4, 3.2, 1.1, 0, 0, 7); g.fill();
         g.fillStyle = '#c4683a'; g.beginPath(); g.moveTo(x - 2.8, y - 3.6); g.lineTo(x + 2.8, y - 3.6); g.lineTo(x + 2, y); g.lineTo(x - 2, y); g.closePath(); g.fill(); g.fillStyle = '#e08a54'; g.fillRect(x - 3.1, y - 4.3, 6.2, 1.1);
         for (let i = -1; i <= 1; i++){ g.fillStyle = '#4fa646'; g.beginPath(); g.ellipse(x + i * 1.6, y - 5.2, 1.1, .6, i * .6, 0, 7); g.fill(); g.fillStyle = i ? d.c : '#ffd84a'; g.beginPath(); g.arc(x + i * 1.8 + sw * .2, y - 7 + Math.abs(i) * .6, 1.2, 0, 7); g.fill(); } break; }
-      case 'tuft': { g.strokeStyle = '#c8a860'; g.lineWidth = .8; for (let i = -2; i <= 2; i++){ g.beginPath(); g.moveTo(x + i * .8, y); g.quadraticCurveTo(x + i * 1.2, y - 2.5 * s, x + i * 1.8 + sw * .5, y - 4 * s * (1 - Math.abs(i) * .15)); g.stroke(); } break; }
+      case 'tuft': { g.strokeStyle = typeof MAP_ID !== 'undefined' && MAPS[MAP_ID] && /^(grass|forest|primeval|amberfen|bamboo|river|marsh|himmapan|anodat|meru|tavatimsa)$/.test(MAPS[MAP_ID].biome) ? '#4e7034' : '#a8905a'; g.lineWidth = .8; for (let i = -2; i <= 2; i++){ g.beginPath(); g.moveTo(x + i * .8, y); g.quadraticCurveTo(x + i * 1.2, y - 2.5 * s, x + i * 1.8 + sw * .5, y - 4 * s * (1 - Math.abs(i) * .15)); g.stroke(); } break; }
       case 'cactus': { g.fillStyle = '#5a9a4a'; g.beginPath(); g.ellipse(x, y - 3.5 * s, 1.8 * s, 3.6 * s, 0, 0, 7); g.fill(); g.beginPath(); g.ellipse(x - 2.4 * s, y - 3.6 * s, .9 * s, 1.6 * s, 0, 0, 7); g.fill();
         g.fillStyle = '#ff8fb4'; g.beginPath(); g.arc(x, y - 7 * s, 1 * s, 0, 7); g.fill(); g.fillStyle = 'rgba(255,255,255,.35)'; g.fillRect(x - .9, y - 5.5 * s, .6, 3 * s); break; }
       case 'bone': { g.fillStyle = '#efe6d2'; g.fillRect(x - 2.4, y - 1, 4.8, 1); for (const e of [-2.4, 2.4]){ g.beginPath(); g.arc(x + e, y - 1.3, .75, 0, 7); g.arc(x + e, y - .2, .75, 0, 7); g.fill(); } break; }

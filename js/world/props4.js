@@ -323,7 +323,7 @@ PROP_TYPES.dragonskull = (seed, v = 0) => makeProp({w:150, h:96, ax:75, ay:78, s
    · the natural props get three times as many shapes (each its own seed; the palette the variant picks is kept), and
    · any prop may be drawn mirrored, which doubles that again — a skull faces left or right, a palm leans either way.
    Only pictures change; collisions and where props stand are as before. */
-const P4_NATURAL = new Set(['tree', 'palm', 'bush', 'rock', 'deadtree', 'pine', 'reed', 'bamboo', 'banana', 'treefern', 'araucaria', 'cycad', 'horsetail', 'groundfern', 'fossil', 'amber', 'thorntree', 'obelisk']);
+const P4_NATURAL = new Set(['tree', 'palm', 'bush', 'rock', 'deadtree', 'pine', 'reed', 'bamboo', 'banana', 'treefern', 'araucaria', 'cycad', 'horsetail', 'groundfern', 'fossil', 'amber', 'thorntree', 'obelisk', 'crystal', 'himtree']);
 const P4_FLIP = new Set([...P4_NATURAL, 'dragonskull', 'ribcage', 'cauldron', 'stalag', 'crystal', 'coral', 'himtree']);   // only things with no left or right of their own (never shops, signs or buildings)
 { const _pi = propImg;
   propImg = function(type, variant = 0){
@@ -335,6 +335,7 @@ const P4_FLIP = new Set([...P4_NATURAL, 'dragonskull', 'ribcage', 'cauldron', 's
   const _ap = addProp;
   addProp = function(type, x, y, variant = 0){
     let v = variant; if (P4_NATURAL.has(type)) v += 6 * Math.floor(R() * 3);
+    if (type === 'crystal' && /^(cave|icecave|badan|demonthrone)$/.test((MAPS[MAP_ID] || {}).biome || '')) v += 500;
     if (type === 'rock'){ const mp = MAPS[MAP_ID] || {}, b = mp.biome || '', land = mp.land || 'fertile';
       v += 100 * (/lava|crater|ash|dragonvale|naraka/.test(b) ? 1 : /desert|dryplain|canyon|dragonroost|khmer/.test(b) ? 2 : land === 'frozen' ? 3 : land === 'dark' && !/primeval/.test(b) ? 4 : 0); }
     if (P4_FLIP.has(type) && R() < .5) v += 1000;
@@ -374,3 +375,32 @@ PROP_TYPES.himtree = (seed, v = 0) => makeProp({w:170, h:170, ax:85, ay:164, see
       g.fillStyle = T.bloom[Math.floor(rng() * 3)]; ov(g, x, y, 1.6, 1.3); g.fill(); }
     if (T.hang) for (let k = 0; k < 2; k++){ const x = c.x + (rng() - .5) * c.r, y = c.y + c.r * .5; for (let j = 0; j < 6; j++){ g.fillStyle = T.bloom[j % 3]; ov(g, x + Math.sin(j) * .6, y + j * 2.4, 1.5, 1.2); g.fill(); } } }   // hanging chains
 }});
+
+/* ---------- mineral outcrops instead of candy crystals (v157) ----------
+   The glowing sweet-coloured crystal clusters stood on almost every map. Now a crystal is what you would find in
+   rock: a weathered boulder split open, with a cluster of points growing out of it — clear smoky quartz, amethyst,
+   citrine or aquamarine in their real, muted colours, each point lit on one face, dark on the other, with a pale edge
+   and a little internal fracture. Only in caves and the underworld do they keep a faint glow (variants 500+). */
+P4.gem = [['#3a3a40', '#6e6c70', '#a8a6a8', '#e6e4e0'], ['#3a2a48', '#5e4878', '#8a74a6', '#cfc0e0'], ['#5a3a12', '#9a6a26', '#c8964a', '#ecd29a'], ['#1e4a4e', '#3e7a7c', '#72a8a6', '#c4e0dc']];
+PROP_TYPES.crystal = (seed, v = 0) => { const glow = v % 1000 >= 500;   // variants 500+ glow faintly (the cave biomes ask for them)
+  return makeProp({w:64, h:66, ax:32, ay:58, seed, shadow:[18, 5], collide:9, glow:glow ? [0, -18, 26] : null, paint(g, rng){
+    const G = P4.gem[(v % 1000) % 4], RP = P4.rock;
+    // the host rock, split open
+    const rp = []; for (let i = 0; i < 9; i++){ const a = Math.PI + i / 8 * Math.PI, r = (15 + rng() * 5) * (i === 4 ? .6 : 1); rp.push([Math.cos(a) * r * 1.2, Math.min(0, Math.sin(a) * r * .8)]); }
+    g.fillStyle = RP[1]; g.beginPath(); rp.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.lineTo(18, 2); g.lineTo(-18, 2); g.closePath(); g.fill();
+    for (let i = 0; i < 8; i++){ const [ax, ay] = rp[i], [bx, by] = rp[i + 1], l = -((ax + bx) / 36) * .7 - ((ay + by) / 26) * .9; g.fillStyle = p4tone(RP, l + (rng() - .5) * .2); g.beginPath(); g.moveTo(0, -6); g.lineTo(ax, ay); g.lineTo(bx, by); g.closePath(); g.fill(); }
+    g.fillStyle = RP[0]; ov(g, 0, -7, 8, 4); g.fill();   // the cavity
+    // the points: hexagonal prisms with a pyramid tip, tallest in the middle, leaning outward
+    const n = 4 + Math.floor(rng() * 3), pts = [];
+    for (let i = 0; i < n; i++){ const t = n === 1 ? 0 : i / (n - 1) - .5, h = (20 + rng() * 14) * (1 - Math.abs(t) * .9), w = 3 + rng() * 1.8; pts.push({x:t * 14 + (rng() - .5) * 3, a:t * .9 + (rng() - .5) * .2, h, w}); }
+    pts.sort((a, b) => b.h - a.h);
+    for (const p of pts.reverse()){ const ca = Math.cos(p.a - Math.PI / 2), sa = Math.sin(p.a - Math.PI / 2), ux = ca, uy = sa, nx = -uy, ny = ux, bx = p.x, by = -6;
+      const P = (u, s) => [bx + ux * u + nx * s, by + uy * u + ny * s], top = p.h * .8;
+      const face = (pts2, col) => { g.fillStyle = col; g.beginPath(); pts2.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); g.fill(); };
+      face([P(0, -p.w), P(top, -p.w), P(p.h, 0), P(top, 0), P(0, 0)], G[2]);   // lit face
+      face([P(0, 0), P(top, 0), P(p.h, 0), P(top, p.w), P(0, p.w)], G[1]);      // shaded face
+      g.strokeStyle = G[3]; g.lineWidth = .7; g.beginPath(); g.moveTo(...P(1, -p.w * .5)); g.lineTo(...P(top * .95, -p.w * .5)); g.stroke();   // the bright edge
+      g.strokeStyle = G[0]; g.lineWidth = .5; g.beginPath(); g.moveTo(...P(top * .4, -p.w * .7)); g.lineTo(...P(top * .55, -p.w * .2)); g.stroke();   // an internal fracture
+      g.strokeStyle = 'rgba(20,16,12,.5)'; g.lineWidth = .5; g.beginPath(); g.moveTo(...P(top, -p.w)); g.lineTo(...P(top, p.w)); g.stroke(); }
+    for (let i = 0; i < 5; i++){ g.fillStyle = RP[1 + (i % 3)]; ov(g, (rng() - .5) * 40, 1 + rng() * 2, 1.6, 1); g.fill(); }   // rubble
+  }}); };
