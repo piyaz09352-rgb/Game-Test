@@ -63,7 +63,10 @@ const NOFL = (() => {
       queueMicrotask(() => flush(this));
     }});
   }
-  const hookAll = () => document.querySelectorAll('.win .pane, [id^="pane-"]').forEach(hook);
+  // (v160) only the windows an NPC opens, and the Auto settings: the bag and the other big windows redraw fast on their
+  // own, and comparing thousands of icon nodes there cost more than it saved
+  const NOFL_PANES = ['forge', 'craft', 'market', 'guild', 'siege', 'auto'];
+  const hookAll = () => NOFL_PANES.forEach(id => hook(document.getElementById('pane-' + id)));
   return {hook, hookAll, flush};
 })();
 NOFL.hookAll();

@@ -734,8 +734,10 @@ function drawHuman(cx, cfg, P){
     G();
     const sh = lean([hipC[0] + side * 6.0 * (cfg.slim || 1), 19.4 + B, 0]), l1 = 4.1, l2 = 3.8;
     let d = [target[0] - sh[0], target[1] - sh[1], target[2] - sh[2]], D = Math.hypot(...d) || 1; const u = [d[0] / D, d[1] / D, d[2] / D];
-    D = Math.min(D, l1 + l2 - .05); const hand = add(sh, mul(u, D));
-    const a = (l1 * l1 - l2 * l2 + D * D) / (2 * D), h = Math.sqrt(Math.max(0, l1 * l1 - a * a));
+    // short chibi arms may stretch up to a quarter to reach the hilt; past that the hand stops short
+    const st = Math.min(1.25, Math.max(1, D / (l1 + l2 - .05))), L1 = l1 * st, L2 = l2 * st;
+    D = Math.min(D, L1 + L2 - .05); const hand = add(sh, mul(u, D));
+    const a = (L1 * L1 - L2 * L2 + D * D) / (2 * D), h = Math.sqrt(Math.max(0, L1 * L1 - a * a));
     const hint = [side * .8, -1, -.2], k = hint[0] * u[0] + hint[1] * u[1] + hint[2] * u[2];
     let pp = [hint[0] - u[0] * k, hint[1] - u[1] * k, hint[2] - u[2] * k]; const pl = Math.hypot(...pp) || 1; pp = [pp[0] / pl, pp[1] / pl, pp[2] / pl];
     const el = add(add(sh, mul(u, a)), mul(pp, h));
@@ -744,12 +746,17 @@ function drawHuman(cx, cfg, P){
     G(); ell(cx, hand, cfg.handWrap ? 2.4 : 2.2, cfg.handWrap ? 2.4 : 2.2, M[cfg.handWrap || cfg.skinM || 'skin'], {});
     return {hand, dir:nrm([hand[0] - el[0], hand[1] - el[1], hand[2] - el[2]])};
   };
+  const arm0 = (side, pitch, out, elb) => { const sh = lean([hipC[0] + side * 6.0 * (cfg.slim || 1), 19.4 + B, 0]), el = add(sh, upper(rotX(rotZ([0, -4.1, 0], side * out), -pitch)));
+    return add(el, upper(rotX(rotZ([0, -3.8, 0], side * out * .6), -(pitch + elb)))); };
   const grip2 = !P.noWeapon && !ride && !cfg.sheathed && (cfg.twoHand || cfg.katana) && (cfg.weapon === 'sword' || cfg.weapon === 'staff' || cfg.weapon === 'dagger') && !(cfg.weapon === 'staff' && P.ring >= 0);
   let AR, AL;
   if (grip2){
     const wa = P.wLeft ? P.armL + P.elbL * .7 : P.armR + P.elbR * .7, wd = nrm(upper(rotX([0, -1, 0], -(wa + P.wpn - .1))));
-    if (P.wLeft){ AL = arm(1, P.armL, P.outL, P.elbL); AR = armTo(-1, add(AL.hand, mul(wd, -3.3))); }
-    else { AR = arm(-1, P.armR, P.outR, P.elbR); AL = armTo(1, add(AR.hand, mul(wd, -3.3))); }
+    // the weapon hand keeps its pose but is drawn in toward the front of the body, so the other hand can close on the
+    // hilt just below it: both hands on the grip, like a real two-handed hold
+    const side = P.wLeft ? 1 : -1, posed = arm0(side, P.wLeft ? P.armL : P.armR, P.wLeft ? P.outL : P.outR, P.wLeft ? P.elbL : P.elbR);
+    const front = lean([hipC[0] + side * 1.6, 15.2 + B, 4.2]), main = lerp3(posed, front, .5), off = add(main, mul(wd, -3.1));
+    if (P.wLeft){ AL = armTo(1, main); AR = armTo(-1, off); } else { AR = armTo(-1, main); AL = armTo(1, off); }
   } else { AR = arm(-1, P.armR, P.outR, P.elbR); AL = arm(1, P.armL, P.outL, P.elbL); }
   const handR = AR.hand, handL = AL.hand;
   if (ride && mouth){ G(); line(cx, handR, mouth, M.gold, {t:1}); line(cx, handL, mouth, M.gold, {t:1}); }
