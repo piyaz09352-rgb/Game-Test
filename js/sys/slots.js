@@ -27,7 +27,7 @@ const eqEmptyHint = sl => sl === 'shield' && !shieldOk() ? L('อาวุธน
 function wearSlot(it){
   if (!it) return null;
   if (it.slot === 'acc') return !S.gear.acc ? 'acc' : !S.gear.acc2 ? 'acc2' : 'acc';
-  if (it.slot === 'shield' && !shieldOk()){ toast(L('ต้องถืออาวุธมือเดียว (ดาบ มีดสั้น คทา) จึงถือโล่ได้ (อาวุธสองมือ ธนู สนับมือ มีดคู่ ใช้ทั้งสองมือ)', 'A shield needs a one-handed weapon: blade, dagger or rod (two-handed weapons, bows, knuckles and twin daggers use both hands)')); return null; }
+  if (it.slot === 'shield' && !shieldOk()){ toast(L('ต้องถืออาวุธมือเดียว (ดาบ มีดสั้น คทา) จึงถือโล่ได้ (อาวุธสองมือ ธนู สนับมือ คาตานะ ใช้ทั้งสองมือ)', 'A shield needs a one-handed weapon: blade, dagger or rod (two-handed weapons, bows, knuckles and katanas use both hands)')); return null; }
   if (it.slot === 'weapon' && it.st && handsOf(it.st) === '2h' && S.gear.shield){ addItem(S.gear.shield, 1); toast(L(`ถอด${nm(ITEMS[S.gear.shield])}เก็บเข้ากระเป๋า · อาวุธสองมือ`, `${nm(ITEMS[S.gear.shield])} put away · two-handed weapon`)); S.gear.shield = null; }
   return it.slot;
 }

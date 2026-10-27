@@ -728,7 +728,29 @@ function drawHuman(cx, cfg, P){
         cap(cx, b0, m0, .55, .32, M[cfg.fistClaw], {}); G(); cap(cx, m0, t0, .32, .12, M[cfg.fistClaw], {}); } }
     return {hand, dir:nrm(fa)};
   };
-  const AR = arm(-1, P.armR, P.outR, P.elbR), AL = arm(1, P.armL, P.outL, P.elbL);
+  // (v159) a two-handed weapon (greatsword, katana, longstaff) is gripped with both hands: the weapon hand keeps its pose
+  // and the other hand reaches the hilt just below it (two-bone reach: shoulder → elbow → hand, elbow bent down and out)
+  const armTo = (side, target) => {
+    G();
+    const sh = lean([hipC[0] + side * 6.0 * (cfg.slim || 1), 19.4 + B, 0]), l1 = 4.1, l2 = 3.8;
+    let d = [target[0] - sh[0], target[1] - sh[1], target[2] - sh[2]], D = Math.hypot(...d) || 1; const u = [d[0] / D, d[1] / D, d[2] / D];
+    D = Math.min(D, l1 + l2 - .05); const hand = add(sh, mul(u, D));
+    const a = (l1 * l1 - l2 * l2 + D * D) / (2 * D), h = Math.sqrt(Math.max(0, l1 * l1 - a * a));
+    const hint = [side * .8, -1, -.2], k = hint[0] * u[0] + hint[1] * u[1] + hint[2] * u[2];
+    let pp = [hint[0] - u[0] * k, hint[1] - u[1] * k, hint[2] - u[2] * k]; const pl = Math.hypot(...pp) || 1; pp = [pp[0] / pl, pp[1] / pl, pp[2] / pl];
+    const el = add(add(sh, mul(u, a)), mul(pp, h));
+    cap(cx, sh, el, 2.3, 2.1, M[cfg.sleeve || cfg.top], cfg.armband ? {tex:(n, lo, q, t) => (t > .62 && t < .82 ? {m:M[cfg.armband]} : undefined)} : {});
+    cap(cx, el, hand, 2.1, 1.9, M[cfg.forearm || cfg.skinM || 'skin'], cfg.wrap ? {tex:(n, lo, q, t) => (t > .42 && t < .9 ? {m:M[cfg.wrap]} : undefined)} : {});
+    G(); ell(cx, hand, cfg.handWrap ? 2.4 : 2.2, cfg.handWrap ? 2.4 : 2.2, M[cfg.handWrap || cfg.skinM || 'skin'], {});
+    return {hand, dir:nrm([hand[0] - el[0], hand[1] - el[1], hand[2] - el[2]])};
+  };
+  const grip2 = !P.noWeapon && !ride && !P.sheathed && (cfg.twoHand || cfg.katana) && (cfg.weapon === 'sword' || cfg.weapon === 'staff' || cfg.weapon === 'dagger') && !(cfg.weapon === 'staff' && P.ring >= 0);
+  let AR, AL;
+  if (grip2){
+    const wa = P.wLeft ? P.armL + P.elbL * .7 : P.armR + P.elbR * .7, wd = nrm(upper(rotX([0, -1, 0], -(wa + P.wpn - .1))));
+    if (P.wLeft){ AL = arm(1, P.armL, P.outL, P.elbL); AR = armTo(-1, add(AL.hand, mul(wd, -3.3))); }
+    else { AR = arm(-1, P.armR, P.outR, P.elbR); AL = armTo(1, add(AR.hand, mul(wd, -3.3))); }
+  } else { AR = arm(-1, P.armR, P.outR, P.elbR); AL = arm(1, P.armL, P.outL, P.elbL); }
   const handR = AR.hand, handL = AL.hand;
   if (ride && mouth){ G(); line(cx, handR, mouth, M.gold, {t:1}); line(cx, handL, mouth, M.gold, {t:1}); }
   // head
@@ -1191,19 +1213,51 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   const wt = cfg.wTier ?? -1, BL = ['steel', 'steel', 'ember', 'obsid', 'jade', 'sun'], SH = ['wood', 'wood', 'lacquer', 'charcoal', 'teal', 'gold'], ORB = ['orb', 'rune', 'ember', 'auraViolet', 'jade', 'sun'];
   const RFM = ['', 'rune', 'orb', 'auraGold', 'auraWhite'], rft = cfg.rfTier || 0;   // refine glow: blue → violet → gold → radiant
   const blade = M[rft ? RFM[rft] : BL[wt] || 'steel'], guard = M[wt === 0 ? 'leather' : wt >= 3 ? 'gold' : 'gold'];
-  const two = !!cfg.twoHand, len = ((w === 'sword' ? 17 : w === 'staff' ? 20 : 9.5) + Math.max(0, wt) * (w === 'sword' ? .7 : w === 'staff' ? .5 : .3)) * (two ? (w === 'sword' ? 1.32 : 1.18) : 1) * WPN_BIG * (w === 'dagger' ? 1.15 : 1);   // daggers a touch more: they were the hardest to see
+  // (v159) one-handed blades and rods are visibly smaller than their two-handed kin: a 1H sword ×0.88, a greatsword ×1.45;
+  // a rod ×0.72, a longstaff ×1.3; the katana is its own long single blade
+  const kat = w === 'dagger' && !!cfg.katana, two = !!cfg.twoHand || kat;
+  const len = kat ? (19.5 + Math.max(0, wt) * .5) * WPN_BIG : ((w === 'sword' ? 17 : w === 'staff' ? 20 : 9.5) + Math.max(0, wt) * (w === 'sword' ? .7 : w === 'staff' ? .5 : .3)) * (w === 'sword' ? (two ? 1.45 : .88) : w === 'staff' ? (two ? .86 : .5) : 1) * WPN_BIG * (w === 'dagger' ? 1.15 : 1);   // daggers a touch more: they were the hardest to see
   let dir = P.wdir || rotX(rotX([0, -1, 0], P.armR + P.wpn), P.lean);
   if (w === 'staff' && P.ring >= 0) dir = nrm([0, 1, .25]);
   const base = add(hR, mul(dir, w === 'staff' ? -6 : -.8)), tip = add(hR, mul(dir, len));
-  (cx.wsegs || (cx.wsegs = [])).push([proj(cx, add(base, mul(dir, w === 'staff' ? len * .45 : 1))), proj(cx, w === 'staff' ? add(tip, mul(dir, 1.4)) : tip)]);   // the blade (or the staff head) in this frame
+  (cx.wsegs || (cx.wsegs = [])).push(w === 'staff' ? [proj(cx, add(tip, mul(dir, -.4))), proj(cx, add(tip, mul(dir, 3.2)))]   // (v159) a staff glows at its head only, never along the shaft
+    : [proj(cx, add(base, mul(dir, kat ? 2 : 1))), proj(cx, tip)]);   // the blade in this frame
   G();
   if (w === 'sword'){
-    const gd = nrm([1, 0, 0]);
-    cap(cx, add(base, mul(dir, two ? -5.5 : -2.5)), base, .9, .9, M.leather, {});   // a two-handed hilt is long enough for both hands
-    G(); cap(cx, add(base, mul(gd, -3 - Math.max(0, wt - 1) * .3 - (two ? 1.6 : 0))), add(base, mul(gd, 3 + Math.max(0, wt - 1) * .3 + (two ? 1.6 : 0))), .95, .95, guard, {});
-    G(); const b0 = add(base, mul(dir, 1));
-    cap(cx, b0, tip, (1.15 + Math.max(0, wt - 2) * .08) * (two ? 1.45 : 1) * 1.15, two ? .9 : .7, blade, {tex:(n, lo, q, t) => (q < .25 && t < .9 ? {t:0} : wt === 3 && Math.abs(t - .5) < .25 && q < .5 ? {m:M.ember, t:1} : undefined)});
-    if (wt >= 2){ G(); ell(cx, add(base, mul(dir, .6)), 1.1, 1.1, wt === 3 ? M.gem : blade); }
+    // (v159) a real sword, not a stick: a FLAT blade (laid as thin strips across its width) with bevelled bright edges, a
+    // darker fuller down the middle and a point; a short ricasso, a crossguard with quillons bent toward the blade, a
+    // wrapped grip and a pommel. Arming sword: blade about 6.5 widths long, guard 3 blade-widths, grip one hand.
+    // Greatsword: wider and longer, a long ricasso, a two-hand grip and a heavier guard.
+    const wvR = [dir[1] * 0 - dir[2] * 0, dir[2] * 1 - dir[0] * 0, dir[0] * 0 - dir[1] * 1];   // dir × [0,0,1]
+    const wv = Math.hypot(...wvR) < .25 ? [1, 0, 0] : nrm(wvR), tv = nrm([dir[1] * wv[2] - dir[2] * wv[1], dir[2] * wv[0] - dir[0] * wv[2], dir[0] * wv[1] - dir[1] * wv[0]]);
+    const hw0 = (two ? 2.25 : 1.6) + Math.max(0, wt - 2) * .07, ric = two ? 2.8 : 1.2, gw = two ? 6 : 4.6, gl = two ? 6.4 : 3.8;
+    const b0 = add(base, mul(dir, ric)), BL = len - ric;
+    const half = t => (t < .82 ? hw0 * (1 - t * .16) : hw0 * .87 * Math.max(0, (1 - t) / .18));   // a long parallel blade, then the point
+    // grip, pommel
+    cap(cx, add(base, mul(dir, -gl)), add(base, mul(dir, -.3)), two ? 1.0 : .9, two ? .95 : .85, M.leather, {tex:(n, lo, q, t) => (Math.abs(Math.sin(t * (two ? 30 : 18) + n[0] * 2)) < .32 ? {m:M[wt >= 3 ? 'gold' : 'charcoal'], t:1} : undefined)});
+    G(); ell(cx, add(base, mul(dir, -gl - .8)), two ? 1.6 : 1.25, two ? 1.6 : 1.25, guard, {});
+    // crossguard with quillons curving toward the blade
+    G(); for (const sd of [-1, 1]){ const g0 = add(base, mul(wv, sd * .4)), g1 = add(base, mul(wv, sd * gw * .7)), g2 = add(add(base, mul(wv, sd * gw)), mul(dir, two ? 1.4 : 1));
+      cap(cx, g0, g1, two ? 1.0 : .82, two ? .85 : .7, guard, {}); cap(cx, g1, g2, two ? .85 : .7, .55, guard, {}); ell(cx, g2, two ? .95 : .75, two ? .95 : .75, guard); }
+    G(); ell(cx, base, two ? 1.4 : 1.1, two ? 1.4 : 1.1, wt >= 2 ? M.gem : guard);
+    // ricasso (unsharpened, a little narrower), then the blade in strips across its width
+    G(); cap(cx, add(base, mul(dir, .3)), b0, hw0 * .62, hw0 * .72, blade, {rz:.5, tex:() => ({t:2})});
+    const strips = two ? 9 : 7, rows = 9;
+    for (let i = 0; i < strips; i++){ const u = -1 + 2 * i / (strips - 1), au = Math.abs(u);
+      const tone = au > .78 ? 0 : au < .2 ? 2 : 1, mat = wt === 3 && au < .2 ? M.ember : blade, th = .42 * (1 - au * .55);
+      let p0 = add(b0, mul(wv, u * half(0)));
+      for (let r = 1; r <= rows; r++){ const t = r / rows, p1 = add(add(b0, mul(dir, BL * t)), mul(wv, u * half(t)));
+        cap(cx, p0, p1, th, th, mat, {tex:() => ({t:tone})}); p0 = p1; } }
+    void tv;
+  } else if (kat){  } else if (kat){
+    // the katana: a long cord-wrapped hilt for two hands, a round guard, a slim blade with a gentle curve and a pale edge
+    const up = nrm(Math.abs(dir[1]) > .95 ? [0, 0, 1] : [-dir[0] * dir[1], 1 - dir[1] * dir[1], -dir[2] * dir[1]]);
+    cap(cx, add(base, mul(dir, -6.2)), add(base, mul(dir, -.2)), 1.0, .95, M.charcoal, {tex:(n, lo, q, t) => (Math.abs(Math.sin(t * 22)) < .35 ? {m:M[wt >= 3 ? 'gold' : 'white'], t:1} : undefined)});
+    G(); ell(cx, add(base, mul(dir, -6.5)), 1.05, 1.05, M[wt >= 3 ? 'gold' : 'steel']);
+    G(); ell(cx, add(base, mul(dir, .1)), 2.3, 2.3, M[wt >= 3 ? 'gold' : 'charcoal'], {rz:.45});
+    G(); const k0 = add(base, mul(dir, .7)), k1 = add(add(base, mul(dir, len * .55)), mul(up, .55)), k2 = add(add(base, mul(dir, len)), mul(up, 1.5));
+    const edge = (n, lo, q, t) => (q < .3 ? {m:M.white, t:0} : undefined);
+    cap(cx, k0, k1, .82, .72, blade, {tex:edge}); cap(cx, k1, k2, .72, .2, blade, {tex:edge});
   } else if (w === 'dagger' && cfg.claw){
     // twin claws (กรงเล็บคู่): three long blades fanned out from a knuckle guard on the back of the fist
     const sd = nrm(Math.abs(dir[1]) > .9 ? [1, 0, 0] : [-dir[1], dir[0], 0]);
@@ -1213,7 +1267,7 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
     cap(cx, add(base, mul(dir, -1.5)), base, .9, .9, M.wood, {});
     G(); cap(cx, add(base, mul(dir, .8)), tip, 1.3, .6, blade, {});
   } else if (w === 'staff'){
-    cap(cx, base, tip, .95, .95, M[SH[wt] || 'wood'], {tex:(n, lo, q, t) => (t > .78 && t < .84 ? {m:rft ? M[RFM[rft]] : M.gold} : undefined)});
+    cap(cx, base, tip, two ? 1.1 : .85, two ? 1.1 : .85, M[SH[wt] || 'wood'], {tex:(n, lo, q, t) => (t > .78 && t < .84 ? {m:M.gold} : undefined)});   // (v159) the shaft never takes the refine glow
     G(); for (let a = 0; a < 6.28; a += .9) line(cx, tip, add(tip, rotX(rotY([0, 3.2, 1.6], a), 0)), M.gold, {t:1});
     G(); ell(cx, add(tip, mul(dir, 1.4)), (two ? .8 : 0) + 2.6 + Math.max(0, wt - 2) * .25 + (P.glow >= 0 && P.ring >= 0 ? (P.glow % 2) * .6 : 0), 2.6 + Math.max(0, wt - 2) * .25, M[rft >= 3 ? RFM[rft] : ORB[wt] || 'orb'], {});
   }
