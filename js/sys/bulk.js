@@ -92,7 +92,8 @@ document.addEventListener('change', e => { const t = e.target; if (!t || !t.data
   .bkset label{display:flex;align-items:center;gap:4px;color:#dce9fb}.bkset select{border-radius:8px;padding:1px 4px}.bkbtns{display:flex;gap:6px;width:100%}
   .bkrow input[type=checkbox]{width:18px;height:18px;flex:none}.bkrow.on{background:rgba(255,211,74,.14)}.bkrow.locked{opacity:.65}.bklk{font-size:14px;width:28px;height:28px}
   .bklist{max-height:min(46vh,380px);overflow:auto}.bkgo{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 4px;border-top:1px solid rgba(255,255,255,.25)}
-  .bkgo .plus{color:#7dffb0}.bklock{margin-left:6px}.bklock.on{background:#ffd34a;color:#3a2000}`;
+  .bkgo .plus{color:#7dffb0}.bklock{margin-left:6px}.bklock.on{background:#ffd34a;color:#3a2000}
+  .bkautog{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.bkautog .bkchip{border-color:#d4b47a;color:#5a3d12;background:#fff}`;
   document.head.appendChild(st); }
 
 /* ---------- locks hold everywhere: no trading, no market listing ---------- */
@@ -107,8 +108,17 @@ EV.on('pickup', id => {
   if (mode === 'sell'){ S.bia += v; addText(P.x, P.y - 70, `+${fmtN(v)} ${CUR()}`, '#ffe08a', 12); } else { addItem('dust', v); addText(P.x, P.y - 70, `+${v} ${L('ผง', 'dust')}`, '#cfe0ff', 12); }
   dirty = true;
 });
-{ const _h = bkHTML;
-  bkHTML = function(mode){ const s = _h.apply(this, arguments), a = bkAuto();
-    const auto = `<label class="bkauto">${L('อัตโนมัติเมื่อเก็บของ', 'When picking up')} <select data-bkauto="1"><option value="off" ${a === 'off' ? 'selected' : ''}>${L('ปิด', 'Off')}</option><option value="sell" ${a === 'sell' ? 'selected' : ''}>${L('ขายตามเกรดที่ตั้ง', 'Sell by grade')}</option><option value="salv" ${a === 'salv' ? 'selected' : ''}>${L('ย่อยตามเกรดที่ตั้ง', 'Salvage by grade')}</option></select></label>`;
-    return s.replace('<div class="bkbtns">', auto + '<div class="bkbtns">'); }; }
-document.addEventListener('change', e => { const t = e.target; if (t && t.dataset && t.dataset.bkauto){ S.bulk = S.bulk || {}; S.bulk.auto = t.value; dirty = true; toast(t.value === 'off' ? L('ปิดขาย/ย่อยอัตโนมัติ', 'Auto sell/salvage off') : t.value === 'sell' ? L('เก็บของแล้วขายตามเกรดที่ตั้งทันที (ชิ้นที่ล็อคไม่โดน)', 'Picked-up gear is sold by your grade settings (locked pieces are safe)') : L('เก็บของแล้วย่อยตามเกรดที่ตั้งทันที (ชิ้นที่ล็อคไม่โดน)', 'Picked-up gear is salvaged by your grade settings (locked pieces are safe)')); } });
+/* (v159) the pick-up switch lives in the Auto settings window (ตั้งค่า Auto), not in the smith's sell-back list:
+   it is part of how Auto plays, and the smith's window is only for selling by hand. Its grade chips are the same
+   settings the sell-back / salvage lists use. */
+{ const _ra = renderAuto;
+  renderAuto = function(){ const r = _ra.apply(this, arguments); const pane = el('pane-auto'); if (!pane || !S) return r;
+    const a = bkAuto(), st = a === 'off' ? null : bkSet(a);
+    const chips = st ? `<div class="bkchips">${[0, 1, 2, 3].map(i => `<button class="bkchip r${i}${st.rar[i] ? ' on' : ''}" data-bkrar="${a}|${i}">${L(RAR[i].th, RAR[i].en)}</button>`).join('')}</div>` : '';
+    pane.insertAdjacentHTML('beforeend', `<div class="sec">${L('เก็บของ', 'Picking up')}</div>
+      <label class="set"><span><b>${L('ขาย/ย่อยอุปกรณ์อัตโนมัติเมื่อเก็บ', 'Sell / salvage gear on pick-up')}</b><small>${L('ชิ้นที่ล็อคไว้ การ์ด และชิ้นที่ดีกว่าที่สวมจะไม่โดน', 'Locked pieces, carded pieces and upgrades are kept')}</small></span>
+        <select data-bkauto="1"><option value="off" ${a === 'off' ? 'selected' : ''}>${L('ปิด', 'Off')}</option><option value="sell" ${a === 'sell' ? 'selected' : ''}>${L('ขายตามเกรด', 'Sell by grade')}</option><option value="salv" ${a === 'salv' ? 'selected' : ''}>${L('ย่อยตามเกรด', 'Salvage by grade')}</option></select></label>
+      ${st ? `<div class="set bkautog"><span><b>${L('เกรดที่จะ' + (a === 'sell' ? 'ขาย' : 'ย่อย'), `Grades to ${a === 'sell' ? 'sell' : 'salvage'}`)}</b></span>${chips}</div>` : ''}`);
+    return r; }; }
+{ const _br = bkRefresh; bkRefresh = function(){ _br.apply(this, arguments); if (typeof reWin === 'function') reWin('auto'); }; }
+document.addEventListener('change', e => { const t = e.target; if (t && t.dataset && t.dataset.bkauto){ S.bulk = S.bulk || {}; S.bulk.auto = t.value; dirty = true; if (typeof reWin === 'function') reWin('auto'); toast(t.value === 'off' ? L('ปิดขาย/ย่อยอัตโนมัติ', 'Auto sell/salvage off') : t.value === 'sell' ? L('เก็บของแล้วขายตามเกรดที่ตั้งทันที (ชิ้นที่ล็อคไม่โดน)', 'Picked-up gear is sold by your grade settings (locked pieces are safe)') : L('เก็บของแล้วย่อยตามเกรดที่ตั้งทันที (ชิ้นที่ล็อคไม่โดน)', 'Picked-up gear is salvaged by your grade settings (locked pieces are safe)')); } });

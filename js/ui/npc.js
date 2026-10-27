@@ -50,6 +50,7 @@ function openNpc(n){
         return `<div class="srow"><span class="ic">${itemIcon(k)}</span><div class="nm"><b>${nm(ITEMS[k])} <span class="ct">×${S.inv[k]}</span></b><small class="${r >= 1.1 ? 'up' : r <= .9 ? 'down' : ''}">${r >= 1 ? '▲' : '▼'} ${Math.round(r * 100)}% · ${L('ชิ้นละ', 'each')} ${pr.toLocaleString()} ${CUR()}</small></div>
         <button class="btn sm" data-sellid="${k}" data-n="1">×1</button><button class="btn sm" data-sellid="${k}" data-n="all">${L('ทั้งหมด', 'All')}</button></div>`; }).join('')
       : `<p class="hint">${L('ยังไม่มีของสะสมจะขาย', 'No loot to sell yet')}</p>`}</div>
+      <div class="sec">${L('ของใช้เดินทาง', 'Travel supplies')}</div><div class="shop"><div class="srow"><span class="ic">${itemIcon('talisman')}</span><div class="nm"><b>${nm(ITEMS.talisman)}</b><small>${itemDesc('talisman')} · ${L('มี', 'have')} ${(S.inv.talisman || 0).toLocaleString()}</small></div><span class="pr">${ITEMS.talisman.buy.toLocaleString()}</span>${qtyBox('talisman', 'item')}</div></div>
       ${etc.length ? `<div class="srow total"><span class="ic">${IC.bag}</span><div class="nm"><b>${L('ขายทั้งหมด', 'Sell everything')}</b></div><span class="pr plus">+${total.toLocaleString()}</span><button class="btn gold sm" data-sellall="1">${L('ขาย', 'Sell')}</button></div>` : ''}`;
   } else if (n.id === 'armorer'){
     say = L('เกราะ หมวก กางเกง รองเท้า โล่ ต่างหู แว่น หน้ากาก ลูกธนู ของดีทั้งนั้น ใส่แล้วกด Q ดูในหน้าต่างอุปกรณ์ได้เลย', 'Armour, helmets, arrows, all good work. Wear them from the Equipment window (Q).');
@@ -75,12 +76,9 @@ function openNpc(n){
     const arrow = ([id]) => { const gr = GEAR[id], lvOk = S.lvl >= gr.lv;
       return `<div class="srow${lvOk ? '' : ' locked'}"><span class="ic">${itemIcon(id)}</span><div class="nm"><b>${nm(gr)}</b><small>${gearStatText(gr.st)} · <span class="${lvOk ? '' : 'bad'}">Lv ${gr.lv}</span> · ${L(`ห่อละ ${gr.pack || 1} ดอก`, `${gr.pack || 1} per pack`)} · ${L('มี', 'have')} ${(S.inv[id] || 0).toLocaleString()}</small></div>
         <span class="pr">${gr.buy.toLocaleString()}<small> /${L('ห่อ', 'pack')}</small></span>${qtyBox(id, 'pack')}</div>`; };
-    say = L('มาแล้วเหรอหลาน ยาหม้อใหม่เพิ่งต้มเสร็จ ยันต์ ลูกธนู ของใช้ทั่วไปป้ามีครบ จะเอากี่ชิ้นก็บอกมา', 'Back again, dear? A fresh pot of medicine just finished brewing. Talismans, arrows, everyday supplies: tell me how many you need.');
-    body = `<div class="sec">${L('ซื้อ', 'Buy')}</div><div class="shop">${row('redpot', '#ff7b6b')}${row('orangepot', '#ffa04a')}${row('whitepot', '#f0f0f0')}${row('elixirpot', '#ffd36a')}${row('divinepot', '#ff9ad8')}${row('bluepot', '#7fb4ff')}${row('bigbluepot', '#4a7aff')}${row('skypot', '#5aa8ff')}${ITEMS.greenpot ? row('greenpot', '#7fe08a') : ''}${row('talisman', '#e3b04b')}</div>
-      <div class="sec">${L('ลูกธนู', 'Arrows')}</div><div class="shop">${GEAR_LIST.filter(g2 => g2[1] === 'ammo').map(arrow).join('')}</div>
-      <p class="hint">${L('ขายของสะสมได้ที่เถ้าแก่ฮง ตลาดกลาง · อุปกรณ์และวัสดุตีบวกที่ช่างตีเหล็กเพชร', 'Sell loot to Thaokae Hong at the market · gear and refine materials at Blacksmith Phet')}</p>
-      <div class="sec">${L('ตีบวก', 'Refining')}</div>
-      <div class="srow"><span class="ic">${itemIcon('ore')}</span><div class="nm"><b>${L('ตีบวกย้ายไปที่ช่างตีเหล็กเพชรแล้ว', 'Refining is now done by Blacksmith Phet')}</b><small>${L('ตีบวกได้ทั้งอาวุธ เกราะ หมวก · อยู่ข้างเตาหลอม', 'Weapons, armour and headgear · by the forge')}</small></div><button class="btn gold sm" data-fgopen="refine">${L('เปิดโรงตีเหล็ก', 'Open the forge')}</button></div>`;
+    say = L('มาแล้วเหรอหลาน ยาหม้อใหม่เพิ่งต้มเสร็จ ร้านป้าขายแต่ยากับโพชั่นนะ จะเอากี่ขวดก็บอกมา', 'Back again, dear? A fresh pot of medicine just finished brewing. I sell only medicine and potions: tell me how many bottles you need.');
+    body = `<div class="sec">${L('ซื้อ', 'Buy')}</div><div class="shop">${row('redpot', '#ff7b6b')}${row('orangepot', '#ffa04a')}${row('whitepot', '#f0f0f0')}${row('elixirpot', '#ffd36a')}${row('divinepot', '#ff9ad8')}${row('bluepot', '#7fb4ff')}${row('bigbluepot', '#4a7aff')}${row('skypot', '#5aa8ff')}${ITEMS.greenpot ? row('greenpot', '#7fe08a') : ''}</div>
+      <p class="hint">${L('ร้านยาขายแต่ยาและโพชั่น · ยันต์กลับบ้านอยู่ที่เถ้าแก่ฮง ตลาดกลาง · ลูกธนูและอุปกรณ์อยู่ที่ช่างตีเหล็กเพชร', 'Potions only · the Return Talisman is at Thaokae Hong\'s market · arrows and gear at Blacksmith Phet')}</p></div>`;
   }
   // quests: Master Vayra gives chapter 0, every shrine keeper gives its map's chapter and bounty
   if (n.id === 'job' || n.id === 'warp'){ const qd = questDialog(n); if (n.id === 'warp'){ body = qd.h + body; if (qd.say) say = qd.say; } else { body += qd.h; if (qd.say && (jobChangeBlock() || !JOBS[S.job].next)) say = qd.say; } }

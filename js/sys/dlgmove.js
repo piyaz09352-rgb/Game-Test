@@ -1,12 +1,14 @@
 /* VAYRATHEN — js/sys/dlgmove.js — the NPC conversation window can be moved and resized
-   · Opens in the middle of the screen every time, sized to the screen (wider screens get a wider window).
+   · Opens in the middle of the screen every time, sized to the screen: (v159) every NPC window is 60% of the screen
+     wide and at most 60% tall (its list scrolls inside), the workshops too. It no longer fades in each time it is
+     placed, so pressing a button that redraws it does not make it blink.
    · Drag it by its header (the portrait and name); drag the corner grip to resize it.
    · A size you pick is remembered as a share of the screen, so it still fits after the screen or UI scale changes.
    · Rotated play (html.rot) works: pointer positions go through ptX/ptY/brect like the other windows.
    Inline !important styles win over the older stylesheet rules that pinned the dialog in place. */
 'use strict';
 
-const DLGM = {KEY:'vayrathen-dlg-v1', size:null, drag:null};
+const DLGM = {KEY:'vayrathen-dlg-v2', size:null, drag:null};
 try { DLGM.size = JSON.parse(localStorage.getItem(DLGM.KEY) || 'null'); } catch (e) {}
 {
   const st = document.createElement('style');
@@ -25,10 +27,11 @@ function dlgBox(d){
   return {r, k, w:vpW() / k, h:vpH() / k, x0:-r.left / k, y0:-r.top / k};
 }
 const dlgSet = (d, o) => { for (const [p, v] of Object.entries(o)) d.style.setProperty(p, v, 'important'); };
-/* screen-scaled size: about half the screen wide (320–680), up to 86% tall; or the share the player picked */
+/* screen-scaled size: 60% of the screen wide, up to 60% tall; or the share the player picked */
+const DLG_SHARE = .6;
 function dlgSize(b){
   const fw = DLGM.size ? DLGM.size[0] : null, fh = DLGM.size ? DLGM.size[1] : null;
-  const w = clamp(fw ? fw * b.w : b.w * .46, Math.min(320, b.w - 16), Math.min(fw ? b.w - 16 : 680, b.w - 16));
+  const w = clamp(fw ? fw * b.w : b.w * DLG_SHARE, Math.min(320, b.w - 16), b.w - 16);
   const h = fh ? clamp(fh * b.h, 160, b.h - 16) : null;
   return {w, h};
 }
@@ -39,14 +42,13 @@ function dlgPlace(d, x, y, w, h){
   x = clamp(x, b.x0, b.x0 + Math.max(0, b.w - w)); y = clamp(y, b.y0, b.y0 + Math.max(0, b.h - 48));
   const room = b.y0 + b.h - y - 8;
   dlgSet(d, {left:x + 'px', top:y + 'px', right:'auto', bottom:'auto', transform:'none', width:w + 'px', 'max-width':'none', zoom:'1',
-    'max-height':room + 'px', height:h ? Math.min(hh, room) + 'px' : 'auto', animation:'dlgFade .18s ease-out both'});
+    'max-height':Math.min(room, Math.round(b.h * (DLGM.size ? .92 : DLG_SHARE))) + 'px', height:h ? Math.min(hh, room) + 'px' : 'auto', animation:'none'});
 }
 /* a fresh open: centre it, sized to the screen */
-const DLG_BIG = ['driller', 'smith'];   // (v132) the workshops (socket drilling, the smith) open at 80% of the screen
 function dlgCenter(d){
-  const b = dlgBox(d), big = !DLGM.size && DLG_BIG.includes(d.dataset.npc), z = dlgSize(b), w = big ? b.w * .8 : z.w, h = big ? b.h * .8 : z.h;
-  dlgSet(d, {width:w + 'px', height:h ? h + 'px' : 'auto', 'max-height':Math.round(b.h * .86) + 'px', transform:'none', zoom:'1'});
-  const hh = h || Math.min(d.offsetHeight, b.h * .86);
+  const b = dlgBox(d), z = dlgSize(b), w = z.w, h = z.h, mh = DLGM.size ? .92 : DLG_SHARE;
+  dlgSet(d, {width:w + 'px', height:h ? h + 'px' : 'auto', 'max-height':Math.round(b.h * mh) + 'px', transform:'none', zoom:'1', animation:'none'});
+  const hh = h || Math.min(d.offsetHeight, b.h * mh);
   dlgPlace(d, b.x0 + (b.w - w) / 2, b.y0 + Math.max(8, (b.h - hh) / 2), w, h);
 }
 function dlgGrip(d){ if (!d.hidden && !d.querySelector('.dlg-grip')){ const g = document.createElement('div'); g.className = 'dlg-grip'; g.setAttribute('aria-hidden', 'true'); d.appendChild(g); } }

@@ -27,7 +27,7 @@
 @media (max-width:560px){.wggrid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));padding:10px;gap:8px}.wgds{display:none}.wgtt small{white-space:normal}.wghd [data-win-open]{display:none}}
 /* (v153) the board is a window at 60% of the screen, not the whole screen: centred over the game (which shows
    dimmed around it); the cards inside are drawn smaller (70%) so more of them fit, the header stays readable */
-#warpGrid{inset:auto;left:50%;top:50%;transform:translate(-50%,-50%);width:max(60vw,min(560px,96vw));height:max(60vh,min(360px,92vh));max-width:96vw;max-height:92vh;
+#warpGrid{inset:auto;left:50%;top:50%;transform:translate(-50%,-50%);width:calc(max(60vw,min(560px,96vw)) / var(--uiz,1));height:calc(max(60vh,min(360px,92vh)) / var(--uiz,1));max-width:calc(96vw / var(--uiz,1));max-height:calc(92vh / var(--uiz,1));
   border-radius:12px;overflow:hidden;box-shadow:0 0 0 100vmax rgba(20,14,6,.45),0 10px 30px rgba(0,0,0,.4)}
 #warpGrid .wggrid{zoom:.7}#warpGrid .wghd{zoom:.82}
 #warpGrid .wghd{padding:10px 14px}
