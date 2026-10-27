@@ -17,10 +17,11 @@ const cuteOn = () => !(typeof PHOTO !== 'undefined' && PHOTO.on && PHOTO.clean);
 const cuteLv = () => (typeof GFX === 'undefined' ? 1 : [0.35, .7, 1][GFX.fx] ?? 1);
 
 /* ---------- 1) scenery ---------- */
-const CUTE_THEME = b => (['desert', 'dryplain', 'canyon'].includes(b) ? 'dry' : ['lavafield', 'crater', 'ashforest'].includes(b) ? 'fire'
-  : ['glacier', 'frozenlake', 'icecave', 'frostcitadel', 'kailash'].includes(b) ? 'snow' : ['cemetery', 'cave', 'badan'].includes(b) ? 'dark'
+const CUTE_THEME = b => (['primeval', 'amberfen'].includes(b) ? 'primeval' : ['desert', 'dryplain', 'canyon', 'dragonroost'].includes(b) ? 'dry' : ['lavafield', 'crater', 'ashforest', 'dragonvale', 'naraka'].includes(b) ? 'fire'
+  : ['glacier', 'frozenlake', 'icecave', 'frostcitadel', 'kailash'].includes(b) ? 'snow' : ['cemetery', 'cave', 'badan', 'demonthrone'].includes(b) ? 'dark'
   : ['tavatimsa', 'meru', 'anodat', 'himmapan', 'innerhim'].includes(b) ? 'heaven' : !b ? 'town' : 'lush');
 const CUTE_KINDS = {
+  primeval:[['tuft', 4], ['pebble', 3], ['clover', 2], ['bone', 1]],   // the Early Cretaceous had almost no flowers (data/world4.js)
   lush:[['flower', 5], ['clover', 4], ['pebble', 2], ['mush', 1], ['bud', 3]],
   town:[['pot', 2], ['flower', 4], ['clover', 2], ['bud', 3]],
   dry:[['tuft', 5], ['pebble', 4], ['cactus', 2], ['bone', 1]],

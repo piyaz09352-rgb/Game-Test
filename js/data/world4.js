@@ -11,44 +11,44 @@
 const W4_MAPS = [
   // ยุคดึกดำบรรพ์ (Age of Dinosaurs): on past the end of the east road, Lv ~75–100 — Thailand's own dinosaurs from the Isan
   // digs (Phu Wiang, Khon Kaen, Korat) beside the famous ones
-  ['phuwiang', 'ป่าดึกดำบรรพ์ภูเวียง', 'Primeval Phu Wiang', 'e', 'himmapan', 95, 'fertile', 'bgm_nature1', [.885, .655], [75, 87],
+  ['phuwiang', 'ป่าดึกดำบรรพ์ภูเวียง', 'Primeval Phu Wiang', 'e', 'primeval', null, 'fertile', 'bgm_nature1', [.885, .655], [75, 87],
     'ป่าเฟิร์นยักษ์ที่ไดโนเสาร์ยังเดินอยู่เหมือนเมื่อร้อยล้านปีก่อน', 'A forest of giant ferns where dinosaurs still walk as they did a hundred million years ago'],
-  ['amberbasin', 'แอ่งอำพันโบราณ', 'Ancient Amber Basin', 'e', 'river', 38, 'fertile', 'bgm_nature4', [.925, .725], [86, 100],
+  ['amberbasin', 'แอ่งอำพันโบราณ', 'Ancient Amber Basin', 'e', 'amberfen', null, 'fertile', 'bgm_nature4', [.925, .725], [86, 100],
     'บึงน้ำสีอำพันที่ทีเร็กซ์ครองและกระดูกโบราณโผล่จากดิน', 'An amber-coloured marsh ruled by the tyrant, old bones jutting from the mud'],
-  ['dragonvale', 'หุบมังกรเพลิง', 'Dragonfire Vale', 's', 'crater', 12, 'volcanic', 'bgm_battle3', [.105, .655], [161, 173],
+  ['dragonvale', 'หุบมังกรเพลิง', 'Dragonfire Vale', 's', 'dragonvale', null, 'volcanic', 'bgm_battle3', [.105, .655], [161, 173],
     'หุบเขาไฟที่ไวเวิร์นทำรังบนหินร้อน', 'A volcanic vale where wyverns nest on the hot rock'],
-  ['dragonroost', 'รังมังกรบรรพกาล', 'Elder Dragon Roost', 's', 'canyon', 42, 'volcanic', 'bgm_adventure', [.072, .725], [172, 185],
+  ['dragonroost', 'รังมังกรบรรพกาล', 'Elder Dragon Roost', 's', 'dragonroost', null, 'volcanic', 'bgm_adventure', [.072, .725], [172, 185],
     'หน้าผาทองที่มังกรเฒ่านอนเฝ้าสมบัติมาพันปี', 'Golden cliffs where old dragons have slept on their hoards for a thousand years'],
-  ['narakagate', 'ประตูนรกภูมิ', 'Gate of Naraka', 's', 'lavafield', 352, 'dark', 'bgm_battle2', [.112, .795], [184, 198],
+  ['narakagate', 'ประตูนรกภูมิ', 'Gate of Naraka', 's', 'naraka', null, 'dark', 'bgm_battle2', [.112, .795], [184, 198],
     'ประตูสู่นรกที่ยมบาลเฝ้าและกระทะทองแดงเดือดไม่หยุด', 'The gate of hell, kept by the yomaban, where the copper cauldrons never stop boiling'],
-  ['demonthrone', 'บัลลังก์จอมมาร', 'Throne of the Demon Lord', 's', 'badan', 284, 'dark', 'bgm_battle1', [.175, .845], [197, 214],
+  ['demonthrone', 'บัลลังก์จอมมาร', 'Throne of the Demon Lord', 's', 'demonthrone', null, 'dark', 'bgm_battle1', [.175, .845], [197, 214],
     'พระราชวังผลึกม่วงของราชันมังกรอสูร', 'The violet crystal palace of the Dragon-Demon Sovereign']
 ];
 
 /* species of each region, weakest first: [id, th, en, 0, archetype, look, element, race, size, extra] */
 const W4_SPECIES = {
   phuwiang:[
-    ['compsog', 'คอมพ์ซอกนาทัสจิ๋ว', 'Little Compsognathus', 0, 'quad', {skin:'#7a9a3a', belly:'#e8e0a0', stripe:'#3a5a1a', head:'theropod', len:.6, leg:.75, girth:.5}, 'earth', 'brute', 's', {aggro:true, k:{spd:18}}],
+    ['compsog', 'คอมพ์ซอกนาทัสจิ๋ว', 'Little Compsognathus', 0, 'quad', {plan:'theropod', skin:'#7a9a3a', belly:'#e8e0a0', stripe:'#3a5a1a', len:.7, leg:.8, girth:.55, skull:1.2, arms:1.3}, 'earth', 'brute', 's', {aggro:true, k:{spd:18}}],
     ['dinonest', 'รังไข่ไดโนเสาร์', 'Dinosaur Egg Clutch', 0, 'slime', {col:'#e0d0a8', emissive:false, top:'leaf', topCol:'#5a8a3a', eye:'#3a2a1a', size:1.1}, 'earth', 'brute', 's', {k:{def:2, hp:1.2, spd:-25}}],
-    ['kinnareemimus', 'คินนรีมิมัสขอนแก่น', 'Kinnareemimus of Khon Kaen', 0, 'quad', {skin:'#c8a060', belly:'#f4ecd0', stripe:'#8a5a2a', head:'theropod', len:.8, leg:1.4, girth:.7, mane:'#e8d0a0'}, 'wind', 'brute', 'm', {k:{spd:22}}],
-    ['sirindhorna', 'สิรินธรน่าโคราช', 'Sirindhorna of Korat', 0, 'quad', {skin:'#6a8a5a', belly:'#d8e0b8', stripe:'#3a5a3a', spots:true, head:'theropod', len:1.1, leg:1, girth:1.2}, 'earth', 'brute', 'm', {k:{hp:1.3}}],
-    ['phuwiangraptor', 'แร็พเตอร์ป่าภูเวียง', 'Phu Wiang Raptor', 0, 'quad', {skin:'#a8603a', belly:'#f0d8b0', stripe:'#3a2a1a', spots:true, head:'theropod', len:.85, leg:1.15, girth:.75, mane:'#c84a2a', eyeGlow:'#ffd04a'}, 'wind', 'brute', 'm', {aggro:true, k:{spd:16, atk:1.15}}],
-    ['redcrestptero', 'เทอโรซอร์หงอนแดง', 'Red-crested Pterosaur', 0, 'bird', {body:'#8a6a4a', wing:'#6a4a32', belly:'#e8d8b8', headCol:'#9a7a5a', crest:'#d83a2a', beak:'#e8c890', beakLen:2.4, tail:'short', size:1.3}, 'wind', 'brute', 'm', {aggro:true, k:{spd:12}}],
-    ['greenstego', 'สเตโกซอรัสแผ่นหลังส้ม', 'Orange-plated Stegosaurus', 0, 'quad', {skin:'#6a7a4a', belly:'#c8c8a0', stripe:'#4a5a32', head:'stego', plates:'#d8763a', len:1, leg:.9, girth:1}, 'earth', 'brute', 'l', {fs:96, k:{hp:1.4, def:1.5, spd:-10}}],
-    ['phuwiangosaurus', 'ภูเวียงโกซอรัส', 'Phuwiangosaurus', 0, 'quad', {skin:'#7a8a8a', belly:'#d0d8c8', stripe:'#5a6a6a', head:'sauropod', len:1, leg:1, girth:1}, 'earth', 'brute', 'l', {fs:128, scale:1.2, k:{hp:1.8, spd:-12}}]
+    ['kinnareemimus', 'คินนรีมิมัสขอนแก่น', 'Kinnareemimus of Khon Kaen', 0, 'quad', {plan:'theropod', skin:'#c8a060', belly:'#f4ecd0', stripe:'#8a5a2a', feathers:'#e8d0a0', beak:true, len:.8, leg:1.35, girth:.7, skull:.75, neck:1.8, arms:1.7, upright:1.4, backFeathers:true, tailFan:true, featherLegs:true}, 'wind', 'brute', 'm', {k:{spd:22}}],
+    ['sirindhorna', 'สิรินธรน่าโคราช', 'Sirindhorna of Korat', 0, 'quad', {plan:'theropod', skin:'#6a8a5a', belly:'#d8e0b8', stripe:'#3a5a3a', spots:true, beak:true, len:1.1, leg:1, girth:1.15, skull:.9, snout:.8, arms:1.5, upright:.6, acc:'#d8c8a0'}, 'earth', 'brute', 'm', {k:{hp:1.3}}],
+    ['phuwiangraptor', 'แร็พเตอร์ป่าภูเวียง', 'Phu Wiang Raptor', 0, 'quad', {plan:'theropod', skin:'#a8603a', belly:'#f0d8b0', stripe:'#3a2a1a', feathers:'#c84a2a', len:.85, leg:1.1, girth:.7, skull:1, snout:1.15, arms:1.6, sickle:true, backFeathers:true, tailFan:true, neckFeathers:true, eyeGlow:'#ffd04a'}, 'wind', 'brute', 'm', {aggro:true, k:{spd:16, atk:1.15}}],
+    ['redcrestptero', 'เทอโรซอร์หงอนแดง', 'Red-crested Pterosaur', 0, 'bird', {plan:'ptero', skin:'#8a6a4a', belly:'#e8d8b8', wing:'#6a4a32', wingMem:'#a87a5a', crest:'#d83a2a', acc:'#e8c890', size:1, beak:1}, 'wind', 'brute', 'm', {aggro:true, k:{spd:12}}],
+    ['greenstego', 'สเตโกซอรัสแผ่นหลังส้ม', 'Orange-plated Stegosaurus', 0, 'quad', {plan:'stego', skin:'#6a7a4a', belly:'#c8c8a0', stripe:'#4a5a32', plates:'#d8763a', acc:'#e8dcc0'}, 'earth', 'brute', 'l', {fs:96, k:{hp:1.4, def:1.5, spd:-10}}],
+    ['phuwiangosaurus', 'ภูเวียงโกซอรัส', 'Phuwiangosaurus', 0, 'quad', {plan:'sauropod', skin:'#7a8a8a', belly:'#d0d8c8', stripe:'#5a6a6a', len:1, leg:1, girth:1}, 'earth', 'brute', 'l', {fs:128, scale:1.2, k:{hp:1.8, spd:-12}}]
   ],
   amberbasin:[
-    ['siamosaurus', 'สยามโมซอรัสจับปลา', 'Fisher Siamosaurus', 0, 'quad', {skin:'#4a6a7a', belly:'#d8e0d0', stripe:'#2a4a5a', head:'theropod', sail:'#c8603a', len:1.2, leg:.9, girth:.95}, 'water', 'brute', 'm', {fs:96, aggro:true}],
-    ['isanosaurus', 'อีสานโนซอรัส', 'Isanosaurus', 0, 'quad', {skin:'#9a7a5a', belly:'#e8d8b8', stripe:'#6a4a2a', spots:true, head:'sauropod', len:.85, leg:.9, girth:.85}, 'earth', 'brute', 'l', {fs:128, k:{hp:1.5, spd:-10}}],
-    ['triceratops', 'ไทรเซราท็อปส์', 'Triceratops', 0, 'quad', {skin:'#7a5a3a', belly:'#c8b090', head:'ceratops', frill:'#c8783a', acc:'#f0e8d0', horns:'tri'}, 'earth', 'brute', 'l', {fs:96, aggro:true, k:{hp:1.4, def:1.6, spd:-4}}],
-    ['ankylosaurus', 'แองคิโลซอรัสหางตะบอง', 'Club-tailed Ankylosaurus', 0, 'quad', {skin:'#5a5a3a', belly:'#b8a878', stripe:'#8a7a4a', spots:true, cracks:true, head:'stego', club:true, acc:'#3a3424', len:.9, leg:.6, girth:1.25}, 'earth', 'brute', 'm', {k:{def:2.2, hp:1.2, spd:-12}}],
-    ['fossilraptor', 'โครงกระดูกแร็พเตอร์', 'Fossil Raptor', 0, 'quad', {skin:'#e8e0c8', belly:'#c8c0a8', stripe:'#8a8270', cracks:true, head:'theropod', len:.8, leg:1.1, girth:.7, eyeGlow:'#7affc8'}, 'shadow', 'undead', 'm', {aggro:true, k:{spd:14}}],
+    ['siamosaurus', 'สยามโมซอรัสจับปลา', 'Fisher Siamosaurus', 0, 'quad', {plan:'theropod', skin:'#4a6a7a', belly:'#d8e0d0', stripe:'#2a4a5a', sail:'#c8603a', len:1.15, leg:.95, girth:.95, skull:1.1, snout:1.7, deep:.7, wide:.8, upright:.7}, 'water', 'brute', 'm', {fs:96, aggro:true}],
+    ['isanosaurus', 'อีสานโนซอรัส', 'Isanosaurus', 0, 'quad', {plan:'sauropod', skin:'#9a7a5a', belly:'#e8d8b8', stripe:'#6a4a2a', spots:true, len:.85, leg:.9, girth:.85, neck:.85}, 'earth', 'brute', 'l', {fs:128, k:{hp:1.5, spd:-10}}],
+    ['triceratops', 'ไทรเซราท็อปส์', 'Triceratops', 0, 'quad', {plan:'ceratops', skin:'#7a5a3a', belly:'#c8b090', stripe:'#5a3a22', frill:'#c8783a', acc:'#f0e8d0'}, 'earth', 'brute', 'l', {fs:96, aggro:true, k:{hp:1.4, def:1.6, spd:-4}}],
+    ['ankylosaurus', 'แองคิโลซอรัสหางตะบอง', 'Club-tailed Ankylosaurus', 0, 'quad', {plan:'ankylo', skin:'#5a5a3a', belly:'#b8a878', stripe:'#8a7a4a', spots:true, acc:'#8a8060'}, 'earth', 'brute', 'm', {k:{def:2.2, hp:1.2, spd:-12}}],
+    ['fossilraptor', 'โครงกระดูกแร็พเตอร์', 'Fossil Raptor', 0, 'quad', {plan:'theropod', skin:'#e8e0c8', belly:'#c8c0a8', stripe:'#8a8270', cracks:true, len:.8, leg:1.1, girth:.65, skull:1, sickle:true, arms:1.5, eyeGlow:'#7affc8', dark:'#5a5448'}, 'shadow', 'undead', 'm', {aggro:true, k:{spd:14}}],
     ['ambergolem', 'หุ่นอำพันโบราณ', 'Ancient Amber Golem', 0, 'rock', {col:'#d89a3a', acc:'#8a5a1a', eye:'#fff0a0', crystals:'#ffc04a', glowCrystal:true, bulk:1.05}, 'earth', 'formless', 'l', {k:{def:2.2, hp:1.3, spd:-10}}],
-    ['skyquetzal', 'เควตซัลโคแอตลัสเงาเมฆ', 'Cloudshadow Quetzalcoatlus', 0, 'bird', {body:'#c8c8c0', wing:'#7a8a9a', belly:'#f0f0e8', headCol:'#2a6ab0', crest:'#e83a2a', beak:'#f0e0b0', beakLen:3, neckLen:1.8, legLen:1.6, tail:'short', size:1.5, fly:false}, 'wind', 'brute', 'l', {aggro:true}],
+    ['skyquetzal', 'เควตซัลโคแอตลัสเงาเมฆ', 'Cloudshadow Quetzalcoatlus', 0, 'bird', {plan:'ptero', skin:'#c8c8c0', belly:'#f0f0e8', wing:'#7a8a9a', wingMem:'#9aa8b8', crest:'#e83a2a', acc:'#f0e0b0', size:1.4, neck:1.6, beak:1.3}, 'wind', 'brute', 'l', {aggro:true}],
     ['marshplesio', 'พลีซิโอซอร์บึงอำพัน', 'Amber Marsh Plesiosaur', 0, 'serpent', {skin:'#3a5a5a', belly:'#c8d8c8', stripe:'#1a3a3a', len:1.3, rise:16, thick:1.3, tailTip:'#5a8a7a'}, 'water', 'brute', 'l', {range:120, shot:'ice', k:{hp:1.3}}]
   ],
   dragonvale:[
-    ['wyvernling', 'ลูกไวเวิร์นเพลิง', 'Flame Wyvernling', 0, 'quad', {skin:'#c8401a', belly:'#ffb860', stripe:'#6a1408', head:'croc', len:.9, leg:.55, girth:.8, wing:'#8a2010', horns:'spike', acc:'#2a1a14', eyeGlow:'#ffd04a'}, 'fire', 'dragon', 's', {aggro:true, k:{spd:12}}],
+    ['wyvernling', 'ลูกไวเวิร์นเพลิง', 'Flame Wyvernling', 0, 'quad', {plan:'wyvern', skin:'#c8401a', belly:'#ffb860', stripe:'#6a1408', wing:'#6a1408', wingMem:'#d8502a', acc:'#f0e0c0', spines:'#3a0e06', len:.8, leg:.9, girth:.7, span:.8, eyeGlow:'#ffd04a'}, 'fire', 'dragon', 's', {aggro:true, k:{spd:12}}],
     ['drakehound', 'หมามังกรเกล็ดแดง', 'Red-scaled Drake Hound', 0, 'quad', {skin:'#9a2a1a', belly:'#e89a5a', stripe:'#3a0e08', spots:true, head:'dog', len:1.05, leg:.85, mane:'#ff7a2a', eyeGlow:'#ff9a3a'}, 'fire', 'dragon', 'm', {aggro:true, k:{spd:16, atk:1.1}}],
     ['dragonegg', 'ไข่มังกรฟักเพลิง', 'Hatching Dragon Egg', 0, 'slime', {col:'#e8c070', emissive:false, spikes:true, eye:'#ff3a1a', size:.9}, 'fire', 'dragon', 's', {k:{def:2.2, hp:1.3, spd:-20}}],
     ['emberwyrm', 'งูมังกรถ่านแดง', 'Ember Wyrm', 0, 'serpent', {skin:'#4a1a12', belly:'#ff8a2a', stripe:'#ffc84a', crest:'#ff5a1a', legs:true, len:1.25, rise:7, thick:1.05, eyeGlow:'#ffe07a', tailTip:'#ffb04a'}, 'fire', 'dragon', 'm', {range:120, shot:'fire'}],
@@ -60,9 +60,9 @@ const W4_SPECIES = {
   dragonroost:[
     ['goldhatchling', 'ลูกมังกรทองหลงรัง', 'Lost Golden Hatchling', 0, 'quad', {skin:'#e8b83a', belly:'#fff0b0', stripe:'#a8781a', head:'lizard', len:.8, leg:.6, girth:.75, wing:'#f0d070', crown:true, eyeGlow:'#ffffff'}, 'holy', 'dragon', 's', {k:{spd:8}}],
     ['jadeloong', 'มังกรหยกสวรรค์', 'Celestial Jade Loong', 0, 'serpent', {skin:'#2a9a6a', belly:'#e8f0b0', stripe:'#106a4a', crest:'#f0d070', legs:true, len:1.45, rise:13, thick:1.1, eyeGlow:'#fff4a0', tailTip:'#f0d070'}, 'wind', 'dragon', 'l', {range:130, shot:'ice'}],
-    ['stormdrake', 'มังกรสายฟ้า', 'Storm Drake', 0, 'quad', {skin:'#2a4a8a', belly:'#a8c8f0', stripe:'#f0f080', head:'croc', len:1.2, leg:.65, girth:.95, wing:'#1a2a5a', horns:'antler', acc:'#e8e8ff', eyeGlow:'#a0e0ff'}, 'wind', 'dragon', 'm', {aggro:true, range:120, shot:'bolt'}],
+    ['stormdrake', 'มังกรสายฟ้า', 'Storm Drake', 0, 'quad', {plan:'dragon', skin:'#2a4a8a', belly:'#a8c8f0', stripe:'#1a2a5a', wing:'#1a2a5a', wingMem:'#5a7ac8', acc:'#e8e8ff', spines:'#f0f080', len:.95, girth:.85, eyeGlow:'#a0e0ff'}, 'wind', 'dragon', 'm', {aggro:true, range:120, shot:'bolt'}],
     ['makara', 'มกรเฝ้ารัง', 'Makara of the Roost', 0, 'quad', {skin:'#3a7a7a', belly:'#d8e8c0', stripe:'#1a4a4a', head:'croc', len:1.35, leg:.5, girth:1.15, tusks:true, acc:'#f4ecd8', fishTail:'#4ab0a0', eyeGlow:'#ffd36a'}, 'water', 'dragon', 'l', {k:{hp:1.4, def:1.4, spd:-6}}],
-    ['bonedragon', 'มังกรกระดูก', 'Bone Dragon', 0, 'quad', {skin:'#e8e0c8', belly:'#b8b098', stripe:'#6a6050', cracks:true, head:'croc', len:1.3, leg:.7, girth:.8, wing:'#5a5448', horns:'buffalo', acc:'#c8c0a8', eyeGlow:'#7affc8'}, 'shadow', 'undead', 'l', {aggro:true, night:true, k:{atk:1.15}}],
+    ['bonedragon', 'มังกรกระดูก', 'Bone Dragon', 0, 'quad', {plan:'dragon', skin:'#e8e0c8', belly:'#b8b098', stripe:'#6a6050', cracks:true, wing:'#c8c0a8', wingMem:'#5a5448', acc:'#c8c0a8', spines:'#8a8270', len:1, girth:.8, eyeGlow:'#7affc8', dark:'#3a3428'}, 'shadow', 'undead', 'l', {aggro:true, night:true, k:{atk:1.15}}],
     ['dragonhawk', 'เหยี่ยวหงอนมังกร', 'Dragon-crested Hawk', 0, 'bird', {body:'#8a5a2a', wing:'#5a3a1a', belly:'#f0e0b0', bars:'#5a3a1a', crest:'#e3b04b', beak:'#f0d060', hook:true, horns:'#e8d8b0', tail:'short'}, 'wind', 'brute', 's', {range:140, shot:'dart', k:{spd:14}}],
     ['dragonpearl', 'ดวงแก้วมังกร', 'Dragon Pearl Spirit', 0, 'floater', {col:'#d8f0ff', kind:'pearl', glow:'#a0e0ff', orbit:'#f0d070', dark:'#3a5a7a', size:.9}, 'water', 'formless', 's', {range:130, shot:'holy'}],
     ['dragonknight', 'อัศวินมังกร', 'Dragon Knight', 0, 'human', {skin:'#c89a70', top:'#7a6a3a', pants:'#3a3424', hair:'#2a2a2a', hat:'helm', hatCol:'#c8a040', weapon:'sword', wings:'#2a5a3a', wingStyle:'bat', wingMem:'#5ab07a', belt:'#e3b04b', iris:'irisBr'}, 'neutral', 'human', 'm', {aggro:true, k:{def:1.5, atk:1.1}}]
@@ -91,12 +91,12 @@ const W4_SPECIES = {
 
 /* one boss per region: [id, th, en, 0, archetype, look, element, race, skills] */
 const W4_BOSSES = {
-  phuwiang:['siamotyrannus', 'สยามโมไทรันนัสราชาแห่งภูเวียง', 'Siamotyrannus, King of Phu Wiang', 0, 'quad', {skin:'#8a4a2a', belly:'#e8c890', stripe:'#3a1a0a', head:'theropod', len:1.25, leg:1.15, girth:1.3, eyeGlow:'#ffd04a'}, 'earth', 'brute', ['charge', 'roar', 'quake', 'enrage']],
-  amberbasin:['trextyrant', 'ไทรันโนซอรัสเร็กซ์ทรราช', 'Tyrannosaurus Rex the Tyrant', 0, 'quad', {skin:'#5a4a3a', belly:'#c8b08a', stripe:'#2a1e14', spots:true, head:'theropod', len:1.35, leg:1.2, girth:1.45, eyeGlow:'#ff6a2a'}, 'earth', 'brute', ['charge', 'roar', 'quake', 'slam', 'enrage']],
-  dragonvale:['wyvernqueen', 'ราชินีไวเวิร์นอัคคี', 'Wyvern Queen of the Flames', 0, 'quad', {skin:'#b8300f', belly:'#ffc070', stripe:'#4a0a04', head:'croc', len:1.45, leg:.6, girth:1.15, wing:'#7a1408', horns:'spike', acc:'#f0d070', crown:true, eyeGlow:'#ffe04a'}, 'fire', 'dragon', ['charge', 'meteor', 'barrage', 'enrage']],
-  dragonroost:['elderdragon', 'พญามังกรบรรพกาล', 'The Elder Dragon', 0, 'quad', {skin:'#c8962a', belly:'#fff0c0', stripe:'#6a4a10', head:'croc', len:1.6, leg:.7, girth:1.3, wing:'#8a5a1a', horns:'buffalo', acc:'#f4ecd8', crown:true, cracks:true, eyeGlow:'#7affc8'}, 'earth', 'dragon', ['quake', 'wave', 'roar', 'heal', 'enrage']],
+  phuwiang:['siamotyrannus', 'สยามโมไทรันนัสราชาแห่งภูเวียง', 'Siamotyrannus, King of Phu Wiang', 0, 'quad', {plan:'theropod', skin:'#9a5a2a', belly:'#ecd2a0', stripe:'#4a2410', len:1.1, leg:1, girth:1.2, skull:1.25, eyeGlow:'#ffd04a'}, 'earth', 'brute', ['charge', 'roar', 'quake', 'enrage']],
+  amberbasin:['trextyrant', 'ไทรันโนซอรัสเร็กซ์ทรราช', 'Tyrannosaurus Rex the Tyrant', 0, 'quad', {plan:'theropod', skin:'#a8642e', belly:'#f0d8a8', stripe:'#4a2a14', len:1.15, leg:1, girth:1.3, skull:1.3, arms:.8, upright:1.3, eyeGlow:'#ffd04a'}, 'earth', 'brute', ['charge', 'roar', 'quake', 'slam', 'enrage']],
+  dragonvale:['wyvernqueen', 'ราชินีไวเวิร์นอัคคี', 'Wyvern Queen of the Flames', 0, 'quad', {plan:'wyvern', skin:'#b8300f', belly:'#ffc070', stripe:'#4a0a04', wing:'#4a0a04', wingMem:'#e8582a', acc:'#f0d070', spines:'#2a0804', crown:true, len:1.1, girth:1.1, eyeGlow:'#ffe04a'}, 'fire', 'dragon', ['charge', 'meteor', 'barrage', 'enrage']],
+  dragonroost:['elderdragon', 'พญามังกรบรรพกาล', 'The Elder Dragon', 0, 'quad', {plan:'dragon', skin:'#c8962a', belly:'#fff0c0', stripe:'#6a4a10', cracks:true, wing:'#6a4a10', wingMem:'#e8b860', acc:'#f4ecd8', spines:'#8a5a1a', crown:true, len:1.15, girth:1.15, eyeGlow:'#7affc8'}, 'earth', 'dragon', ['quake', 'wave', 'roar', 'heal', 'enrage']],
   narakagate:['narakawarden', 'ผู้คุมนรกอเวจี', 'Warden of Avici', 0, 'human', {skin:'#2a2a3e', top:'#3a0a0a', pants:'#1a0606', hair:'#ff3a0a', hatCol:'#c8a040', horns:'#e8d8c0', hornLen:3, fangs:true, beard:true, weapon:'staff', wings:'#1a0a0a', wingStyle:'bat', wingMem:'#a81a0a', necklace:true, iris:'irisGr'}, 'fire', 'demon', ['field', 'summon', 'slam', 'wave', 'enrage']],
-  demonthrone:['dragondemonking', 'ราชันมังกรอสูร', 'The Dragon-Demon Sovereign', 0, 'quad', {skin:'#1a0e1e', belly:'#8a1a3a', stripe:'#c83aff', head:'croc', len:1.7, leg:.75, girth:1.35, wing:'#3a0a2a', horns:'antler', acc:'#ff3a6a', crown:true, mane:'#c83aff', eyeGlow:'#ff2a4a'}, 'shadow', 'demon', ['meteor', 'teleport', 'summon', 'wave', 'field', 'enrage']]
+  demonthrone:['dragondemonking', 'ราชันมังกรอสูร', 'The Dragon-Demon Sovereign', 0, 'quad', {plan:'dragon', skin:'#1a0e1e', belly:'#8a1a3a', stripe:'#c83aff', wing:'#2a0a2a', wingMem:'#7a1a4a', acc:'#ff3a6a', spines:'#c83aff', crown:true, len:1.2, girth:1.2, eyeGlow:'#ff2a4a', hornUp:2.4}, 'shadow', 'demon', ['meteor', 'teleport', 'summon', 'wave', 'field', 'enrage']]
 };
 
 /* field notes (shown in the wiki and on the target card) — every one written for its creature */
