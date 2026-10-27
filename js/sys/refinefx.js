@@ -77,10 +77,11 @@ function rfWeaponFx(g, segs, rf, seed){
 }
 /* fallback for a hero whose frame carries no weapon line: a small glow at the weapon hand */
 const rfHand = (x, y) => [[x + 6, y - 14, x + 6, y - 24]];
+/* (v161) a weapon put away on the back does not shine over the body */
 { const _over = LIVE.drawOver;
   LIVE.drawOver = function(g, ...a){
     const r = _over.call(this, g, ...a);
-    if (S && !P.dead){ const x = P.x - cam.x, y = P.y - cam.y - (P.ride ? 14 : 0), rf = myWeaponRf(); if (rf){ const d = rfNear(x, y); rfWeaponFx(g, d ? d.segs : rfHand(x, y), rf, 1); } }
+    if (S && !P.dead && !(typeof SHEATH !== 'undefined' && (SHEATH.on || P.ride))){ const x = P.x - cam.x, y = P.y - cam.y - (P.ride ? 14 : 0), rf = myWeaponRf(); if (rf){ const d = rfNear(x, y); rfWeaponFx(g, d ? d.segs : rfHand(x, y), rf, 1); } }
     if (typeof NET !== 'undefined' && NET.ghosts && SETTINGS.oFx !== false) for (const gh of NET.ghosts.values()){ const rf = clamp((gh.q && gh.q.rf) | 0, 0, 15); if (!rf || (gh.q && gh.q.dead)) continue;
       const x = gh.x - cam.x, y = gh.y - cam.y - (gh.q.r ? 14 : 0), d = rfNear(x, y); rfWeaponFx(g, d ? d.segs : rfHand(x, y), rf, (gh.peer || '').length); }
     return r;

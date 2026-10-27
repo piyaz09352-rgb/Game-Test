@@ -26,6 +26,6 @@ EV.on('tick', () => {
 const sheathBack = () => { const j = JOBS[S.job], w = j && j.weapon && j.weapon.type; return w && w !== 'fist' || !!(S.gear && S.gear.shield); };
 if (typeof drawWings === 'function'){ const _dw = drawWings;
   drawWings = function(g, id, x, y, dir, t, o = {}){
-    const away = dir >= 3 && dir <= 5, mine = typeof P !== 'undefined' && Math.abs(x - P.x) < 2 && Math.abs(y - P.y) < 2;
+    const away = dir >= 3 && dir <= 5, mine = typeof P !== 'undefined' && typeof cam !== 'undefined' && Math.abs(x - (P.x - cam.x)) < 2 && Math.abs(y - (P.y - cam.y)) < 2;   // (v161) the hero is drawn at screen position
     if (away && mine && (SHEATH.on || P.ride) && sheathBack()){ if (o.part === 'front') return; if (o.part === 'back') return _dw.call(this, g, id, x, y, dir, t, {...o, part:'front'}); }
     return _dw.apply(this, arguments); }; }

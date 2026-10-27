@@ -936,32 +936,88 @@ function drawHuman(cx, cfg, P){
   if (cfg.fangs){ for (const sd of [-1, 1]){ G(); cap(cx, add(hc, [sd * 2.2, -4.4, 9.6]), add(hc, [sd * 2.5, -7.6, 9.4]), .9, .35, M.white, {}); } }
   if (cfg.wings){ const fl = ride ? 0 : Math.sin((P.sway || 0) * 1.3 + (P.bob || 0)) * .25;
     for (const sd of [-1, 1]){ G(); for (let i = 0; i < 5; i++){ const k = i / 4; ell(cx, lean([hipC[0] + sd * (4 + k * 9), 21 + B + k * 4 - k * k * 6 + fl * 6 * k, -5.5 - k * 2]), 5.4 - k * 2.2, 2.2, M[cfg.wings], {rz:4.5 - k * 2, tex:n => (n[1] < -.3 ? {m:M[cfg.wingTip || cfg.wings], t:1} : undefined)}); } } }
-  // (v159) out of combat, and always while riding, the weapon and shield ride on the back: a blade or staff across the
-  // back from the right shoulder to the left hip (hilt up), a bow upright between the shoulder blades, a dagger at the
-  // hip, a shield flat on the back under the blade
+  // (v161) out of combat, and always while riding, the gear is carried the way it really is carried:
+  //  · sword, greatsword, katana: SHEATHED in a scabbard on the back, hung from a baldric (the strap crosses the chest
+  //    from the right shoulder to the left hip); the hilt stands beside the head over the right shoulder, ready for a
+  //    right-hand draw, the scabbard runs down across the back toward the left hip. Katana in a black lacquer saya.
+  //  · rod, longstaff: across the back on the same strap, the head over the right shoulder, the foot at the left hip
+  //  · bow: slung strung across the body as archers carry it: the stave across the back, the top limb over the left
+  //    shoulder, the bottom limb past the right hip, and the STRING across the chest (it is the strap)
+  //  · dagger: level in a sheath on the belt at the small of the back, the hilt to the right hand
+  //  · shield: flat in the middle of the back on a guige strap (crossing the chest the other way); weapons over it
+  //  The chibi head covers most of the upper back, so the hilts and staff heads sit just outside the head's outline and
+  //  the long parts reach below it, where they read from every side. Nothing here glows (the glow is drawn over the body).
   const stow = !P.noWeapon && (cfg.sheathed || !!ride);
   if (stow){
+    const ws0 = cx.wsegs ? cx.wsegs.length : 0;
     const back = (dx, dy, dz) => lean([hipC[0] + dx, dy + B, dz]), shOn = cfg.shield && !cfg.twoHand && cfg.weapon !== 'bow';
-    if (shOn){ const sh = cfg.shield, big = (sh[3] || 1) * .92, c = back(0, 16.8, -6.9);
+    const wt = cfg.wTier ?? -1, strapM = M[wt >= 3 ? 'lacquer' : 'leather'], fit = M[wt >= 3 ? 'gold' : 'steel'];
+    // a point on the front (sd 1) or back (sd -1) of the chest at (x, y)
+    const chest = (x, y, sd) => { const q = 1 - (x / 7.1) ** 2 - ((y - 15) / 7) ** 2; return back(x, y, .4 + sd * (6.6 * Math.sqrt(Math.max(0, q)) + .45)); };
+    const strap = (pts, r = .55, m = strapM) => { G(); for (let i = 0; i < pts.length - 1; i++) cap(cx, pts[i], pts[i + 1], r, r, m, {}); };
+    // a strap over one shoulder (x0 side, near the neck) down across the chest to the other hip (x1)
+    const sash = (x0, x1, r, m) => { const pts = []; for (let i = 0; i <= 8; i++){ const k = i / 8, x = x0 + (x1 - x0) * k, y = 21.2 - k * 12.4; pts.push(chest(x, y, 1)); } strap(pts, r, m); };
+    if (shOn){ const sh = cfg.shield, big = (sh[3] || 1) * .92, c = back(0, 14.4, -7.2);
+      sash(5.8, -6.2, .45, strapM);
       G(); ell(cx, c, 5.3 * big, 6.3 * big, M[sh[0]], {rz:1.1});
       G(); ell(cx, add(c, [0, 0, -.5]), 4.4 * big, 5.4 * big, M[sh[1]], {rz:1.1, tex:sh[4] ? (n => (Math.abs(n[0]) < .12 || Math.abs(n[1] - .1) < .1 ? {m:M[sh[4]], t:1} : undefined)) : undefined});
       if (sh[2]){ G(); ell(cx, add(c, [0, .3, -1.4]), 1.5 * big, 1.5 * big, M[sh[2]]); } }
-    const w = cfg.weapon;
+    const w = cfg.weapon, zb = shOn ? -9.4 : -7.6, kat = w === 'dagger' && !!cfg.katana, two = !!cfg.twoHand || kat;
     if (w && w !== 'fist'){
-      const P2 = {...P, ring:-1, draw:0, arrow:false, glow:-1}, dz = shOn ? -9.1 : -7.4;
+      const P2 = {...P, ring:-1, draw:0, arrow:false, glow:-1}, cf = {...cfg, rfTier:0, offWeapon:false};
       if (w === 'bow'){
-        // the bow slung across the back, limbs bowed outward, the string straight: drawn in the plane of the back so it
-        // reads from behind as a bow, not as a stick seen edge-on
-        const c = back(0, 18, -7.6), ax = nrm(upper([.55, -1, 0])), bx = nrm(upper([1, .55, 0])), BW = 10 * WPN_BIG * .92, bw = cfg.wTier ?? -1;
+        const BW = 10 * WPN_BIG * 1.06, bw = wt, ax = nrm(upper([.62, 1, 0])), out = upper([0, 0, -1]), c = back(2.2, 14.6, zb);
         const limbM = M[['wood', 'wood', 'lacquer', 'charcoal', 'teal', 'gold'][bw] || 'wood'], pts = [];
-        for (let i = 0; i <= 16; i++){ const yy = BW - i / 16 * BW * 2; pts.push(add(add(c, mul(ax, yy)), mul(bx, 2.2 * (1 - (yy / BW) ** 2)))); }
-        G(); for (let i = 0; i < pts.length - 1; i++) cap(cx, pts[i], pts[i + 1], .95 + (i > 6 && i < 10 ? .25 : 0), .95, i < 2 || i > pts.length - 4 ? M.steel : limbM, {});
-        G(); line(cx, pts[0], pts[pts.length - 1], M.white, {t:1});
+        for (let i = 0; i <= 18; i++){ const yy = BW - i / 18 * BW * 2, k = yy / BW; pts.push(add(add(c, mul(ax, yy)), mul(out, 2.6 * (1 - k * k) - .9 * Math.abs(k) ** 3))); }   // a recurve: belly out, tips back
+        G(); for (let i = 0; i < pts.length - 1; i++) cap(cx, pts[i], pts[i + 1], 1.2 + (i > 7 && i < 11 ? .35 : 0), 1.2, i < 2 || i > pts.length - 4 ? M.steel : (i > 7 && i < 11 ? M.leather : limbM), {});
+        // the string: from the top nock over the left shoulder, across the chest, under the right arm to the bottom nock
+        const top = pts[0], bot = pts[pts.length - 1], sp = [top, back(7.4, 22.2, -1.4)];
+        for (let i = 0; i <= 6; i++){ const k = i / 6; sp.push(chest(6.2 - 12.6 * k, 20.6 - 11 * k, 1)); }
+        sp.push(back(-7.4, 9, -1.2), bot);
+        G(); for (let i = 0; i < sp.length - 1; i++) line(cx, sp[i], sp[i + 1], M.white, {t:1});
       }
-      else if (w === 'dagger' && !cfg.katana){ P2.wdir = nrm(upper([-.15, -1, .35])); const h = back(-5.6, 12.2, -2.4); drawWeapon(cx, w, P2, h, h, () => (cx.gid = gid++), {...cfg, offWeapon:false}); }
-      else if (w === 'staff'){ P2.wdir = nrm(upper([-.5, 1, -.04])); const h = back(4.4, 12.5, dz); drawWeapon(cx, w, P2, h, h, () => (cx.gid = gid++), cfg); }   // head up over the right shoulder
-      else { P2.wdir = nrm(upper([.8, -1, -.04])); const h = back(-4.8, 26.5, dz); drawWeapon(cx, w, P2, h, h, () => (cx.gid = gid++), cfg); }   // hilt over the right shoulder
+      else if (w === 'dagger' && !kat){
+        // level on the belt at the small of the back, edge down, hilt to the right
+        P2.wdir = nrm(upper([1, -.12, 0])); const h = back(-4.2, 10.4, -7.0);
+        drawWeapon(cx, w, P2, h, h, G, cf);
+        const len = (9.5 + Math.max(0, wt) * .3) * WPN_BIG * 1.15, a0 = add(h, mul(P2.wdir, .2)), a1 = add(h, mul(P2.wdir, len + .5));
+        G(); cap(cx, a0, a1, 1.45, 1.0, strapM, {}); G(); ell(cx, a1, 1.0, 1.0, fit); G(); ell(cx, a0, 1.6, 1.6, fit, {rz:.5});
+      }
+      else if (w === 'staff'){
+        // head over the right shoulder beside the head, the foot toward the left hip
+        const len = (20 + Math.max(0, wt) * .5) * (two ? .86 : .5) * WPN_BIG, tot = len + 6, tip = back(-10.6, 27.5, zb), sn = Math.min(.8, (27.5 - 3) / tot);
+        P2.wdir = nrm(upper([-Math.sqrt(1 - sn * sn), sn, 0])); const h = add(tip, mul(P2.wdir, -len));
+        sash(-6.2, 6.0, .55, strapM);
+        drawWeapon(cx, w, P2, h, h, G, cf);
+        // the strap holds it at two points
+        G(); for (const k of [.35, .75]){ const q = add(h, mul(P2.wdir, -6 + tot * k - len * 0)); ell(cx, add(q, mul(P2.wdir, -tot * .0)), 1.25, 1.25, strapM, {rz:.6}); }
+      }
+      else {
+        // sword, greatsword, katana: hilt over the right shoulder, sheathed blade down across the back
+        const len = kat ? (19.5 + Math.max(0, wt) * .5) * WPN_BIG : (17 + Math.max(0, wt) * .7) * (two ? 1.45 : .88) * WPN_BIG;
+        const gy = 21.6, gx = two ? -10.2 : -9.6, sn = Math.min(.86, (gy - 2.6) / len);
+        P2.wdir = nrm(upper([Math.sqrt(1 - sn * sn), -sn, 0])); const g0 = back(gx, gy, zb), h = add(g0, mul(P2.wdir, .8)), dir = P2.wdir;
+        sash(-6.2, 6.0, two ? .65 : .55, strapM);
+        drawWeapon(cx, w, P2, h, h, G, cf);
+        const scM = kat ? M[wt >= 3 ? 'lacquer' : 'charcoal'] : M[['leather', 'leather', 'lacquer', 'charcoal', 'teal', 'lacquer'][wt] || 'leather'];
+        if (kat){
+          // saya: follows the katana's gentle curve, a cord (sageo) knotted at the mouth, a horn cap at the end
+          const up = nrm(Math.abs(dir[1]) > .95 ? [0, 0, 1] : [-dir[0] * dir[1], 1 - dir[1] * dir[1], -dir[2] * dir[1]]);
+          const base = add(h, mul(dir, -.8)), k0 = add(base, mul(dir, .5)), k1 = add(add(base, mul(dir, len * .55)), mul(up, .55)), k2 = add(add(base, mul(dir, len + .6)), mul(up, 1.5));
+          G(); cap(cx, k0, k1, 1.3, 1.22, scM, {tex:(n, lo, q, t) => (t > .06 && t < .1 ? {m:M[wt >= 3 ? 'gold' : 'white'], t:1} : undefined)}); cap(cx, k1, k2, 1.22, 1.0, scM, {});
+          G(); ell(cx, k2, 1.05, 1.05, M[wt >= 3 ? 'gold' : 'charcoal']);
+          G(); cap(cx, add(k0, mul(dir, 2)), add(add(k0, mul(dir, 3.4)), mul(up, -2.2)), .35, .35, M[wt >= 3 ? 'gold' : 'white'], {});
+        } else {
+          // scabbard: wider than the blade, a metal throat (locket) at the mouth, a metal tip (chape), a strap ring
+          const hw = two ? 2.75 : 2.05, base = add(h, mul(dir, -.8)), a0 = add(base, mul(dir, .35)), a1 = add(base, mul(dir, len + .5));
+          G(); cap(cx, a0, a1, hw, hw * .62, scM, {rz:1.25});
+          G(); cap(cx, a0, add(a0, mul(dir, 2.0)), hw + .2, hw + .15, fit, {rz:1.4});
+          G(); cap(cx, add(a1, mul(dir, -2.2)), add(a1, mul(dir, .3)), hw * .7, hw * .45, fit, {rz:1.3});
+          G(); ell(cx, add(a0, mul(dir, len * .32)), hw + .25, .5, strapM, {rz:hw * .6});
+        }
+      }
     }
+    if (cx.wsegs) cx.wsegs.length = ws0;
   }
   // weapon follows the forearm
   if (!P.noWeapon && !stow){
