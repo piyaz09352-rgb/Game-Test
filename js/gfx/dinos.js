@@ -75,28 +75,42 @@ const DINO = (() => {
     ell(cx, e, r, r, P.EY, glow ? {} : {tex:nn => (nn[1] > .25 && nn[2] > .2 ? {m:M.white, t:0} : Math.abs(nn[2]) < .22 && !glow ? {m:P.DK, t:3} : undefined)});
     cap(cx, add(e, [side * r * .2, r * .9, -r]), add(e, [side * r * .2, r * 1.05, r * 1.1]), r * .55, r * .4, P.SK, {});   // brow ridge
   }
-  /* a jawed head: cranium, upper snout, lower jaw that swings open, teeth, eyes, nostrils. Returns key points. */
+  /* a jawed head built like a theropod skull, not two balls: a deep, narrow, boxy upper skull that tapers to the
+     snout (roof and cheek rows of small spheres, so it keeps its shape from every side), a dark antorbital opening
+     in the cheek, an eye under a bony brow with a little horn boss, a dark lip line with a row of teeth, a separate
+     lower jaw hinged under the back of the skull that swings open on a red mouth and tongue, and nostrils at the tip.
+     Returns key points for horns and crests. */
   function jawHead(cx, P, s, sk, hc, o, opt){
-    const snout = (opt.snout ?? 1) * 6.2 * sk, w = (opt.wide ?? 1) * 2.5 * sk, deep = (opt.deep ?? 1) * 2.9 * sk, skin = opt.skin;
-    const pitch = opt.pitch ?? 0, jaw = o.jaw * (opt.jawK ?? 1);
-    const R = p => add(hc, rotX(p, pitch));
-    // cranium (two lobes for width) and the upper snout tapering to the tip
-    cx.gid = 60; for (const sd of [-1, 1]) ell(cx, R([sd * w * .35, deep * .3, -1.4 * sk]), w * .72, deep * .82, P.SK, {rz:2.6 * sk, tex:skin('head')});
-    const tip = R([0, deep * .05, snout]);
-    cx.gid = 61; cap(cx, R([0, deep * .32, .4 * sk]), tip, deep * .66, deep * (opt.beak ? .32 : .46), P.SK, {tex:skin('head')});
-    // the lower jaw hinges under the back of the skull
-    const hinge = R([0, -deep * .45, -1.4 * sk]), jtip = add(hinge, rotX([0, -.4 * sk, snout * .96 + 1.2 * sk], -pitch + jaw));
-    cx.gid = 62; cap(cx, hinge, jtip, deep * .5, deep * (opt.beak ? .22 : .34), opt.beak ? P.AC : P.BE || P.SK, {});
-    if (jaw > .12){ cx.gid = 63; for (let i = 0; i <= 4; i++){ const k = i / 4; cap(cx, lerp3(lerp3(hinge, jtip, .15), lerp3(hinge, jtip, .85), k), lerp3(R([0, -deep * .32, -.6 * sk]), add(tip, [0, -deep * .3, -.6 * sk]), k), deep * .3 * (1 - k * .4), deep * .3 * (1 - k * .4), M.mouth, {}); } }   // the inside of the mouth, a red wedge between the jaws   // the inside of the mouth
-    if (opt.beak){ cx.gid = 64; cap(cx, add(tip, [0, .2 * sk, -1.4 * sk]), add(tip, [0, -.35 * sk, .25 * sk]), deep * .42, .2, P.AC, {}); }   // horny beak tip
-    else { cx.gid = 64; const n = Math.max(4, Math.round(snout / (1.1 * sk)));   // teeth along both jaws
-      for (let i = 0; i < n; i++){ const k = (i + .5) / n, up = lerp3(R([0, -deep * .32, .2 * sk]), add(tip, [0, -deep * .3, -.3 * sk]), k);
-        for (const sd of [-1, 1]){ const b = add(up, [sd * w * (.4 - k * .18), 0, 0]); cap(cx, b, add(b, [0, -1.25 * sk * (1 - k * .35), .25]), .42 * sk, .1, M.tusk, {}); }
-        if (jaw > .12){ const lo2 = lerp3(add(hinge, [0, deep * .3, sk]), add(jtip, [0, deep * .25, -.3 * sk]), k); for (const sd of [-1, 1]) cap(cx, add(lo2, [sd * w * (.32 - k * .12), 0, 0]), add(lo2, [sd * w * (.32 - k * .12), 1.05 * sk, .1]), .38 * sk, .1, M.tusk, {}); } } }
-    // nostrils, eyes
-    cx.gid = 65; for (const sd of [-1, 1]) ell(cx, add(tip, [sd * deep * .25, deep * .35, -.8 * sk]), .3 * sk, .22 * sk, P.DK, {});
-    cx.gid = 66; for (const sd of [-1, 1]) eye(cx, R([sd * w * .78, deep * .55, -.6 * sk]), sd, .62 * sk, P, o, !!s.eyeGlow);
-    return {R, tip, deep, w};
+    const Ls = 7.2 * (opt.snout ?? 1) * sk, deep = 3.3 * (opt.deep ?? 1) * sk, wide = 1.75 * (opt.wide ?? 1) * sk, z0 = -2.2 * sk;
+    const pitch = opt.pitch ?? 0, jaw = Math.min(.95, o.jaw * (opt.jawK ?? 1)), R = p => add(hc, rotX(p, pitch));
+    const H = u => deep * (1 - .48 * u), Wd = u => wide * (1 - .42 * u), top = u => deep * .5 - u * deep * .2, N = 12;
+    const fen = (u, nn, sd) => !opt.beak && u > .32 && u < .58 && nn[0] * sd > .35 && nn[1] > -.35 && nn[1] < .55;   // the antorbital opening
+    // upper skull: roof row and cheek row on both sides, plus a keel down the middle of the roof
+    for (let i = 0; i <= N; i++){ const u = i / N, z = z0 + u * Ls, h = H(u), w = Wd(u), r = Math.min(h * .3, w * .62), yT = top(u);
+      for (const sd of [-1, 1]){ cx.gid = 60 + (sd > 0 ? 1 : 0);
+        ell(cx, R([sd * (w - r), yT - r, z]), r, r, P.SK, {tex:nn => (nn[1] > .35 && P.ST && Math.sin(u * 9) > .5 ? {m:P.ST} : (h3(i, Math.floor(nn[0] * 6), Math.floor(nn[1] * 6)) > .84 ? {dt:1} : undefined))});
+        ell(cx, R([sd * (w - r * .9), yT - h * .62, z]), r * 1.05, r * 1.05, P.SK, {tex:nn => (fen(u, nn, sd) ? {m:P.DK, t:3} : nn[1] < -.55 ? {m:P.DK, t:2} : undefined)}); }   // cheek, with the lip line under it
+      cx.gid = 62; ell(cx, R([0, yT - r * .7, z]), r * .9, r * .9, P.SK, {}); }
+    const tip = R([0, top(1) - H(1) * .45, z0 + Ls + .4 * sk]);
+    cx.gid = 63; ell(cx, tip, Wd(1) * .9, H(1) * .45, P.SK, {});
+    // brow ridges over the eyes, with a small horn boss (tyrannosaur lacrimal / postorbital)
+    for (const sd of [-1, 1]){ const u = .16, b = R([sd * Wd(u) * .9, top(u) - H(u) * .18, z0 + u * Ls]);
+      cx.gid = 64 + (sd > 0 ? 1 : 0); cap(cx, add(b, [0, .35 * sk, -1.1 * sk]), add(b, [0, .5 * sk, 1.3 * sk]), .55 * sk, .45 * sk, P.SK, {});
+      if (!opt.beak) cap(cx, add(b, [0, .5 * sk, .2 * sk]), add(b, [sd * .15, 1.15 * sk, .5 * sk]), .45 * sk, .12, P.AC, {});
+      eye(cx, add(b, [sd * .1 * sk, -.75 * sk, .15 * sk]), sd, .5 * sk, P, o, !!s.eyeGlow); }
+    // nostrils
+    cx.gid = 66; for (const sd of [-1, 1]) ell(cx, R([sd * Wd(.92) * .55, top(.92) - H(.92) * .15, z0 + .92 * Ls]), .28 * sk, .2 * sk, P.DK, {});
+    // teeth hang from the lip line
+    if (!opt.beak){ cx.gid = 67; for (let i = 2; i <= N; i++){ const u = i / N; for (const sd of [-1, 1]){ const b = R([sd * Wd(u) * .78, top(u) - H(u) * .88, z0 + u * Ls]); cap(cx, b, add(b, rotX([0, -.95 * sk * (1.15 - u * .4), .15 * sk], pitch)), .32 * sk, .08, M.tusk, {}); } } }
+    else { cx.gid = 67; cap(cx, add(tip, [0, .2 * sk, -1.2 * sk]), add(tip, [0, -.45 * sk, .35 * sk]), H(1) * .38, .15, P.AC, {}); }   // a horny beak
+    // the lower jaw: hinged under the back of the skull, swings down
+    const hinge = R([0, top(0) - H(0) * .92, z0 + .35 * sk]), J = p => add(hinge, rotX(p, pitch + jaw)), JL = Ls * .94;
+    if (jaw > .08){ cx.gid = 68; for (let i = 1; i <= 6; i++){ const u = i / 6; ell(cx, lerp3(J([0, .5 * sk, JL * u * .95]), R([0, top(u) - H(u) * .8, z0 + u * Ls]), .5), Wd(u) * .55, Wd(u) * .55, M.mouth, {}); }   // mouth and tongue
+      cx.gid = 68; cap(cx, J([0, .45 * sk, JL * .15]), J([0, .55 * sk, JL * .7]), Wd(.3) * .32, Wd(.7) * .25, M.mouth, {tex:() => ({t:0})}); }
+    for (let i = 0; i <= 8; i++){ const u = i / 8, d = (1.45 - u * .7) * sk, w = Wd(u) * .82, r = Math.min(d * .55, w * .6);
+      for (const sd of [-1, 1]){ cx.gid = 69 + (sd > 0 ? 1 : 0); ell(cx, J([sd * (w - r), -d * .45, JL * u]), r, r, opt.beak ? P.AC : P.SK, {tex:nn => (nn[1] < -.3 && P.BE ? {m:P.BE} : undefined)});
+        if (!opt.beak && i > 0 && jaw > .08){ const b = J([sd * (w - r) * .9, d * .1, JL * u]); cap(cx, b, add(b, rotX([0, .8 * sk * (1.1 - u * .4), 0], pitch + jaw)), .3 * sk, .08, M.tusk, {}); } } }
+    return {R, tip, deep:H(0), w:Wd(0)};
   }
   /* a three-toed bird-like foot, the middle toe longest; sickle: a raised killing claw on the second toe */
   function foot3(cx, P, f, sd, sz, sickle){
@@ -148,19 +162,24 @@ const DINO = (() => {
       const hip = T([0, H, 0]), chest = T([0, H + up, BL]), belly = add(lerp3(hip, chest, .55), [0, -.8 * g, 0]);
       // legs: thigh, shin, long metatarsus, three toes — far leg first
       for (const sd of [-1, 1]){ const off = sd > 0 ? Math.PI : 0, sw = walk ? Math.sin(ph + off) * .55 : (o.atk ? [0, .1, -.25, 0][f] * sd : 0), lift = walk ? Math.max(0, Math.cos(ph + off)) * 2.2 : 0;
-        const top = add(hip, [sd * 3.1 * g, -.6, .6]);
+        const top = add(hip, [sd * 3.3 * g, -.4, .8]);
         const knee = add(top, rotX([sd * .4, -H * .42, H * .2], sw)), ankle = add(knee, rotX([0, -H * .34, -H * .22], sw * .6)), ft = add(ankle, rotX([0, -H * .24 + .6 + lift, H * .05], sw * .3));
-        cx.gid = 20 + (sd > 0 ? 2 : 0); ell(cx, add(top, [sd * .9, -2, .8]), 4.4 * g, 5.4 * g, P.SK, {rz:4.6 * g, tex:skin('leg')});   // the drumstick thigh muscle
-        cap(cx, top, knee, 3.4 * g, 2.1 * g, P.SK, {step:.4, tex:skin('leg')});
+        // the thigh: a long muscle wrapped round the femur (thick at the hip, narrowing to the knee), not a ball
+        cx.gid = 20 + (sd > 0 ? 2 : 0); cap(cx, add(top, [0, 1.2 * g, -1.2 * g]), lerp3(top, knee, .72), 3.7 * g, 2.5 * g, P.SK, {step:.35, tex:skin('leg')});
+        cap(cx, top, knee, 2.9 * g, 1.9 * g, P.SK, {step:.4, tex:skin('leg')});
+        cap(cx, lerp3(knee, ankle, .05), lerp3(knee, ankle, .5), 1.9 * g, 1.45 * g, P.SK, {});   // the calf
         cx.gid = 21 + (sd > 0 ? 2 : 0); cap(cx, knee, ankle, 2 * g, 1.25 * g, P.SK, {step:.4, tex:skin('leg')}); cap(cx, ankle, ft, 1.2 * g, 1 * g, P.SK, {});
         foot3(cx, P, ft, sd, Math.sqrt(g) * (s.foot ?? 1), s.sickle);
         if (P.FE && s.featherLegs){ cx.gid = 24; for (let i = 0; i < 4; i++) cap(cx, lerp3(top, knee, .2 + i * .2), add(lerp3(top, knee, .2 + i * .2), [sd * 1.6, -1.6, -1.8]), .9, .3, P.FE, {}); } }
       // tail, level behind the hips
-      const tp = tail(cx, P, skin, add(hip, [0, .6 * g, -2.5 * g]), tl, 4.8 * g, .4, o, {rise:2.4, droop:2.2, segs:10});
+      const tp = tail(cx, P, skin, add(hip, [0, .9 * g, -2.4 * g]), tl, 3.9 * g, .35, o, {rise:3.2, droop:1.6, segs:12});
       if (P.FE && s.tailFan){ cx.gid = 52; const e = tp[tp.length - 1]; for (const a of [-.9, -.45, 0, .45, .9]) cap(cx, tp[tp.length - 3], add(e, [Math.sin(a) * 3, .3, -Math.cos(a) * 2.2]), .8, .35, P.FE, {}); }
       // torso: hips → ribcage → chest
-      cx.gid = 1; cap(cx, hip, belly, 4.8 * g, 5.4 * g, P.SK, {step:.35, tex:skin('body', 0, .5)});
-      cx.gid = 2; cap(cx, belly, chest, 5.4 * g, 4.6 * g, P.SK, {step:.35, tex:skin('body', .5, 1)});
+      // torso: deeper than it is wide — a back row and a belly row (ribcage, gut) rather than one round barrel
+      cx.gid = 1; cap(cx, add(hip, [0, 1.4 * g, 0]), add(belly, [0, 1.8 * g, 0]), 3.6 * g, 3.9 * g, P.SK, {step:.35, tex:skin('body', 0, .5)});
+      cap(cx, add(hip, [0, -1, .6]), add(belly, [0, -1.6 * g, 0]), 3.4 * g, 4.3 * g, P.SK, {step:.35, tex:skin('body', 0, .5)});
+      cx.gid = 2; cap(cx, add(belly, [0, 1.8 * g, 0]), add(chest, [0, .8 * g, 0]), 3.9 * g, 3.4 * g, P.SK, {step:.35, tex:skin('body', .5, 1)});
+      cap(cx, add(belly, [0, -1.6 * g, 0]), add(chest, [0, -1.2 * g, .4]), 4.3 * g, 3.5 * g, P.SK, {step:.35, tex:skin('body', .5, 1)});
       if (P.SL){ cx.gid = 3; sheetFill(cx, t => add(lerp3(hip, chest, -.15 + t * 1.1), [0, 3.6 * g, 0]), t => add(lerp3(hip, chest, -.15 + t * 1.1), [0, 3.6 * g + (2 + Math.sin(t * Math.PI) * 10.5) * g, (t - .5) * -1.2]), .55 * g, P.SL, 14,
         (nn, t, u) => (Math.abs(Math.sin(t * 14 * Math.PI)) < .2 ? {m:P.ST || P.DK, t:1} : {t:u > .85 ? 2 : u > .4 ? 0 : 1})); }   // spinosaur sail on long spines
       if (P.FE && s.backFeathers){ cx.gid = 3; for (let i = 0; i < 7; i++){ const p = lerp3(hip, chest, i / 6); cap(cx, add(p, [0, 4.2 * g, 0]), add(p, [0, 5.6 * g, -2.4]), 1, .35, P.FE, {}); } }
@@ -388,5 +407,8 @@ const DINO = (() => {
   BEAST.make = function(key, spec){
     const plan = spec && DINO.plans[spec.plan];
     if (!plan) return _mk.call(this, key, spec);
-    SPR.MOBS[key] = {name:key, fs:Math.max(spec.fs || 96, 96), scale:spec.scale || 1, model:plan(key, spec)};
+    // sz: the animal's real size class relative to a hero (data/world4.js). The frame must hold the whole animal in
+    // any of the 8 facings, so it is sized from how far the body reaches from its feet (tail tip, neck, wings)
+    const scale = (spec.scale || 1) * (spec.sz || 1), L = spec.len || 1, reach = {theropod:30 * L, sauropod:44 * L, ceratops:24 * L, stego:26 * L, ankylo:22 * L, ptero:26 * (spec.size || 1), dragon:36 * L, wyvern:34 * L}[spec.plan] || 30;
+    SPR.MOBS[key] = {name:key, fs:Math.max(spec.fs || 96, 96, Math.ceil(reach * 2.1 * scale)), scale, model:plan(key, spec)};
   }; }

@@ -32,9 +32,9 @@ Object.assign(PROP_TYPES, {
     for (let t = 0; t <= 1; t += .03){ const x = lean * t * t, y = -t * H, w = 4.6 - t * 1.2;
       g.fillStyle = PAL3.trunkM; g.fillRect(x - w, y - 2.4, w * 2, 2.6); g.fillStyle = PAL3.trunkD; g.fillRect(x + w * .25, y - 2.4, w * .75, 2.6);
       if (Math.floor(t * 33) % 3 === 0){ g.fillStyle = PAL3.fiber; g.fillRect(x - w - 1, y - 1, 2, 2); g.fillRect(x + w - 1, y - 1.6, 2, 2); } }   // old frond bases
-    const tx = lean, ty = -H, cols = [PAL3.fernD, PAL3.fernM, PAL3.fernL];
+    const tx = lean, ty = -H, cols = typeof P4 !== 'undefined' ? P4.fern : [PAL3.fernD, PAL3.fernM, PAL3.fernL];
     for (let i = 0; i < 11; i++){ const a = -Math.PI / 2 + (i / 10 - .5) * 3.9 + (rng() - .5) * .2, back = i % 2;
-      frond(g, rng, tx, ty, a, 36 + rng() * 12, 18 + rng() * 10, back ? [PAL3.fernD, PAL3.fernD, PAL3.fernM] : cols, 4.4); }
+      frond(g, rng, tx, ty, a, 36 + rng() * 12, 18 + rng() * 10, back ? cols.map((c, j) => cols[Math.max(0, j - 1)]) : cols, 4.4); }
     for (let i = 0; i < 4; i++) frond(g, rng, tx, ty, -Math.PI / 2 + (i - 1.5) * .35, 14 + rng() * 6, -4, [PAL3.fernM, PAL3.fernL, PAL3.fernH], 2.6);   // young fiddleheads in the middle
     g.fillStyle = PAL3.fernH; for (let i = 0; i < 3; i++){ ov(g, tx + (i - 1) * 3, ty - 14 - i * 2, 1.8, 1.8); g.fill(); }
   }}),
@@ -43,12 +43,12 @@ Object.assign(PROP_TYPES, {
     const H = 22 + rng() * 14;
     for (let y = 0; y > -H; y -= 4){ const w = 9 - (-y / H) * 2.5; for (let x = -w; x < w; x += 4){ g.fillStyle = (Math.floor(x / 4) + Math.floor(y / 4)) % 2 ? PAL3.trunkM : PAL3.trunkL; pv(g, [x, y, x + 2, y - 2, x + 4, y, x + 2, y + 2]); g.fill(); } g.fillStyle = PAL3.trunkD; g.fillRect(w - 3, y - 2, 3, 4); }
     for (let i = 0; i < 13; i++){ const a = -Math.PI / 2 + (i / 12 - .5) * 3.3 + (rng() - .5) * .15, len = 30 + rng() * 8;
-      frond(g, rng, 0, -H, a, len, 6 + rng() * 4, i % 2 ? [PAL3.cycD, PAL3.cycM, PAL3.cycD] : [PAL3.cycD, PAL3.cycL, PAL3.cycM], 3.4); }
+      frond(g, rng, 0, -H, a, len, 6 + rng() * 4, typeof P4 !== 'undefined' ? P4.cycad : [PAL3.cycD, PAL3.cycL, PAL3.cycM], 3.4); }
     g.fillStyle = '#c8a040'; ov(g, 0, -H - 6, 4.5, 7); g.fill(); g.fillStyle = '#e8c860'; for (let i = 0; i < 4; i++){ ov(g, -1.5 + (i % 2) * 3, -H - 10 + i * 2.6, 1.3, 1); g.fill(); }   // the seed cone
   }}),
   /* araucaria: a tall straight conifer with tiers of level branches tufted at the tips, and a flat crown */
-  araucaria: seed => makeProp({w:110, h:190, ax:55, ay:184, seed, shadow:[16, 6, 6], collide:8, paint(g, rng){
-    const H = 140 + rng() * 30;
+  araucaria: seed => makeProp({w:130, h:270, ax:65, ay:264, seed, shadow:[22, 7, 8], collide:8, paint(g, rng){
+    const H = 210 + rng() * 40;   // a 30–40 m conifer, shortened like every big plant (props4.js)
     g.fillStyle = PAL3.trunkD; pv(g, [-4, 0, 4, 0, 1.6, -H, -1.6, -H]); g.fill(); g.fillStyle = PAL3.trunkL; pv(g, [-4, 0, -1.4, 0, -.4, -H, -1.6, -H]); g.fill();
     const tiers = 9;
     for (let i = 0; i < tiers; i++){ const k = i / (tiers - 1), y = -H * (.42 + k * .58), span = 36 * (1 - k * .55) + rng() * 6;
@@ -63,9 +63,9 @@ Object.assign(PROP_TYPES, {
     const n = 5 + Math.floor(rng() * 4);
     for (let i = 0; i < n; i++){ const x0 = (rng() - .5) * 22, H = 40 + rng() * 38, lean = (rng() - .5) * 10;
       for (let k = 0; k < 1; k += 1 / 8){ const x = x0 + lean * k, y = -H * k, y2 = -H * (k + 1 / 8), x2 = x0 + lean * (k + 1 / 8);
-        g.strokeStyle = i % 2 ? '#4a8a3a' : '#6aa24a'; g.lineWidth = 3 - k * 1.2; g.beginPath(); g.moveTo(x, y); g.lineTo(x2, y2); g.stroke();
+        g.strokeStyle = i % 2 ? '#3e6430' : '#557a3c'; g.lineWidth = 3 - k * 1.2; g.beginPath(); g.moveTo(x, y); g.lineTo(x2, y2); g.stroke();
         g.fillStyle = '#1e2a14'; g.fillRect(x2 - 1.6, y2 - .6, 3.2, 1.3);
-        if (k > .25 && k < .9){ g.strokeStyle = '#7ab45a'; g.lineWidth = .8; for (const sd of [-1, 1]){ g.beginPath(); g.moveTo(x2, y2); g.lineTo(x2 + sd * (8 - k * 5), y2 + 5); g.stroke(); } } }
+        if (k > .25 && k < .9){ g.strokeStyle = '#6a8c4a'; g.lineWidth = .8; for (const sd of [-1, 1]){ g.beginPath(); g.moveTo(x2, y2); g.lineTo(x2 + sd * (8 - k * 5), y2 + 5); g.stroke(); } } }
       g.fillStyle = '#8a7a3a'; ov(g, x0 + lean, -H - 2, 1.8, 3.2); g.fill(); }   // the spore cone at the tip
   }}),
   /* ground ferns: a low clump of fronds */
@@ -136,16 +136,16 @@ Object.assign(PROP_TYPES, {
 /* ---------- ground recipes ---------- */
 Object.assign(BIOME, {
   /* Primeval Phu Wiang: a humid fern forest under araucarias, mud pools, no flowers yet */
-  primeval:{base:['#3f6a2e', '#4a7634', '#55803a'], mottle:['rgba(30,50,20,.5)', 'rgba(170,200,120,.25)'], blades:['#2f5a2a', '#3f7a32', '#5a9a3e', '#7ab44a'], bladeN:38000,
+  primeval:{base:['#384a2a', '#40542e', '#4a5e34'], mottle:['rgba(64,48,28,.42)', 'rgba(150,170,100,.18)'], blades:['#2c4424', '#3a5a2c', '#4e7036', '#6a8a42'], bladeN:30000,   // a shaded forest floor: soil and leaf litter showing through
     road:['#8a6a42', '#a08052', '#b08e5c'], ponds:4, pondR:[60, 120], pondCols:['#6a5a3a', '#3a5a3a', '#4a7048', '#7a9a68'],
-    props:[['treefern', 8, 1], ['araucaria', 5, 1], ['cycad', 6, 1], ['horsetail', 4, 1], ['groundfern', 9, 1], ['fossil', 1, 1], ['rock', 2, 1]], propN:150, fx:'mist', fxA:.22},
+    props:[['treefern', 8, 5], ['araucaria', 5, 5], ['cycad', 6, 5], ['horsetail', 4, 5], ['groundfern', 9, 5], ['fossil', 1, 3], ['rock', 2, 1]], propN:150, fx:'mist', fxA:.22},
   /* Ancient Amber Basin: a braided sandy river on a floodplain, horsetail beds, bones in the sand bars */
-  amberfen:{base:['#8f8a52', '#9a945a', '#a69f66'], mottle:['rgba(90,80,40,.4)', 'rgba(240,220,160,.3)'], blades:['#6a8a3a', '#8a9a4a', '#a8a85a'], bladeN:22000,
+  amberfen:{base:['#7e7650', '#878058', '#918a60'], mottle:['rgba(90,70,40,.4)', 'rgba(230,210,160,.22)'], blades:['#5a6a34', '#6e7a3e', '#8a8a4a'], bladeN:18000,
     road:['#b89a62', '#c8aa72', '#d6b880'], band:{y0:820, y1:1140, deep:'#4a5a3a', mid:'#5a7a4e', hi:'#9ab07a', shore:'#d8c08a'}, ponds:3, pondR:[50, 100], pondCols:['#d8c08a', '#6a5a2a', '#a8782a', '#e8b04a'],
-    props:[['horsetail', 7, 1], ['cycad', 4, 1], ['araucaria', 3, 1], ['ribcage', 2, 1], ['fossil', 4, 1], ['amber', 3, 1], ['groundfern', 5, 1], ['reed', 2, 1]], propN:120, fx:'dust', fxA:.08}
+    props:[['horsetail', 7, 5], ['cycad', 4, 5], ['araucaria', 3, 5], ['ribcage', 2, 3], ['fossil', 4, 3], ['amber', 3, 3], ['groundfern', 5, 5], ['reed', 2, 1]], propN:120, fx:'dust', fxA:.08}
 });
-BIOME.dragonvale = {...BIOME.crater, props:[['dragonskull', 3, 1], ['rock', 7, 1], ['crystal', 3, 3], ['stalag', 4, 2]]};
-BIOME.dragonroost = {...BIOME.canyon, base:['#b08a56', '#bc9660', '#c8a26c'], mottle:['rgba(110,70,40,.4)', 'rgba(250,220,170,.3)'], props:[['dragonskull', 3, 1], ['ribcage', 2, 1], ['rock', 9, 1], ['stalag', 4, 2], ['araucaria', 2, 1]], fx:'dust', fxA:.12};
-BIOME.naraka = {...BIOME.lavafield, props:[['cauldron', 2, 1], ['thorntree', 6, 1], ['rock', 6, 1], ['stalag', 3, 2]]};
+BIOME.dragonvale = {...BIOME.crater, props:[['dragonskull', 1, 3], ['rock', 7, 1], ['crystal', 3, 3], ['stalag', 4, 2]]};
+BIOME.dragonroost = {...BIOME.canyon, base:['#b08a56', '#bc9660', '#c8a26c'], mottle:['rgba(110,70,40,.4)', 'rgba(250,220,170,.3)'], props:[['dragonskull', 1, 3], ['ribcage', 2, 3], ['rock', 9, 1], ['stalag', 4, 2], ['araucaria', 2, 5]], fx:'dust', fxA:.12};
+BIOME.naraka = {...BIOME.lavafield, props:[['cauldron', 2, 3], ['thorntree', 6, 3], ['rock', 6, 1], ['stalag', 3, 2]]};
 BIOME.demonthrone = {...BIOME.badan, base:['#2a1e34', '#32243e', '#3a2a46'], mottle:['rgba(15,8,20,.55)', 'rgba(200,120,230,.15)'], blades:null, road:['#4a3a5a', '#5a4a6a', '#6a5a7a'],
-  pondCols:['#2a1a2a', '#4a0a3a', '#8a1a6a', '#ff6ae0'], props:[['obelisk', 6, 1], ['crystal', 5, 4], ['statue', 2, 2], ['rock', 2, 1]], fx:'embers', fxA:.25, tint:'rgba(80,20,90,.12)'};   // a violet palace floor, not the sea floor it borrows from
+  pondCols:['#2a1a2a', '#4a0a3a', '#8a1a6a', '#ff6ae0'], props:[['obelisk', 6, 3], ['crystal', 5, 4], ['statue', 2, 2], ['rock', 2, 1]], fx:'embers', fxA:.25, tint:'rgba(80,20,90,.12)'};   // a violet palace floor, not the sea floor it borrows from
