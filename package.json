@@ -1,0 +1,21 @@
+{
+  "name": "vayrathen",
+  "version": "1.0.0",
+  "private": true,
+  "description": "VAYRATHEN — Thai-style MMORPG prototype (HTML5 Canvas + plain JavaScript, no build step)",
+  "scripts": {
+    "start": "node tests/serve.js 8080",
+    "test": "node --test --test-concurrency=3 \"tests/*.test.js\"",
+    "test:data": "node --test tests/data.test.js",
+    "test:smoke": "node --test tests/smoke.test.js",
+    "test:stress": "node --test tests/stress.test.js",
+    "test:online": "node --test tests/online.test.js",
+    "test:fast": "node --test --test-concurrency=2 tests/data.test.js tests/smoke.test.js tests/bia.test.js tests/combatcaps.test.js tests/itemtip.test.js tests/touchequip.test.js tests/joylay.test.js tests/potsteady.test.js tests/lazypanel.test.js tests/featureoff.test.js tests/botbuff.test.js tests/tgttop.test.js"
+  },
+  "devDependencies": {
+    "playwright": "1.56.1"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

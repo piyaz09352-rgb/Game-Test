@@ -1,0 +1,7 @@
+node_modules/
+test-results/
+.firebase/
+.DS_Store
+# Firebase admin key and full backups (tools/firebase-backup.mjs): never commit or upload
+service-account*.json
+vayrathen-full-*.json

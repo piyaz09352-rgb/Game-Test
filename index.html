@@ -1,0 +1,419 @@
+<meta charset="utf-8">
+<meta name="color-scheme" content="only light">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="screen-orientation" content="landscape">
+<meta name="mobile-web-app-capable" content="yes">
+<title>VAYRATHEN</title>
+<meta name="description" content="VAYRATHEN — Thai-fantasy MMORPG prototype">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Mali:wght@400;500;600;700&family=Cinzel:wght@600;800&family=Pridi:wght@500;600;700&family=Sarabun:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="css/base.css?v=123">
+<link rel="stylesheet" href="css/hud.css?v=111">
+<link rel="stylesheet" href="css/thai.css?v=111">
+<link rel="stylesheet" href="css/ornate.css?v=111">
+<link rel="stylesheet" href="css/palace.css?v=111">
+<link rel="stylesheet" href="css/systems.css?v=123">
+<link rel="stylesheet" href="css/warpgrid.css?v=111">
+<link rel="stylesheet" href="css/auth.css?v=111">
+<link rel="stylesheet" href="css/pastel.css?v=111">
+<link rel="stylesheet" href="css/royal.css?v=111">
+<link rel="stylesheet" href="css/winfit.css?v=111">
+<link rel="stylesheet" href="css/chatglass.css?v=111">
+<link rel="stylesheet" href="css/hudname.css?v=111">
+<link rel="stylesheet" href="css/sunlit.css?v=111">
+<div class="rotate" id="rotate" role="alert">
+  <div class="rot-card">
+    <svg class="rot-ic" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="8" width="24" height="44" rx="4"/><path d="M29 46h6"/><path d="M50 22a18 18 0 016 14M56 36l-4-3M56 36l3-4"/></svg>
+    <h2><span data-en="Turn your device sideways">หมุนจอเป็นแนวนอน</span></h2>
+    <p><span data-en="VAYRATHEN plays in landscape only">VAYRATHEN เล่นได้เฉพาะแนวนอน</span><br><span data-en="Rotate and the game resumes right away">หมุนเครื่องแล้วเกมจะเล่นต่อทันที</span></p>
+  </div>
+</div>
+<div class="app">
+  <header class="top"><h1>VAYRATHEN</h1><span class="thai"><span data-en="Realm of Vayra">อาณาจักรวายรา</span></span><span class="sub"><span data-en="Prototype 0.3 · Suwannin Fields · EXP x2 · Job x2">Prototype 0.3 · ทุ่งสุวรรณิน · EXP x2 · Job x2</span></span></header>
+  <div class="stage" id="wrap">
+    <canvas id="cv" aria-label="แผนที่เกม ทุ่งสุวรรณิน" data-en-label="Game map, Suwannin Fields"></canvas>
+    <div class="ui" id="ui">
+      <section class="card char" id="charCard" aria-label="ตัวละคร" data-en-label="Character">
+        <div class="portrait"><canvas id="portrait" width="64" height="64"></canvas><span class="lvb" id="lvBadge">1</span></div>
+        <div class="cinfo">
+          <div class="cname"><b id="cJob"><span data-en="Villager">ชาวบ้าน</span></b><span id="cLv"></span></div>
+          <div class="bar hp" id="hpBar"><i class="ghost" id="hpG"></i><i id="hpI"></i><span id="hpT"></span></div>
+          <div class="bar sp"><i class="ghost" id="spG"></i><i id="spI"></i><span id="spT"></span></div>
+          <div class="thin bx" title="Base EXP"><i id="bxI"></i></div>
+          <div class="thin jx" title="Job EXP"><i id="jxI"></i></div>
+          <div class="xpt"><span id="bxT"></span><span id="ammoT" class="ammo" hidden></span><span id="jxT"></span></div>
+          <div class="buffs" id="buffs" hidden></div>
+        </div>
+      </section>
+      <section class="card goal" id="goalCard" aria-label="Quest">
+        <div class="gt"><span data-en="Quest">เควสต์</span><button class="ibtn fold" data-fold="goalCard" aria-label="พับภารกิจ" data-en-label="Fold quest"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6l4 4 4-4"/></svg></button></div>
+        <p id="goal"></p>
+      </section>
+      <section class="card target" id="target" hidden aria-live="polite">
+        <div class="tn"><b id="tName"></b><span class="em" id="tEm"></span></div>
+        <small id="tMeta"></small>
+        <div class="bar hp"><i class="ghost" id="tG"></i><i id="tI"></i></div>
+      </section>
+      <section class="card mapc" id="mapCard" aria-label="แผนที่ย่อ" data-en-label="Minimap">
+        <div class="mhead"><div class="mapname" id="mapName"></div><button class="ibtn fold mmfold" data-fold="mapCard" aria-label="พับ/กางแผนที่ย่อ" title="พับ/กางแผนที่ย่อ" data-en-label="Fold minimap"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6l4 4 4-4"/></svg></button></div><div class="mt"><span class="clock" id="clock"></span><button class="uitoggle" id="uiToggle" data-hideui="1" aria-pressed="false" aria-label="ซ่อน UI" title="ซ่อน/แสดง UI (H)" data-en-label="Hide UI"><svg class="i-off" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2.5 10s2.8-5 7.5-5c1.4 0 2.6.4 3.7 1M17.5 10s-2.8 5-7.5 5c-1.4 0-2.6-.4-3.7-1"/><path d="M3.5 16.5l13-13"/></svg><svg class="i-on" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M2.5 10s2.8-5 7.5-5 7.5 5 7.5 5-2.8 5-7.5 5-7.5-5-7.5-5z"/><circle cx="10" cy="10" r="2.2"/></svg><span><span data-en="Hide UI">ซ่อน UI</span></span></button></div>
+        <canvas id="minimap" title="แตะเพื่อเดินไปจุดนั้น" data-en-label="Tap to walk there" aria-label="แผนที่ย่อ แตะเพื่อเดินไปจุดนั้น"></canvas>
+        <div class="zm"><button class="ibtn" data-zoom="-1" aria-label="ซูมออก" title="ซูมออก (−)" data-en-label="Zoom out"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8h8"/></svg></button><span id="zoomV">100%</span><button class="ibtn" data-zoom="1" aria-label="ซูมเข้า" title="ซูมเข้า (+)" data-en-label="Zoom in"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 8h8M8 4v8"/></svg></button></div>
+      </section>
+
+      <section class="win" id="win-stat" hidden><header class="wt" data-drag="stat"><i class="gem"></i><b><span data-en="Status">สถานะ</span></b><kbd>A</kbd><button class="ibtn minb" data-min="stat" aria-label="ย่อ" data-en-label="Minimize"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10l4-4 4 4"/></svg></button><button class="ibtn" data-wclose="stat" aria-label="ปิด" data-en-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></header><div class="wb"><div class="pane" id="pane-stat"></div></div></section>
+      <section class="win" id="win-skill" hidden><header class="wt" data-drag="skill"><i class="gem"></i><b><span data-en="Skill">สกิล</span></b><kbd>S</kbd><button class="ibtn minb" data-min="skill" aria-label="ย่อ" data-en-label="Minimize"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10l4-4 4 4"/></svg></button><button class="ibtn" data-wclose="skill" aria-label="ปิด" data-en-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></header><div class="wb"><div class="pane" id="pane-skill"></div></div></section>
+      <section class="win" id="win-bag" hidden><header class="wt" data-drag="bag"><i class="gem"></i><b><span data-en="Inventory">กระเป๋า</span></b><kbd>E</kbd><button class="ibtn minb" data-min="bag" aria-label="ย่อ" data-en-label="Minimize"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10l4-4 4 4"/></svg></button><button class="ibtn" data-wclose="bag" aria-label="ปิด" data-en-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></header><div class="wb"><div class="pane" id="pane-bag"></div></div></section>
+      <section class="win" id="win-equip" hidden><header class="wt" data-drag="equip"><i class="gem"></i><b><span data-en="Equipment">อุปกรณ์</span></b><kbd>Q</kbd><button class="ibtn minb" data-min="equip" aria-label="ย่อ" data-en-label="Minimize"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10l4-4 4 4"/></svg></button><button class="ibtn" data-wclose="equip" aria-label="ปิด" data-en-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></header><div class="wb"><div class="pane" id="pane-equip"></div></div></section>
+      <section class="win" id="win-log" hidden><header class="wt" data-drag="log"><i class="gem"></i><b><span data-en="Log">บันทึก</span></b><kbd>L</kbd><button class="ibtn minb" data-min="log" aria-label="ย่อ" data-en-label="Minimize"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10l4-4 4 4"/></svg></button><button class="ibtn" data-wclose="log" aria-label="ปิด" data-en-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></header><div class="wb"><div class="pane" id="pane-log"></div></div></section>
+      <section class="win" id="win-social" hidden><header class="wt" data-drag="social"><i class="gem"></i><b><span data-en="Online">ออนไลน์</span></b><kbd>N</kbd><button class="ibtn minb" data-min="social" aria-label="ย่อ" data-en-label="Minimize"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10l4-4 4 4"/></svg></button><button class="ibtn" data-wclose="social" aria-label="ปิด" data-en-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></header><div class="wb"><div class="pane" id="pane-social"></div></div></section>
+      <section class="win" id="win-quest" hidden><header class="wt" data-drag="quest"><i class="gem"></i><b><span data-en="Quests">เควสต์</span></b><kbd>J</kbd><button class="ibtn minb" data-min="quest" aria-label="ย่อ" data-en-label="Minimize"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10l4-4 4 4"/></svg></button><button class="ibtn" data-wclose="quest" aria-label="ปิด" data-en-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></header><div class="wb"><div class="pane" id="pane-quest"></div></div></section>
+      <section class="win" id="win-world" hidden><header class="wt" data-drag="world"><i class="gem"></i><b><span data-en="World Map">แผนที่โลก</span></b><kbd>M</kbd><button class="ibtn minb" data-min="world" aria-label="ย่อ" data-en-label="Minimize"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10l4-4 4 4"/></svg></button><button class="ibtn" data-wclose="world" aria-label="ปิด" data-en-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></header><div class="wb"><div class="pane" id="pane-world"></div></div></section>
+      <section class="win" id="win-wiki" hidden><header class="wt" data-drag="wiki"><i class="gem"></i><b><span data-en="Wiki">วิกิ</span></b><kbd>K</kbd><button class="ibtn minb" data-min="wiki" aria-label="ย่อ" data-en-label="Minimize"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10l4-4 4 4"/></svg></button><button class="ibtn" data-wclose="wiki" aria-label="ปิด" data-en-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></header><div class="wb"><div class="pane" id="pane-wiki"></div></div></section>
+      <section class="win" id="win-settings" hidden><header class="wt" data-drag="settings"><i class="gem"></i><b><span data-en="Settings">ตั้งค่า</span></b><kbd>O</kbd><button class="ibtn minb" data-min="settings" aria-label="ย่อ" data-en-label="Minimize"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10l4-4 4 4"/></svg></button><button class="ibtn" data-wclose="settings" aria-label="ปิด" data-en-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></header><div class="wb"><div class="pane" id="pane-settings"></div></div></section>
+      <section class="win" id="win-auto" hidden><header class="wt" data-drag="auto"><i class="gem"></i><b><span data-en="Auto Setup">ตั้งค่า Auto</span></b><kbd>⇧B</kbd><button class="ibtn minb" data-min="auto" aria-label="ย่อ" data-en-label="Minimize"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10l4-4 4 4"/></svg></button><button class="ibtn" data-wclose="auto" aria-label="ปิด" data-en-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></header><div class="wb"><div class="pane" id="pane-auto"></div></div></section>
+      <section class="win" id="win-help" hidden><header class="wt" data-drag="help"><i class="gem"></i><b><span data-en="Guide">คู่มือ</span></b><kbd>?</kbd><button class="ibtn minb" data-min="help" aria-label="ย่อ" data-en-label="Minimize"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10l4-4 4 4"/></svg></button><button class="ibtn" data-wclose="help" aria-label="ปิด" data-en-label="Close"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 4l8 8M12 4l-8 8"/></svg></button></header><div class="wb"><div class="pane" id="pane-help">
+        <dl class="keys"></dl>
+        <p class="empty"><span data-en="Drag a window by its title bar. Positions and folds are remembered in this browser.">ลากแถบชื่อหน้าต่างเพื่อย้าย ตำแหน่งและการพับจะถูกจำไว้ในเบราว์เซอร์นี้</span></p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn" id="resetUi" hidden><span data-en="Reset UI layout">จัด UI กลับค่าเริ่มต้น</span></button></div>
+      </div></div></section>
+
+      <nav class="dock" id="dock" aria-label="แถบลัด" data-en-label="Hotbar">
+        <div class="hotbar" id="hotbar"></div>
+      </nav>
+      <div class="castbar" id="castBar" hidden aria-live="polite"><div class="cbh"><b id="castN"></b><span id="castT"></span></div><div class="cbar"><i id="castI"></i></div></div>
+      <nav class="rail" id="rail" aria-label="เมนู" data-en-label="Menu">
+        <button class="railtog" id="railTog" aria-expanded="true" title="พับ/กางเมนู"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6h12M4 10h12M4 14h12"/></svg><span><span data-en="Menu">เมนู</span></span><i class="dot" id="dotRail" hidden></i><svg class="chev" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6l4 4 4-4"/></svg></button>
+        <div class="menu">
+          <button class="mb" data-win="stat" aria-label="สถานะ" data-en-label="Status"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="6.5" r="3"/><path d="M4 17c.8-3.4 3.2-5 6-5s5.2 1.6 6 5"/></svg><span class="dot" id="dotStat" hidden></span><span class="tip"><span data-en="Status">สถานะ</span><kbd>A</kbd></span></button>
+          <button class="mb" data-win="skill" aria-label="สกิล" data-en-label="Skill"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M10 2.5l1.9 4.6 4.6 1.9-4.6 1.9L10 15.5l-1.9-4.6L3.5 9l4.6-1.9z"/><path d="M15.5 14l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7z"/></svg><span class="dot" id="dotSkill" hidden></span><span class="tip"><span data-en="Skill">สกิล</span><kbd>S</kbd></span></button>
+          <button class="mb" data-win="bag" aria-label="กระเป๋า" data-en-label="Inventory"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M7 6V4.8a3 3 0 016 0V6"/><path d="M4 6h12l-1 11H5z"/><path d="M8 10h4"/></svg><span class="dot" id="dotBag" hidden></span><span class="tip"><span data-en="Inventory">กระเป๋า</span><kbd>E</kbd></span></button>
+          <button class="mb" data-win="equip" aria-label="อุปกรณ์" data-en-label="Equipment"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3.5L3.5 6l1.5 3.5L6.5 9v7.5h7V9l1.5.5L16.5 6 13 3.5c-.6 1.3-1.7 2-3 2s-2.4-.7-3-2z"/></svg><span class="dot" id="dotEquip" hidden></span><span class="tip"><span data-en="Equipment">อุปกรณ์</span><kbd>Q</kbd></span></button>
+          <button class="mb" data-win="quest" aria-label="เควสต์" data-en-label="Quests"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3.5h8l2 2v11H5z"/><path d="M8 8h5M8 11h5M8 14h3"/><path d="M5.5 3.5c-1.4 0-2 .8-2 1.8s.6 1.7 2 1.7"/></svg><span class="dot" id="dotQuest" hidden></span><span class="tip"><span data-en="Quests">เควสต์</span><kbd>J</kbd></span></button>
+          <button class="mb" data-win="social" aria-label="ออนไลน์" data-en-label="Online"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="7.5" cy="7" r="2.6"/><path d="M2.8 16c.6-2.8 2.4-4.3 4.7-4.3s4.1 1.5 4.7 4.3"/><circle cx="14" cy="6.5" r="2"/><path d="M13.3 11.2c2 .1 3.4 1.5 3.9 4"/></svg><span class="tip"><span data-en="Online">ออนไลน์</span><kbd>N</kbd></span></button>
+          <button class="mb" data-win="world" aria-label="แผนที่โลก" data-en-label="World map"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2.5 5l5-2 5 2 5-2v12l-5 2-5-2-5 2z"/><path d="M7.5 3v12M12.5 5v12"/></svg><span class="tip"><span data-en="World map">แผนที่โลก</span><kbd>M</kbd></span></button>
+          <button class="mb" data-win="log" aria-label="บันทึก" data-en-label="Log"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><path d="M5 3.5h10v13H5z"/><path d="M8 7h4M8 10h4M8 13h2.5"/></svg><span class="tip"><span data-en="Log">บันทึก</span><kbd>L</kbd></span></button>
+          <button class="mb" data-win="wiki" aria-label="วิกิ" data-en-label="Wiki"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4.5h4.5A2.5 2.5 0 0110 7v9a2 2 0 00-2-2H3z"/><path d="M17 4.5h-4.5A2.5 2.5 0 0010 7v9a2 2 0 012-2h5z"/></svg><span class="tip"><span data-en="Wiki">วิกิ</span><kbd>K</kbd></span></button>
+          <button class="mb" data-win="help" aria-label="คู่มือ" data-en-label="Guide"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="7"/><path d="M8 8a2 2 0 113 1.7c-.7.4-1 .9-1 1.6M10 14v.1"/></svg><span class="tip"><span data-en="Guide">คู่มือ</span><kbd>?</kbd></span></button>
+          <button class="mb" data-win="settings" aria-label="ตั้งค่า" data-en-label="Settings"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"><circle cx="10" cy="10" r="2.6"/><path d="M10 2.5v2.2M10 15.3v2.2M2.5 10h2.2M15.3 10h2.2M4.7 4.7l1.6 1.6M13.7 13.7l1.6 1.6M4.7 15.3l1.6-1.6M13.7 6.3l1.6-1.6"/></svg><span class="tip"><span data-en="Settings">ตั้งค่า</span><kbd>O</kbd></span></button>
+          <i class="msep" aria-hidden="true"></i>
+          <button class="mb exitbtn" id="btnExit" aria-label="ออกจากเกม" data-en-label="Exit game"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 3.5H5v13h6"/><path d="M9 10h8M14 7l3 3-3 3"/></svg><span class="tip"><span data-en="Save &amp; exit">บันทึกและออก</span></span></button>
+        </div>
+      </nav>
+      <div class="title" id="title">
+        <div class="title-card authing">
+          <p class="t-eyebrow"><span data-en="Realm of Vayra">อาณาจักรวายรา</span></p>
+          <h2>VAYRATHEN</h2>
+          <p class="t-sub"><span data-en="Legend of the Sealed God">ตำนานแห่งเทพผู้ถูกผนึก</span></p>
+          <div id="titleBody"><p class="au-hint au-wait" style="display:block;padding:26px 0">กำลังโหลด…</p></div>
+          <div class="t-btns">
+            <button class="tbtn" id="btnTitleSettings"><span data-en="Settings">ตั้งค่า</span></button>
+          </div>
+          <p class="t-save" id="saveInfo"></p>
+        </div>
+      </div>
+      <div class="dialog confirm" id="confirm" hidden role="alertdialog"></div>
+      
+      <div class="joyzone" id="joyZone" aria-label="จอยเดิน" data-en-label="Movement joystick"><div class="joy" id="joy"><i class="halo"></i><i class="ring"></i><i class="yantra"></i><i class="arrow"></i><i class="knob" id="joyKnob"><i class="gem"></i></i></div></div>
+      <div class="mobaact" id="mobaAct"></div>
+      <div class="mobautil" id="mobaUtil"></div>
+      <div class="mobapot" id="mobaPot" aria-label="ยา" data-en-label="Potions"></div>
+      <div class="chips" id="chips"><div class="botchip" id="botChip" hidden data-openauto="1" title="ตั้งค่า Auto (Shift+B)"><i></i><span>Auto</span></div><div class="fps" id="fps" hidden></div><div class="netchip" id="netChip" data-st="off" data-win="social" title="ออนไลน์ (N)"><i></i><span>ออฟไลน์</span></div></div>
+      <div class="chatbox" id="chatBox" hidden>
+        <div class="cgrip" id="chatGrip" title="ลากเพื่อยืด/หดแชท" aria-label="ปรับความสูงแชท"></div><div class="ctabs"><button class="ctab on" data-ctab="all">ทั้งหมด</button><button class="ctab" data-ctab="world">โลก</button><button class="ctab" data-ctab="map">แผนที่</button><button class="ctab" data-ctab="party">ปาร์ตี้</button><button class="ctab" data-ctab="guild">กิลด์</button><button class="csz cmin" data-chatmin="1" aria-label="ย่อแชท" title="ย่อแชท">–</button><button class="csz" data-csz="-1" aria-label="หดแชท" title="หดแชท">▾</button><button class="csz" data-csz="1" aria-label="ยืดแชท" title="ยืดแชท">▴</button></div>
+        <div class="clog" id="chatLog" aria-live="polite"></div>
+        <form class="cin" id="chatForm" autocomplete="off"><select id="chatCh" aria-label="ช่องแชท"><option value="all">🌏 โลก</option><option value="map">📍 แผนที่</option><option value="party">👥 ปาร์ตี้</option><option value="guild">🛡 กิลด์</option></select><input id="chatIn" maxlength="120" placeholder="พิมพ์ข้อความ…" enterkeyhint="send" autocomplete="off" autocorrect="off"><button type="submit" class="csend" aria-label="ส่ง">ส่ง</button></form>
+      </div>
+      <button class="chatbtn" id="chatBtn" hidden aria-label="เปิดแชท" data-chatopen="1"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M3 4.5h14v9H8l-4 3v-3H3z"/></svg><span class="cbl">แชท</span><span class="cprev" id="chatPrev"></span><b class="cbadge" id="chatBadge" hidden>0</b></button>
+      <div class="invite" id="inviteBox" hidden><span class="iv-t"></span><button class="btn gold sm" data-ivyes="1">ตกลง</button><button class="btn sm" data-ivno="1">ปฏิเสธ</button></div>
+      <input type="file" id="importFile" accept=".json,application/json" hidden>
+      <div class="banner" id="banner" hidden></div>
+      <div class="dialog" id="dialog" hidden></div>
+    </div>
+  </div>
+  <p class="foot"><span data-en="Click the ground to walk · click a monster to attack · press ? for all keys">คลิกพื้นเพื่อเดิน · คลิกมอนสเตอร์เพื่อโจมตี · กด ? เพื่อดูปุ่มลัดทั้งหมด</span></p>
+</div>
+
+<!-- scripts load in dependency order: gfx → core → data → world → game → render → ui → main -->
+<script>globalThis.__SPR_DOM = true;</script>
+<script src="js/gfx/sprites.js?v=116"></script>
+<script src="js/gfx/beasts.js?v=129"></script>
+<script src="js/gfx/variety.js?v=131"></script>
+<script src="js/gfx/realism.js?v=122"></script>
+<script src="js/gfx/themepal.js?v=128"></script>
+
+<script src="js/gfx/art.js?v=111"></script>
+<script src="js/core/util.js?v=111"></script>
+<script src="js/core/rotate.js?v=111"></script>
+<script src="js/core/i18n.js?v=111"></script>
+<script src="js/core/sfx.js?v=111"></script>
+<script src="js/data/elements.js?v=111"></script>
+<script src="js/data/jobs.js?v=111"></script>
+<script src="js/data/monsters.js?v=111"></script>
+<script src="js/data/items.js?v=111"></script>
+<script src="js/data/world3.js?v=111"></script>
+<script src="js/data/world.js?v=131"></script>
+<script src="js/data/lore.js?v=111"></script>
+<script src="js/data/gear.js?v=111"></script>
+<script src="js/data/quests.js?v=111"></script>
+<script src="js/game/state.js?v=111"></script>
+<script src="js/world/props.js?v=111"></script>
+<script src="js/world/props2.js?v=111"></script>
+<script src="js/world/village2.js?v=111"></script>
+<script src="js/world/arenbloom.js?v=111"></script>
+<script src="js/world/terrain.js?v=111"></script>
+<script src="js/world/physics.js?v=111"></script>
+<script src="js/world/maps.js?v=111"></script>
+<script src="js/world/lava2.js?v=111"></script>
+<script src="js/world/biome3.js?v=111"></script>
+<script src="js/game/mobs.js?v=111"></script>
+<script src="js/game/combat.js?v=111"></script>
+<script src="js/game/skills.js?v=132"></script>
+<script src="js/game/items.js?v=111"></script>
+<script src="js/game/loot.js?v=111"></script>
+<script src="js/game/actions.js?v=111"></script>
+<script src="js/game/bot.js?v=111"></script>
+<script src="js/game/player.js?v=111"></script>
+<script src="js/game/effects.js?v=132"></script>
+<script src="js/render/vfx.js?v=132"></script>
+<script src="js/sys/stdfont.js?v=111"></script>
+<script src="js/render/render.js?v=133"></script>
+<script src="js/render/namecache.js?v=111"></script>
+<script src="js/sys/mobscale.js?v=111"></script>
+<script src="js/game/perf.js?v=111"></script>
+<script src="js/ui/input.js?v=111"></script>
+<script src="js/ui/npc.js?v=111"></script>
+<script src="js/ui/equip.js?v=111"></script>
+<script src="js/ui/worldmap.js?v=124"></script>
+<script src="js/net/firebase-config.js"></script>
+<script src="js/net/firebase-shim.js?v=111"></script>
+<script src="js/net/online.js?v=111"></script>
+<script src="js/ui/icons.js?v=111"></script>
+<script src="js/ui/itemart.js?v=111"></script>
+<script src="js/ui/panels.js?v=132"></script>
+<script src="js/ui/warpgrid.js?v=111"></script>
+<script src="js/ui/bag.js?v=112"></script>
+<script src="js/ui/cards.js?v=111"></script>
+<script src="js/ui/wiki.js?v=111"></script>
+<script src="js/ui/hud.js?v=112"></script>
+<script src="js/ui/menu.js?v=132"></script>
+<script src="js/ui/keys.js?v=111"></script>
+<script src="js/ui/joystick.js?v=111"></script>
+<script src="js/game/save.js?v=111"></script>
+<script src="js/sys/core.js?v=111"></script>
+<script src="js/sys/hooks.js?v=111"></script>
+<script src="js/sys/rarity.js?v=111"></script>
+<script src="js/sys/account.js?v=111"></script>
+<script src="js/sys/costume.js?v=111"></script>
+<script src="js/sys/achieve.js?v=111"></script>
+<script src="js/sys/daily.js?v=111"></script>
+<script src="js/sys/weekly.js?v=111"></script>
+<script src="js/sys/story.js?v=111"></script>
+<script src="js/sys/craft.js?v=111"></script>
+<script src="js/sys/guild.js?v=111"></script>
+<script src="js/sys/trade.js?v=111"></script>
+<script src="js/sys/wboss.js?v=111"></script>
+<script src="js/sys/wboss2.js?v=111"></script>
+<script src="js/sys/netmob.js?v=130"></script>
+<script src="js/sys/dungeon.js?v=111"></script>
+<script src="js/sys/pvp.js?v=111"></script>
+<script src="js/sys/social2.js?v=111"></script>
+<script src="js/sys/tutorial.js?v=111"></script>
+<script src="js/sys/wikiadd.js?v=111"></script>
+<script src="js/sys/living.js?v=111"></script>
+<script src="js/sys/bossfury.js?v=111"></script>
+<script src="js/sys/afflict.js?v=111"></script>
+<script src="js/sys/moblife.js?v=111"></script>
+<script src="js/sys/world2.js?v=111"></script>
+<script src="js/sys/ambience.js?v=111"></script>
+<script src="js/sys/netboss.js?v=111"></script>
+<script src="js/sys/costume2.js?v=149"></script>
+<script src="js/world/falls.js?v=111"></script>
+<script src="js/sys/cosx.js?v=111"></script>
+<script src="js/sys/events.js?v=111"></script>
+<script src="js/sys/festivals2.js?v=111"></script>
+<script src="js/sys/siege.js?v=111"></script>
+<script src="js/sys/guildwar.js?v=111"></script>
+<script src="js/sys/house.js?v=111"></script>
+<script src="js/sys/backup.js?v=111"></script>
+<script src="js/sys/thumbs.js?v=123"></script>
+<script src="js/sys/smith.js?v=111"></script>
+<script src="js/sys/starter.js?v=111"></script>
+<script src="js/sys/balance.js?v=111"></script>
+<script src="js/sys/grandfx.js?v=111"></script>
+<script src="js/sys/camp.js?v=111"></script>
+<script src="js/sys/bgm.js?v=142"></script>
+<script src="js/sys/talkbtn.js?v=111"></script>
+<script src="js/sys/camp2.js?v=111"></script>
+<script src="js/sys/fishing.js?v=111"></script>
+<script src="js/sys/tour.js?v=111"></script>
+<script src="js/sys/companion.js?v=111"></script>
+<script src="js/sys/tamed.js?v=111"></script>
+<script src="js/sys/aqua.js?v=111"></script>
+<script src="js/sys/hands.js?v=111"></script>
+<script src="js/sys/slots.js?v=139"></script>
+<script src="js/sys/party.js?v=111"></script>
+<script src="js/sys/refinefx.js?v=111"></script>
+<script src="js/sys/visual.js?v=111"></script>
+<script src="js/sys/statfix.js?v=111"></script>
+<script src="js/sys/cute.js?v=111"></script>
+<script src="js/sys/dummy.js?v=111"></script>
+<script src="js/sys/dlgmove.js?v=132"></script>
+<script src="js/sys/dlgmorph.js?v=111"></script>
+<script src="js/sys/compare.js?v=111"></script>
+<script src="js/sys/buyqty.js?v=111"></script>
+<script src="js/sys/statup.js?v=111"></script>
+<script src="js/sys/herbfx.js?v=111"></script>
+<script src="js/sys/beastkeeper.js?v=111"></script>
+<script src="js/ui/menuicons.js?v=111"></script>
+<script src="js/sys/fame.js?v=111"></script>
+<script src="js/sys/cooking.js?v=111"></script>
+<script src="js/sys/foodstack.js?v=111"></script>
+<script src="js/sys/season.js?v=111"></script>
+<script src="js/sys/gm.js?v=111"></script>
+<script src="js/sys/beastart.js?v=126"></script>
+<script src="js/sys/skillhold.js?v=111"></script>
+<script src="js/sys/mvp.js?v=111"></script>
+<script src="js/sys/bossclock.js?v=141"></script>
+<script src="js/sys/allybuff.js?v=111"></script>
+<script src="js/sys/barber.js?v=111"></script>
+<script src="js/sys/bosslines.js?v=111"></script>
+<script src="js/sys/gearfx.js?v=111"></script>
+<script src="js/sys/statconfirm.js?v=111"></script>
+<script src="js/sys/invcombo.js?v=111"></script>
+<script src="js/sys/potright.js?v=146"></script>
+<script src="js/sys/steadydom.js?v=115"></script>
+<script src="js/sys/compslot.js?v=111"></script>
+<script src="js/sys/skillsfx.js?v=111"></script>
+<script src="js/sys/npctag.js?v=111"></script>
+<script src="js/sys/onlineclean.js?v=111"></script>
+<script src="js/sys/campcook.js?v=111"></script>
+<script src="js/sys/support.js?v=111"></script>
+<script src="js/sys/cursor.js?v=111"></script>
+<script src="js/sys/spirittiger.js?v=111"></script>
+<script src="js/sys/hudedit.js?v=111"></script>
+<script src="js/sys/joyfit.js?v=146"></script>
+<script src="js/sys/joylay.js?v=112"></script>
+<script src="js/sys/gmlock.js?v=111"></script>
+<script src="js/sys/auth.js?v=111"></script>
+<script src="js/sys/healer.js?v=111"></script>
+<script src="js/sys/wincenter.js?v=111"></script>
+<script src="js/sys/ridefight.js?v=111"></script>
+<script src="js/sys/bosssafe.js?v=111"></script>
+<script src="js/sys/bgrun.js?v=111"></script>
+<script src="js/sys/afkkick.js?v=111"></script>
+<script src="js/sys/pmini.js?v=111"></script>
+<script src="js/sys/netsummon.js?v=111"></script>
+<script src="js/sys/setclean.js?v=111"></script>
+<script src="js/sys/menufit.js?v=111"></script>
+<script src="js/sys/rogueline.js?v=111"></script>
+<script src="js/sys/cardjelly.js?v=111"></script>
+<script src="js/sys/sockets.js?v=126"></script>
+<script src="js/sys/classlines.js?v=111"></script>
+<script src="js/sys/wardrobe2.js?v=111"></script>
+<script src="js/sys/fashion30.js?v=111"></script>
+<script src="js/sys/resetpts.js?v=111"></script>
+<script src="js/sys/portrait.js?v=111"></script>
+<script src="js/sys/statdetail.js?v=111"></script>
+<script src="js/sys/npclook.js?v=111"></script>
+<script src="js/sys/npcspace.js?v=111"></script>
+<script src="js/sys/rogue2.js?v=111"></script>
+<script src="js/sys/mage2.js?v=111"></script>
+<script src="js/sys/polish.js?v=126"></script>
+<script src="js/sys/groundtarget.js?v=111"></script>
+<script src="js/sys/bulk.js?v=111"></script>
+<script src="js/sys/sfx2.js?v=111"></script>
+<script src="js/sys/warpgate.js?v=111"></script>
+<script src="js/sys/tgtstatus.js?v=111"></script>
+<script src="js/sys/partyfind.js?v=111"></script>
+<script src="js/sys/endgame.js?v=126"></script>
+<script src="js/sys/autofix.js?v=111"></script>
+<script src="js/sys/partyassist.js?v=111"></script>
+<script src="js/sys/hudfit.js?v=138"></script>
+<script src="js/sys/rank2.js?v=111"></script>
+<script src="js/sys/bosssig.js?v=111"></script>
+<script src="js/sys/drill.js?v=111"></script>
+<script src="js/sys/dungeon2.js?v=111"></script>
+<script src="js/sys/dungeon3.js?v=111"></script>
+<script src="js/sys/whatsnew.js?v=111"></script>
+<script src="js/sys/banner2.js?v=132"></script>
+<script src="js/sys/syschat.js?v=111"></script>
+<script src="js/sys/kicklist.js?v=111"></script>
+<script src="js/sys/cardui.js?v=126"></script>
+<script src="js/sys/bossplus.js?v=111"></script>
+<script src="js/sys/bagplus.js?v=111"></script>
+<script src="js/sys/menutrim.js?v=111"></script>
+<script src="js/sys/textoutline.js?v=111"></script>
+<script src="js/sys/sunread.js?v=111"></script>
+<script src="js/sys/steady.js?v=111"></script>
+<script src="js/sys/equip6.js?v=111"></script>
+<script src="js/sys/skshout.js?v=111"></script>
+<script src="js/sys/tlock.js?v=111"></script>
+<script src="js/sys/tpick.js?v=111"></script>
+<script src="js/sys/pcatk.js?v=111"></script>
+<script src="js/sys/cards8.js?v=111"></script>
+<script src="js/sys/pets3.js?v=111"></script>
+<script src="js/sys/petevo.js?v=111"></script>
+<script src="js/sys/gear10.js?v=111"></script>
+<script src="js/sys/balance30.js?v=111"></script>
+<script src="js/sys/zonesets.js?v=111"></script>
+<script src="js/sys/classswap.js?v=150"></script>
+<script src="js/sys/advbook.js?v=111"></script>
+<script src="js/sys/camp3.js?v=111"></script>
+<script src="js/sys/campround.js?v=111"></script>
+<script src="js/sys/campbloom.js?v=111"></script>
+<script src="js/sys/worldtree.js?v=111"></script>
+<script src="js/sys/authsec.js?v=111"></script>
+<script src="js/sys/winfit.js?v=132"></script>
+<script src="js/sys/bosshard.js?v=111"></script>
+<script src="js/sys/tgticons.js?v=111"></script>
+<script src="js/sys/tgtframe.js?v=111"></script>
+<script src="js/sys/sktone.js?v=111"></script>
+<script src="js/sys/backcute.js?v=111"></script>
+<script src="js/sys/bossshout.js?v=132"></script>
+<script src="js/sys/shieldfx.js?v=111"></script>
+<script src="js/world/villagenpc.js?v=111"></script>
+<script src="js/sys/lite.js?v=111"></script>
+<script src="js/sys/heatshade.js?v=111"></script>
+<script src="js/sys/dmgclear.js?v=111"></script>
+<script src="js/sys/dmgstack.js?v=111"></script>
+<script src="js/sys/paneguard.js?v=111"></script>
+<script src="js/sys/skills6.js?v=111"></script>
+<script src="js/sys/combatrules.js?v=115"></script>
+<script src="js/sys/partyplus.js?v=111"></script>
+<script src="js/sys/skillfx.js?v=132"></script>
+<script src="js/sys/couple.js?v=111"></script>
+<script src="js/sys/skbonus.js?v=111"></script>
+<script src="js/sys/login.js?v=111"></script>
+<script src="js/sys/lfgplus.js?v=111"></script>
+<script src="js/sys/mkplus.js?v=111"></script>
+<script src="js/sys/itemtip.js?v=148"></script>
+<script src="js/sys/hands2.js?v=111"></script>
+<script src="js/sys/tower.js?v=111"></script>
+<script src="js/sys/mail.js?v=111"></script>
+<script src="js/sys/towerweek.js?v=111"></script>
+<script src="js/sys/towerparty.js?v=111"></script>
+<script src="js/sys/featureoff.js?v=129"></script>
+<script src="js/main.js?v=111"></script>
+<script src="js/sys/smooth3.js?v=111"></script>
+<script src="js/sys/perf4.js?v=111"></script>
+<script src="js/sys/touchequip.js?v=132"></script>
+<script src="js/sys/bia.js?v=111"></script>
+<script src="js/sys/touchsize.js?v=132"></script>
+<script src="js/sys/bagsub.js?v=115"></script>
+<script src="js/sys/skillfx2.js?v=116"></script>
+<script src="js/sys/jobfx.js?v=126"></script>
+<script src="js/sys/tutfold.js?v=127"></script>
+<script src="js/sys/changelog.js?v=127"></script>
+<script src="js/sys/bossnature.js?v=117"></script>
+<script src="js/sys/inspect.js?v=125"></script>
+<script src="js/sys/petnet.js?v=136"></script>
+<script src="js/sys/eqring.js?v=149"></script>
+<script src="js/sys/chatfix.js?v=144"></script>
+<script src="js/sys/hunttypes.js?v=150"></script>
+<script src="js/world/terrcache.js?v=135"></script>
+
+<script src="js/sys/lazypanel.js?v=113"></script>
+<script src="js/sys/lazylayout.js?v=114"></script>
+<script src="js/sys/steadymoba.js?v=112"></script>
+<script src="js/sys/tapsize.js?v=112"></script>
