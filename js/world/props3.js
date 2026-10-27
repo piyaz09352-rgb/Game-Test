@@ -144,8 +144,8 @@ Object.assign(BIOME, {
     road:['#b89a62', '#c8aa72', '#d6b880'], band:{y0:820, y1:1140, deep:'#4a5a3a', mid:'#5a7a4e', hi:'#9ab07a', shore:'#d8c08a'}, ponds:3, pondR:[50, 100], pondCols:['#d8c08a', '#6a5a2a', '#a8782a', '#e8b04a'],
     props:[['horsetail', 7, 5], ['cycad', 4, 5], ['araucaria', 3, 5], ['ribcage', 2, 3], ['fossil', 4, 3], ['amber', 3, 3], ['groundfern', 5, 5], ['reed', 2, 1]], propN:120, fx:'dust', fxA:.08}
 });
-BIOME.dragonvale = {...BIOME.crater, props:[['dragonskull', 1, 3], ['rock', 7, 1], ['crystal', 3, 3], ['stalag', 4, 2]]};
-BIOME.dragonroost = {...BIOME.canyon, base:['#b08a56', '#bc9660', '#c8a26c'], mottle:['rgba(110,70,40,.4)', 'rgba(250,220,170,.3)'], props:[['dragonskull', 1, 3], ['ribcage', 2, 3], ['rock', 9, 1], ['stalag', 4, 2], ['araucaria', 2, 5]], fx:'dust', fxA:.12};
+BIOME.dragonvale = {...BIOME.crater, props:[['rock', 7, 1], ['crystal', 3, 3], ['stalag', 4, 2]]};
+BIOME.dragonroost = {...BIOME.canyon, base:['#b08a56', '#bc9660', '#c8a26c'], mottle:['rgba(110,70,40,.4)', 'rgba(250,220,170,.3)'], props:[['ribcage', 1, 3], ['rock', 9, 1], ['stalag', 4, 2], ['araucaria', 2, 5]], fx:'dust', fxA:.12};
 BIOME.naraka = {...BIOME.lavafield, props:[['cauldron', 2, 3], ['thorntree', 6, 3], ['rock', 6, 1], ['stalag', 3, 2]]};
 BIOME.demonthrone = {...BIOME.badan, base:['#2a1e34', '#32243e', '#3a2a46'], mottle:['rgba(15,8,20,.55)', 'rgba(200,120,230,.15)'], blades:null, road:['#4a3a5a', '#5a4a6a', '#6a5a7a'],
   pondCols:['#2a1a2a', '#4a0a3a', '#8a1a6a', '#ff6ae0'], props:[['obelisk', 6, 3], ['crystal', 5, 4], ['statue', 2, 2], ['rock', 2, 1]], fx:'embers', fxA:.25, tint:'rgba(80,20,90,.12)'};   // a violet palace floor, not the sea floor it borrows from
