@@ -22,7 +22,7 @@ const CUTE_THEME = b => (['primeval', 'amberfen'].includes(b) ? 'primeval' : ['d
   : ['tavatimsa', 'meru', 'anodat', 'himmapan', 'innerhim'].includes(b) ? 'heaven' : !b ? 'town' : 'lush');
 const CUTE_KINDS = {
   primeval:[['tuft', 4], ['pebble', 3], ['clover', 2], ['bone', 1]],   // the Early Cretaceous had almost no flowers (data/world4.js)
-  lush:[['flower', 5], ['clover', 4], ['pebble', 2], ['mush', 1], ['bud', 3]],
+  lush:[['flower', 1], ['clover', 3], ['pebble', 3], ['mush', 1], ['tuft', 4], ['bud', 1]],   // (v154) far fewer cartoon flowers: the ground has its own detail now (world/ground2.js)
   town:[['pot', 2], ['flower', 4], ['clover', 2], ['bud', 3]],
   dry:[['tuft', 5], ['pebble', 4], ['cactus', 2], ['bone', 1]],
   fire:[['ember', 4], ['cinder', 5]],   

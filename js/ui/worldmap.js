@@ -21,17 +21,20 @@ function mobArt(key){
   return MART_NONE;
 }
 function martNext(){
-  const go = dl => { do { const key = MARTQ.q.shift(); if (!key){ MARTQ.on = false; return; }
+  // (v153) while a board full of pictures is open (warp board, world map, wiki) the game hardly ever goes idle, so a
+  // picture used to come only every 300 ms; there the pictures are now painted in 12 ms slices between frames
+  const busy = () => !!document.querySelector('#warpGrid:not([hidden]), #wmap:not([hidden]), .wk:not([hidden])');
+  const go = dl => { const t0 = performance.now(); do { const key = MARTQ.q.shift(); if (!key){ MARTQ.on = false; return; }
       const url = mobArtNow(key);
       for (const e of document.querySelectorAll(`img[data-mart="${key}"]`)) e.src = url || MART_NONE;
-    } while (dl && dl.timeRemaining && dl.timeRemaining() > 8);   // as many as fit in the idle moment
+    } while (busy() ? performance.now() - t0 < 12 : dl && dl.timeRemaining && dl.timeRemaining() > 8);   // as many as fit in the idle moment
     martNext(); };
-  if (typeof requestIdleCallback === 'function') requestIdleCallback(go, {timeout:250}); else setTimeout(go, 30);
+  if (busy()) setTimeout(go, 0); else if (typeof requestIdleCallback === 'function') requestIdleCallback(go, {timeout:250}); else setTimeout(go, 30);
 }
 function mobArtNow(key){
   if (MOB_ART[key] !== undefined) return MOB_ART[key];
   let url = '';
-  try { if (SPR.MOBS[key]){ const im = SPR.renderFrame('mob', key, 'idle', 1, 0), c = document.createElement('canvas'); c.width = im.width; c.height = im.height; c.getContext('2d').putImageData(im, 0, 0);
+  try { if (SPR.MOBS[key]){ const im = SPR.renderFrame('mob', key, 'idle', 1, 0, Math.min(.85, typeof GFX !== 'undefined' && GFX.k || 1)), c = document.createElement('canvas'); c.width = im.width; c.height = im.height; c.getContext('2d').putImageData(im, 0, 0);
       const d = im.data; let x0 = im.width, y0 = im.height, x1 = 0, y1 = 0;
       for (let y = 0; y < im.height; y++) for (let x = 0; x < im.width; x++) if (d[(y * im.width + x) * 4 + 3] > 20){ if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
       if (x1 > x0){ const w = x1 - x0 + 1, h = y1 - y0 + 1, o = document.createElement('canvas'); o.width = w; o.height = h; o.getContext('2d').drawImage(c, x0, y0, w, h, 0, 0, w, h); url = o.toDataURL(); } } } catch (e) { url = ''; }

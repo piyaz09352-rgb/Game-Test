@@ -13,3 +13,10 @@
     if (typeof NAV !== 'undefined') NAV.grid = null;
     return r;
   }; }
+
+/* (v154) the World Trees keep their land's mood in natural colours (see world/props4.js) */
+if (typeof CAMP_THEME !== 'undefined'){
+  Object.assign(CAMP_THEME.volcanic.leaf, {leafD:'#4a2a14', leafM:'#7a4a1e', leafL:'#a8702e'});
+  Object.assign(CAMP_THEME.dark.leaf, {leafD:'#1e3020', leafM:'#2e4a2e', leafL:'#4e6a3e'});
+  Object.assign(CAMP_THEME.light.leaf, {leafD:'#5a6a22', leafM:'#8a8a2a', leafL:'#d8b830'});
+}

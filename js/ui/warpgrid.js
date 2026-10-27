@@ -33,6 +33,10 @@ function wgOpen(n){
   let b = el('warpGrid'); if (!b){ b = document.createElement('div'); b.id = 'warpGrid'; b.hidden = true; el('ui').appendChild(b); }
   b.innerHTML = wgHTML(n); b.dataset.npc = n.id; b.hidden = false;
   const here = b.querySelector('.wgc.here'); if (here) here.scrollIntoView({block:'center'});
+  // (v153) the monster pictures of the cards on screen are painted first (they used to wait behind every card above them)
+  if (typeof IntersectionObserver === 'function' && typeof MARTQ !== 'undefined'){ const io = new IntersectionObserver(es => { for (const e of es){ if (!e.isIntersecting) continue; io.unobserve(e.target);
+      for (const im of e.target.querySelectorAll('img[data-mart]')){ const k = im.dataset.mart, i = MARTQ.q.indexOf(k); if (i > 0){ MARTQ.q.splice(i, 1); MARTQ.q.unshift(k); } } } }, {root:b.querySelector('.wggrid')});
+    b.querySelectorAll('.wgc').forEach(c => io.observe(c)); }
 }
 function wgClose(){ const b = el('warpGrid'); if (b && !b.hidden){ b.hidden = true; b.innerHTML = ''; } }
 const wgOn = () => { const b = el('warpGrid'); return !!b && !b.hidden; };

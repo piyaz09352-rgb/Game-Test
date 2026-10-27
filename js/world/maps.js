@@ -100,6 +100,7 @@ function paintBiome(g, B, mapId){
         if (((bx - cx) / rw) ** 2 + ((by - cy) / rh) ** 2 > 1 || R() < .18) continue;
         g.fillStyle = cols[Math.floor(R() * 3)]; g.fillRect(bx, by, 11, 5); g.fillStyle = 'rgba(255,240,220,.25)'; g.fillRect(bx, by, 11, 1); }
     } }
+  if (typeof groundDetail === 'function') groundDetail(g, B, mapId);   // (v154) soil, tufts, stones, litter, cracks (world/ground2.js)
   // trails from every gate to the middle of the map
   const road = (w, col) => { for (const tr of TRAIL.lines){ g.beginPath(); tr.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.strokeStyle = col; g.lineWidth = w; g.stroke(); } };
   road(52, B.road[0]); road(44, B.road[1]); road(34, B.road[2]);

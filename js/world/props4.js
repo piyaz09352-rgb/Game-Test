@@ -352,3 +352,25 @@ BIOME.oasis = {base:['#d8b878', '#e0c284', '#e8cc90'], mottle:['rgba(170,120,60,
     groves:{n:3, size:[3, 5], r:70, props:[['palm', 3]], under:[['bush', 3], ['rock', 4]]},
     banks:{k:2.4, props:[['palm', 3], ['palm', 3], ['reed', 4], ['reed', 4], ['bush', 3]]},
     scatter:{n:12, props:[['rock', 4], ['deadtree', 3]]}}};
+
+/* ---------- Himmapan trees and camp trees: real flowering trees, not candy balls (v154) ----------
+   The magic forests had pink, cyan, yellow and violet puff-ball trees. Thailand's own flowering trees are as
+   colourful and real: ราชพฤกษ์ golden shower (hanging yellow chains), ชมพูพันธุ์ทิพย์ pink trumpet, อินทนิล purple
+   crape myrtle and ทองกวาว flame of the forest (orange). Each is a green tree in leaf with its blossoms in clusters.
+   The World Trees at the camps keep their land's mood in natural colours: autumn rust in the volcanic lands, a deep
+   green with violet blossom in the dark lands and golden-shower gold in the lands of light. */
+const P4_BLOOM = [
+  {leaf:P4.leaf[2], bloom:['#d8a020', '#f0c430', '#ffe070'], hang:true},    // golden shower
+  {leaf:P4.leaf[0], bloom:['#d86a9a', '#f08ab8', '#ffc4dc']},              // pink trumpet
+  {leaf:P4.leaf[1], bloom:['#7a4ab0', '#9a6ac8', '#c8a4e8']},              // crape myrtle
+  {leaf:P4.leaf[2], bloom:['#c8441a', '#f06a22', '#ffa04a']}];             // flame of the forest
+PROP_TYPES.himtree = (seed, v = 0) => makeProp({w:170, h:170, ax:85, ay:164, seed, shadow:[50, 14, 6], collide:12, paint(g, rng){
+  const T = P4_BLOOM[v % 4], H = 56 + rng() * 14, lean = (rng() - .5) * 10, cw = 58 + rng() * 12, ch = 42 + rng() * 10;
+  p4roots(g, rng, 0, 0, 6, P4.bark); p4trunk(g, rng, 0, 0, lean, -H, 6.5, 4, P4.bark);
+  for (const [dx, dy] of [[-28, -H - 10], [24, -H - 14], [-6, -H - 28]]) p4branch(g, P4.bark, lean, -H + 6, lean + dx, dy, 3.2);
+  const cl = p4canopy(g, rng, lean, -H - ch * .55, cw, ch, T.leaf, {dome:true, dense:.45});
+  for (const c of cl){ if (rng() < .25) continue;   // blossom clusters on the sunny side of each clump
+    for (let k = 0; k < c.r * 2.2; k++){ const a = 3.4 + rng() * 2.6, d = Math.sqrt(rng()) * c.r * .9, x = c.x + Math.cos(a) * d, y = c.y + Math.sin(a) * d * .85;
+      g.fillStyle = T.bloom[Math.floor(rng() * 3)]; ov(g, x, y, 1.6, 1.3); g.fill(); }
+    if (T.hang) for (let k = 0; k < 2; k++){ const x = c.x + (rng() - .5) * c.r, y = c.y + c.r * .5; for (let j = 0; j < 6; j++){ g.fillStyle = T.bloom[j % 3]; ov(g, x + Math.sin(j) * .6, y + j * 2.4, 1.5, 1.2); g.fill(); } } }   // hanging chains
+}});
