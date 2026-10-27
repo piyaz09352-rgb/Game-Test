@@ -1,0 +1,8 @@
+/* VAYRATHEN — css/hudname.css — the character card shows only the class name, large and gilded (v31);
+   the Base/Job levels already sit on the portrait badge and the EXP lines below. */
+html body .ui #cLv{display:none!important}
+html body .ui .cname{display:block;overflow:visible;line-height:1.1;margin:0 0 3px}
+html body .ui .cname #cJob,html body .ui .cname #cJob span{display:inline-block;padding:0!important;margin:0;border:0!important;border-radius:0;box-shadow:none!important;
+  background:linear-gradient(180deg,#fffbe8 0%,#ffe08a 45%,#e8a93a 75%,#b8741a 100%)!important;-webkit-background-clip:text!important;background-clip:text!important;color:transparent!important;
+  font:800 20px/1.15 var(--thai),var(--display),sans-serif!important;letter-spacing:.5px;white-space:nowrap;text-shadow:none!important;
+  filter:drop-shadow(0 1px 0 #3a1a04) drop-shadow(0 0 5px rgba(255,196,90,.45))!important}

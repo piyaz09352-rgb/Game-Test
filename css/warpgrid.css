@@ -1,0 +1,27 @@
+/* VAYRATHEN — css/warpgrid.css — (v95) the full-screen region board of the boatman and the warp shrine */
+#warpGrid{position:fixed;inset:0;z-index:950;display:flex;flex-direction:column;background:#fbf4e4;color:#3a2408;pointer-events:auto}
+#warpGrid[hidden]{display:none}
+.wghd{display:flex;align-items:center;gap:10px;padding:10px 14px;background:linear-gradient(180deg,#3d9ae8,#2a78c8);box-shadow:0 2px 8px rgba(40,60,90,.25)}
+.wgtt{flex:1;min-width:0}.wgtt b{display:block;font:800 18px var(--thai,Mali),sans-serif;color:#fff}
+.wgtt small{display:block;font-size:12.5px;color:#e8f3ff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wgbia{padding:4px 12px;border-radius:999px;background:#fff6d8;color:#8a5a00;font:800 14px var(--thai,Mali),sans-serif;box-shadow:inset 0 0 0 1.5px #e3b04b}
+.wgx{width:36px;height:36px;border-radius:50%;border:2px solid #fff;background:#e5484d;color:#fff;font:800 17px sans-serif;cursor:pointer}
+.wggrid{flex:1;overflow-y:auto;padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px;align-content:start;grid-auto-rows:max-content}
+.wgc{display:flex;flex-direction:column;border-radius:14px;background:#fffdf7;box-shadow:0 0 0 1.5px #e6cf9e,0 3px 8px rgba(120,80,20,.12);overflow:hidden}
+.wgc.here{box-shadow:0 0 0 2.5px #2a8f4a,0 3px 10px rgba(40,140,70,.25)}
+.wgpic{position:relative;aspect-ratio:16/9;background:#cfe6b8 url(../assets/worldmap/worldmap.png) no-repeat;background-size:700% auto}
+.wgc.locked .wgpic{filter:grayscale(.85) brightness(.9)}
+.wglv{position:absolute;left:8px;top:8px;padding:3px 9px;border-radius:999px;background:rgba(255,255,255,.94);color:#7a3e00;font:800 13px var(--thai,Mali),sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.wghere{position:absolute;right:8px;top:8px;padding:3px 9px;border-radius:999px;background:#2a8f4a;color:#fff;font:700 12px var(--thai,Mali),sans-serif}
+.wglock{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);padding:3px 10px;border-radius:999px;background:rgba(40,30,20,.75);color:#fff;font:700 12px var(--thai,Mali),sans-serif;white-space:nowrap}
+.wgbd{display:flex;flex-direction:column;gap:5px;padding:9px 11px 11px;flex:1}
+.wgnm{font:800 15.5px var(--thai,Mali),sans-serif;color:#3a2408}
+.wgland{font-size:11.5px;font-weight:700;color:#5a4428}.wgland::before{content:'';display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--lc);margin-right:5px;vertical-align:-1px}
+.wgds{margin:0;font-size:12px;line-height:1.4;color:#5a4428}
+.wgboss{display:flex;align-items:center;gap:8px;padding:5px 7px;border-radius:10px;background:#fff3dc;box-shadow:inset 0 0 0 1px #ecd3a0}
+.wgboss img{width:44px;height:44px;object-fit:contain}
+.wgboss span{display:flex;flex-direction:column;min-width:0}.wgboss b{font:800 13px var(--thai,Mali),sans-serif;color:#9a2a10}.wgboss small{font-size:11px;color:#6a5434}
+.wgmobs{display:flex;gap:4px;flex-wrap:wrap}.wgmobs span{width:34px;height:34px;border-radius:8px;background:#f4ead4}.wgmobs img{width:100%;height:100%;object-fit:contain}
+.wgft{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:4px}
+.wgfee{font:800 14px var(--thai,Mali),sans-serif;color:#8a5a00}
+@media (max-width:560px){.wggrid{grid-template-columns:repeat(auto-fill,minmax(160px,1fr));padding:10px;gap:8px}.wgds{display:none}.wgtt small{white-space:normal}.wghd [data-win-open]{display:none}}

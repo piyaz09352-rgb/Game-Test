@@ -1,0 +1,27 @@
+{
+  "rules": {
+    "gms": {
+      ".read": "auth != null",
+      ".write": false
+    },
+    "rooms": {
+      "$room": {
+        "peers": {
+          ".read": "auth != null",
+          ".indexOn": ["by"],
+          "$peer": {
+            ".write": "auth != null && (!data.exists() || data.child('by').val() === auth.uid) && (!newData.exists() || newData.child('by').val() === auth.uid)"
+          }
+        },
+        "ev": {
+          ".read": "auth != null",
+          ".indexOn": ["t"],
+          "$e": {
+            ".write": "auth != null && (!data.exists() || data.child('by').val() === auth.uid) && (!newData.exists() || newData.child('by').val() === auth.uid)",
+            ".validate": "newData.child('j').isString() && newData.child('j').val().length < 60000 && (newData.child('topic').val() !== 'gm' || root.child('gms').child(auth.uid).val() === true)"
+          }
+        }
+      }
+    }
+  }
+}

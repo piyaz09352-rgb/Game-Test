@@ -1,0 +1,31 @@
+/* VAYRATHEN — css/winfit.css — phone windows fill the screen (v30)
+   On a phone (the compact UI: narrow or short screens, hud.js compactUI) a window used to be a small sheet whose
+   inner lists each had their own height cap, so on a short landscape screen the wardrobe grid, the bag and other
+   lists shrank to a sliver or vanished. Now an open window takes the whole game screen (sized by js/sys/winfit.js) (a 4px margin), sits above
+   every HUD piece, and its body is one scrolling area: inner lists drop their own caps and scroll with the page. */
+.ui.compact .win:not(.min){z-index:70!important;max-width:none!important;max-height:none!important}   /* size and place: js/sys/winfit.js */
+.ui.compact .win:not(.min) .wb{flex:1 1 auto;min-height:0}
+.ui.compact .win:not(.min) .wb > .pane{max-height:none!important;height:100%;overflow-y:auto}
+/* inner lists that capped themselves to the old sheet: let the window scroll instead */
+.ui.compact .win .bagw,
+.ui.compact .win .achlist,
+.ui.compact .win .wnl,
+.ui.compact #win-equip.invwin .invcombo > #pane-bag .bagw{max-height:none!important;overflow:visible!important}
+/* bigger touch targets for tabs and small buttons */
+.ui.compact .win .wt{min-height:34px}
+.ui.compact .win .wt .ibtn{min-width:34px;min-height:34px}
+
+/* the wardrobe on a phone: a fixed two-part sheet. The character (with the wear / buy / dye buttons) on the left and the
+   tabs + item grid on the right; each side scrolls on its own, nothing is sticky, nothing can slide over anything.
+   Held upright (narrow), the character sits on top in a short band and the grid fills the rest. */
+.ui.compact #pane-equip:has(> .cosw2){display:flex!important;flex-direction:column;overflow:hidden!important;gap:8px}
+.ui.compact #pane-equip > .eqtabs{flex:none}
+.ui.compact .cosw2{flex:1 1 auto;min-height:0;display:grid!important;grid-template-columns:minmax(150px,30%) minmax(0,1fr)!important;grid-template-rows:minmax(0,1fr)!important;gap:10px!important;align-items:stretch!important}
+.ui.compact .cosw2 .eqstage{position:relative!important;top:auto!important;z-index:auto!important;min-height:0;overflow-y:auto;overscroll-behavior:contain;align-self:stretch!important}
+.ui.compact .cosw2 .wrcol{min-height:0;display:flex!important;flex-direction:column;gap:8px}
+.ui.compact .cosw2 .wrtabs{flex:none}
+.ui.compact .cosw2 .cosgrid{flex:1 1 auto;min-height:0;max-height:none!important;overflow-y:auto!important;overscroll-behavior:contain}
+.ui.compact .cosw2 .coslist{grid-template-columns:repeat(auto-fill,minmax(96px,1fr))}
+@media (max-aspect-ratio:1/1){
+  .ui.compact .cosw2{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:minmax(0,38%) minmax(0,1fr)!important}
+}

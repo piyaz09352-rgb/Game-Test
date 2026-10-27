@@ -1,0 +1,27 @@
+/* Layout: the map fills the stage; UI floats over it as lacquer-and-gold-leaf cards that fold away.
+   Single deliberate night-lacquer look (game HUD), all colors explicit. */
+:root{
+  --bg:#0e0d15; --lac:#1b1828; --lac-2:#13111d; --glass:rgba(22,20,34,.86);
+  --line:rgba(227,176,75,.26); --line-2:rgba(227,176,75,.55);
+  --fg:#f1eadb; --muted:#a39cb8; --gold:#e3b04b; --gold-2:#f7dc9a;
+  --hp:#e5574f; --hp-2:#ff8a72; --sp:#4f8fe0; --sp-2:#8cc6ff; --xp:#e3b04b; --jx:#55c2a0;
+  --display:"Mali",system-ui,sans-serif;
+  --body:"Mali",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --ease:cubic-bezier(.2,.8,.2,1);
+  color-scheme:only light;   /* (v123) the UI is light: phones in dark mode must not invert it (dark swatches turned white) */
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{background:var(--bg);color:var(--fg)}
+body{font-family:var(--body);font-size:14px;line-height:1.5}
+.app{max-width:1360px;margin:0 auto;padding:12px 16px 16px;display:flex;flex-direction:column;gap:10px}
+.top{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+.top h1{margin:0;font:600 22px/1 var(--display);letter-spacing:.32em;color:var(--gold);
+  background:linear-gradient(100deg,var(--gold) 0%,var(--gold-2) 45%,var(--gold) 60%);background-size:220% 100%;-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;animation:sheen 7s linear infinite}
+.top .sub{color:var(--muted);font-size:12.5px}
+@keyframes sheen{to{background-position:-220% 0}}
+
+.stage{position:relative;border-radius:14px;overflow:hidden;background:#0a0910;box-shadow:0 0 0 1px var(--line),0 24px 60px rgba(0,0,0,.5)}
+canvas#cv{display:block;width:100%;touch-action:manipulation;cursor:pointer;image-rendering:pixelated}
+.ui{position:absolute;inset:0;pointer-events:none;font-size:13px}
+.ui > *{pointer-events:auto}

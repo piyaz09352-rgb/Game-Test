@@ -1,0 +1,153 @@
+/* VAYRATHEN — css/royal.css — "Royal Night" UI theme (original)
+   One palette for the whole game: midnight-lacquer panels, thin gold trim, warm cream text and gold headings.
+   Replaces the sky-blue page and the white candy rims of pastel.css, which clashed with the warm painted world.
+   Loaded after every other stylesheet; it only re-colours and re-fonts, the layout is untouched. */
+
+:root{
+  --display:"Cinzel","Pridi","Sarabun",system-ui,sans-serif; --thai:"Pridi","Sarabun",system-ui,sans-serif; --body:"Sarabun",system-ui,-apple-system,"Segoe UI",sans-serif;
+  /* palette */
+  --rn-0:#070a16; --rn-1:#0d1226; --rn-2:#141b36; --rn-3:#1d2648; --rn-4:#2a3563;
+  --rn-gold:#e8c26a; --rn-gold-hi:#fff0c2; --rn-gold-lo:#9c7330; --rn-gold-dk:#5b3f12;
+  --rn-cream:#f7edd6; --rn-mute:#c9bea4; --rn-ruby:#e2465a; --rn-jade:#3fd6a0; --rn-azure:#5fb8ff;
+  --rn-trim:0 0 0 1px rgba(232,194,106,.55),0 0 0 3px rgba(7,10,22,.9),0 0 0 4px rgba(232,194,106,.28);
+  --rn-drop:0 10px 28px rgba(0,0,0,.55);
+  /* the older tokens every stylesheet and many scripts read */
+  --bg:#0a0e1f; --lac:#141b36; --lac-2:#0d1226; --glass:rgba(13,18,38,.94);
+  --line:rgba(232,194,106,.28); --line-2:rgba(232,194,106,.6);
+  --fg:var(--rn-cream); --muted:var(--rn-mute); --gold:var(--rn-gold); --gold-2:var(--rn-gold-hi); --gold-3:#c8932f;
+  --royal:#1d2648; --royal-2:#141b36; --halo:rgba(232,194,106,.35); --halo-2:rgba(255,226,150,.7);
+  --rim:linear-gradient(180deg,#fff0c2,#e8c26a 45%,#9c7330);
+  --sky1:#1d2648; --sky2:#141b36; --sky3:#0d1226; --skyD:#05070f; --ink:var(--rn-cream); --sun:#f2c552; --sun2:#c8932f;
+}
+
+/* ---------- page frame ---------- */
+html,body{background:radial-gradient(ellipse 80% 60% at 50% 0%,#2a2350 0%,#121633 45%,#070a16 100%) fixed !important;color:var(--rn-cream)}
+body{font-weight:500;letter-spacing:.1px}
+.top h1{font-family:"Cinzel",serif !important;font-weight:800;letter-spacing:.32em;background:linear-gradient(180deg,#fff6d8,#e8c26a 55%,#9c7330) !important;
+  -webkit-background-clip:text !important;background-clip:text !important;-webkit-text-fill-color:transparent !important;color:transparent !important;
+  text-shadow:none !important;filter:drop-shadow(0 2px 0 rgba(0,0,0,.6)) drop-shadow(0 0 10px rgba(232,194,106,.35))}
+.top .thai{color:var(--rn-gold-hi) !important;font-family:var(--thai);font-weight:600;text-shadow:0 1px 0 #000 !important}
+.top .sub,.foot{color:var(--rn-mute) !important}
+.stage{background:#05070f !important;border-radius:14px !important;
+  box-shadow:0 0 0 1px rgba(232,194,106,.7),0 0 0 4px #0b0f22,0 0 0 5px rgba(232,194,106,.35),0 18px 50px rgba(0,0,0,.7),0 0 60px rgba(120,90,200,.18) !important}
+
+/* ---------- every panel: midnight lacquer with a gold hairline ---------- */
+.card,.win,.dock,.dialog,.rail,.chatbox,.confirm,#confirm,.invite,.castbar,
+.tutbox,.achpop,.cardpop,.tipcard,.ptyhud,.skpick,.gmlockbox,.photobar,.hebar,.emowheel,.suppop .supbox{
+  border:1px solid rgba(232,194,106,.75) !important;
+  background:linear-gradient(180deg,rgba(29,38,72,.96),rgba(13,18,38,.97) 60%,rgba(9,12,27,.98)) padding-box !important;
+  box-shadow:inset 0 1px 0 rgba(255,240,194,.18),inset 0 0 0 3px rgba(7,10,22,.6),inset 0 0 0 4px rgba(232,194,106,.16),var(--rn-drop) !important;
+  border-radius:12px !important;color:var(--rn-cream) !important}
+.win .wt,.dialog .dh{background:linear-gradient(180deg,#2f2a52,#1b1838) !important;border-bottom:1px solid rgba(232,194,106,.6) !important;
+  box-shadow:inset 0 -1px 0 rgba(0,0,0,.6),inset 0 1px 0 rgba(255,240,194,.15) !important;border-radius:11px 11px 0 0 !important}
+.win .wt b,.win .wt span,.dialog .dh h3{font-family:var(--thai);font-weight:700;color:var(--rn-gold-hi) !important;-webkit-text-fill-color:var(--rn-gold-hi) !important;
+  text-shadow:0 1px 0 #000,0 0 8px rgba(232,194,106,.35) !important;letter-spacing:.3px}
+.dialog .dh small{color:var(--rn-mute) !important;-webkit-text-fill-color:var(--rn-mute) !important;text-shadow:none !important}
+.win .wt kbd{background:rgba(232,194,106,.15) !important;color:var(--rn-gold) !important;border:1px solid rgba(232,194,106,.5) !important}
+.win .wt .gem{background:radial-gradient(circle at 35% 30%,#fff6d8,#e8c26a 50%,#9c7330) !important;box-shadow:0 0 0 1px #000,0 0 8px rgba(232,194,106,.6) !important}
+.win .wt .ibtn,.win .wt .ibtn svg{color:var(--rn-gold) !important;stroke:var(--rn-gold) !important}
+.win .wb,.dialog .db{color:var(--rn-cream) !important}
+.sec{color:var(--rn-gold) !important;font-family:var(--thai);font-weight:700;border-color:rgba(232,194,106,.3) !important;text-shadow:0 1px 0 #000 !important}
+.empty,.hint,small{color:var(--rn-mute)}
+.list .item,.srow,.eqit,.mvprow,.bslot,.slot,.row,.stats tr,.derived > div{background-color:rgba(255,240,194,.045) !important;border-color:rgba(232,194,106,.2) !important}
+.tutbox *,.achpop *,.tipcard *{text-shadow:0 1px 0 rgba(0,0,0,.5)}
+.tutbox .tuth,.tutbox b,.achpop b{color:var(--rn-gold-hi) !important;-webkit-text-fill-color:var(--rn-gold-hi) !important}
+.tutdots i,.tutdots span{background:rgba(232,194,106,.25) !important}
+.tutdots .on,.tutdots i.on{background:var(--rn-gold) !important}
+.tutn,.tutbox .tutn{color:#2a1a00 !important;-webkit-text-fill-color:#2a1a00 !important;background:linear-gradient(180deg,#fff0c2,#e8c26a) !important}
+
+/* ---------- buttons: dark lacquer with gold edge, gold for the main action ---------- */
+.btn,.tbtn,.ibtn,.seg button,.chatbtn,.railtog,.mb{background:linear-gradient(180deg,#2a3563,#171e3d) !important;color:var(--rn-cream) !important;
+  border:1px solid rgba(232,194,106,.55) !important;border-radius:9px !important;box-shadow:inset 0 1px 0 rgba(255,240,194,.18),0 2px 0 #05070f,0 3px 8px rgba(0,0,0,.4) !important;
+  text-shadow:0 1px 0 #000 !important;font-weight:600}
+.btn:hover,.tbtn:hover,.ibtn:hover,.mb:hover,.chatbtn:hover{filter:brightness(1.18);border-color:var(--rn-gold) !important}
+.btn:active,.tbtn:active,.ibtn:active{transform:translateY(1px);box-shadow:0 0 0 #000 !important}
+.btn.gold,.tbtn.gold,.seg button.on,.btn.on,.au-pill{background:linear-gradient(180deg,#fff0c2,#e8c26a 45%,#b8862f) !important;color:#2a1a00 !important;
+  border:1px solid #fff0c2 !important;box-shadow:inset 0 -2px 0 rgba(91,63,18,.45),0 2px 0 #5b3f12,0 4px 14px rgba(232,194,106,.3) !important;text-shadow:0 1px 0 rgba(255,255,255,.4) !important}
+.btn.gold *,.tbtn.gold *,.seg button.on *{color:#2a1a00 !important}
+.ibtn svg,.mb svg,.railtog svg{stroke:var(--rn-gold) !important}
+.railtog span,.mb span{color:var(--rn-cream) !important}
+
+/* ---------- character card ---------- */
+.portrait::before{background:radial-gradient(circle at 50% 36%,#3a3a72,#1a1d3c 70%,#0b0e20) !important;box-shadow:0 0 0 2px var(--rn-gold),0 0 0 4px #070a16,0 0 14px rgba(232,194,106,.35) !important}
+.lvb{background:linear-gradient(180deg,#fff0c2,#e8c26a 50%,#b8862f) !important;color:#2a1a00 !important;box-shadow:0 0 0 1px #000 !important;border-radius:8px !important}
+.cname b{font-family:var(--thai);color:var(--rn-gold-hi) !important;text-shadow:0 1px 0 #000,0 0 8px rgba(232,194,106,.3) !important}
+.cname span{background:rgba(232,194,106,.14) !important;color:var(--rn-gold-hi) !important;border:1px solid rgba(232,194,106,.5) !important;box-shadow:none !important}
+.bar{background:#05070f !important;box-shadow:0 0 0 1px rgba(232,194,106,.55),inset 0 2px 3px rgba(0,0,0,.6) !important;border-radius:6px !important}
+.bar.hp i:not(.ghost){background:linear-gradient(180deg,#ff9aa6,#e2465a 50%,#9a1c33) !important}
+.bar.sp i:not(.ghost){background:linear-gradient(180deg,#a8e2ff,#3a9ef0 50%,#1a5bb0) !important}
+.bar span{color:#fff !important;font-weight:700;text-shadow:0 1px 1px #000,0 0 3px #000 !important}
+.thin{background:#05070f !important;box-shadow:0 0 0 1px rgba(232,194,106,.35) !important}
+.thin.bx i{background:linear-gradient(90deg,#b8862f,#fff0c2) !important}
+.thin.jx i{background:linear-gradient(90deg,#1f9e74,#8ff2cc) !important}
+
+/* ---------- minimap, hotbar, touch buttons ---------- */
+#minimap{border-radius:10px !important;box-shadow:0 0 0 1px var(--rn-gold),0 0 0 3px #070a16 !important}
+.mapname{font-family:var(--thai);color:var(--rn-gold-hi) !important;-webkit-text-fill-color:var(--rn-gold-hi) !important;text-shadow:0 1px 0 #000 !important}
+.hk,.hotbar > *{background:linear-gradient(180deg,#232c55,#10152d) !important;border-radius:9px !important;
+  box-shadow:inset 0 0 0 1px rgba(232,194,106,.45),inset 0 2px 6px rgba(0,0,0,.5) !important}
+.hk:hover{box-shadow:inset 0 0 0 1px var(--rn-gold),0 0 10px rgba(232,194,106,.4) !important}
+.hk kbd,.hk b,.hk span,.mu span,.mu b{color:var(--rn-cream) !important;text-shadow:0 1px 0 #000 !important}
+.hk kbd{color:var(--rn-gold) !important;opacity:.85}
+.mo{background:radial-gradient(circle at 40% 30%,#3a4680,#1a2146 60%,#0b0f22) !important;border:1px solid var(--rn-gold) !important;
+  box-shadow:0 0 0 2px #070a16,0 4px 12px rgba(0,0,0,.5) !important;color:var(--rn-cream) !important}
+.mo span,.mo b,.mo em,.mo small{color:var(--rn-cream) !important;text-shadow:0 1px 0 #000 !important}
+.mo.atk{background:radial-gradient(circle at 40% 30%,#fff0c2,#e8c26a 45%,#9c7330) !important;box-shadow:0 0 0 2px #070a16,0 0 18px rgba(232,194,106,.45) !important}
+.mo.atk span,.mo.atk b{color:#2a1a00 !important;text-shadow:none !important}
+.joy .ring{border-color:rgba(232,194,106,.6) !important;background:rgba(7,10,22,.35) !important}
+.joy .knob{background:radial-gradient(circle at 40% 30%,#fff0c2,#e8c26a 50%,#9c7330) !important;box-shadow:0 0 0 2px #070a16,0 3px 10px rgba(0,0,0,.5) !important}
+.chips > *{background:rgba(13,18,38,.9) !important;color:var(--rn-cream) !important;border:1px solid rgba(232,194,106,.5) !important;box-shadow:none !important}
+.ui .rail .mb .tip,.ui.moba .rail .mb .tip,.ui .rail:not(.folded) .mb .tip,.ui.moba .rail:not(.folded) .mb .tip{color:var(--rn-cream) !important;-webkit-text-fill-color:var(--rn-cream) !important;text-shadow:0 1px 0 #000 !important}
+.ui .rail.folded .mb .tip{background:rgba(13,18,38,.95) !important;border:1px solid rgba(232,194,106,.5)}
+
+/* ---------- dialog, chat, banners ---------- */
+.dialog .wallet{background:rgba(232,194,106,.15) !important;color:var(--rn-gold-hi) !important;border:1px solid rgba(232,194,106,.5)}
+.dialog .say{background:linear-gradient(180deg,#fbf3df,#efe0bb) !important;color:#2b2014 !important;border:1px solid var(--rn-gold-lo) !important;border-radius:10px !important;box-shadow:inset 0 0 0 2px rgba(255,255,255,.5) !important}
+.dialog .say *{color:#2b2014 !important;text-shadow:none !important}
+.dpw,.dp{box-shadow:0 0 0 2px var(--rn-gold),0 0 0 4px #070a16 !important;background:#1d2648 !important}
+.chatbox .ctab{background:rgba(232,194,106,.08);color:var(--rn-mute)}
+.chatbox .ctab.on{background:rgba(232,194,106,.22);color:var(--rn-gold-hi)}
+.chatbox .clog{background:rgba(0,0,0,.35)}
+.chatbox input,.chatbox select,.nmin{background:#070a16 !important;color:var(--rn-cream) !important;border:1px solid rgba(232,194,106,.4) !important}
+input,select,textarea{color-scheme:dark}
+.banner{background:linear-gradient(90deg,transparent,rgba(13,18,38,.92) 15%,rgba(13,18,38,.92) 85%,transparent) !important;border:0 !important;border-radius:0 !important;
+  border-top:1px solid rgba(232,194,106,.6) !important;border-bottom:1px solid rgba(232,194,106,.6) !important;box-shadow:none !important}
+.banner,.banner *,.banner span{font-family:var(--thai);color:var(--rn-gold-hi) !important;-webkit-text-fill-color:var(--rn-gold-hi) !important;text-shadow:0 1px 0 #000,0 0 12px rgba(232,194,106,.5) !important}
+.jobs .choice{background:linear-gradient(180deg,#2a3563,#141b36) !important;border:1px solid rgba(232,194,106,.6) !important;border-radius:10px !important;box-shadow:0 3px 0 #05070f !important;color:var(--rn-cream) !important}
+.jobs .choice b{color:var(--rn-gold-hi) !important}.jobs .choice small{color:var(--rn-mute) !important}.jobs .choice em{color:var(--rn-gold) !important}
+
+/* ---------- title / sign-in ---------- */
+.title{background:radial-gradient(ellipse at 50% 40%,rgba(30,26,60,.55),rgba(5,7,15,.88)) !important}
+.title-card{border:1px solid var(--rn-gold) !important;border-radius:14px !important;background:linear-gradient(180deg,#1d2648,#0d1226) !important;box-shadow:var(--rn-trim),var(--rn-drop) !important}
+.title-card h2{font-family:"Cinzel",serif !important;background:linear-gradient(180deg,#fff6d8,#e8c26a 55%,#9c7330) !important;-webkit-background-clip:text !important;background-clip:text !important;
+  -webkit-text-fill-color:transparent !important;color:transparent !important;text-shadow:none !important;filter:drop-shadow(0 2px 0 #000) drop-shadow(0 0 14px rgba(232,194,106,.4))}
+.title-card .t-eyebrow,.title-card .t-sub{color:var(--rn-gold-hi) !important;text-shadow:0 1px 0 #000 !important}
+.au-box{background:linear-gradient(180deg,rgba(20,27,54,.96),rgba(9,12,27,.98)) !important;border:1px solid rgba(232,194,106,.6) !important;border-radius:12px !important;box-shadow:inset 0 1px 0 rgba(255,240,194,.12) !important;color:var(--rn-cream) !important}
+.au-tabs{background:#070a16 !important;box-shadow:inset 0 0 0 1px rgba(232,194,106,.45) !important}
+.au-tabs button{color:var(--rn-mute) !important}
+.au-l,.au-head b,.au-head small,.au-box label,.au-box p,.au-box small,.au-box span{color:var(--rn-cream) !important;text-shadow:none !important}
+.au-box small,.au-box p{color:var(--rn-mute) !important}
+.au-pill,.au-pill *{color:#2a1a00 !important}
+.au-in{background:#070a16 !important;border:1px solid rgba(232,194,106,.4) !important;border-radius:9px !important}
+.au-in:focus-within{border-color:var(--rn-gold) !important;box-shadow:0 0 0 3px rgba(232,194,106,.18) !important}
+.au-in input{color:var(--rn-cream) !important}
+.au-in input::placeholder{color:#7d7563 !important}
+.au-in svg{stroke:var(--rn-gold) !important;color:var(--rn-gold) !important}
+.au-lang{background:#070a16 !important;color:var(--rn-gold) !important;border:1px solid rgba(232,194,106,.6) !important}
+
+.au-tabs button[aria-selected="true"]{color:#2a1a00 !important}
+.au-go{background:linear-gradient(180deg,#fff0c2,#e8c26a 45%,#b8862f) !important;border:1px solid #fff0c2 !important}
+.au-go,.au-go span{color:#2a1a00 !important;text-shadow:0 1px 0 rgba(255,255,255,.4) !important}
+
+/* announcement card (banner2.js): midnight card with a gold edge instead of the white pill */
+html body #banner.bn2{background:linear-gradient(180deg,rgba(29,38,72,.97),rgba(13,18,38,.97)) !important;border:1px solid rgba(232,194,106,.75) !important;
+  box-shadow:0 0 0 3px rgba(7,10,22,.7),0 8px 22px rgba(0,0,0,.5),0 0 18px rgba(232,194,106,.18) !important}
+html body #banner.bn2 .bnh{color:var(--rn-gold-hi) !important;-webkit-text-fill-color:var(--rn-gold-hi) !important;font-family:var(--thai)}
+html body #banner.bn2.bz .bnh{color:#ff9a8a !important;-webkit-text-fill-color:#ff9a8a !important}
+html body #banner.bn2 .bns{color:var(--rn-mute) !important;-webkit-text-fill-color:var(--rn-mute) !important}
+
+/* active tabs share one look: gold plate, dark lettering */
+html body .eqtabs button.on,html body .bagtabs .bagtab.on,html body .bagview .bagv.on,html body .wktabs .wktab.on,html body .vispre button.on,html body .fgtabs button.on,html body #sdTab{
+  background:linear-gradient(180deg,#fff0c2,#e8c26a 50%,#b8862f) !important;color:#2a1a00 !important;border-color:#fff0c2 !important;text-shadow:none !important}
+html body .eqtabs button.on *,html body .bagtabs .bagtab.on *,html body .wktabs .wktab.on *,html body .fgtabs button.on *,html body #sdTab *{color:#2a1a00 !important;-webkit-text-fill-color:#2a1a00 !important}
+html body .chatbox .csend{background:linear-gradient(180deg,#fff0c2,#e8c26a 50%,#b8862f) !important;color:#2a1a00 !important;border:0 !important}

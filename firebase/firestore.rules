@@ -1,0 +1,95 @@
+rules_version = '2';
+// VAYRATHEN — Cloud Firestore rules (copy into Firebase Console → Firestore Database → Rules → Publish)
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // GM (game master): put the same uids as GM_UIDS in js/net/firebase-config.js
+    // (Firebase Console → Authentication → Users → User UID), e.g. return ['AbC123...', 'XyZ789...'];
+    function gmUids() { return []; }
+    function signedIn() { return request.auth != null; }
+    function isGM() { return signedIn() && request.auth.uid in gmUids(); }
+
+    // player cards (ranking, houses): everyone signed in reads, each player writes only their own; a GM may delete any (world reset)
+    match /players/{uid} {
+      allow read: if signedIn();
+      allow create, update: if signedIn() && request.auth.uid == uid;
+      allow delete: if signedIn() && (request.auth.uid == uid || isGM());
+      allow write: if isGM();   // restore from a backup
+    }
+    // private saves, account, 7-day backups, season + archives: only the owner (the admin script backs these up)
+    match /data/users/{uid}/{doc=**} {
+      allow read, write: if signedIn() && request.auth.uid == uid;
+    }
+    // guilds (+ members, castle siege) and the player market: shared (sellers and members delete their own rows; a GM may delete all)
+    match /guilds/{rest=**} {
+      allow read: if signedIn();
+      allow write: if signedIn();
+    }
+    match /market/{rest=**} {
+      allow read: if signedIn();
+      allow write: if signedIn();
+    }
+    // server state: season (world reset), GM list, GM log — everyone reads, only a GM writes
+    match /server/{rest=**} {
+      allow read: if signedIn();
+      allow write: if isGM();
+    }
+    // server backups: GM only
+    match /backups/{rest=**} {
+      allow read, write: if isGM();
+    }
+    // Hall of Fame (js/sys/fame.js): everyone signed in reads; a record is created once, by one of the players it
+    // names; only a speed record (spd_*) may be replaced, and only by a faster time; nobody deletes
+    function fameOk(id){
+      let d = request.resource.data;
+      let now = request.time.toMillis();
+      return id.matches('(disc|clr|spd|mile)_[a-z0-9_]{1,40}')
+        && d.keys().hasOnly(['names', 'uids', 'party', 't', 'at', 'lv', 'prev'])
+        && d.names is list && d.names.size() >= 1 && d.names.size() <= 12
+        && d.uids is list && d.uids.size() == d.names.size() && request.auth.uid in d.uids
+        && d.party is bool && d.at is int && d.at > now - 86400000 && d.at < now + 86400000
+        && (!('t' in d) || (d.t is int && d.t >= 1000 && d.t <= 86400000))
+        && (!id.matches('spd_.*') || ('t' in d))
+        && (!('lv' in d) || d.lv is int)
+        && (!('prev' in d) || d.prev is map);
+    }
+    match /fame/{id} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null && fameOk(id);
+      allow update: if request.auth != null && id.matches('spd_.*') && fameOk(id) && request.resource.data.t < resource.data.t;
+      allow write: if isGM();   // a GM deletes them at a world reset and restores them from a backup; players never delete
+    }
+    // mail (js/sys/mail.js): the sender writes a letter as themselves; only the recipient (or the sender) reads it;
+    // only the recipient marks it read / takes the attachments / deletes it
+    match /mail/{id} {
+      allow read: if isGM() || (signedIn() && (resource == null || resource.data.to == request.auth.uid || resource.data.from == request.auth.uid));
+      allow create: if signedIn() && request.resource.data.from == request.auth.uid
+        && request.resource.data.to is string && request.resource.data.s is string && request.resource.data.s.size() <= 60
+        && request.resource.data.m is string && request.resource.data.m.size() <= 600
+        && (request.resource.data.c == 0 || request.resource.data.to == request.auth.uid);
+      allow update: if signedIn() && resource.data.to == request.auth.uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rd', 'taken']);
+      allow delete: if signedIn() && (resource.data.to == request.auth.uid || isGM());
+      allow write: if isGM();   // restore from a backup
+    }
+    // the tower's weekly board (js/sys/towerweek.js): one row per player per week, written only by that player
+    match /towerwk/{id} {
+      allow read: if signedIn();
+      allow write: if signedIn() && id == string(request.resource.data.w) + '_' + request.auth.uid && request.resource.data.uid == request.auth.uid
+        && request.resource.data.f is int && request.resource.data.f >= 0;
+      allow delete: if isGM();
+      allow write: if isGM();   // restore from a backup
+    }
+    // MVP board (js/sys/mvp.js): everyone signed in reads; anyone signed in reports a region boss appearing or falling
+    match /mvp/{id} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && id.matches('[a-z0-9_]{1,40}')
+        && request.resource.data.keys().hasOnly(['up', 'sp', 'at', 'names', 'uids', 'map', 'n', 'lv'])
+        && (!('names' in request.resource.data) || (request.resource.data.names is list && request.resource.data.names.size() <= 12));
+    }
+    // MVP hunter ranking: each player writes only their own count
+    match /mvphunt/{uid} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == uid && request.resource.data.keys().hasOnly(['name', 'n', 'at']) && request.resource.data.n is int;
+    }
+  }
+}

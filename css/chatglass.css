@@ -1,0 +1,44 @@
+/* VAYRATHEN — css/chatglass.css — the chat box, redone (v31): a light frosted parchment panel instead of a dark one.
+   Dark ink on cream reads over any scene; each channel has its own coloured tag and name colour; the tabs are one
+   segmented strip, the input row is a single rounded bar. When nobody is using it (idle) the panel fades back and
+   the tabs and input tuck away, leaving the last lines readable. */
+html body .ui .chatbox{--cg-ink:#3b2612;--cg-mute:#8a6d4a;--cg-line:rgba(176,124,40,.45);
+  background:linear-gradient(180deg,rgba(255,251,240,.9),rgba(250,238,212,.88))!important;border:1.5px solid var(--cg-line)!important;border-radius:16px!important;
+  box-shadow:0 6px 18px rgba(60,30,0,.25),inset 0 1px 0 rgba(255,255,255,.9)!important;backdrop-filter:blur(6px) saturate(1.1)!important;-webkit-backdrop-filter:blur(6px) saturate(1.1)!important;
+  padding:8px 10px 9px!important;gap:6px!important;color:var(--cg-ink)!important;transition:background .35s,box-shadow .35s,border-color .35s,opacity .35s!important}
+html body .ui .chatbox::before,html body .ui .chatbox::after{display:none!important}
+html body .ui .chatbox.idle{background:linear-gradient(180deg,rgba(255,251,240,.55),rgba(250,238,212,.5))!important;border-color:rgba(176,124,40,.2)!important;box-shadow:0 4px 12px rgba(60,30,0,.12)!important}
+/* grip */
+html body .ui .chatbox .cgrip{height:4px!important;width:42px!important;margin:-3px auto 0!important;border-radius:4px!important;background:rgba(176,124,40,.4)!important}
+/* tabs: one segmented strip, with the size buttons at its end */
+html body .ui .chatbox .ctabs{gap:2px!important;padding:2px!important;background:rgba(176,124,40,.13)!important;border-radius:10px!important;align-items:stretch}
+html body .ui .chatbox .ctab{flex:1 1 auto;border:0!important;border-radius:8px!important;background:transparent!important;color:var(--cg-mute)!important;text-shadow:none!important;
+  font:700 12px/1 var(--thai,Mali),sans-serif!important;padding:6px 4px!important;cursor:pointer;box-shadow:none!important;backdrop-filter:none!important}
+html body .ui .chatbox .ctab:hover{color:var(--cg-ink)!important;background:rgba(255,255,255,.55)!important}
+html body .ui .chatbox .ctab.on{background:linear-gradient(180deg,#fff3c4,#f1c45a)!important;color:#3b2200!important;box-shadow:0 1px 3px rgba(120,70,0,.3)!important}
+html body .ui .chatbox .csz{flex:0 0 24px!important;border:0!important;border-radius:8px!important;background:transparent!important;color:var(--cg-mute)!important;font-size:12px!important}
+html body .ui .chatbox .csz:hover{background:rgba(255,255,255,.6)!important;color:var(--cg-ink)!important}
+/* the lines */
+html body .ui .chatbox .clog{background:transparent!important;padding:0 2px!important;scrollbar-width:thin;scrollbar-color:rgba(176,124,40,.45) transparent}
+html body .ui .chatbox .cl,html body .ui .chatbox.idle .cl{color:var(--cg-ink)!important;text-shadow:none!important;font:500 13.5px/1.5 var(--thai,Mali),sans-serif;padding:1px 0}
+html body .ui .chatbox .cl b{color:#9a5a00!important;font-weight:800}
+html body .ui .chatbox .cl .ctag{display:inline-block;margin-right:5px;padding:0 6px;border-radius:6px;font:800 10.5px/17px var(--thai,Mali),sans-serif;color:#fff!important;background:#d99a1c!important;vertical-align:1px;text-shadow:none!important}
+html body .ui .chatbox .cl.ch-party .ctag{background:#2f86d6!important}html body .ui .chatbox .cl.ch-party b{color:#1d68b0!important}
+html body .ui .chatbox .cl.ch-map .ctag{background:#4c9a2a!important}html body .ui .chatbox .cl.ch-map b{color:#3b7d1e!important}
+html body .ui .chatbox .cl.ch-guild .ctag{background:#13907a!important}html body .ui .chatbox .cl.ch-guild b{color:#0e7563!important}
+html body .ui .chatbox .cl.ch-w .ctag{background:#c23c9e!important}html body .ui .chatbox .cl.ch-w b{color:#a32a84!important}html body .ui .chatbox .cl.ch-w{color:#7a2363!important}
+html body .ui .chatbox .cl.me b{color:#6b3fc4!important}
+html body .ui .chatbox .cl.ch-sys{color:#b4321e!important;font-style:normal;font-weight:700;background:rgba(214,70,40,.09);border-radius:6px;padding:1px 6px;margin:1px 0}
+html body .ui .chatbox .cl .cjob{color:#8a5a10!important;background:rgba(232,170,60,.18)!important;border:1px solid rgba(176,124,40,.35)!important}
+/* the input row: one rounded bar */
+html body .ui .chatbox .cin{gap:0!important;background:#fff!important;border:1.5px solid var(--cg-line)!important;border-radius:12px!important;padding:3px!important;align-items:center;box-shadow:inset 0 1px 2px rgba(60,30,0,.08)}
+html body .ui .chatbox .cin:focus-within{border-color:#e0a82e!important;box-shadow:0 0 0 3px rgba(240,190,80,.25)!important}
+html body .ui .chatbox .cin .cemo{width:30px!important;height:30px;border:0!important;background:transparent!important;color:#b07a20!important;border-radius:9px!important}
+html body .ui .chatbox .cin .cemo:hover{background:#fff4d6!important}
+html body .ui .chatbox .cin select{background:#fff4d6!important;color:var(--cg-ink)!important;border:0!important;border-radius:9px!important;font:700 12px var(--thai,Mali),sans-serif!important;padding:6px 4px!important;margin-right:4px;cursor:pointer}
+html body .ui .chatbox .cin input{background:transparent!important;color:var(--cg-ink)!important;border:0!important;font:500 13.5px var(--thai,Mali),sans-serif!important;padding:6px 4px!important;outline:none}
+html body .ui .chatbox .cin input::placeholder{color:#b39a78}
+html body .ui .chatbox .cin .csend{border-radius:9px!important;padding:7px 16px!important;background:linear-gradient(180deg,#ffe9a8,#eeb43e)!important;color:#3b2200!important;box-shadow:0 1px 2px rgba(120,70,0,.35)!important;border:0!important}
+html body .ui .chatbox .cin .csend:hover{filter:brightness(1.05)}
+/* idle on a computer: the tabs and input fold away so the panel shrinks to just the lines (they come back on hover or Enter) */
+@media (pointer:fine){html body .ui .chatbox.idle .ctabs,html body .ui .chatbox.idle .cin,html body .ui .chatbox.idle .cgrip{display:none!important}}

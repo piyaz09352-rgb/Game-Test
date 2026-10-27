@@ -1,0 +1,162 @@
+/* VAYRATHEN — css/pastel.css — "Sky Candy" UI theme (original)
+   A bright, friendly casual-MMO look: sky-blue candy panels with a thick white rim and a soft drop under them,
+   white title tabs with blue lettering, rounded bubbly buttons, sunny yellow for the main actions, and chunky
+   HP/SP bars. Loaded last, so it re-skins the older lacquer-and-gold theme without touching the layout. */
+
+:root{
+  --bg:#9fd8fb; --lac:#3f8fd8; --lac-2:#2f74bc; --glass:rgba(63,143,216,.92);
+  --line:rgba(255,255,255,.45); --line-2:rgba(255,255,255,.8);
+  --fg:#ffffff; --muted:#dcefff; --gold:#ffd84a; --gold-2:#fff4b8; --gold-3:#f0a51a;
+  --royal:#2f74bc; --royal-2:#255f9e; --halo:rgba(255,255,255,.6); --halo-2:rgba(255,255,255,.9);
+  --rim:linear-gradient(180deg,#ffffff,#e4f4ff 50%,#b9dcfa);
+  --sky1:#78c8f8; --sky2:#4a9de2; --sky3:#2f74bc; --skyD:#1f5c9e; --ink:#24548f; --sun:#ffd34a; --sun2:#ffb31f;
+  --kanok:none; --lai:none;
+}
+html,body{background:linear-gradient(180deg,#bfe7ff,#8ccff7)}
+.top h1{background:none;-webkit-text-fill-color:#fff;color:#fff;text-shadow:0 2px 0 var(--sky3),0 0 12px rgba(255,255,255,.7);animation:none}
+.top .thai{color:#fff;text-shadow:0 1px 0 var(--sky3)}
+.top .sub{color:var(--ink)}
+.stage{background:#7cc2f0;box-shadow:0 0 0 4px #fff,0 10px 30px rgba(31,92,158,.35);border-radius:18px}
+.foot{color:var(--ink)}
+
+/* ---------- every panel: candy blue with a white rim ---------- */
+.card,.win,.dock,.dialog,.rail,.chatbox,.confirm,#confirm,.invite,.castbar{
+  border:3px solid #fff !important;
+  background:linear-gradient(180deg,var(--sky1),var(--sky2) 55%,var(--sky3)) padding-box !important;
+  box-shadow:0 4px 0 var(--skyD),0 10px 22px rgba(20,60,120,.35),inset 0 2px 0 rgba(255,255,255,.55) !important;
+  border-radius:18px !important; animation:none !important; backdrop-filter:none;
+}
+.card::before,.card::after,.win::before,.win::after,.dialog::before,.dialog::after,.rail::before,.dock::before,.dock::after{background-image:none !important;opacity:0}
+.win .wt{background:linear-gradient(180deg,#ffffff,#e2f3ff) !important;border-bottom:2px solid #bfe0fa !important;box-shadow:none !important;border-radius:14px 14px 0 0;color:var(--ink)}
+.win .wt b,.win .wt span{color:var(--ink) !important;text-shadow:none !important;-webkit-text-fill-color:var(--ink)}
+.win .wt kbd{background:var(--sky2);color:#fff;border:0;border-radius:6px}
+.win .wt .gem{background:radial-gradient(circle at 35% 30%,#fff,#ffd84a 50%,#f0a51a) !important;box-shadow:0 0 0 2px #fff,0 1px 0 2px #c98a14 !important;border-radius:50%}
+.win .wt .ibtn{color:var(--ink)}
+.win .wb,.dialog .db{color:#fff}
+.sec{color:#fff !important;border-color:rgba(255,255,255,.45) !important;text-shadow:0 1px 0 var(--sky3)}
+.empty,.hint,small{color:var(--muted)}
+.list .item,.srow,.eqit,.mvprow,.bslot,.slot,.row{background-color:rgba(255,255,255,.14);border-color:rgba(255,255,255,.35)}
+
+/* ---------- buttons: bubbly ---------- */
+.btn,.tbtn,.ibtn,.seg button{background:linear-gradient(180deg,#ffffff,#d9efff) !important;color:var(--ink) !important;border:2px solid #fff !important;border-radius:12px !important;
+  box-shadow:0 3px 0 #8cbbe6,0 4px 8px rgba(20,60,120,.25) !important;text-shadow:none !important;font-weight:700}
+.btn:hover,.tbtn:hover,.ibtn:hover{filter:brightness(1.05);transform:translateY(-1px)}
+.btn:active,.tbtn:active,.ibtn:active{transform:translateY(2px);box-shadow:0 1px 0 #8cbbe6 !important}
+.btn.gold,.tbtn.gold,.seg button.on,.btn.on{background:linear-gradient(180deg,#fff3a0,var(--sun) 50%,var(--sun2)) !important;color:#6a3a00 !important;border-color:#fff !important;box-shadow:0 3px 0 #d08a10,0 4px 10px rgba(240,160,20,.35) !important}
+.btn[disabled],.btn:disabled{opacity:.55;filter:grayscale(.3)}
+.ibtn svg{stroke:var(--ink)}
+
+/* ---------- character card ---------- */
+.portrait::before{background:radial-gradient(circle at 50% 36%,#e8f6ff,#9fd2f8 70%,#5aa6e6) !important;box-shadow:0 0 0 3px #fff,0 3px 0 3px var(--skyD),0 6px 12px rgba(20,60,120,.4) !important}
+.portrait::after{display:none}
+.lvb{background:linear-gradient(180deg,#fff3a0,var(--sun) 50%,var(--sun2)) !important;color:#6a3a00 !important;box-shadow:0 0 0 2px #fff,0 2px 0 2px #d08a10 !important;clip-path:none !important;border-radius:10px !important}
+.cname b{background:none !important;-webkit-background-clip:initial;background-clip:initial;color:#fff !important;filter:none !important;text-shadow:0 2px 0 var(--sky3)}
+.cname span{background:#fff !important;color:var(--ink) !important;border:0 !important;box-shadow:0 2px 0 #8cbbe6 !important}
+.bar{height:16px;border-radius:9px;background:#1f4f86 !important;box-shadow:0 0 0 2px #fff,inset 0 2px 3px rgba(0,0,0,.35) !important}
+.bar.hp i:not(.ghost){background:linear-gradient(180deg,#ffb0b6,#ff5a6e 50%,#e0304a) !important}
+.bar.sp i:not(.ghost){background:linear-gradient(180deg,#c6f0ff,#46b8ff 50%,#1f84e0) !important}
+.bar span{text-shadow:0 1px 0 rgba(0,0,0,.6) !important}
+.thin{box-shadow:0 0 0 1.5px #fff !important;background:#1f4f86 !important}
+.thin.bx i{background:linear-gradient(90deg,#ffd34a,#fff3a0) !important}
+.thin.jx i{background:linear-gradient(90deg,#5fe0a8,#c8ffe6) !important}
+
+/* ---------- minimap, dock, hotkeys, mobile buttons ---------- */
+#minimap{border-radius:12px;box-shadow:0 0 0 3px #fff,0 3px 0 3px var(--skyD) !important}
+.mapname{background:none !important;-webkit-text-fill-color:#fff;color:#fff !important;filter:none !important;text-shadow:0 2px 0 var(--sky3)}
+.hk,.hotbar > *{background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,.12)) !important;border-radius:12px !important;box-shadow:inset 0 0 0 2px rgba(255,255,255,.75) !important}
+.hk:hover{box-shadow:inset 0 0 0 2px #fff,0 0 10px rgba(255,255,255,.6) !important}
+.hk kbd,.hk b,.hk span{color:#fff;text-shadow:0 1px 0 var(--sky3)}
+.mo{background:radial-gradient(circle at 40% 30%,#ffffff,#bfe4ff 45%,#5aa6e6) !important;border:3px solid #fff !important;box-shadow:0 4px 0 var(--skyD),0 6px 14px rgba(20,60,120,.35) !important;color:var(--ink) !important}
+.mo.atk{background:radial-gradient(circle at 40% 30%,#fff7c8,var(--sun) 50%,var(--sun2)) !important;box-shadow:0 5px 0 #d08a10,0 8px 18px rgba(240,160,20,.45) !important}
+.mb{background:linear-gradient(180deg,#ffffff,#d9efff) !important;border:2px solid #fff !important;border-radius:14px !important;box-shadow:0 3px 0 #8cbbe6 !important;color:var(--ink) !important}
+.mb svg{stroke:var(--ink)}
+.railtog{background:linear-gradient(180deg,#ffffff,#d9efff) !important;color:var(--ink) !important;border-radius:14px !important;box-shadow:0 3px 0 #8cbbe6 !important}
+.railtog span,.railtog svg{color:var(--ink);stroke:var(--ink)}
+.joy .ring{border-color:#fff !important;background:rgba(255,255,255,.18) !important}
+.joy .knob{background:radial-gradient(circle at 40% 30%,#fff,#bfe4ff 50%,#5aa6e6) !important;box-shadow:0 0 0 3px #fff,0 4px 0 3px var(--skyD) !important}
+.chips > *{background:#fff !important;color:var(--ink) !important;border:0 !important;box-shadow:0 2px 0 #8cbbe6 !important;border-radius:999px !important}
+
+/* ---------- dialog (NPC) and chat ---------- */
+.dialog .dh{background:linear-gradient(180deg,#ffffff,#e2f3ff) !important;border-radius:14px 14px 0 0;color:var(--ink)}
+.dialog .dh h3,.dialog .dh small{color:var(--ink) !important;text-shadow:none !important;-webkit-text-fill-color:var(--ink)}
+.dialog .wallet{background:#fff3b0 !important;color:#6a3a00 !important;border-radius:999px}
+.dialog .say{background:#fff !important;color:#2a3f5c !important;border-radius:14px !important;border:0 !important;box-shadow:0 3px 0 #8cbbe6 !important}
+.dialog .say *{color:#2a3f5c}
+.dpw,.dp{border-radius:50% !important;box-shadow:0 0 0 3px #fff !important;background:#bfe4ff !important}
+.chatbox .ctab{background:rgba(255,255,255,.25);color:#fff;border-radius:10px 10px 0 0}
+.chatbox .ctab.on{background:#fff;color:var(--ink)}
+.chatbox .clog{background:rgba(20,60,120,.25);border-radius:10px}
+.chatbox input,.chatbox select{background:#fff;color:var(--ink);border:0;border-radius:10px}
+.chatbtn{background:linear-gradient(180deg,#ffffff,#d9efff) !important;color:var(--ink) !important;border:2px solid #fff !important;border-radius:14px !important;box-shadow:0 3px 0 #8cbbe6 !important}
+
+/* ---------- banners, tags, title ---------- */
+.banner{background:linear-gradient(180deg,#ffffff,#e2f3ff) !important;color:var(--ink) !important;border:3px solid #fff !important;border-radius:999px !important;box-shadow:0 4px 0 #8cbbe6,0 10px 24px rgba(20,60,120,.3) !important;text-shadow:none !important}
+.banner *{color:var(--ink) !important;-webkit-text-fill-color:var(--ink)}
+.title{background:radial-gradient(ellipse at 50% 30%,rgba(255,255,255,.55),rgba(120,200,248,.85)) !important}
+.title-card{border:3px solid #fff !important;border-radius:22px !important;background:linear-gradient(180deg,var(--sky1),var(--sky2) 60%,var(--sky3)) !important;box-shadow:0 6px 0 var(--skyD),0 16px 34px rgba(20,60,120,.4) !important}
+.title-card h2{background:none !important;-webkit-text-fill-color:#fff;color:#fff !important;text-shadow:0 3px 0 var(--sky3),0 0 18px rgba(255,255,255,.8) !important}
+.title-card .t-eyebrow,.title-card .t-sub{color:#fff !important;text-shadow:0 1px 0 var(--sky3)}
+input,select,textarea{border-radius:10px}
+.nmin{background:#fff !important;color:var(--ink) !important;border:2px solid #bfe0fa !important}
+.banner span{background:none !important;-webkit-text-fill-color:var(--ink) !important;color:var(--ink) !important;animation:none !important}
+.banner::before,.banner::after{display:none}
+.top h1{-webkit-text-fill-color:#fff;text-shadow:0 2px 0 var(--sky3),0 3px 6px rgba(31,92,158,.5)}
+.top .thai{color:var(--ink);text-shadow:none}
+/* pop-ups: tutorial, achievements, cards, tips, party frame */
+.tutbox,.achpop,.cardpop,.tipcard,.ptyhud,.skpick,.gmlockbox,.photobar,.hebar,.emowheel,.suppop .supbox{
+  border:3px solid #fff !important;border-radius:18px !important;background:linear-gradient(180deg,var(--sky1),var(--sky2) 55%,var(--sky3)) !important;
+  box-shadow:0 4px 0 var(--skyD),0 10px 22px rgba(20,60,120,.35) !important;color:#fff !important}
+.tutbox *,.achpop *,.tipcard *{text-shadow:none}
+.tutbox .tuth,.tutbox b,.achpop b{color:#fff !important;-webkit-text-fill-color:#fff}
+.tutdots i,.tutdots span{background:rgba(255,255,255,.35) !important}
+.tutdots .on,.tutdots i.on{background:var(--sun) !important}
+
+/* sign-in box */
+.au-box{background:linear-gradient(180deg,#eaf7ff,#cfeaff) !important;border:3px solid #fff !important;border-radius:18px !important;box-shadow:0 4px 0 #8cbbe6,0 10px 22px rgba(20,60,120,.3) !important;color:var(--ink) !important}
+.au-box::before,.au-box::after,.au-cn,.au-fx{display:none !important}
+.au-tabs{background:#fff !important;border-radius:999px !important;box-shadow:inset 0 0 0 2px #bfe0fa !important}
+.au-tabs button{color:var(--ink) !important}
+.au-pill{background:linear-gradient(180deg,#fff3a0,var(--sun) 50%,var(--sun2)) !important;box-shadow:0 2px 0 #d08a10 !important}
+.au-l,.au-head b,.au-head small,.au-box label,.au-box p,.au-box small,.au-box span{color:var(--ink) !important;text-shadow:none !important}
+.au-in{background:#fff !important;border:2px solid #bfe0fa !important;border-radius:12px !important;box-shadow:none !important}
+.au-in input{background:transparent !important;color:var(--ink) !important;border:0 !important}
+.au-in svg{stroke:#5a8cc4 !important;color:#5a8cc4 !important}
+.au-lang{background:var(--sky2) !important;color:#fff !important;border:2px solid #fff !important}
+
+/* ===== v10.1 contrast pass: deep navy panels + white text, sky-blue headers, white rims ===== */
+:root{--sky1:#2d5a9e; --sky2:#21467f; --sky3:#16315c; --skyD:#0d2141; --ink:#14325e; --muted:#c8dcf6; --fg:#ffffff}
+.win .wt,.dialog .dh{background:linear-gradient(180deg,#6bbcf5,#3b8ad6) !important;border-bottom:2px solid #fff !important}
+.win .wt b,.win .wt span,.dialog .dh h3{color:#fff !important;-webkit-text-fill-color:#fff !important;text-shadow:0 1px 0 #0d2a52,0 0 4px rgba(13,42,82,.6) !important}
+.dialog .dh small{color:#eaf5ff !important;-webkit-text-fill-color:#eaf5ff !important;text-shadow:0 1px 0 #0d2a52 !important}
+.win .wt kbd{background:#fff;color:var(--ink)}
+.win .wt .ibtn svg{stroke:var(--ink)}
+.list .item,.srow,.eqit,.mvprow,.bslot,.slot,.row,.stats tr,.derived > div{background-color:rgba(255,255,255,.07)}
+.sec{color:#ffe27a !important;text-shadow:0 1px 0 #0d2141 !important}
+.empty,.hint,small{color:var(--muted)}
+.bar{background:#0b1d3a !important}
+.thin{background:#0b1d3a !important}
+.hk,.hotbar > *{background:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05)) !important}
+.hk kbd,.hk b,.hk span{text-shadow:0 1px 0 #0d2141}
+.chatbox .clog{background:rgba(0,0,0,.25)}
+.mapname,.cname b{text-shadow:0 1px 0 #0d2141,0 0 4px rgba(13,33,65,.7) !important}
+.top h1{-webkit-text-fill-color:#16315c;color:#16315c;text-shadow:0 2px 0 #fff}
+.top .thai{color:#16315c}
+.top .sub,.foot{color:#24467e}
+.title-card h2{text-shadow:0 3px 0 #0d2141,0 0 14px rgba(120,190,255,.7) !important}
+.tutbox .tuth,.tutbox b,.achpop b{color:#ffe27a !important;-webkit-text-fill-color:#ffe27a}
+/* menu tile labels: dark text on the white tiles (they were cream on white) */
+.ui .rail .mb .tip,.ui.moba .rail .mb .tip,.ui .rail:not(.folded) .mb .tip,.ui.moba .rail:not(.folded) .mb .tip{color:var(--ink) !important;text-shadow:none !important;font-weight:700 !important;-webkit-text-fill-color:var(--ink)}
+.ui .rail.folded .mb .tip{background:#fff !important;border-radius:8px}
+.hk kbd,.hk b,.hk span,.mu span,.mu b{color:var(--ink) !important;text-shadow:none !important}
+.mo span,.mo b,.mo em,.mo small{color:var(--ink) !important;text-shadow:0 0 2px #fff !important}
+.mo.atk span,.mo.atk b{color:#6a3a00 !important}
+.hk{background:linear-gradient(180deg,#ffffff,#d9efff) !important;box-shadow:0 2px 0 #8cbbe6 !important}
+.hk kbd{color:#5a7fae !important}
+.tutn,.tutbox .tutn{color:#6a3a00 !important;-webkit-text-fill-color:#6a3a00 !important;background:var(--sun) !important}
+/* the − 100% + zoom row under the minimap is gone (zoom with the mouse wheel, a pinch, or the + / − keys) */
+.mapc .zm{display:none !important}
+/* the skill-slot picker always opens in the middle of the screen */
+.skpick{left:50% !important;top:50% !important;transform:translate(-50%,-50%) !important;position:absolute !important}
+.jobs .choice{background:linear-gradient(180deg,#3d6fb6,#26508f) !important;border:2px solid #fff !important;border-radius:14px !important;box-shadow:0 3px 0 #0d2141 !important;color:#fff !important}
+.jobs .choice:hover{filter:brightness(1.08)}
+.jobs .choice b{color:#ffe27a !important}.jobs .choice small{color:#eaf5ff !important}.jobs .choice em{color:#ffd34a !important}
