@@ -146,16 +146,6 @@ if (typeof TIPS !== 'undefined'){
   EV.on('tick', () => { if (!S || !S.lvl) return; if (P.crT && T - P.crT < .5) tip('castres'); if (typeof CMB !== 'undefined' && CMB.n >= 2) tip('combo'); if (TEAM.full) tip('team'); if (typeof GT !== 'undefined' && GT.id) tip('ground'); });
 }
 
-/* ---------- the Tier-4 trial: after Base Lv 150, defeat 3 region bosses, then Master Vayra lets you change ---------- */
-const T4Q_NEED = 3;
-/* bosses beaten before (lifetime count from the achievements) count too: a veteran is not sent back out */
-/* (v126) the trial is called off: once Job Lv and Base Lv 150 are reached, Master Vayra changes the class at once */
-const t4Done = () => true;
-const t4Ready = () => { const j = JOBS[S.job]; return j && j.tier === 3 && j.next && S.jlvl >= j.jobMax && S.lvl >= 150; };
-EV.on('kill', m => { const mm = m && m.def ? m : null; if (!S || !t4Ready() || !mm || !mm.def.boss) return; if (t4Done()) return;
-  S.t4q = (S.t4q || 0) + 1; dirty = true; banner(L(`บททดสอบ Tier 4: ปราบบอส ${S.t4q}/${T4Q_NEED}`, `Tier-4 trial: bosses ${S.t4q}/${T4Q_NEED}`));
-  if (S.t4q >= T4Q_NEED) setTimeout(() => toast(L('ผ่านบททดสอบแล้ว! กลับไปหาครูวายราเพื่อเปลี่ยนอาชีพ', 'Trial complete! Return to Master Vayra to change jobs')), 1500); });
-{ const _jb = jobChangeBlock;
-  jobChangeBlock = function(){ const r = _jb.apply(this, arguments); if (r) return r;
-    if (t4Ready() && !t4Done()) return L(`บททดสอบ Tier 4: ปราบบอสประจำแคว้นตัวไหนก็ได้ ${T4Q_NEED} ตัว (ตอนนี้ ${S.t4q || 0}/${T4Q_NEED})`, `Tier-4 trial: defeat any ${T4Q_NEED} region bosses (now ${S.t4q || 0}/${T4Q_NEED})`);
-    return r; }; }
+/* ---------- (v160) the Tier-4 boss trial was called off in v126; its code and its saved count (S.t4q) are gone ---------- */
+{ const _ld = load, _sv = save; const t4x = () => { if (typeof S !== 'undefined' && S && 't4q' in S) delete S.t4q; };
+  load = function(){ const r = _ld.apply(this, arguments); if (r && 't4q' in r) delete r.t4q; return r; }; save = function(){ t4x(); return _sv.apply(this, arguments); }; }
