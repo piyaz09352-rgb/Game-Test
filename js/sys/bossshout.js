@@ -44,6 +44,7 @@ function shoutPlace(){
   e.style.top = Math.round(clamp(y - H * .75, 6, Math.max(6, uh - H - 6))) + 'px';
 }
 function bossShout(m, mood, move, line){
+  return;   // (v155) boss speech bubbles are switched off on the owner's request: no bubble, no banner, no chat line
   const M = SHOUT_MOOD[mood] || SHOUT_MOOD.rage, d = m && m.def; if (!d) return;
   const raw = line ? L(...line) : L(...M.lines[Math.floor(Math.random() * M.lines.length)]), mv = move || '';
   const text = raw.replace(/\{m\}/g, mv || L('พลังของข้า', 'my power')), e = shoutEl();
