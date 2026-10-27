@@ -261,7 +261,7 @@ function loadMap(id){
 /* paint the current map again (quality change, lost canvas): same seed → same ground, props and water */
 function repaintMap(){
   const id = MAP_ID; obstacles.length = 0; PROPS.length = 0; WATERS.length = 0; WFALLS.length = 0;
-  TS = Math.min(GFX.ts, Math.sqrt(16e6 / (W * H)));   // keep the ground canvas within a safe pixel budget on big maps
+  TS = Math.min(GFX.ts, Math.sqrt((GFX.terrPx || 16e6) / (W * H)));   // keep the ground canvas within a safe pixel budget on big maps
   if (terr.width !== Math.round(W * TS)){ terr.width = Math.round(W * TS); terr.height = Math.round(H * TS); }
   setupGates(id);
   CAMP = id === 0 ? null : {x:Math.round(W * .5), y:Math.round(H * .5)};

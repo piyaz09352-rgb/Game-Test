@@ -12,8 +12,11 @@ const GFX = (() => {
   const P = {
     low:   {dpr:1,   kMax:2, ts:1,   ps:2, budget:touch ? 8e6 : 12e6,  fx:0},
     medium:{dpr:1.5, kMax:3, ts:1.5, ps:3, budget:touch ? 14e6 : 24e6, fx:1},
-    high:  {dpr:2,   kMax:4, ts:2,   ps:3, budget:touch ? 22e6 : 40e6, fx:2},
-    ultra: {dpr:2,   kMax:4, ts:touch ? 2 : 3, ps:4, budget:touch ? 30e6 : 64e6, fx:2}
+    high:  {dpr:2,   kMax:4, ts:2,   ps:4, budget:touch ? 22e6 : 48e6, fx:2, terrPx:touch ? 20e6 : 30e6},
+    // (v156) ultra is now the sharpest the game can draw: sprites up to 6 px per unit on 3× screens, props painted at
+    // 6×, and the ground canvas allowed to grow to ~56 megapixels on a desktop (it was capped at 16, so on big maps
+    // the ground was drawn at 1.4 px per unit and looked soft however high the setting)
+    ultra: {dpr:3,   kMax:touch ? 5 : 6, ts:3, ps:touch ? 5 : 6, budget:touch ? 36e6 : 110e6, fx:2, terrPx:touch ? 28e6 : 56e6}
   };
   // first guess from the hardware; a slow first session lowers it (stored), never raises it
   let guess = touch ? (mem <= 3 || cores <= 4 ? 'low' : mem <= 4 ? 'medium' : 'high')
@@ -25,7 +28,7 @@ const GFX = (() => {
   // smooth picture (default on): sprites are drawn a step sharper than the screen and filtered, so edges are soft
   // and anti-aliased and movement glides between pixels instead of stepping
   let smooth = true; try { smooth = JSON.parse(localStorage.getItem('vayrathen-settings-v1') || '{}').smooth !== false; } catch (e) {}
-  const G = {touch, ORDER, P, guess, mode, preset:null, k:2, ts:1, ps:2, dpr:1, budget:12e6, fx:1, smooth};
+  const G = {touch, ORDER, P, guess, mode, preset:null, k:2, ts:1, ps:2, dpr:1, budget:12e6, fx:1, smooth, terrPx:16e6};
   G.use = name => {
     const p = P[name]; G.preset = name;
     const devDpr = Math.min(p.dpr, globalThis.devicePixelRatio || 1);
@@ -33,7 +36,7 @@ const GFX = (() => {
     const px = Math.min(4, Math.max(2, Math.round(h / 330 * 2) / 2));
     const ss = G.smooth && name !== 'low' ? 1 : 0;
     G.k = Math.max(2, Math.min(p.kMax + ss, Math.round(px * devDpr) + ss));
-    G.ts = p.ts; G.ps = Math.max(p.ps, Math.min(G.k, 4)); G.dpr = p.dpr; G.budget = p.budget; G.fx = p.fx;
+    G.ts = p.ts; G.ps = Math.max(p.ps, Math.min(G.k, 4)); G.dpr = p.dpr; G.budget = p.budget; G.fx = p.fx; G.terrPx = p.terrPx || 16e6;
     return G;
   };
   G.use(mode === 'auto' ? guess : mode);

@@ -34,7 +34,7 @@ function tcMini(){ const m = mini.getContext('2d'); m.setTransform(1, 0, 0, 1, 0
   repaintMap = function(){
     const id = MAP_ID;
     // the canvas size depends on the map and the picture setting: set it as repaintMap would, to name the picture
-    const ts = Math.min(GFX.ts, Math.sqrt(16e6 / (W * H))), tw = Math.round(W * ts), th = Math.round(H * ts);
+    const ts = Math.min(GFX.ts, Math.sqrt((GFX.terrPx || 16e6) / (W * H))), tw = Math.round(W * ts), th = Math.round(H * ts);
     if (terr.width !== tw){ terr.width = tw; terr.height = th; }
     // (v135) only at the low and medium picture, and only for grounds up to 9 million pixels: on a PC at high/ultra a
     // kept ground is up to 64 MB of graphics memory, and two of them on top of everything else made some graphics

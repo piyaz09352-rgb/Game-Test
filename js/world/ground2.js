@@ -114,9 +114,14 @@ const G2_GROUND = {
   ice:['#b6cee0', '#bed4e4', '#c6dae8'], stone:['#3a3834', '#403d38', '#46423c'], gloom:['#384030', '#3e4434', '#444a38'], marble:['#e2dac6', '#e6decc', '#eae2d2']};
 const G2_BLADES = {grass:['#3e6a2c', '#4e7a34', '#6a8e3e', '#86a24a'], forest:['#2c4a22', '#3a5a2a', '#4e7034'], gloom:['#2a3424', '#384430', '#4a5638'], marble:['#7a9a5a', '#8aaa66', '#a8c07a'],
   dry:['#8a7a42', '#a8964e'], canyon:['#7a6a3a', '#94844a'], sand:['#a8925a', '#b8a266'], snow:null, ice:null, basalt:null, ash:['#3a3634', '#5a5450'], stone:null};
+/* paths: worn earth, packed sand, trodden snow or old flagstones — never a bright gold or pink band (v156: the golden
+   heavenly road read as a pillar of light running up the screen) */
+const G2_ROAD = {grass:['#6a5638', '#7a6442', '#86704c'], forest:['#4e3e28', '#5a4830', '#665238'], sand:['#bc9c66', '#c6a670', '#ceb07a'], dry:['#8e6e44', '#987a4e', '#a28458'],
+  canyon:['#8a5440', '#945e48', '#9e6850'], basalt:['#3a302c', '#443832', '#4e4038'], ash:['#5a5450', '#625c56', '#6a645e'], snow:['#b8c6d6', '#c6d2e0', '#d2dce8'],
+  ice:['#9ab4c8', '#a6bed0', '#b2c8d8'], stone:['#4e4a44', '#58534c', '#625c54'], gloom:['#4a4434', '#544c3a', '#5e5640'], marble:['#bcb29a', '#c8bea6', '#d2c8b2']};
 { const _pm2 = paintMap;
   paintMap = function(mapId){ const mp = MAPS[mapId]; if (!mp || !mapId || !BIOME[mp.biome]) return _pm2.apply(this, arguments);
     const k = mp.biome, keep = BIOME[k], kind = G2_KIND(k), nat = G2_GROUND[kind];
-    BIOME[k] = {...keep, base:nat, mottle:['rgba(20,16,10,.16)', 'rgba(255,250,235,.1)'], blades:kind in G2_BLADES ? G2_BLADES[kind] : keep.blades,
+    BIOME[k] = {...keep, base:nat, road:G2_ROAD[kind], plank:false, floor:keep.floor && keep.floor.kind === 'gold' ? {...keep.floor, kind:'stone'} : keep.floor, mottle:['rgba(20,16,10,.16)', 'rgba(255,250,235,.1)'], blades:kind in G2_BLADES ? G2_BLADES[kind] : keep.blades,
       flowers:/^(grass|marble)$/.test(kind) ? keep.flowers : null, flowerN:Math.round((keep.flowerN || 200) * .25)};
     try { return _pm2.apply(this, arguments); } finally { BIOME[k] = keep; } }; }
