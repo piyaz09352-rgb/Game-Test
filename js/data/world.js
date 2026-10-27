@@ -382,8 +382,9 @@ const ROAD_LV_RAW = {e:[[5, 15], [14, 24], [23, 33], [32, 42], [41, 52], [50, 62
   w:[[150, 162], [160, 172], [170, 182], [180, 192], [190, 202], [200, 214]],
   n:[[210, 220], [218, 228], [226, 236], [234, 244], [242, 252], [250, 262], [260, 272], [272, 286], [286, 300]]};
 if (typeof WORLD_MORE === 'function') WORLD_MORE();   // v29: thirty more regions and three hundred more species (data/world3.js)
+if (typeof WORLD_DRAGON === 'function') WORLD_DRAGON();   // dinosaurs past the east road, dragons & demons past the south road (data/world4.js)
 const ROAD_LV = Object.fromEntries(Object.entries(ROAD_LV_RAW).map(([d, a]) => [d, a.map(([lo, hi]) => [LVMAP(lo), Math.max(LVMAP(lo) + 2, LVMAP(hi))])]));
-const ROAD_LAND = {e:() => 'fertile', s:k => k < Math.round(ROADS.s.length * 5 / 8) ? 'arid' : 'volcanic', w:() => 'frozen', n:k => k < Math.round(ROADS.n.length * 2 / 3) ? 'dark' : 'light'};
+const ROAD_LAND = {e:() => 'fertile', s:k => k < Math.round(ROADS.s.filter(i => !MAPS[i].landFix).length * 5 / 8) ? 'arid' : 'volcanic', w:() => 'frozen', n:k => k < Math.round(ROADS.n.length * 2 / 3) ? 'dark' : 'light'};
 const OPP = {n:'s', s:'n', e:'w', w:'e'}, DIRV = {n:[0, -1], s:[0, 1], e:[1, 0], w:[-1, 0]};
 {
   const SP = {}; SPECIES.forEach(s => { SP[s[0]] = s; }); const BS = {}; BOSSES.forEach(b => { BS[b[0]] = b; });
@@ -392,7 +393,7 @@ const OPP = {n:'s', s:'n', e:'w', w:'e'}, DIRV = {n:[0, -1], s:[0, 1], e:[1, 0],
     const mp = MAPS[id], [c, e] = ROAD_LV[d][k], [a, b] = mp.lv, n = mp.mobs.length;
     mp.mobs.forEach((t, i) => { const s = SP[t]; if (!s) return; s[3] = b > a && s[3] ? Math.round(clamp(c + (s[3] - a) / (b - a) * (e - c), c - 1, e + 1)) : Math.round(c + i / Math.max(1, n - 1) * (e - c)); });
     const bs = BS[mp.boss]; bs[3] = Math.min(360, e + (b > a && bs[3] ? clamp(bs[3] - b, 3, 12) : 8));
-    mp.lv = [c, e]; mp.land = ROAD_LAND[d](k);
+    mp.lv = [c, e]; mp.land = mp.landFix || ROAD_LAND[d](k);
     mp.links = {[OPP[d]]:k ? ROADS[d][k - 1] : 0}; if (k < ROADS[d].length - 1) mp.links[d] = ROADS[d][k + 1];
     const [vx, vy] = DIRV[d], r = .1 + k * .345 / Math.max(ROADS[d].length - 1, 1), z = k % 2 ? .04 : -.04;   // world-map position: out along its road, zig-zagging
     mp.wx = .5 + (vx ? vx * r : z); mp.wy = .5 + (vy ? vy * r : z * .8);

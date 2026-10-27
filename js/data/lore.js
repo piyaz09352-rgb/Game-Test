@@ -271,4 +271,5 @@ const MOB_LORE = {
   dummy:["หุ่นฟางที่ครูฝึกตั้งไว้ให้ซ้อมตี ไม่ตอบโต้และไม่มีวันพัง เหมาะสำหรับลองสกิลและวัดความแรง", "A straw dummy the trainers set up for practice. It never hits back and never breaks, perfect for testing skills and measuring damage."],
   crowncrystal:["ผลึกจักรพรรดิหัวใจของปราสาทในศึกชิงปราสาท กิลด์ใดทำลายได้จะยึดปราสาทนั้นไป", "The Crown Crystal, heart of a castle in the guild siege. Whichever guild shatters it takes the castle."]
 };
-if (typeof W3_LOREMAP !== 'undefined') Object.assign(MOB_LORE, W3_LOREMAP);   // v29: the 330 creatures of the new regions (data/world3.js)
+if (typeof W3_LOREMAP !== 'undefined') Object.assign(MOB_LORE, W3_LOREMAP);
+if (typeof W4_LOREMAP !== 'undefined') Object.assign(MOB_LORE, W4_LOREMAP);   // แดนมังกรอสูร (data/world4.js)   // v29: the 330 creatures of the new regions (data/world3.js)
