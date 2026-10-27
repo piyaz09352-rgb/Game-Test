@@ -482,7 +482,7 @@ const BEAST = (() => {
   const FAM = {
     cat:   {Lb:15, rc:5.8, rh:5.3, leg:8.6, lt:2.1, neck:[3.2, 4.2], hr:4.3, ml:2.4, mr:[2.3, 1.7], ear:'cat', tail:[15, 1.5, .9], dip:.8},
     dog:   {Lb:13, rc:5.6, rh:4.8, leg:9.6, lt:1.8, neck:[4.5, 4.2], hr:3.9, ml:4.6, mr:[2.1, 1.3], ear:'dog', tail:[8, 1.6, .7], dip:.4},
-    bear:  {Lb:13.5, rc:7.8, rh:7.2, leg:6.6, lt:3.1, neck:[1.8, 4.6], hr:4.9, ml:3.2, mr:[2.5, 1.8], ear:'bear', tail:[1.6, 1.4, 1], dip:-.6, hump:1},
+    bear:  {Lb:16.5, rc:5.4, rh:5.1, leg:10.6, lt:3, neck:[3.4, 4.4], hr:5.3, ml:4.2, mr:[2.5, 1.8], ear:'bear', tail:[1.6, 1.4, 1], dip:-.4, hump:1},   // (v158) a real bear stands tall on heavy legs
     deer:  {Lb:13.5, rc:5.9, rh:5.7, leg:12.6, lt:1.45, neck:[8.2, 4.6], hr:3.4, ml:4.8, mr:[1.9, 1.3], ear:'leaf', tail:[3, 1.2, .8], dip:.3},
     goat:  {Lb:12.5, rc:6.2, rh:5.8, leg:10.4, lt:1.75, neck:[6.4, 4.2], hr:3.6, ml:4.2, mr:[2, 1.4], ear:'leaf', tail:[2.4, 1.2, .8], dip:.2},
     horse: {Lb:15.5, rc:6.6, rh:6.4, leg:13.4, lt:1.7, neck:[8.8, 5.4], hr:3.7, ml:6.4, mr:[2.2, 1.7], ear:'horse', tail:[9, 1.7, 1.1], dip:.4},
@@ -490,7 +490,7 @@ const BEAST = (() => {
     boar:  {Lb:14, rc:7.2, rh:5.8, leg:6.4, lt:1.9, neck:[1.2, 4.2], hr:4.8, ml:4.8, mr:[3, 2.2], ear:'small', tail:[5, .7, .4], dip:-.3, ridge:1},
     lizard:{Lb:11, rc:3.6, rh:3.4, leg:3.4, lt:1.05, neck:[.6, 2.6], hr:2.6, ml:3, mr:[1.7, 1.05], ear:'none', tail:[16, 2.2, .45], dip:0, sprawl:1, flat:1},
     croc:  {Lb:13, rc:4.9, rh:4.7, leg:3.4, lt:1.5, neck:[.3, 3.2], hr:3.4, ml:7.5, mr:[2.3, 1.45], ear:'none', tail:[15, 3.5, .7], dip:0, sprawl:1, flat:1, scutes:1},
-    elephant:{Lb:12, rc:7.4, rh:7, leg:8.6, lt:2.9, neck:[1.4, 4.6], hr:5.4, ml:0, mr:[2.6, 1.2], ear:'elephant', tail:[7, .7, .45], dip:.4, trunk:1},
+    elephant:{Lb:13.5, rc:6.3, rh:6.1, leg:12.8, lt:2.55, neck:[1.6, 4.4], hr:5.6, ml:0, mr:[2.6, 1.2], ear:'elephant', tail:[7, .7, .45], dip:.5, trunk:1},
     // dinosaurs (data/world4.js): a two-legged hunter with a level tail; a long-necked giant on pillar legs; a frilled
     // horn-face and a plated back on short pillar legs. All carry the tail out behind them instead of letting it hang.
     theropod:{Lb:12, rc:5.4, rh:5.8, leg:12.5, lt:2.2, neck:[3.8, 5], hr:3.5, ml:6.4, mr:[2.6, 2.3], skullZ:1.45, ear:'none', tail:[17, 3.2, .45], dip:0, biped:1, dino:1},
@@ -511,7 +511,7 @@ const BEAST = (() => {
     // no two species alike: each key nudges its own proportions a little (length, legs, head, tail)
     const kh = [...key].reduce((a, c) => a * 31 + c.charCodeAt(0) | 0, 7), J = i => 1 + (h3(kh % 997, i, 9) - .5) * .16;
     const len = (s.len ?? 1) * J(1), legK = (s.leg ?? 1) * J(2), gir = s.girth ?? 1, tailK = J(4);
-    const gb = 1 + (gir - 1) * .55, Lb = F.Lb * len * (1 + (gir - 1) * .25), rc = F.rc * gb, rh = F.rh * gb, LL = F.leg * legK, lt = F.lt * gir, hr = F.hr * Math.sqrt(gir) * J(3);
+    const gb = 1 + (gir - 1) * .55, Lb = F.Lb * len * (1 + (gir - 1) * .25), rc = F.rc * gb, rh = F.rh * gb, LL = F.leg * legK, lt = F.lt * (fam === 'elephant' || fam === 'bear' ? Math.sqrt(gir) : gir), hr = F.hr * Math.sqrt(gir) * J(3);
     const sprawl = !!F.sprawl, ele = fam === 'elephant';
     const cat = fam === 'cat', clouded = cat && s.spots && ST, tiger = cat && ST && !s.spots, spotted = !cat && s.spots;
     /* the coat: one function for every part; t runs along the part, nn is the surface direction */
@@ -622,11 +622,13 @@ const BEAST = (() => {
       if (MN && s.ruff){ cx.gid = 8; ell(cx, add(hc, [0, -1, -hr * .9]), hr * 1.3, hr * 1.25, MN, {tex:nn => (Math.sin(Math.atan2(nn[0], nn[1]) * 11) > .45 ? {dt:1} : undefined)}); }
       // skull, muzzle, nose — as a function so the three-headed Airavata can have three
       const drawHead = (hd, hi) => { const G = g => (cx.gid = g + hi * 100);
-      G(9); ell(cx, hd, hr, hr * (F.flat ? .62 : .9), SK, {rz:hr * (F.skullZ || 1), tex:nn => eyesTex(nn, o, EY, {glow:!!s.eyeGlow, sp:F.flat ? .55 : .62, y:F.flat ? .5 : ele ? .1 : .26, rx:F.flat ? .1 : .085, ry:F.flat ? .14 : .1, front:F.flat ? -.2 : .05}) || coat(nn, .5, 'head')});
+      if (ele){ G(8); for (const sd of [-1, 1]) ell(cx, add(hd, [sd * hr * .32, hr * .42, -hr * .12]), hr * .58, hr * .5, SK, {tex:nn => coat(nn, .45, 'head')});   // (v158) the two domes of the forehead
+        cap(cx, add(hd, [0, -hr * .05, hr * .2]), add(hd, [0, -hr * .45, hr * .7]), hr * .7, hr * .52, SK, {tex:(nn, lo, q, t) => (Math.abs(Math.sin(t * 22)) < .15 ? {dt:1} : coat(nn, .5, 'head'))}); }   // the long, wrinkled face
+      G(9); ell(cx, hd, hr * (ele ? .85 : 1), hr * (F.flat ? .62 : ele ? .78 : .9), SK, {rz:hr * (F.skullZ || 1), tex:nn => eyesTex(nn, o, EY, {glow:!!s.eyeGlow, sp:F.flat ? .55 : .62, y:F.flat ? .5 : ele ? .1 : .26, rx:F.flat ? .1 : .085, ry:F.flat ? .14 : .1, front:F.flat ? -.2 : .05}) || coat(nn, .5, 'head')});
       const m0 = add(hd, [0, -hr * (F.flat ? .1 : .2), hr * .55]), m1 = add(hd, [0, -hr * (F.flat ? .2 : .2) - F.ml * (F.flat ? .06 : .3), hr * .55 + F.ml]);
       if (ele){   // the trunk, hanging and swaying, curling up when it attacks
         let p0 = add(hd, [0, -hr * .25, hr * .75]); const curl = act === 'attack' ? [0, .6, 1, .3][f] : 0;
-        for (let i = 1; i <= 7; i++){ const k = i / 7, p1 = add(hd, [Math.sin(ph + k * 2) * k * .8, -hr * .25 - k * 9 * (1 - curl * .8) + k * k * (2 + curl * 9), hr * .75 + k * 2.6 + k * k * (1.5 + curl * 3) + o.lun * .2]);
+        for (let i = 1; i <= 7; i++){ const k = i / 7, p1 = add(hd, [Math.sin(ph + k * 2) * k * .8, -hr * .25 - k * 13 * (1 - curl * .8) + k * k * (3 + curl * 12), hr * .75 + k * 2.6 + k * k * (1.5 + curl * 3) + o.lun * .2]);
           G(40 + i); cap(cx, p0, p1, (2.3 - k * 1.3) * Math.sqrt(gir), (2.3 - (k + 1 / 7) * 1.3) * Math.sqrt(gir), SK, {tex:(nn, lo, q, t) => (Math.sin((k + t / 7) * 70) > .6 ? {dt:1} : undefined)}); p0 = p1; } }
       else {
         G(10); cap(cx, m0, m1, F.mr[0] * Math.sqrt(gir), F.mr[1] * Math.sqrt(gir), MZ, {tex:(nn, lo, q, t) => (fam === 'croc' && Math.abs(nn[1] + .05) < .1 && t > .1 ? {m:M.white, t:1} : F.flat && Math.abs(nn[1] + .05) < .07 ? {m:DK} : nn[1] < -.55 && t > .5 ? {dt:1} : t > .3 && nn[1] > .3 && MZ !== SK ? {m:SK} : undefined)});
@@ -642,7 +644,7 @@ const BEAST = (() => {
         else if (F.ear === 'bear') ell(cx, add(e0, [sd * .3, .2, 0]), hr * .33, hr * .33, SK, {tex:nn => (nn[2] > .4 ? {m:DK} : undefined)});
         else if (F.ear === 'leaf') cap(cx, add(e0, [0, -.4, 0]), add(e0, [sd * hr * .85, hr * .25, -.8]), hr * .26, hr * .16, SK, {tex:nn => (nn[2] > .3 ? {m:BE} : undefined)});
         else if (F.ear === 'horse') cap(cx, e0, add(e0, [sd * .3, hr * .7, .2]), hr * .22, .25, SK, {});
-        else if (F.ear === 'elephant') ell(cx, add(hd, [sd * hr * .95, .2, -hr * .55]), hr * .9, hr * 1.05, SK, {rz:1.1, tex:nn => (nn[0] * sd < -.2 ? {m:BE, dt:1} : Math.abs(Math.sin(nn[1] * 8)) < .12 ? {dt:1} : undefined)});
+        else if (F.ear === 'elephant') ell(cx, add(hd, [sd * hr * .95, -.4, -hr * .95]), hr * .95, hr * 1.15, SK, {rz:.45, tex:nn => (nn[0] * sd < -.2 ? {m:BE, dt:1} : Math.abs(Math.sin(nn[1] * 8)) < .12 ? {dt:1} : undefined)});
         else if (F.ear === 'none'){}
         else if (F.ear === 'side') cap(cx, add(e0, [0, -.8, 0]), add(e0, [sd * hr * .9, -.6, -.4]), hr * .25, hr * .18, SK, {});
         else cap(cx, e0, add(e0, [sd * .5, hr * .5, -.6]), hr * .24, .2, SK, {});

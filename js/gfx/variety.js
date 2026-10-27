@@ -145,8 +145,17 @@ for (const b of ['kraisorn', 'kotchasi', 'kilen', 'maninmangkon', 'hemaraj', 'go
   'krahang', 'krahangluang', 'nangtani', 'asura', 'stuccoyaksha', 'ayutyaksha', 'himogre', 'stonesingha', 'khmerlion', 'stonenaga', 'stoneapsara',
   'frostyaksha', 'guardiandeva', 'devaguard', 'snowlion', 'frostnaga']) delete VARIETY[b];
 
+/* (v158) real animals vary the way real animals do: an elephant or a bear never grows wings, antlers or a fish tail.
+   Their makeovers come from the real range of the family — tusk shape, a woolly coat, build, leg length, a ruff. */
+const MAKEOVER_REAL = {
+  elephant:[{tusks:'curved', len:1.1}, {shaggy:true, girth:1.45, tusks:'curved', len:.95}, {leg:1.15, len:.9, girth:.95}, {girth:1.2, leg:.9, tusks:false},
+    {tusks:true, len:1.2, leg:1.05}, {girth:1.5, leg:.95, tusks:'curved'}, {shaggy:true, len:1.05, leg:1.1}, {girth:1.05, len:1.25, tusks:true}],
+  bear:[{shaggy:true, len:1.1}, {girth:1.35, len:.85}, {ruff:true, shaggy:true}, {leg:1.15, girth:.9}, {len:1.2, leg:.85}, {girth:1.2, leg:1.1, shaggy:true}]
+};
 function makeoverOf(key, spec){
-  const n = VARIETY[key], P = MAKEOVER[spec.arch === 'bird' && spec.bat ? 'bat' : spec.arch]; if (!n || !P) return null;
+  const n = VARIETY[key]; if (!n) return null;
+  if (spec.arch === 'quad' && MAKEOVER_REAL[spec.head]) return MAKEOVER_REAL[spec.head][(n - 1) % MAKEOVER_REAL[spec.head].length];
+  const P = MAKEOVER[spec.arch === 'bird' && spec.bat ? 'bat' : spec.arch]; if (!P) return null;
   const a = P[(n - 1) % P.length];
   return n > P.length ? {...a, ...P[(n - 1 + 5) % P.length]} : a;   // past the end of the list: two makeovers at once
 }
