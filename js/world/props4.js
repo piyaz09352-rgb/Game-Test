@@ -339,3 +339,16 @@ const P4_FLIP = new Set([...P4_NATURAL, 'dragonskull', 'ribcage', 'cauldron', 's
       v += 100 * (/lava|crater|ash|dragonvale|naraka/.test(b) ? 1 : /desert|dryplain|canyon|dragonroost|khmer/.test(b) ? 2 : land === 'frozen' ? 3 : land === 'dark' && !/primeval/.test(b) ? 4 : 0); }
     if (P4_FLIP.has(type) && R() < .5) v += 1000;
     return _ap.call(this, type, x, y, v); }; }
+
+/* ---------- Emerald Oasis, remade (v153) ----------
+   It borrowed the desert recipe tinted toward its "emerald" hue, which turned the whole map neon green. A real oasis
+   is the other way round: open desert sand with dune ripples and bare rock, and all the green packed round the
+   water — a spring-fed pool ringed by date palms, reeds and bushes, a few dead trees and boulders out in the sand. */
+BIOME.oasis = {base:['#d8b878', '#e0c284', '#e8cc90'], mottle:['rgba(170,120,60,.32)', 'rgba(255,240,200,.32)'], blades:['#b89a5a', '#a88a4a'], bladeN:2500,
+  road:['#c09858', '#cca468', '#d6b076'], floor:{kind:'cracks', n:6}, ponds:3, pondR:[110, 190], pondCols:['#cdb27a', '#1e6a6e', '#2e9a92', '#8ad8c4'],
+  props:[['palm', 1, 3]], propN:1, fx:'dust', fxA:.12,
+  zones:{clearings:2,
+    edge:{n:26, depth:200, gap:30, props:[['rock', 4], ['rock', 4], ['deadtree', 3]]},
+    groves:{n:3, size:[3, 5], r:70, props:[['palm', 3]], under:[['bush', 3], ['rock', 4]]},
+    banks:{k:2.4, props:[['palm', 3], ['palm', 3], ['reed', 4], ['reed', 4], ['bush', 3]]},
+    scatter:{n:12, props:[['rock', 4], ['deadtree', 3]]}}};

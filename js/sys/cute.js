@@ -17,7 +17,7 @@ const cuteOn = () => !(typeof PHOTO !== 'undefined' && PHOTO.on && PHOTO.clean);
 const cuteLv = () => (typeof GFX === 'undefined' ? 1 : [0.35, .7, 1][GFX.fx] ?? 1);
 
 /* ---------- 1) scenery ---------- */
-const CUTE_THEME = b => (['primeval', 'amberfen'].includes(b) ? 'primeval' : ['desert', 'dryplain', 'canyon', 'dragonroost'].includes(b) ? 'dry' : ['lavafield', 'crater', 'ashforest', 'dragonvale', 'naraka'].includes(b) ? 'fire'
+const CUTE_THEME = b => (['primeval', 'amberfen'].includes(b) ? 'primeval' : ['desert', 'dryplain', 'canyon', 'dragonroost', 'oasis'].includes(b) ? 'dry' : ['lavafield', 'crater', 'ashforest', 'dragonvale', 'naraka'].includes(b) ? 'fire'
   : ['glacier', 'frozenlake', 'icecave', 'frostcitadel', 'kailash'].includes(b) ? 'snow' : ['cemetery', 'cave', 'badan', 'demonthrone'].includes(b) ? 'dark'
   : ['tavatimsa', 'meru', 'anodat', 'himmapan', 'innerhim'].includes(b) ? 'heaven' : !b ? 'town' : 'lush');
 const CUTE_KINDS = {

@@ -206,4 +206,5 @@ function WORLD_DRAGON(){
     ROAD_LV_RAW[road].push(raw.slice()); // raw levels: the layout stretches them with LVMAP like the rest of the road
   });
   W4_RECOLOR_APPLY();
+  const oasis = MAPS.find(m => m.en === 'Emerald Oasis'); if (oasis){ oasis.biome = 'oasis'; oasis.hue = null; }   // a desert with its green round the water (world/props4.js)
 }
