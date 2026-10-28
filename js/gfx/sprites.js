@@ -516,6 +516,13 @@ function humanPose(act, f, n, weapon){
     if (weapon === 'bow'){
       P.armL = 1.5; P.outL = .05; P.elbL = .05; P.armR = [1.0, 1.35, 1.45, 1.2, .5][f]; P.elbR = [.6, 1.6, 2.2, .3, .3][f]; P.outR = .1; P.draw = [0, .6, 1, 0, 0][f];
       P.lean = [0, .05, .08, -.04, 0][f]; P.twist = [0, -.25, -.4, .1, 0][f]; P.arrow = f >= 1 && f <= 2; P.legL = .25; P.legR = -.2;
+    } else if (weapon === 'shuriken'){
+      // (v184) a throwing star: the hand draws back past the ear, whips forward flat and lets go at frame 2, follows
+      // through low, then a new star is drawn from the pouch; the free hand points at the target
+      P.armR = [.5, 1.9, 1.35, .75, .4][f]; P.elbR = [.7, 2.0, .25, .1, .5][f]; P.outR = [.2, .55, .05, -.2, .1][f]; P.wpn = [1.7, 2.6, 1.5, 1.2, 1.7][f];
+      P.armL = [.4, 1.25, .9, .35, .2][f]; P.elbL = [.4, .15, .3, .5, .4][f]; P.outL = [.2, .1, .15, .25, .2][f];
+      P.lean = [0, -.06, .14, .12, .03][f]; P.twist = [0, -.4, .3, .38, .06][f]; P.sway = [0, .4, -.5, -.5, -.1][f];
+      P.legL = [0, -.1, .4, .36, .08][f]; P.legR = -P.legL * .6; P.bob = [0, .2, -.6, -.5, -.1][f]; P.thrown = f === 2 || f === 3;
     } else if (weapon === 'dagger'){
       // one-handed knife slash: draw the blade up and back over the shoulder, cut down and across the body with the hips,
       // let it follow through low, then recover; the free hand guards in front, then swings back for balance
@@ -1323,6 +1330,24 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
     (cx.wsegs || (cx.wsegs = [])).push([proj(cx, tp), proj(cx, bt)]);   // where the weapon is in this frame (refine glow)
     void fwd; return;
   }
+  if (w === 'shuriken'){
+    // (v184) a ninja's throwing star, held flat between the fingers: four leaf blades with bright edges round a ringed
+    // hole; it leaves the hand at the release of a throw (P.thrown) and a fresh one is back in the hand for the next
+    if (P.thrown) return;
+    const st = cfg.wTier ?? -1, met = M[['steel', 'steel', 'ember', 'obsid', 'jade', 'sun'][st] || 'steel'];
+    let dir0 = P.wdir || rotX(rotX([0, -1, 0], P.armR + P.wpn), P.lean); dir0 = nrm(dir0);
+    const R = (4 + Math.max(0, st) * .16) * WPN_BIG, c = add(hR, mul(dir0, R * .55)), sp = .4 + (P.spinStar || 0);
+    // the star is a flat disc: lay it in whichever plane the camera sees most of (it reads as a star, never as a sliver)
+    const AX = [[1, 0, 0], [0, 1, 0], [0, 0, 1]], p0 = proj(cx, c); let best = null, ba = -1;
+    for (const [i, j] of [[0, 1], [0, 2], [1, 2]]){ const pa = proj(cx, add(c, AX[i])), pb = proj(cx, add(c, AX[j]));
+      const ar = Math.abs((pa.x - p0.x) * (pb.y - p0.y) - (pa.y - p0.y) * (pb.x - p0.x)); if (ar > ba){ ba = ar; best = [AX[i], AX[j]]; } }
+    const dir = nrm(add(best[0], mul(best[1], .25))), wv = nrm(add(best[1], mul(best[0], -.25)));
+    for (let k = 0; k < 4; k++){ const a = sp + k * Math.PI / 2, u = add(mul(dir, Math.cos(a)), mul(wv, Math.sin(a)));
+      const tip = add(c, mul(u, R)); G(); cap(cx, add(c, mul(u, R * .18)), tip, R * .26, .18, met, {rz:.35, tex:(n, lo, q, t) => (Math.abs(n[0]) > .7 ? {t:0} : {t:2})}); }
+    G(); ell(cx, c, R * .24, R * .24, M[st >= 3 ? 'gold' : 'scarlet'] || met); G(); ell(cx, c, R * .1, R * .1, M.charcoal || met);
+    (cx.wsegs || (cx.wsegs = [])).push([proj(cx, add(c, mul(dir, -R))), proj(cx, add(c, mul(dir, R)))]);
+    return;
+  }
   const wt = cfg.wTier ?? -1, BL = ['steel', 'steel', 'ember', 'obsid', 'jade', 'sun'], SH = ['wood', 'wood', 'lacquer', 'charcoal', 'teal', 'gold'], ORB = ['orb', 'rune', 'ember', 'auraViolet', 'jade', 'sun'];
   const RFM = ['', 'rune', 'orb', 'auraGold', 'auraWhite'], rft = cfg.rfTier || 0;   // refine glow: blue → violet → gold → radiant
   const blade = M[BL[wt] || 'steel'],   // (v166) a refined blade stays its own metal (it used to turn into glowing white at +13 and vanish into a blob of light); the glow is laid over it by refinefx.js
@@ -1724,7 +1749,7 @@ const MOBS = {
 /* ---------- sheets ---------- */
 const FS = 88, ANCHOR_Y = 82;
 /* one-handed weapons (knife, sword, staff) switch hands with the view so the weapon is never hidden behind the body */
-const ONE_HAND = ['dagger', 'sword', 'staff'];
+const ONE_HAND = ['dagger', 'sword', 'staff', 'shuriken'];   // (v184) the ninja's stars are thrown from one hand
 let DAGGER_LEFT = [0, 1];
 function mirrorArms(P){ const Q = {...P}; for (const [a, b] of [['armL', 'armR'], ['elbL', 'elbR'], ['outL', 'outR'], ['legL', 'legR'], ['liftL', 'liftR']]){ Q[a] = P[b]; Q[b] = P[a]; }
   Q.twist = -(P.twist || 0); Q.sway = -(P.sway || 0); Q.hipX = -(P.hipX || 0); Q.wLeft = true; return Q; }

@@ -179,7 +179,7 @@ function fgBuy(id, n = 1){
   const it = ITEMS[id], gr = typeof GEAR !== 'undefined' && GEAR[id];
   if (gr){ if (S.lvl < gr.lv){ toast(L(`ต้อง Lv ${gr.lv}`, `Needs Lv ${gr.lv}`)); return; } if (S.bia < gr.buy){ toast(L('เงินไม่พอ', 'Not enough Bia')); return; }
     S.bia -= gr.buy;
-    if (gr.slot === 'ammo'){ addItem(id, gr.pack || 1); if (!S.gear.ammo || !S.inv[S.gear.ammo]){ S.gear.ammo = id; derive(); } }
+    if (gr.slot === 'ammo'){ addItem(id, gr.pack || 1); if (ammoFits(id) && (!S.gear.ammo || !S.inv[S.gear.ammo] || !ammoFits(S.gear.ammo))){ S.gear.ammo = id; derive(); } }
     else { const key = rollGear(id, 'shop', P.x, P.y - 20); addItem(key, 1); }
     SFX.play('coin'); log(L(`ซื้อ ${nm(gr)}`, `Bought ${nm(gr)}`), 'g'); toast(L('ซื้อแล้ว · สวมได้ในหน้าต่างอุปกรณ์ (Q)', 'Bought · wear it from the Equipment window (Q)'));
   } else if (it && it.buy){ const cost = it.buy * n; if (S.bia < cost){ toast(L('เงินไม่พอ', 'Not enough Bia')); return; } S.bia -= cost; addItem(id, n); SFX.play('coin'); log(L(`ซื้อ ${nm(it)} ×${n}`, `Bought ${nm(it)} ×${n}`)); }
@@ -231,7 +231,7 @@ WIN_RENDER.forge = function(){
       </div>${stage}</div>`;
   } else if (RF.tab === 'buy'){
     const wt = JOBS[S.job].weapon.type, bow = wt === 'bow' || S.job === 'novice';
-    const subs = [['weapon', 'อาวุธ', 'Weapons'], ['ammo', 'ลูกธนู', 'Arrows'], ['head', 'หมวก', 'Head'], ['shield', 'โล่', 'Shields'], ['armor', 'เสื้อเกราะ', 'Body'], ['pants', 'กางเกง', 'Legs'], ['shoes', 'รองเท้า', 'Feet'], ['acc', 'เครื่องประดับ', 'Accessories'], ['mat', 'วัสดุตีบวก', 'Refine materials']];
+    const subs = [['weapon', 'อาวุธ', 'Weapons'], ammoWant() === 'star' ? ['ammo', 'ดาวกระจาย', 'Stars'] : ['ammo', 'ลูกธนู', 'Arrows'], ['head', 'หมวก', 'Head'], ['shield', 'โล่', 'Shields'], ['armor', 'เสื้อเกราะ', 'Body'], ['pants', 'กางเกง', 'Legs'], ['shoes', 'รองเท้า', 'Feet'], ['acc', 'เครื่องประดับ', 'Accessories'], ['mat', 'วัสดุตีบวก', 'Refine materials']];
     if (!subs.some(s => s[0] === RF.shop)) RF.shop = 'weapon';
     const gearRow = ([id]) => { const gr = GEAR[id], ok = S.lvl >= gr.lv;
       return `<div class="srow fgrow${ok ? '' : ' locked'}"><span class="ic">${itemIcon(id)}</span><div class="nm"><b>${nm(gr)}</b><small>${gearStatText(gr.st)} · <span class="${ok ? '' : 'bad'}">Lv ${gr.lv}</span>${gr.pack > 1 ? ` · ×${gr.pack}` : ''}</small></div>
@@ -240,9 +240,9 @@ WIN_RENDER.forge = function(){
         <span class="pr">${fmtN(it.buy)}</span>${qtyBox(id, 'fg')}</div>`; };
     let rows = '';
     const ammoRow = ([id]) => { const gr = GEAR[id], ok = S.lvl >= gr.lv;
-      return `<div class="srow fgrow${ok ? '' : ' locked'}"><span class="ic">${itemIcon(id)}</span><div class="nm"><b>${nm(gr)} <span class="ct">${L('มี', 'have')} ${(S.inv[id] || 0).toLocaleString()}</span></b><small>${gearStatText(gr.st)} · <span class="${ok ? '' : 'bad'}">Lv ${gr.lv}</span> · ${L(`ห่อละ ${gr.pack || 1} ดอก`, `${gr.pack || 1} per pack`)}</small></div>
+      return `<div class="srow fgrow${ok ? '' : ' locked'}"><span class="ic">${itemIcon(id)}</span><div class="nm"><b>${nm(gr)} <span class="ct">${L('มี', 'have')} ${(S.inv[id] || 0).toLocaleString()}</span></b><small>${gearStatText(gr.st)} · <span class="${ok ? '' : 'bad'}">Lv ${gr.lv}</span> · ${L(`ห่อละ ${gr.pack || 1} ${ammoKind(id) === 'star' ? 'ดวง' : 'ดอก'}`, `${gr.pack || 1} per pack`)}</small></div>
         <span class="pr">${fmtN(gr.buy)}<small> /${L('ห่อ', 'pack')}</small></span>${qtyBox(id, 'pack')}</div>`; };
-    if (RF.shop === 'ammo') rows = GEAR_LIST.filter(g => g[1] === 'ammo').sort((a, b) => a[4] - b[4]).map(ammoRow).join('');
+    if (RF.shop === 'ammo') rows = GEAR_LIST.filter(g => g[1] === 'ammo' && ammoKind(g[0]) === ammoWant()).sort((a, b) => a[4] - b[4]).map(ammoRow).join('');
     else if (RF.shop === 'mat') rows = ['ore', 'ore_a', 'rf_luck', 'rf_guard'].map(matRow).join('');
     else rows = GEAR_LIST.filter(g => g[1] === RF.shop && lineOk(g[6]) && (RF.shop !== 'weapon' || (g[6] && g[6].wtype === wt && !(g[6].hands === '2h' && wt === 'dagger' && !jobChain().includes('rogue'))))).sort((a, b) => a[4] - b[4]).map(gearRow).join('') || `<p class="hint">${L('ไม่มีสินค้าสำหรับอาชีพนี้', 'Nothing for this class')}</p>`;
     body = `<div class="fgsub">${subs.map(([k, th, en]) => `<button class="${RF.shop === k ? 'on' : ''}" data-fgshop="${k}">${L(th, en)}</button>`).join('')}</div>

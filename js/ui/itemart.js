@@ -148,9 +148,17 @@ function iaGlove(p, t){
   const one = tr => `<g transform="${tr}"><path d="M8 20c0-7 4-11 9-11s8 4 8 10c0 5-3 8-8 8H11c-2 0-3-2-3-7z" fill="${col}" ${OL}/><path d="M12 12c2-1.4 5-1.6 7 0" stroke="#fff" stroke-width="1.4" opacity=".55" fill="none"/><rect x="9" y="26" width="13" height="5" rx="1.6" fill="${cuff}" ${OL}/></g>`;
   return ['', one('translate(-1 2)') + one('translate(41 4) scale(-1 1)')];
 }
+/* (v184) a four-point throwing star: four leaf blades, a bevel down each, a hole in the middle with a wrapped ring */
+function iaStar(gid, cx, cy, R, rot, glow, ring){
+  let d = ''; for (let i = 0; i < 8; i++){ const a = rot + i / 8 * Math.PI * 2, r = i % 2 ? R * .27 : R; d += `${i ? 'L' : 'M'}${(cx + Math.cos(a) * r).toFixed(2)} ${(cy + Math.sin(a) * r).toFixed(2)}`; }
+  let bev = ''; for (let i = 0; i < 4; i++){ const a = rot + i / 4 * Math.PI * 2; bev += `M${(cx + Math.cos(a) * R * .3).toFixed(2)} ${(cy + Math.sin(a) * R * .3).toFixed(2)}L${(cx + Math.cos(a) * R * .9).toFixed(2)} ${(cy + Math.sin(a) * R * .9).toFixed(2)}`; }
+  return `<path d="${d}Z" fill="url(#${gid})" ${OL}${glow || ''}/><path d="${bev}" stroke="#fff" stroke-width=".7" opacity=".55"/>` +
+    (ring ? `<circle cx="${cx}" cy="${cy}" r="${(R * .2).toFixed(2)}" fill="none" stroke="${ring}" stroke-width="1.4"/>` : '') + `<circle cx="${cx}" cy="${cy}" r="${(R * .1).toFixed(2)}" fill="#1c0f08"/>`;
+}
 function iaWeapon(p, w, t){
   const c = IA_TIER[t] || IA_TIER[0], guard = t === 0 ? '#8a5a34' : '#f2c444', gem = t >= 2 ? `<circle cx="13.6" cy="26.4" r="1.6" fill="${t === 3 ? '#ff5a5a' : c[0]}" ${OL}/>` : '';
   const d = lg(p + 'b', [c[0], c[1], c[2]], 0, 0, 1, 1), glow = t >= 2 ? ` style="filter:drop-shadow(0 0 2px ${c[1]})"` : '';
+  if (w === 'shuriken') return [d, iaStar(p + 'b', 27, 13, 6.4, .2, '') + iaStar(p + 'b', 17, 22, 12.6, .55, glow, t >= 2 ? (t === 3 ? '#c4222a' : c[1]) : '#c4222a')];
   if (w === 'sword') return [d, `<path d="M33.6 6.4l-1.4 5.4-15.4 15.4-3.6-3.6L28.6 8z" fill="url(#${p}b)" ${OL}${glow}/><path d="M32.6 7.4L16 24" stroke="${c[0]}" stroke-width=".9" opacity=".9"/>
       <path d="M9.6 21.4l9 9" stroke="#1c0f08" stroke-width="4.4" stroke-linecap="round"/><path d="M9.6 21.4l9 9" stroke="${guard}" stroke-width="2.6" stroke-linecap="round"/>
       <path d="M13.4 27.2L8 32.6" stroke="#1c0f08" stroke-width="4" stroke-linecap="round"/><path d="M13.4 27.2L8 32.6" stroke="#6a3a22" stroke-width="2.4" stroke-linecap="round"/><circle cx="7.4" cy="33.2" r="2.2" fill="${guard}" ${OL}/>${gem}`];
@@ -266,6 +274,8 @@ function iaPick(id){
   const it = ITEMS[id] || {}, p = 'ia' + id.replace(/\W/g, '') + '\u00a7';
   if (IA_POT[id]) return {p, art:IA.flask(p, ...IA_POT[id]), frame:id === 'elixirpot' ? 2 : 0, glow:IA_POT[id][0][1]};
   if (it.recall || id === 'talisman') return {p, art:IA.talisman(p), frame:1, glow:'#f2c444'};
+  if (it.kind === 'ammo' && it.st && it.st.star){ const c = IA_ARROW['q_' + ({water:'ice'}[it.st.elem] || it.st.elem)] || IA_ARROW.q_wood;   // (v184) a stack of throwing stars in the element's colours
+    return {p, art:[lg(p + 's', [c[0], c[1], c[2]], 0, 0, 1, 1), iaStar(p + 's', 26, 14, 8, .3, '') + iaStar(p + 's', 14, 18, 8, .05, '') + iaStar(p + 's', 21, 26, 9.5, .45, '', '#c4222a')], frame:id === 's_iron' ? 0 : 1, glow:c[1]}; }
   if (it.kind === 'ammo') return {p, art:IA.arrows(p, IA_ARROW[id] || IA_ARROW.q_wood, id === 'q_wood' ? '#f4efe4' : (IA_ARROW[id] || [])[1]), frame:id === 'q_wood' ? 0 : 1, glow:(IA_ARROW[id] || IA_ARROW.q_wood)[1]};
   if (it.kind === 'gear'){
     if (it.base && it.base !== id && ITEMS[it.base]) id = it.base;            // a rolled instance (base~xxxx) looks like its base piece

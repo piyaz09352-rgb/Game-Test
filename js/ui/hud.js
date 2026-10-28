@@ -159,7 +159,7 @@ function hud(){
   const nb = nextBase(S.lvl), nj = nextJob(S.jlvl), jm = S.jlvl >= JOBS[S.job].jobMax, bm = S.lvl >= LV_MAX;
   setW('bxI', bm ? 1 : S.exp / nb); setW('jxI', jm ? 1 : S.jexp / nj);
   setT('bxT', bm ? 'Base MAX' : `Base ${(Math.min(S.exp / nb, .999) * 100).toFixed(1)}%`); setT('jxT', jm ? 'Job MAX' : `Job ${(S.jexp / nj * 100).toFixed(1)}%`);
-  { const a = el('ammoT'), on = usesArrows(); if (a.hidden === on) a.hidden = !on; if (on){ const n = arrowCount(); setT('ammoT', `➶ ${n}`); a.classList.toggle('low', n < 50); } }
+  { const a = el('ammoT'), on = usesArrows(); if (a.hidden === on) a.hidden = !on; if (on){ const n = arrowCount(); setT('ammoT', `${ammoWant() === 'star' ? '✦' : '➶'} ${n}`); a.classList.toggle('low', n < 50); } }
   setT('cJob', nm(JOBS[S.job])); setT('cLv', `Base ${S.lvl} · Job ${S.jlvl}`); setT('lvBadge', String(S.lvl));
   document.querySelectorAll('.cdv').forEach(c => {
     const id = c.dataset.cd, sk = SKILLS[id], full = sk ? skCd(sk, skl(id) || 1) : MOVES[id].cd;

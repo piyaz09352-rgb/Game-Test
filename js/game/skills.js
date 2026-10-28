@@ -84,7 +84,7 @@ function trySkill(id){
   }
   if (sk.type === 'heal' && S.hp >= DER.maxhp){ toast(L('HP เต็มแล้ว', 'HP is full')); return; }
   if (sk.type === 'petcall' && !S.pet){ toast(L('ยังไม่มี Pet', 'You have no pet')); return; }
-  if (usesArrows() && !sk.magic && ['ranged', 'line', 'aoeTarget', 'fieldDot', 'debuff'].includes(sk.type) && sk.job !== 'novice'){
+  if (usesArrows() && ammoWant() === 'arrow' && !sk.magic && ['ranged', 'line', 'aoeTarget', 'fieldDot', 'debuff'].includes(sk.type) && sk.job !== 'novice'){
     const n = sk.type === 'ranged' ? (sk.hits ? sk.hits(lv) : 1) : sk.type === 'aoeTarget' || sk.type === 'fieldDot' ? 5 : 1;
     if (!useArrows(n)) return;
   }

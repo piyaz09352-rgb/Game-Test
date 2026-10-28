@@ -17,7 +17,7 @@ function teAct(id){
   const it = ITEMS[id]; if (!it || !(S.inv[id] > 0)) return null;
   if (it.kind === 'use') return {k:'use', th:'ใช้', en:'Use', ok:true};
   if (it.kind === 'gear') return {k:'wear', th:'สวมใส่', en:'Wear', ok:S.lvl >= (it.lv || 0)};
-  if (it.kind === 'ammo' && S.gear.ammo !== id && typeof usesArrows === 'function' && usesArrows()) return {k:'wear', th:'ใส่ลูกธนู', en:'Load', ok:S.lvl >= (it.lv || 0)};
+  if (it.kind === 'ammo' && S.gear.ammo !== id && typeof ammoFits === 'function' && ammoFits(id)) return {k:'wear', th:ammoWant() === 'star' ? 'ใส่ดาวกระจาย' : 'ใส่ลูกธนู', en:'Load', ok:S.lvl >= (it.lv || 0)};
   return null;
 }
 function teDo(id){

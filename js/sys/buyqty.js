@@ -24,7 +24,7 @@ function qtyBuy(id, kind, n){
   if (kind === 'pack' && GEAR[id] && S.lvl < GEAR[id].lv){ toast(L(`ต้อง Lv ${GEAR[id].lv}`, `Needs Lv ${GEAR[id].lv}`)); return; }
   if (S.bia < cost){ toast(L('เงินไม่พอ', 'Not enough Bia')); return; }
   S.bia -= cost;
-  if (kind === 'pack'){ const gr = GEAR[id]; addItem(id, (gr.pack || 1) * n); if (!S.gear.ammo || !S.inv[S.gear.ammo]){ S.gear.ammo = id; derive(); } }
+  if (kind === 'pack'){ const gr = GEAR[id]; addItem(id, (gr.pack || 1) * n); if (ammoFits(id) && (!S.gear.ammo || !S.inv[S.gear.ammo] || !ammoFits(S.gear.ammo))){ S.gear.ammo = id; derive(); } }
   else addItem(id, n);
   const got = kind === 'pack' ? (GEAR[id].pack || 1) * n : n;
   SFX.play('coin'); log(L(`ซื้อ ${nm(ITEMS[id] || GEAR[id])} ×${got.toLocaleString()} · ${cost.toLocaleString()} เบี้ย`, `Bought ${nm(ITEMS[id] || GEAR[id])} ×${got.toLocaleString()} · ${cost.toLocaleString()} Bia`));

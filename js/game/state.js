@@ -58,7 +58,8 @@ function derive(){
     : b.str * 2 + Math.floor(b.dex / 5) + Math.floor(b.luk / 5) + wAtk;
   atk = Math.round(atk * (1 + (pas.atkPct || 0) + G.atkPct));
   let matk = Math.floor(b.int * 2.5) + Math.floor(b.int / 9) ** 2 +   // was INT×2 + (INT/7)²: stronger early, flatter late
-     (wIt && wIt.wmatk ? wIt.wmatk : j.weapon.matk || 0) + (j.weapon.type === 'staff' && !wIt ? (S.refine || 0) * 5 : 0);
+     (wIt && wIt.wmatk ? wIt.wmatk : j.weapon.matk || 0) + (j.weapon.type === 'staff' && !wIt ? (S.refine || 0) * 5 : 0) +
+     (wt === 'shuriken' ? (!wIt ? (S.refine || 0) * 5 : 0) + (gear.ammo && ITEMS[gear.ammo] && ITEMS[gear.ammo].st && ITEMS[gear.ammo].st.star ? ITEMS[gear.ammo].st.smatk || 0 : 0) : 0);   // (v184) the stars in the pouch add their MATK
   matk = Math.round(matk * (1 + (pas.matkPct || 0) + G.matkPct));
   let maxhp = (35 + L0 * 9 * j.hp) * (1 + b.vit / 100);
   if (slotHas('c_dew')) maxhp += 200;
@@ -76,7 +77,7 @@ function derive(){
     castMul:Math.max(.25, 1 - (b.dex * 2 + b.int) / 400) * Math.max(.2, 1 - (pas.castPct || 0)),
     range:j.range + (j.ranged ? pas.range || 0 : 0),
     move:1 + (pas.move || 0),
-    welem:slotHas('c_lantern') ? 'holy' : (wt === 'bow' && gear.ammo && ITEMS[gear.ammo]) ? ITEMS[gear.ammo].st.elem : 'neutral'
+    welem:slotHas('c_lantern') ? 'holy' : ((wt === 'bow' || wt === 'shuriken') && gear.ammo && ITEMS[gear.ammo] && !!ITEMS[gear.ammo].st.star === (wt === 'shuriken')) ? ITEMS[gear.ammo].st.elem : 'neutral'
   };
   S.hp = Math.min(S.hp, DER.maxhp); S.sp = Math.min(S.sp, DER.maxsp);
 }

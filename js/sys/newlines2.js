@@ -121,7 +121,7 @@ const NL_LOOK = {
   bangkaew:['houndknight', {name:'อัศวินบางแก้ว', en:'Bangkaew Paladin', hair:'hairWhite', sideMat:'hairChestnut', tail:'hairWhite', top:'ivory', sleeve:'ivory', pauldron:'gold', cape:'scarlet', capeTex:'gold',
     shield:['gold', 'ivory', 'gold', 1.12, 'scarlet'], aura:'auraGold', topTex:nlTrim('ivory', 'gold', 'gold'), ...NL_WRAP('ivory', 'gold', 'gold', 'scarlet', {pauldron:'gold'}), faceFur:'hairWhite', muzzle:'white'}],
   ninja:['rogue', {name:'นินจา', en:'Ninja', hair:'hairBlack', iris:'irisBr', top:'charcoal', sleeve:'charcoal', forearm:'charcoal', handWrap:'charcoal', pants:'charcoal', boots:'charcoal', bootCuff:'scarlet', belt:'scarlet',
-    ninjaMask:'charcoal', hat:'band', bandMat:'steel', twin:false, aura:'auraWhite', topTex:nlTrim('charcoal', 'scarlet')}],
+    ninjaMask:'charcoal', hat:'band', bandMat:'steel', twin:false, weapon:'shuriken', shield:null, katana:false, aura:'auraWhite', topTex:nlTrim('charcoal', 'scarlet')}],
   shinobi:['ninja', {name:'นินจาเงา', en:'Shadow Shinobi', top:'midnight', sleeve:'midnight', pants:'midnight', bootCuff:'navy', belt:'navy', bandMat:'navy', cape:'scarlet', topTex:nlTrim('midnight', 'navy')}],
   kage:['shinobi', {name:'จอมนินจาคาเงะ', en:'Kage', top:'charcoal', sleeve:'charcoal', pants:'charcoal', belt:'gold', bandMat:'gold', cape:'charcoal', capeTex:'gold', hair:'hairCrimson', aura:'auraWhite', topTex:nlTrim('charcoal', 'gold', 'gold')}]
 };
@@ -160,16 +160,16 @@ const NL_KIT = {   // job: [weapon name, armour, head, charm, stat1, stat2, hand
   dogfolk:[['ดาบเฝ้าบ้าน', 'Housewatch Sword'], ['เสื้อเจ้าตูบ', 'Puppy Tunic'], ['ผ้าพันคอเจ้าตูบ', 'Puppy Scarf'], ['ป้ายชื่อนำโชค', 'Lucky Name Tag'], 'vit', 'str', '1h'],
   houndknight:[['ดาบอัศวินเฝ้าวัง', 'Palace Hound Blade'], ['เกราะอัศวินหมา', 'Hound Knight Mail'], ['หมวกอัศวินหมา', 'Hound Knight Helm'], ['ปลอกคอเงิน', 'Silver Collar'], 'vit', 'str', '1h'],
   bangkaew:[['ดาบศักดิ์สิทธิ์บางแก้ว', 'Bangkaew Holy Blade'], ['เกราะบางแก้ว', 'Bangkaew Mail'], ['มงกุฎบางแก้ว', 'Bangkaew Crown'], ['ปลอกคอทองบางแก้ว', 'Golden Bangkaew Collar'], 'vit', 'str', '1h'],
-  ninja:[['คุไนศิษย์นินจา', 'Apprentice Kunai'], ['ชุดนินจา', 'Ninja Garb'], ['ผ้าคาดหน้าผากนินจา', 'Ninja Headband'], ['ม้วนคัมภีร์ลับ', 'Secret Scroll'], 'agi', 'dex', '1h'],
-  shinobi:[['นินจาโตะเงา', 'Shadow Ninjato'], ['ชุดนินจาเงา', 'Shadow Shinobi Garb'], ['ผ้าคาดนินจาเงา', 'Shinobi Headband'], ['ม้วนคัมภีร์เงา', 'Shadow Scroll'], 'agi', 'dex', '1h'],
-  kage:[['ดาบคาเงะ', 'Kage Blade'], ['ชุดคาเงะ', 'Kage Garb'], ['หมวกคาเงะ', 'Kage Hat'], ['ตราคาเงะ', 'Kage Seal'], 'agi', 'luk', '2h']
+  ninja:[['ดาวกระจายศิษย์นินจา', 'Apprentice Shuriken'], ['ชุดนินจา', 'Ninja Garb'], ['ผ้าคาดหน้าผากนินจา', 'Ninja Headband'], ['ม้วนคัมภีร์ลับ', 'Secret Scroll'], 'int', 'dex', '2h'],
+  shinobi:[['ดาวกระจายเงา', 'Shadow Shuriken'], ['ชุดนินจาเงา', 'Shadow Shinobi Garb'], ['ผ้าคาดนินจาเงา', 'Shinobi Headband'], ['ม้วนคัมภีร์เงา', 'Shadow Scroll'], 'int', 'dex', '2h'],
+  kage:[['ดาวกระจายคาเงะ', 'Kage Shuriken'], ['ชุดคาเงะ', 'Kage Garb'], ['หมวกคาเงะ', 'Kage Hat'], ['ตราคาเงะ', 'Kage Seal'], 'int', 'luk', '2h']
 };
 if (typeof KIT !== 'undefined') for (const [job, [wN, aN, hN, xN, s1, s2, hands]] of Object.entries(NL_KIT)){
-  const J = JOBS[job], tier = J.tier, wt = J.weapon.type, caster = wt === 'staff', lv = tier >= 4 ? 150 : tier === 3 ? 40 : 1, ids = ['w', 'a', 'h', 'x'].map(s => `k_${job}_${s}`);
-  const wst = {wtype:wt, hands, watk:J.weapon.atk + (tier >= 4 ? 25 : tier === 3 ? 6 : 4), [s1]:tier >= 4 ? 4 : tier === 3 ? 2 : 1, ...(caster ? {wmatk:(J.weapon.matk || 0) + (tier >= 4 ? 30 : 8)} : {}),
-    ...(NL_LINE_OF[job] === 'merchant' ? {axe:1} : {}), ...(NL_LINE_OF[job] === 'catfolk' ? {claw:1} : {}), ...(NL_LINE_OF[job] === 'ninja' && hands === '2h' ? {katana:1, crit:6} : {})};
+  const J = JOBS[job], tier = J.tier, wt = J.weapon.type, caster = wt === 'staff', mag = caster || wt === 'shuriken', lv = tier >= 4 ? 150 : tier === 3 ? 40 : 1, ids = ['w', 'a', 'h', 'x'].map(s => `k_${job}_${s}`);
+  const wst = {wtype:wt, hands, watk:J.weapon.atk + (tier >= 4 ? 25 : tier === 3 ? 6 : 4), [s1]:tier >= 4 ? 4 : tier === 3 ? 2 : 1, ...(mag ? {wmatk:(J.weapon.matk || 0) + (tier >= 4 ? 30 : 8)} : {}),
+    ...(NL_LINE_OF[job] === 'merchant' ? {axe:1} : {}), ...(NL_LINE_OF[job] === 'catfolk' ? {claw:1} : {}), ...(wt === 'shuriken' ? {crit:tier >= 4 ? 6 : 2} : {})};
   const art = tier >= 4 ? ['a_vajra', 'h_vajra', 'x_vajra'] : tier === 3 ? (caster ? ['a_yantra', 'h_mongkhon', 'x_moon'] : ['a_padded', 'h_lotus', 'x_charm']) : (caster ? ['a_cotton', 'h_cloth', 'x_ring'] : ['a_buffalo', 'h_cloth', 'x_bead']);
-  const wArt = NL_LINE_OF[job] === 'merchant' ? null : wt === 'staff' ? `w_${hands === '2h' ? 'lstaff' : 'staff'}${tier >= 4 ? 6 : tier === 3 ? 2 : 0}` : wt === 'fist' ? `w_claw${tier >= 4 ? 6 : tier === 3 ? 2 : 0}` : wt === 'dagger' ? (hands === '2h' ? 'w_tdagger6' : `w_dagger${tier === 3 ? 2 : 0}`) : `w_sword${tier >= 4 ? 6 : tier === 3 ? 2 : 0}`;
+  const wArt = NL_LINE_OF[job] === 'merchant' ? null : wt === 'staff' ? `w_${hands === '2h' ? 'lstaff' : 'staff'}${tier >= 4 ? 6 : tier === 3 ? 2 : 0}` : wt === 'shuriken' ? `w_shuriken${tier >= 4 ? 6 : tier === 3 ? 2 : 0}` : wt === 'fist' ? `w_claw${tier >= 4 ? 6 : tier === 3 ? 2 : 0}` : wt === 'dagger' ? (hands === '2h' ? 'w_tdagger6' : `w_dagger${tier === 3 ? 2 : 0}`) : `w_sword${tier >= 4 ? 6 : tier === 3 ? 2 : 0}`;
   const parts = [['weapon', wN, wst, wArt], ['armor', aN, tier >= 4 ? {def:42, mdef:10, hp:900, [s1]:3} : tier === 3 ? {def:18, mdef:3, hp:260} : {def:3, hp:15}, art[0]],
     ['head', hN, tier >= 4 ? {def:14, mdef:8, [s1]:4, [s2]:2} : tier === 3 ? {def:6, mdef:2, [s1]:2} : {def:1, hp:10}, art[1]], ['acc', xN, tier >= 4 ? {[s1]:6, [s2]:4, hpPct:.04} : tier === 3 ? {[s1]:3, [s2]:2, hpPct:.02} : {[s1]:1, hp:15}, art[2]]];
   parts.forEach(([slot, nmz, st, a], i) => { const id = ids[i]; if (ITEMS[id]) return;
@@ -192,9 +192,9 @@ if (typeof SK_GLYPH !== 'undefined') Object.assign(SK_GLYPH, {
   loyalheart:'heart', guardbark:'roar', shieldwall:'shield', bite:'fang', tackle:'dash', howl:'shout', keennose:'eye', wagtail:'heal',
   guardianpaw:'paw', ironfur:'shield', crunch:'fang', houndrush:'chevron', fangspin:'spiral', packhowl:'banner', loyalvow:'hand', sniffout:'target',
   bangkaewblood:'heartshield', stalwart:'tower', kingfang:'crown', wolfstorm:'tornado', shieldcharge:'shieldbash', lunarhowl:'moon', packleader:'banner', guardianangel:'wings',
-  shinobiway:'mask', quickslash:'cut', ninjadash:'dash', katon:'flame', suiton:'drop', kunaithrow:'dart', smokescreen:'smoke', kawarimi:'back',
-  bladeart:'swords2', iai:'bolt', fuuton:'wave', raiton:'bolt2', dragonflame:'flame', kagebunshin:'ghost', shurikenstorm:'star', poisonkunai:'drop',
-  kagemastery:'crown', shadowflash:'cuts', blinkstrike:'back', kirin:'bolt2', waterdragon:'waves', thousandshadows:'ghost', kunairain:'arrowdown', silentkill:'skull'
+  shinobiway:'mask', quickslash:'arrows3', ninjadash:'net', katon:'flame', suiton:'drop', kunaithrow:'dart', smokescreen:'smoke', kawarimi:'back',
+  bladeart:'star', iai:'spiral', fuuton:'wave', raiton:'bolt2', dragonflame:'flame', kagebunshin:'ghost', shurikenstorm:'star', poisonkunai:'drop',
+  kagemastery:'crown', shadowflash:'rain', blinkstrike:'tornado', kirin:'bolt2', waterdragon:'waves', thousandshadows:'ghost', kunairain:'arrowdown', silentkill:'skull'
 });
 
 /* ======================= effects ======================= */

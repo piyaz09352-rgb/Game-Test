@@ -38,13 +38,21 @@ const GEAR_LIST = [
   ['q_wind', 'ammo', 'ลูกธนูลม', 'Wind Arrows', 20, 2400, {elem:'wind', atk:6}],
   ['q_earth', 'ammo', 'ลูกธนูหิน', 'Stone Arrows', 20, 2400, {elem:'earth', atk:6}],
   ['q_holy', 'ammo', 'ลูกธนูเงินศักดิ์สิทธิ์', 'Silver Arrows', 50, 9000, {elem:'holy', atk:10}],
-  ['q_shadow', 'ammo', 'ลูกธนูความมืด', 'Shadow Arrows', 50, 9000, {elem:'shadow', atk:10}]
+  ['q_shadow', 'ammo', 'ลูกธนูความมืด', 'Shadow Arrows', 50, 9000, {elem:'shadow', atk:10}],
+  // (v184) throwing stars for the ninja line's pouch (one per throw): they add MATK and lend their element to the throw
+  ['s_iron', 'ammo', 'ดาวกระจายเหล็ก', 'Iron Stars', 1, 60, {star:1, elem:'neutral', smatk:3}],
+  ['s_fire', 'ammo', 'ดาวกระจายเพลิง', 'Fire Stars', 20, 2600, {star:1, elem:'fire', smatk:8}],
+  ['s_ice', 'ammo', 'ดาวกระจายน้ำแข็ง', 'Frost Stars', 20, 2600, {star:1, elem:'water', smatk:8}],
+  ['s_wind', 'ammo', 'ดาวกระจายวายุ', 'Gale Stars', 20, 2600, {star:1, elem:'wind', smatk:8}],
+  ['s_earth', 'ammo', 'ดาวกระจายศิลา', 'Stone Stars', 20, 2600, {star:1, elem:'earth', smatk:8}],
+  ['s_holy', 'ammo', 'ดาวกระจายเงินศักดิ์สิทธิ์', 'Silver Stars', 50, 9600, {star:1, elem:'holy', smatk:14}],
+  ['s_shadow', 'ammo', 'ดาวกระจายเงามืด', 'Shadow Stars', 50, 9600, {star:1, elem:'shadow', smatk:14}]
 ];
 /* weapons and accessories: these only drop from monsters (not sold). Weapons are kept per weapon type, so a
    class can only wield its own kind; armour, headgear and accessories fit every class.
    weapon stats: watk / wmatk replace the class's starting weapon; other keys add like any gear */
 /* how a weapon is held: 1h มือเดียว (dagger, blade, rod) · 2h สองมือ (knuckles, bow, greatsword, longstaff) */
-const HANDS_DEF = {dagger:'1h', sword:'1h', staff:'1h', fist:'2h', bow:'2h'};
+const HANDS_DEF = {dagger:'1h', sword:'1h', staff:'1h', fist:'2h', bow:'2h', shuriken:'2h'};   // (v184) the ninja's throwing stars: held in one hand, a two-handed class of weapon
 const handsOf = st => (st && st.wtype ? st.hands || HANDS_DEF[st.wtype] || '1h' : null);
 const handsTxt = h => (h === '2h' ? L('สองมือ', 'Two-handed') : L('มือเดียว', 'One-handed'));
 const WEAPON_TIERS = [[10, 'ฝึกหัด', 'Apprentice'], [30, 'เหล็กกล้า', 'Steel'], [55, 'ยันต์เพลิง', 'Ember'], [80, 'นิลกาฬ', 'Obsidian'], [100, 'นาคราช', 'Naga'], [115, 'สุริยเทพ', 'Solar'],
@@ -54,6 +62,11 @@ for (const wt in WEAPON_KINDS){ const [th, en, ak, mk] = WEAPON_KINDS[wt];
   WEAPON_TIERS.forEach(([lv, tth, ten], i) => { const atk = Math.round((18 + lv * 1.25) * ak), st = {wtype:wt, watk:atk};
     if (mk) st.wmatk = Math.round(25 + lv * 1.5); if (i >= 2) st[wt === 'staff' ? 'int' : wt === 'bow' ? 'dex' : wt === 'dagger' ? 'agi' : 'str'] = i; if (i >= 4) st.crit = i;
     st.hands = HANDS_DEF[wt]; GEAR_LIST.push([`w_${wt}${i}`, 'weapon', `${th}${tth}`, `${ten} ${en}`, lv, 400 + lv * lv * 9, st]); }); }
+/* (v184) ดาวกระจาย — the ninja line's weapon: thrown stars that strike with magic (MATK), held in one hand but counted as
+   two-handed (no shield). Each throw uses one star from the pouch (the ammo slot), like a bow uses arrows. */
+WEAPON_TIERS.forEach(([lv, tth, ten], i) => { const st = {wtype:'shuriken', hands:'2h', watk:Math.round((18 + lv * 1.25) * .35), wmatk:Math.round((25 + lv * 1.5) * 1.08)};
+  if (i >= 2){ st.int = i; st.dex = Math.ceil(i / 2); } if (i >= 4) st.crit = i;
+  GEAR_LIST.push([`w_shuriken${i}`, 'weapon', `ดาวกระจาย${tth}`, `${ten} Shuriken`, lv, 400 + lv * lv * 9, st]); });
 /* two-handed lines: greatswords for sword classes, longstaves for staff classes. Held in both hands: more power
    (ATK +20% · MATK +25%), slower swings (ASPD −8). One-handed blades and rods swing faster (ASPD +3). */
 WEAPON_TIERS.forEach(([lv, tth, ten], i) => {
@@ -163,24 +176,33 @@ function gearDrop(m){
   if (!pool.length) return null; return pool[Math.floor(Math.random() * pool.length)][0];
 }
 /* ---------- arrows ---------- */
-const usesArrows = () => JOBS[S.job].weapon.type === 'bow';
-function arrowCount(){ const id = S.gear && S.gear.ammo, n = id ? S.inv[id] || 0 : 0; if (n) return n; const o = GEAR_LIST.find(g => g[1] === 'ammo' && S.inv[g[0]] > 0 && S.lvl >= g[4]); return o ? S.inv[o[0]] : 0; }
+/* (v184) two kinds of ammo: arrows for bows, throwing stars (st.star) for the ninja's ดาวกระจาย; each only fits its own weapon */
+const ammoWant = () => (JOBS[S.job].weapon.type === 'shuriken' ? 'star' : 'arrow');
+const ammoKind = id => (ITEMS[id] && ITEMS[id].st && ITEMS[id].st.star ? 'star' : 'arrow');
+const usesArrows = () => JOBS[S.job].weapon.type === 'bow' || JOBS[S.job].weapon.type === 'shuriken';
+const ammoFits = id => usesArrows() && !!ITEMS[id] && ITEMS[id].kind === 'ammo' && ammoKind(id) === ammoWant();
+const ammoStarter = () => (ammoWant() === 'star' ? 's_iron' : 'q_wood');
+const ammoOther = () => GEAR_LIST.find(g => g[1] === 'ammo' && S.inv[g[0]] > 0 && S.lvl >= g[4] && ammoKind(g[0]) === ammoWant());
+function arrowCount(){ const id = S.gear && S.gear.ammo, n = id && ammoFits(id) ? S.inv[id] || 0 : 0; if (n) return n; const o = ammoOther(); return o ? S.inv[o[0]] : 0; }
 /* take n arrows from the worn quiver; when it runs dry switch to any other arrows in the bag. false = none left */
 function useArrows(n = 1){
   if (!usesArrows()) return true;
   S.gear = S.gear || {};
-  if (!(S.gear.ammo && S.inv[S.gear.ammo] > 0)){ const other = GEAR_LIST.find(g => g[1] === 'ammo' && S.inv[g[0]] > 0 && S.lvl >= g[4]); if (other){ S.gear.ammo = other[0]; derive(); toast(L(`เปลี่ยนเป็น${nm(ITEMS[other[0]])}`, `Switched to ${nm(ITEMS[other[0]])}`)); } }
+  if (S.gear.ammo && !ammoFits(S.gear.ammo)) S.gear.ammo = null;   // arrows in a ninja's pouch (or stars in a quiver) do not count
+  if (!(S.gear.ammo && S.inv[S.gear.ammo] > 0)){ const other = ammoOther(); if (other){ S.gear.ammo = other[0]; derive(); toast(L(`เปลี่ยนเป็น${nm(ITEMS[other[0]])}`, `Switched to ${nm(ITEMS[other[0]])}`)); } }
   const id = S.gear.ammo, have = id ? S.inv[id] || 0 : 0;
-  if (!have){ if (T - (P.noArrowT || -9) > 2){ P.noArrowT = T; toast(L('ลูกธนูหมด! ซื้อได้ที่ร้านป้าบัวคำ', 'Out of arrows! Buy more from Auntie Buakham\'s store')); }
-    if (BOT.on){ setBot(false); banner(L('Auto หยุด: ลูกธนูหมด', 'Auto stopped: out of arrows')); } return false; }
+  const star = ammoWant() === 'star';
+  if (!have){ if (T - (P.noArrowT || -9) > 2){ P.noArrowT = T; toast(star ? L('ดาวกระจายหมด! ซื้อได้ที่ร้านตีบวก (โรงตีเหล็ก)', 'Out of throwing stars! Buy more at the smith') : L('ลูกธนูหมด! ซื้อได้ที่ร้านป้าบัวคำ', 'Out of arrows! Buy more from Auntie Buakham\'s store')); }
+    if (BOT.on){ setBot(false); banner(star ? L('Auto หยุด: ดาวกระจายหมด', 'Auto stopped: out of stars') : L('Auto หยุด: ลูกธนูหมด', 'Auto stopped: out of arrows')); } return false; }
   S.inv[id] = have - Math.min(have, n); if (!S.inv[id]){ delete S.inv[id]; } dirty = true;
   return true;
 }
 function gearStatText(st){
   const out = [];
   if (st.elem) out.push(elemName(st.elem));
-  if (st.watk) out.push(`${st.claw ? L('กรงเล็บคู่', 'Twin claws') : st.glove ? L('นวมคู่', 'Boxing gloves') : st.wtype === 'dagger' && handsOf(st) === '2h' ? L('มีดคู่', 'Twin daggers') : L(...WTYPE[st.wtype])} (${handsTxt(handsOf(st))}) · ATK ${st.watk}`);
+  if (st.watk) out.push(`${st.claw ? L('กรงเล็บคู่', 'Twin claws') : st.glove ? L('นวมคู่', 'Boxing gloves') : st.wtype === 'dagger' && handsOf(st) === '2h' ? L('มีดคู่', 'Twin daggers') : L(...WTYPE[st.wtype])} (${st.wtype === 'shuriken' ? L('ถือมือเดียว · อาวุธสองมือ', 'one hand · two-handed class') : handsTxt(handsOf(st))}) · ATK ${st.watk}`);
   if (st.wmatk) out.push(`MATK ${st.wmatk}`);
+  if (st.smatk) out.push(`MATK +${st.smatk}`);
   if (st.atk) out.push(`ATK +${st.atk}`);
   if (st.crit) out.push(`CRIT +${st.crit}%`);
   if (st.atkPct) out.push(`ATK +${Math.round(st.atkPct * 100)}%`);

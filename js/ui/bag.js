@@ -90,7 +90,7 @@ function bagInfo(){
   if (CARDS[id] && BAG.tab === 'card'){ box.innerHTML = `${cardHTML(id)}<div class="nm"><b>${nm(CARDS[id])} <span class="ct">×${S.cards[id] || 0}</span></b><small>${L('ใส่ในช่อง Card ของ', 'Goes in the card socket of your')} ${L(SLOT_TH[CARDS[id].slot], SLOT_EN[CARDS[id].slot])}</small></div><button class="btn sm gold" data-card="${id}" ${S.cards[id] > 0 ? '' : 'disabled'}>${S.slots && S.slots[CARDS[id].slot] ? L('สลับ Card', 'Swap card') : L('ใส่ Card', 'Slot card')}</button>`; return; }
   const it = ITEMS[id]; if (!it){ box.innerHTML = ''; return; }
   const act = it.kind === 'use' ? `<button class="btn sm gold" data-use="${id}">${L('ใช้', 'Use')}</button>`
-    : it.kind === 'gear' || (it.kind === 'ammo' && S.gear.ammo !== id && usesArrows()) ? `<button class="btn sm gold" data-wear="${id}" ${S.lvl >= it.lv ? '' : 'disabled'}>${L('สวม', 'Wear')}</button>`
+    : it.kind === 'gear' || (it.kind === 'ammo' && S.gear.ammo !== id && ammoFits(id)) ? `<button class="btn sm gold" data-wear="${id}" ${S.lvl >= it.lv ? '' : 'disabled'}>${L('สวม', 'Wear')}</button>`
     : it.kind === 'ammo' && S.gear.ammo === id ? `<span class="ct">${L('ใช้อยู่', 'in use')}</span>` : '';
   const meta = [it.lv ? `Lv ${it.lv}` : '', it.st ? (typeof gearLines === 'function' ? gearLines(id) : gearStatText(it.st)) : '', it.sell ? L(`ขาย ${it.sell.toLocaleString()} เบี้ย`, `Sells ${it.sell.toLocaleString()} Bia`) : ''].filter(Boolean).join(' · ');
   box.innerHTML = `<span class="bico">${itemIcon(id)}</span><div class="nm"><b><span class="rar r${it.rar || 0}">${nm(it)}</span> ${rarLine(id)} <span class="ct">×${(S.inv[id] || 0).toLocaleString()}</span></b><small>${itemDesc(id) || ''}${meta ? `${itemDesc(id) ? '<br>' : ''}${meta}` : ''}</small></div>${act}`;

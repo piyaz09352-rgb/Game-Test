@@ -3,7 +3,7 @@
      พ่อค้า    พ่อค้า → นายวาณิช → มหาเศรษฐีวาณิช        the middle way: an axe (one hand + shield, or two hands), money skills, trade buffs
      เผ่าแมว  เจ้าเหมียว → แมวป่าจอมซน → ราชินีวิเชียรมาศ   cat folk: claws, pounces, charm and nine lives (AGI · DEX)
      เผ่าหมา  เจ้าตูบ → อัศวินหมาเฝ้าวัง → อัศวินบางแก้ว   dog folk: a loyal guard with sword and shield, bites and howls (VIT · STR)
-     นินจา    นินจา → นินจาเงา → จอมนินจาคาเงะ           kunai and ninjato, ninjutsu (fire, water, wind, lightning), smoke and clones (AGI · DEX)
+     นินจา    นินจา → นินจาเงา → จอมนินจาคาเงะ           thrown stars (ดาวกระจาย, magic, ranged), ninjutsu (fire, water, wind, lightning), smoke and clones (INT · DEX)
    Every tier has the same three play styles as the other lines (a · b · c), 49 points for 80 levels of skills, and
    tier 4 opens at Job Lv 50 of tier 3 and Base Lv 150. Statuses, money costs, effects, looks, weapons and kits are in
    newlines2.js. */
@@ -35,12 +35,13 @@ const NL_JOBS = {
     weapon:{name:'ดาบอัศวินเฝ้าวัง', en:'Palace Hound Blade', atk:88, type:'sword'}},
   bangkaew:{tier:4, name:'อัศวินบางแก้ว', en:'Bangkaew Paladin', parent:'houndknight', hp:1.9, sp:3.2, delay:50, range:30, jobMax:50, stat:'VIT · STR',
     weapon:{name:'ดาบศักดิ์สิทธิ์บางแก้ว', en:'Bangkaew Holy Blade', atk:148, type:'sword'}},
-  ninja:{tier:2, name:'นินจา', en:'Ninja', parent:'novice', next:['shinobi'], hp:.85, sp:2.8, delay:40, range:24, jobMax:50, stat:'AGI · DEX',
-    weapon:{name:'คุไนนินจา', en:'Ninja Kunai', atk:34, type:'dagger'}},
-  shinobi:{tier:3, name:'นินจาเงา', en:'Shadow Shinobi', parent:'ninja', next:['kage'], hp:1.05, sp:3.4, delay:36, range:26, jobMax:50, stat:'AGI · DEX',
-    weapon:{name:'นินจาโตะเงา', en:'Shadow Ninjato', atk:86, type:'dagger'}},
-  kage:{tier:4, name:'จอมนินจาคาเงะ', en:'Kage', parent:'shinobi', hp:1.2, sp:3.8, delay:32, range:26, jobMax:50, stat:'AGI · DEX · LUK',
-    weapon:{name:'ดาบคาเงะ', en:'Kage Blade', atk:150, type:'dagger'}}
+  // (v184) the ninja line throws ดาวกระจาย: a ranged, magic line (INT for power, DEX for casting, LUK for the stars' criticals)
+  ninja:{tier:2, name:'นินจา', en:'Ninja', parent:'novice', next:['shinobi'], hp:.85, sp:3.2, delay:44, range:160, ranged:true, jobMax:50, stat:'INT · DEX',
+    weapon:{name:'ดาวกระจายนินจา', en:'Ninja Shuriken', atk:12, matk:34, type:'shuriken'}},
+  shinobi:{tier:3, name:'นินจาเงา', en:'Shadow Shinobi', parent:'ninja', next:['kage'], hp:1.0, sp:4.2, delay:40, range:170, ranged:true, jobMax:50, stat:'INT · DEX',
+    weapon:{name:'ดาวกระจายเงา', en:'Shadow Shuriken', atk:30, matk:88, type:'shuriken'}},
+  kage:{tier:4, name:'จอมนินจาคาเงะ', en:'Kage', parent:'shinobi', hp:1.15, sp:5, delay:36, range:180, ranged:true, jobMax:50, stat:'INT · DEX · LUK',
+    weapon:{name:'ดาวกระจายคาเงะ', en:'Kage Shuriken', atk:50, matk:150, type:'shuriken'}}
 };
 for (const [id, j] of Object.entries(NL_JOBS)) JOBS[id] = {ranged:false, ...j, skills:[]};
 for (const l of ['occult', 'merchant', 'catfolk', 'dogfolk', 'ninja']) if (!JOBS.novice.next.includes(l)) JOBS.novice.next.push(l);
@@ -209,29 +210,32 @@ nlPas('packleader', 'bangkaew', 'จ่าฝูง', 'Leader of the Pack', lv =
 nlBuf('guardianangel', 'bangkaew', 'เทวดาเฝ้าเจ้านาย', 'Guardian Angel', ['เทวดาเฝ้า', 'Angel'], {fx:'heal', act:'wai', sp:lv => 40 + lv * 3, cd:45, buff:lv => ({t:6, dmgRed:+(.3 + lv * .02).toFixed(2)})});
 
 /* ======================= นินจา ======================= */
-nlPas('shinobiway', 'ninja', 'วิถีนินจา', 'Way of the Shinobi', lv => ({daggerAtk:lv * 3, crit:lv * .5, flee:lv}));
-nlAtk('quickslash', 'ninja', 'ฟันฉับ', 'Quick Slash', ['ฟันฉับ', 'Slash'], {type:'melee', fx:'slash', act:'crossslash', sp:lv => 8 + lv, cd:.7, hits:() => 2, every:.1, dmg:lv => 1 + lv * .18});
-nlAtk('ninjadash', 'ninja', 'ก้าวเงาฟัน', 'Shadow Step Slash', ['ก้าวเงา', 'Step'], {type:'dash', fx:'shadowBlink', act:'lunge', sp:lv => 12 + lv, cd:3, range:160, dmg:lv => 1.6 + lv * .28});
-nlAtk('katon', 'ninja', 'คาถาไฟ ลูกไฟ', 'Fire Release: Fireball', ['คาถาไฟ', 'Katon'], {type:'aoeTarget', fx:'katon', act:'seal', elem:'fire', sp:lv => 16 + lv * 2, cd:2.5, range:200, radius:60, dmg:lv => 1.4 + lv * .4});
-nlAtk('suiton', 'ninja', 'คาถาน้ำ กระสุนน้ำ', 'Water Release: Water Shot', ['คาถาน้ำ', 'Suiton'], {type:'bolt', fx:'ice', act:'seal', elem:'water', sp:lv => 12 + lv, cd:1.5, range:180, dmg:lv => 1.2 + lv * .3, freeze:lv => [.1 + lv * .02, 1.5]});
-nlAtk('kunaithrow', 'ninja', 'ปาคุไน', 'Kunai Throw', ['ปาคุไน', 'Kunai'], {type:'bolt', fx:'kunai', act:'throw', sp:lv => 8 + lv, cd:.8, range:170, hits:lv => 1 + Math.floor(lv / 3), dmg:lv => .7 + lv * .12});
+/* (v184) every damaging ninja skill is magic now (MATK): the stars, the kunai and the ninjutsu alike */
+nlPas('shinobiway', 'ninja', 'วิถีนินจา', 'Way of the Shinobi', lv => ({matkPct:+(lv * .02).toFixed(2), flee:lv}));
+nlAtk('quickslash', 'ninja', 'ปาดาวคู่', 'Twin Star Throw', ['ดาวคู่', 'Twin Star'], {type:'bolt', fx:'shuriken', act:'throw', magic:true, sp:lv => 8 + lv, cd:.7, range:190, hits:() => 2, dmg:lv => .8 + lv * .14});
+nlAtk('ninjadash', 'ninja', 'ดาวกระจายตรึงเงา', 'Shadow-Pin Star', ['ตรึงเงา', 'Pin'], {type:'bolt', fx:'shuriken', act:'throw', magic:true, sp:lv => 14 + lv, cd:4, range:200, dmg:lv => 1.5 + lv * .25, st:lv => ({slow:[.3 + lv * .03, 3 + lv * .2]})});
+nlAtk('katon', 'ninja', 'คาถาไฟ ลูกไฟ', 'Fire Release: Fireball', ['คาถาไฟ', 'Katon'], {type:'aoeTarget', fx:'katon', act:'seal', elem:'fire', magic:true, sp:lv => 16 + lv * 2, cd:2.5, range:200, radius:60, dmg:lv => 1.4 + lv * .4});
+nlAtk('suiton', 'ninja', 'คาถาน้ำ กระสุนน้ำ', 'Water Release: Water Shot', ['คาถาน้ำ', 'Suiton'], {type:'bolt', fx:'ice', act:'seal', elem:'water', magic:true, sp:lv => 12 + lv, cd:1.5, range:180, dmg:lv => 1.2 + lv * .3, freeze:lv => [.1 + lv * .02, 1.5]});
+nlAtk('kunaithrow', 'ninja', 'ปาคุไน', 'Kunai Throw', ['ปาคุไน', 'Kunai'], {type:'bolt', fx:'kunai', act:'throw', magic:true, sp:lv => 8 + lv, cd:.8, range:170, hits:lv => 1 + Math.floor(lv / 3), dmg:lv => .7 + lv * .12});
 nlBuf('smokescreen', 'ninja', 'ระเบิดควัน', 'Smoke Bomb', ['ระเบิดควัน', 'Smoke'], {fx:'smokeBomb', act:'crouch', sp:() => 20, cd:25, buff:lv => ({t:3 + lv * .3, stealth:1, flee:lv * 3, sureCrit:1})});
-nlSk('kawarimi', 'ninja', 'คาถาสลับร่าง', 'Substitution', ['สลับร่าง', 'Kawarimi'], {type:'backstep', fx:'smokeBomb', act:'crouch', sp:lv => 10 + lv, cd:5, dist:lv => 60 + lv * 5});
-nlPas('bladeart', 'shinobi', 'วิชาดาบเงา', 'Shadow Blade Art', lv => ({atkPct:lv * .02, crit:lv, critDmg:lv * .02}));
-nlAtk('iai', 'shinobi', 'ชักดาบสายฟ้า', 'Lightning Draw', ['ชักดาบ', 'Iai'], {type:'melee', fx:'slash', act:'crossslash', sp:lv => 20 + lv * 2, cd:2.5, dmg:lv => 3.2 + lv * .45});
-nlAtk('fuuton', 'shinobi', 'คาถาลม ใบมีดลม', 'Wind Release: Wind Blade', ['คาถาลม', 'Fuuton'], {type:'line', fx:'windBlade', act:'seal', elem:'wind', sp:lv => 22 + lv * 2, cd:3, len:200, width:30, dmg:lv => 2.2 + lv * .35});
-nlAtk('raiton', 'shinobi', 'คาถาสายฟ้า', 'Lightning Release', ['สายฟ้า', 'Raiton'], {type:'aoeTarget', fx:'thunder', act:'seal', elem:'wind', sp:lv => 26 + lv * 2, cd:3, range:200, radius:80, hits:() => 2, every:.25, dmg:lv => 1.8 + lv * .3, st:() => ({shock:1.5})});
-nlAtk('dragonflame', 'shinobi', 'คาถาไฟ มังกรเพลิง', 'Fire Release: Dragon Flame', ['มังกรเพลิง', 'Dragon'], {type:'line', fx:'fireLine', act:'seal', elem:'fire', sp:lv => 28 + lv * 2, cd:4, len:220, width:34, dmg:lv => 2.6 + lv * .4});
+// คาถาสลับร่าง: a puff of smoke, a log left behind, and the next star thrown from the new spot hits much harder
+nlSk('kawarimi', 'ninja', 'คาถาสลับร่าง', 'Substitution', ['สลับร่าง', 'Kawarimi'], {type:'backstep', fx:'smokeBomb', act:'crouch', sp:lv => 10 + lv, cd:5, dist:lv => 60 + lv * 5, buff:lv => ({t:5, nextShot:+(1.5 + lv * .1).toFixed(2)})});
+nlPas('bladeart', 'shinobi', 'วิชาดาวกระจาย', 'Shuriken Art', lv => ({matkPct:+(lv * .02).toFixed(2), crit:lv * .5, critDmg:+(lv * .02).toFixed(2)}));
+nlAtk('iai', 'shinobi', 'ดาวกระจายยักษ์ฟูมะ', 'Fuma Shuriken', ['ฟูมะ', 'Fuma'], {type:'line', fx:'pierce', act:'throw', magic:true, sp:lv => 20 + lv * 2, cd:2.5, len:240, width:30, dmg:lv => 2.8 + lv * .42});
+nlAtk('fuuton', 'shinobi', 'คาถาลม ใบมีดลม', 'Wind Release: Wind Blade', ['คาถาลม', 'Fuuton'], {type:'line', fx:'windBlade', act:'seal', elem:'wind', magic:true, sp:lv => 22 + lv * 2, cd:3, len:200, width:30, dmg:lv => 2.2 + lv * .35});
+nlAtk('raiton', 'shinobi', 'คาถาสายฟ้า', 'Lightning Release', ['สายฟ้า', 'Raiton'], {type:'aoeTarget', fx:'thunder', act:'seal', elem:'wind', magic:true, sp:lv => 26 + lv * 2, cd:3, range:200, radius:80, hits:() => 2, every:.25, dmg:lv => 1.8 + lv * .3, st:() => ({shock:1.5})});
+nlAtk('dragonflame', 'shinobi', 'คาถาไฟ มังกรเพลิง', 'Fire Release: Dragon Flame', ['มังกรเพลิง', 'Dragon'], {type:'line', fx:'fireLine', act:'seal', elem:'fire', magic:true, sp:lv => 28 + lv * 2, cd:4, len:220, width:34, dmg:lv => 2.6 + lv * .4});
 nlBuf('kagebunshin', 'shinobi', 'แยกเงาพราง', 'Shadow Clones', ['แยกเงา', 'Clones'], {fx:'shadowBlink', act:'seal', sp:() => 35, cd:35, buff:lv => ({t:20, flee:lv * 6})});
-nlAtk('shurikenstorm', 'shinobi', 'พายุดาวกระจาย', 'Shuriken Storm', ['ดาวกระจาย', 'Shuriken'], {type:'aoeTarget', fx:'shurikenRain', act:'throw', sp:lv => 24 + lv * 2, cd:3, range:200, radius:90, hits:() => 4, every:.15, dmg:lv => .5 + lv * .08});
+nlAtk('shurikenstorm', 'shinobi', 'พายุดาวกระจาย', 'Shuriken Storm', ['ดาวกระจาย', 'Shuriken'], {type:'aoeTarget', fx:'shurikenRain', act:'throw', magic:true, sp:lv => 24 + lv * 2, cd:3, range:200, radius:90, hits:() => 4, every:.15, dmg:lv => .5 + lv * .08});
 nlDeb('poisonkunai', 'shinobi', 'คุไนอาบพิษ', 'Poisoned Kunai', ['คุไนพิษ', 'Venom'], {fx:'poison', act:'throw', anim:'attack', sp:lv => 14 + lv, cd:4, st:lv => ({poison:[.25 + lv * .04, 8], slow:[.1 + lv * .02, 5]})});
-nlPas('kagemastery', 'kage', 'วิถีคาเงะ', 'Way of the Kage', lv => ({atkPct:lv * .03, crit:lv, critDmg:lv * .03}));
-nlAtk('shadowflash', 'kage', 'ประกายเงาพันดาบ', 'Thousand Shadow Flash', ['พันดาบ', 'Flash'], {type:'melee', fx:'slash', act:'crossslash', sp:lv => 40 + lv * 3, cd:3, hits:() => 8, every:.06, dmg:lv => .55 + lv * .07});
-nlAtk('blinkstrike', 'kage', 'ก้าวพริบตา', 'Blink Strike', ['พริบตา', 'Blink'], {type:'dash', fx:'shadowBlink', act:'lunge', sp:lv => 30 + lv * 3, cd:4, range:200, dmg:lv => 3 + lv * .4, stun:() => .6});
-nlAtk('kirin', 'kage', 'คาถาสายฟ้า กิเลน', 'Lightning Release: Kirin', ['กิเลน', 'Kirin'], {type:'aoeTarget', fx:'kirin', act:'seal', elem:'wind', sig:1, sp:lv => 70 + lv * 5, cd:12, cast:() => 1.5, range:240, radius:140, dmg:lv => 7 + lv * .9, st:() => ({shock:2})});
-nlAtk('waterdragon', 'kage', 'คาถาน้ำ มังกรวารี', 'Water Release: Water Dragon', ['มังกรวารี', 'Water Dragon'], {type:'line', fx:'waterLine', act:'seal', elem:'water', sp:lv => 45 + lv * 3, cd:5, len:240, width:40, dmg:lv => 3.2 + lv * .45, st:lv => ({slow:[.2 + lv * .02, 5]})});
+nlPas('kagemastery', 'kage', 'วิถีคาเงะ', 'Way of the Kage', lv => ({matkPct:+(lv * .03).toFixed(2), crit:lv, critDmg:+(lv * .03).toFixed(2)}));
+nlAtk('shadowflash', 'kage', 'พายุพันดาราเงา', 'Thousand Star Barrage', ['พันดารา', 'Barrage'], {type:'bolt', fx:'shuriken', act:'throw', magic:true, sp:lv => 40 + lv * 3, cd:3, range:210, hits:() => 8, dmg:lv => .5 + lv * .07});
+// วงล้อดาวรอบกาย: stars spun out in a ring round the Kage — for when the foes are already at your sleeve
+nlAtk('blinkstrike', 'kage', 'วงล้อดาวรอบกาย', 'Star Wheel', ['วงล้อดาว', 'Wheel'], {type:'aoeSelf', fx:'shurikenRain', act:'throw', magic:true, sp:lv => 30 + lv * 3, cd:5, radius:100, hits:() => 4, every:.15, dmg:lv => .8 + lv * .12, knock:30});
+nlAtk('kirin', 'kage', 'คาถาสายฟ้า กิเลน', 'Lightning Release: Kirin', ['กิเลน', 'Kirin'], {type:'aoeTarget', fx:'kirin', act:'seal', elem:'wind', magic:true, sig:1, sp:lv => 70 + lv * 5, cd:12, cast:() => 1.5, range:240, radius:140, dmg:lv => 7 + lv * .9, st:() => ({shock:2})});
+nlAtk('waterdragon', 'kage', 'คาถาน้ำ มังกรวารี', 'Water Release: Water Dragon', ['มังกรวารี', 'Water Dragon'], {type:'line', fx:'waterLine', act:'seal', elem:'water', magic:true, sp:lv => 45 + lv * 3, cd:5, len:240, width:40, dmg:lv => 3.2 + lv * .45, st:lv => ({slow:[.2 + lv * .02, 5]})});
 nlBuf('thousandshadows', 'kage', 'พันเงาพราง', 'Thousand Shadows', ['พันเงา', 'Shadows'], {fx:'shadowBlink', act:'seal', sp:() => 50, cd:40, buff:lv => ({t:15, aspdPct:+(lv * .03).toFixed(2)})});
-nlAtk('kunairain', 'kage', 'ฝนคุไน', 'Kunai Rain', ['ฝนคุไน', 'Kunai Rain'], {type:'aoeTarget', fx:'kunaiRain', act:'throw', sp:lv => 40 + lv * 3, cd:4, range:220, radius:120, hits:() => 6, every:.12, dmg:lv => .5 + lv * .07});
+nlAtk('kunairain', 'kage', 'ฝนคุไน', 'Kunai Rain', ['ฝนคุไน', 'Kunai Rain'], {type:'aoeTarget', fx:'kunaiRain', act:'throw', magic:true, sp:lv => 40 + lv * 3, cd:4, range:220, radius:120, hits:() => 6, every:.12, dmg:lv => .5 + lv * .07});
 nlPas('silentkill', 'kage', 'สังหารเงียบ', 'Silent Killing', lv => ({crit:lv, critDmg:lv * .03, flee:lv * 2}));
 
 /* ---------- the eight a tier and the style of each ---------- */
@@ -257,7 +261,7 @@ Object.assign(SK8_PATH, {
   merchant:{a:['ขวานศึก', 'Axe work', '#e8a23a'], b:['ทุ่มทุน', 'Money power', '#e2574c'], c:['ค้าขาย', 'Trade & guard', '#d8a02a']},
   catfolk:{a:['ข่วนรัว', 'Scratching', '#e8a23a'], b:['กระโจน', 'Pounces', '#e2574c'], c:['ออดอ้อน', 'Charm & lives', '#d86aa8']},
   dogfolk:{a:['ผู้พิทักษ์', 'Guardian', '#4a8ad8'], b:['เขี้ยวเล็บ', 'Fangs', '#e2574c'], c:['ฝูงหมา', 'The pack', '#3aa86a']},
-  ninja:{a:['ดาบนินจา', 'Blade', '#e8a23a'], b:['นินจุตสึ', 'Ninjutsu', '#e2574c'], c:['ลับลวงพราง', 'Stealth & throws', '#6a7ad8']}
+  ninja:{a:['ดาวกระจาย', 'Shuriken', '#e8a23a'], b:['นินจุตสึ', 'Ninjutsu', '#e2574c'], c:['ลับลวงพราง', 'Stealth & throws', '#6a7ad8']}
 });
 for (const j of Object.keys(NL_JOBS)) SK8_LINE[j] = NL_LINE_OF[j];
 for (const job of Object.keys(NL_JOBS)){ const P0 = SK8[job], list = [...P0.a, ...P0.b, ...P0.c];

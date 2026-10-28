@@ -79,9 +79,10 @@ const ETC_EL = ['earth', 'wind', 'water', 'fire', 'shadow', 'holy', 'neutral', '
 const itemIcon = id => (typeof itemArt === 'function' ? itemArt(id) : itemGlyph(id));
 const itemGlyph = id => { const it = ITEMS[id] || {};
   if (it.kind === 'use') return it.recall ? iconSvg('scroll', 'holy') : iconSvg('pot', it.spheal ? 'water' : id === 'elixirpot' ? 'holy' : id === 'whitepot' ? 'neutral' : id === 'orangepot' ? 'earth' : 'fire');
+  if (it.kind === 'ammo' && it.st && it.st.star) return iconSvg(GLYPH.star ? 'star' : 'spike', it.st.elem || 'neutral');
   if (it.kind === 'ammo') return iconSvg('arrow', (it.st && it.st.elem) || 'neutral');
   if (it.kind === 'gear'){ const tier = it.lv >= 100 ? 'holy' : it.lv >= 75 ? 'shadow' : it.lv >= 50 ? 'fire' : it.lv >= 25 ? 'water' : 'neutral';
-    if (it.slot === 'weapon') return iconSvg({sword:'sword', dagger:'dagger', staff:'meteor', fist:'fist', bow:'arrow'}[it.wtype] || 'sword', tier);
+    if (it.slot === 'weapon') return iconSvg({sword:'sword', dagger:'dagger', staff:'meteor', fist:'fist', bow:'arrow', shuriken:GLYPH.star ? 'star' : 'spike'}[it.wtype] || 'sword', tier);
     if (it.slot === 'acc') return iconSvg('gem', tier);
     return iconSvg(it.slot === 'head' ? 'helm' : 'armor', tier); }
   if (it.kind === 'mat') return iconSvg('ore', 'water');

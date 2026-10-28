@@ -33,14 +33,14 @@ function applyDamage(m, res, sk){
   if (m.pvp){ if (typeof pvpDeal === 'function') pvpDeal(m, res, sk); return; }   // a duel opponent: the damage travels to them
   const y = m.y - MOB_H[m.type] - 4;
   if (res.miss){ addText(m.x, y, 'Miss', '#cfcfcf'); return; }
-  if (res.magic) res.crit = false; // spells never crit
+  if (res.magic && !res.shur) res.crit = false; // spells never crit (a thrown star can: v184)
   if (m.st && m.st.shock > 0 && !res.poison) res.dmg = Math.round(res.dmg * 1.15);
   if (!res.poison){ const w = JOBS[S.job].weapon.type;
-    if (res.magic) sk ? SFX.impact(res.elem || sk.elem) : SFX.play('orbhit', {elem:res.elem});   // spell hit by element · caster basic orb pop
+    if (res.magic && !res.shur) sk ? SFX.impact(res.elem || sk.elem) : SFX.play('orbhit', {elem:res.elem});   // spell hit by element · caster basic orb pop
     else if (sk && w === 'fist'){ const k = muayStrike(sk); SFX.play('mh_' + k, {big:true}); if (k === 'jab' || k === 'hook') P.mtSk = k === 'jab' ? 'hook' : 'jab'; if (res.crit) SFX.play('crit'); }
     else if (sk) SFX.play(res.crit ? 'crit' : 'skill_hit');                                         // physical skill: heavy hit
-    else if (w === 'fist') { SFX.play('mh_' + (P.mt || 'jab')); if (res.crit) SFX.play('crit'); }
-    else { SFX.hit(w); if (res.crit) SFX.play('crit'); } }                                         // basic attack: weapon voice
+    else if (w === 'fist') { if (res.crit) SFX.play('crit'); else SFX.play('mh_' + (P.mt || 'jab')); }   // (v184) a critical normal attack: the crit sound alone
+    else { if (res.crit) SFX.play('crit'); else SFX.hit(w); } }                                         // basic attack: weapon voice
   m.hp -= res.dmg; if (m.wb && typeof wbHit === 'function') wbHit(res.dmg); if (typeof nmHit === 'function') nmHit(m, res.dmg); m.flash = .12; m.aggro = true; if (m.atkT > .4) m.hurtT = .25;
   if (m.hp > 0 && res.dmg > 0 && !res.poison) SFX.mob('hurt', m);
   if (!res.poison) unhide();
@@ -138,13 +138,24 @@ function respawn(){
 const MT_COMBO = ['jab', 'hook', 'jab', 'kick', 'elbow', 'knee', 'jab', 'uppercut', 'teep', 'kick'];
 function muayStrike(sk){ const a = sk.act || '';
   return a === 'punch' || a === 'flurry' ? (P.mtSk || 'jab') : a === 'uppercut' ? 'uppercut' : a === 'kick' || a === 'spinkick' ? 'kick' : a === 'knee' ? 'knee' : a === 'teep' ? 'teep' : a === 'elbow' ? 'elbow' : 'hook'; }
+/* (v184) the ninja's normal attack: one star from the pouch, thrown spinning; it hits with MATK in the stars' element and,
+   unlike a spell, it can land a critical hit (LUK, CRIT and the ninja's crit skills count) */
+function shurShot(t, mul = 1){
+  const elem = DER.welem;
+  return {k:'shuriken', elem, x:P.x, y:P.y - 30, t, delay:.06, speed:760, hit:() => {
+    const r = magicDamage(t, .95 * mul, elem); r.shur = true;
+    const hb = hideBuff() || P.buffs.smokescreen; let cr = (DER.crit || 0) + buffSum('crit'); if (hb && hb.sureCrit){ cr = 100; hb.sureCrit = 0; }
+    if (r.dmg > 0 && Math.random() * 100 < cr){ r.crit = true; r.dmg = Math.round(r.dmg * (DER.critDmg || 1.5)); }
+    applyDamage(t, r); VFX.play('slashHit', {x:t.x, y:t.y - MOB_H[t.type] * .5}); }};
+}
 function basicAttack(t){
   P.swing = 1; P.atkAnim = .42; P.act = null; if (!JOBS[S.job].caster){ if (JOBS[S.job].weapon.type === 'fist'){ P.mt = MT_COMBO[(P.mtI = ((P.mtI || 0) + 1) % MT_COMBO.length)]; SFX.play('mt_' + P.mt); } else SFX.swing(JOBS[S.job].weapon.type); } P.dir = SPR.dirFromVec(t.x - P.x, t.y - P.y);
   const mul = P.buffs.backstep ? P.buffs.backstep.nextShot : 1; if (P.buffs.backstep){ delete P.buffs.backstep; renderBuffs(); }
   if (usesArrows() && !useArrows(1)){ P.atkAnim = 0; return; }
   if (JOBS[S.job].caster){ SFX.play('orb', {elem:DER.welem}); projs.push({k:'orb', elem:DER.welem, x:P.x, y:P.y - 34, t, delay:.12, speed:520, hit:() => { applyDamage(t, magicDamage(t, .7, DER.welem)); VFX.play('orbHit', {x:t.x, y:t.y - MOB_H[t.type] * .5, elem:DER.welem}); }}); return; }
   { const wt = JOBS[S.job].weapon.type; if (wt === 'dagger' || wt === 'sword') later(wt === 'dagger' ? .06 : .1, () => VFX.play('swingArc', {x:P.x, y:P.y, ang:Math.atan2(t.y - P.y, t.x - P.x), flip:typeof DAGGER_LEFT !== 'undefined' && DAGGER_LEFT.includes(P.dir | 0), kind:wt})); }
-  const strike = () => { if (JOBS[S.job].ranged) projs.push({k:'arrow', elem:DER.welem, x:P.x, y:P.y - 20, t, delay:0, speed:720, hit:() => { applyDamage(t, physDamage(t, mul)); VFX.play('arrowHit', {x:t.x, y:t.y - MOB_H[t.type] * .5, elem:DER.welem}); }}); else applyDamage(t, physDamage(t, mul)); };
+  const strike = () => { if (JOBS[S.job].weapon.type === 'shuriken'){ projs.push(shurShot(t, mul)); return; }   // (v184) a thrown star: magic damage
+    if (JOBS[S.job].ranged) projs.push({k:'arrow', elem:DER.welem, x:P.x, y:P.y - 20, t, delay:0, speed:720, hit:() => { applyDamage(t, physDamage(t, mul)); VFX.play('arrowHit', {x:t.x, y:t.y - MOB_H[t.type] * .5, elem:DER.welem}); }}); else applyDamage(t, physDamage(t, mul)); };
   strike();
   if (DER.pas.dbl && Math.random() < DER.pas.dbl){ later(.14, () => { if (!t.dead){ strike(); VFX.play('slashHit', {x:t.x, y:t.y - MOB_H[t.type] * .5, gold:true}); } }); }
 }

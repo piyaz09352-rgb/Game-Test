@@ -4,7 +4,7 @@
 'use strict';
 
 const EQ = {dir:0};
-const WTYPE = {dagger:['มีดสั้น', 'Dagger'], sword:['ดาบ', 'Sword'], staff:['ไม้เท้า', 'Staff'], bow:['ธนู', 'Bow'], fist:['สนับมือ', 'Knuckles']};
+const WTYPE = {dagger:['มีดสั้น', 'Dagger'], sword:['ดาบ', 'Sword'], staff:['ไม้เท้า', 'Staff'], bow:['ธนู', 'Bow'], fist:['สนับมือ', 'Knuckles'], shuriken:['ดาวกระจาย', 'Shuriken']};
 const EQ_IC = {
   head:'<path d="M4 12.5c0-4 2.7-7 6-7s6 3 6 7"/><path d="M2.8 12.5h14.4M10 3v2.5"/><circle cx="10" cy="2.6" r=".9"/>',
   armor:'<path d="M7 3.5L3.5 6l1.5 3.5L6.5 9v7.5h7V9l1.5.5L16.5 6 13 3.5c-.6 1.3-1.7 2-3 2s-2.4-.7-3-2z"/>',
@@ -46,17 +46,17 @@ function eqSlot(sl){
     <div class="eqtx"><small>${typeof EQ_LBL !== 'undefined' && EQ_LBL[sl] ? L(...EQ_LBL[sl]) : L(SLOT_TH[sl], SLOT_EN[sl])} ${rarLine(S.gear && S.gear[sl])}</small><b class="rar r${rarOf(S.gear && S.gear[sl] || '')}">${name}</b><i>${sub}</i></div>${off}${sock}</div>`;
 }
 function ammoSlot(){
-  if (JOBS[S.job].weapon.type !== 'bow') return '';
-  const id = S.gear && S.gear.ammo, it = id && ITEMS[id];
+  if (!usesArrows()) return '';
+  const id = S.gear && S.gear.ammo && ammoFits(S.gear.ammo) ? S.gear.ammo : null, it = id && ITEMS[id], star = ammoWant() === 'star';
   return `<div class="eqsl eqsl-ammo${it ? ' full' : ' warn'}"><div class="eqbox">${it ? itemIcon(id) : eqSvg('weapon', 'ghost')}${it ? `<em class="eqrf n">${arrowCount()}</em>` : ''}</div>
-    <div class="eqtx"><small>${L('ลูกธนู', 'Arrows')}</small><b>${it ? nm(it) : L('ไม่มีลูกธนู', 'No arrows')}</b><i>${it ? gearStatText(it.st) : L('ยิงไม่ได้ · ซื้อที่ตลาดกลาง', 'Cannot shoot · buy at the market')}</i></div>${it ? unBtn('data-unwear', 'ammo', L('ถอด', 'Take off')) : ''}</div>`;
+    <div class="eqtx"><small>${star ? L('ดาวกระจาย', 'Throwing stars') : L('ลูกธนู', 'Arrows')}</small><b>${it ? nm(it) : star ? L('ไม่มีดาวกระจาย', 'No stars') : L('ไม่มีลูกธนู', 'No arrows')}</b><i>${it ? gearStatText(it.st) : star ? L('ปาไม่ได้ · ซื้อที่โรงตีเหล็ก', 'Cannot throw · buy at the smith') : L('ยิงไม่ได้ · ซื้อที่ตลาดกลาง', 'Cannot shoot · buy at the market')}</i></div>${it ? unBtn('data-unwear', 'ammo', L('ถอด', 'Take off')) : ''}</div>`;
 }
 function renderEquip(){
   const pane = document.getElementById('pane-equip'); if (!pane || !S) return;
   if (EQ.tab === 'cos' && typeof renderWardrobe === 'function'){ renderWardrobe(); return; }
   const D = DER, cards = Object.keys(S.cards).filter(k => S.cards[k] > 0);
   const st = (k, v, ic) => `<div class="eqstat"><small>${k}</small><b>${v}</b></div>`;
-  const gs = Object.keys(S.inv).filter(k => ITEMS[k] && (ITEMS[k].kind === 'gear' || (ITEMS[k].kind === 'ammo' && usesArrows() && S.gear.ammo !== k))).sort((a, b) => (ITEMS[b].rar || 0) - (ITEMS[a].rar || 0) || (ITEMS[b].lv || 0) - (ITEMS[a].lv || 0));
+  const gs = Object.keys(S.inv).filter(k => ITEMS[k] && (ITEMS[k].kind === 'gear' || (ITEMS[k].kind === 'ammo' && ammoFits(k) && S.gear.ammo !== k))).sort((a, b) => (ITEMS[b].rar || 0) - (ITEMS[a].rar || 0) || (ITEMS[b].lv || 0) - (ITEMS[a].lv || 0));
   pane.innerHTML = (typeof eqTabs === 'function' ? eqTabs() : '') + `
     <div class="eqdoll2">
       <div class="eqside eqL">${['head', 'armor', 'pants', 'shoes'].map(eqSlot).join('')}</div>

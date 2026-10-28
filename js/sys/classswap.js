@@ -63,7 +63,7 @@ function csGo(line, cur){
   // gear the new class can't use goes back into the bag
   for (const sl in S.gear){ const id = S.gear[sl], it = id && ITEMS[id]; if (!it) continue;
     if ((sl === 'weapon' && !canWield(it)) || !lineOk(it.st)){ addItem(id, 1); S.gear[sl] = null; } }
-  if (usesArrows() && !arrowCount()){ addItem('q_wood', 1000); S.gear.ammo = 'q_wood'; }
+  if (usesArrows() && !arrowCount()){ const a0 = ammoStarter(); addItem(a0, 1000); S.gear.ammo = a0; }
   csClearClass();
   derive(); S.hp = DER.maxhp; S.sp = DER.maxsp; if (typeof skTab !== 'undefined') skTab = S.job;
   banner(L(`สลับเป็น${nm(JOBS[S.job])} · Job Lv ${S.jlvl}`, `Now a ${nm(JOBS[S.job])} · Job Lv ${S.jlvl}`));

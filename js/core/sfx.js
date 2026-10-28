@@ -88,6 +88,9 @@ const SFX = (() => {
       [3150, 4730, 6080].forEach((f, i) => osc('sine', f, t + .03, .16 - i * .03, .018, fxg)); },
     atk_dagger(t){ // a thin, fast "fiu" as the blade cuts the air
       noise(t, .07, .26, fxg, {f:2600, to:8500, q:3}); osc('sine', 5200, t + .03, .05, .02, fxg, {to:7400, glide:.04}); },
+    atk_star(t){ // (v184) a throwing star leaving the hand: a short flick, then the whirr of the spinning blades fading away
+      noise(t, .03, .22, fxg, {f:1800, to:3600, q:1.4}); [0, .035, .07, .105].forEach((d, i) => noise(t + .02 + d, .03, .12 - i * .022, fxg, {f:5200 - i * 300, q:4}));
+      osc('sine', 6400, t + .02, .12, .012, fxg, {to:5200, glide:.1}); },
     atk_staff(t){ noise(t, .16, .22, fxg, {f:500, to:1400, q:1.1}); },
     atk_fist(t){ noise(t, .05, .2, fxg, {f:900, to:1800, q:1}); },
     atk_bow(t){ osc('triangle', 196, t, .16, .26, fxg, {to:150, glide:.12}); osc('sine', 392, t, .08, .1, fxg); noise(t + .02, .12, .1, fxg, {f:4000, to:2200, q:3}); },
@@ -99,6 +102,9 @@ const SFX = (() => {
       noise(t, .09, .5, fxg, {f:7800, to:2200, q:2.4}); noise(t, .025, .35, fxg, {f:4200, q:1});
       osc('sine', 3950, t + .005, .22, .05, fxg); osc('sine', 5930, t + .005, .12, .025, fxg);
       osc('sine', 260, t, .07, .22, fxg, {to:120, glide:.05}); },
+    hit_star(t){ // (v184) the star biting in: a bright "tink" of steel, a short bite and a small thud
+      noise(t, .02, .42, fxg, {f:5200, q:1.2}); osc('sine', 3300, t, .16, .05, fxg); osc('sine', 4870, t, .09, .03, fxg);
+      noise(t + .004, .05, .2, fxg, {f:1600, to:800, q:1}); osc('sine', 200, t, .06, .16, fxg, {to:110}); },
     hit_staff(t){ osc('sine', 210, t, .09, .26, fxg, {to:120}); noise(t, .05, .25, fxg, {f:700, q:1.2}); },
     hit_fist(t){ noise(t, .05, .4, fxg, {f:480, q:.8}); osc('sine', 130, t, .1, .32, fxg, {to:60}); },
     hit_bow(t){ noise(t, .04, .3, fxg, {f:1800, q:1}); osc('sine', 260, t, .06, .18, fxg, {to:140}); },
@@ -212,7 +218,7 @@ const SFX = (() => {
     const sz = m.def.size, p = (sz === 'l' ? .7 : sz === 'm' ? .88 : 1.1) * (m.def.boss ? .75 : 1), v = m.def.boss ? 1.4 : 1;
     const name = (kind === 'atk' ? 'ma_' : kind === 'shot' ? 'm_shot' : 'mh_') + (kind === 'shot' ? '' : arch); play(name, {p, v}); }
   /* which voices to use: weapon type for basic attacks, element for spells */
-  const WPN = w => ({sword:'sword', dagger:'dagger', staff:'staff', fist:'fist', bow:'bow'})[w] || 'sword';
+  const WPN = w => ({sword:'sword', dagger:'dagger', staff:'staff', fist:'fist', bow:'bow', shuriken:'star'})[w] || 'sword';
   const EL = e => (['fire', 'water', 'wind', 'earth', 'holy', 'shadow', 'poison'].includes(e) ? e : 'neutral');
 
   // ---------- music ----------
