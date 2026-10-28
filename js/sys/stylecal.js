@@ -10,6 +10,21 @@
 'use strict';
 
 const STYLE_CAL = {
+  occult:{a:0.5, b:0.41, c:0.42},
+  shaman:{a:0.73, b:0.49, c:0.8},
+  hexlord:{a:0.85, b:0.64, c:0.98},
+  merchant:{a:1.78, b:1.45, c:1.01},
+  tradelord:{a:1.8, b:1.81, c:1.1},
+  tycoon:{a:1.75, b:1.93, c:1.47},
+  catfolk:{a:2.26, b:2.17, c:2.01},
+  lynx:{a:3.06, b:3.0, c:2.45},
+  catqueen:{a:2.49, b:2.75, c:2.59},
+  dogfolk:{a:2.17, b:3.25, c:2.01},
+  houndknight:{a:3.23, b:3.5, c:2.5},
+  bangkaew:{a:3.5, b:3.5, c:3.5},
+  ninja:{a:3.31, b:2.01, c:2.38},
+  shinobi:{a:0.74, b:0.59, c:0.65},
+  kage:{a:0.61, b:0.31, c:0.35},
   archsage:{a:0.84, b:1.72, c:0.83},
   astro:{a:1.1, b:1.22, c:1.18},
   bandit:{a:0.96, b:1.04, c:1.42},
