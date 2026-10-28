@@ -11,9 +11,10 @@
 const SFXS = {
   files:{
     // (v169) the one-handed sword swing/hit recordings were taken out at the owner's request (to be made again)
+    atk_sword1:'audio/sfx/sword1_attack.mp3',   // (v173) a one-handed sword's normal attack: one blow, one sound
     miss:'audio/sfx/miss.mp3'   // (v172) every attack that misses ("Miss"), whoever swings it
   },
-  gain:{miss:.55}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
+  gain:{miss:.55, atk_sword1:.55}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
 };
 /* which recorded kind a weapon type is for the hero now: a one-handed sword is 'sword1' (a greatsword, the merchant's axes
    and two-handed blades are other kinds, not recorded yet) */
@@ -43,12 +44,18 @@ function sfxsPlay(k, at){
   return true;
 }
 { const _sw = SFX.swing, _hit = SFX.hit;
-  SFX.swing = function(w){ const k = sfxsKind(w);
-    if (k && sfxsPlay('atk_' + k)){ const raw = SFX.raw(); SFXS.sw = raw ? raw.ac.currentTime : -9; return; }
-    // (v171) the swing waits a moment (the blow is decided right after it), and a miss plays the recorded miss instead
-    if (SFXS.buf.miss){ const me = SFXS.pend = {w, args:arguments, self:this}; queueMicrotask(() => { if (SFXS.pend === me){ SFXS.pend = null; _sw.apply(me.self, me.args); } }); return; }
+  /* (v173) one recording per blow (atk_<kind>): swing and impact in one sound, played as the blow starts; the separate
+     hit sound is then left out for that weapon. The blow waits a moment before it sounds (the hit roll comes right after
+     the swing begins): a miss plays the recorded miss in its place. */
+  SFX.swing = function(w){ const k = sfxsKind(w), rec = k && SFXS.buf['atk_' + k];
+    if (!rec) sfxsLoad('atk_' + k);
+    if (rec || SFXS.buf.miss){ const me = SFXS.pend = {w, args:arguments, self:this};
+      queueMicrotask(() => { if (SFXS.pend !== me) return; SFXS.pend = null;
+        if (rec && sfxsPlay('atk_' + k)){ const raw = SFX.raw(); SFXS.sw = raw ? raw.ac.currentTime : -9; } else _sw.apply(me.self, me.args); });
+      return; }
     return _sw.apply(this, arguments); };
   SFX.hit = function(w){ const k = sfxsKind(w), raw = SFX.raw && SFX.raw();
+    if (k && SFXS.buf['atk_' + k] && !SFXS.files['hit_' + k]) return;   // the blow's recording already has its impact
     if (k && raw){ const now = raw.ac.currentTime, at = now - SFXS.sw < SFXS.lag ? SFXS.sw + SFXS.lag : now;
       if (sfxsPlay('hit_' + k, at)) return; }
     return _hit.apply(this, arguments); };
