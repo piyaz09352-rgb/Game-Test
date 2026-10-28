@@ -16,9 +16,10 @@ const SFXS = {
     atk_bow1:'audio/sfx/bow_shot.mp3',   // (v178) a bow's normal shot (the arrow's landing keeps its own sound)
     atk_fist1:'audio/sfx/fist_attack1.mp3', atk_fist2:'audio/sfx/fist_attack2.mp3',   // (v179) the boxers' knuckles and gloves: first and second punch
     atk_2h1:'audio/sfx/twohand_attack1.mp3', atk_2h2:'audio/sfx/twohand_attack2.mp3',   // (v177) two-handed weapons that strike twice: first blow, second blow
+    crit:'audio/sfx/critical.mp3',   // (v181) every critical hit of the hero's
     miss:'audio/sfx/miss.mp3'   // (v172) every attack that misses ("Miss"), whoever swings it
   },
-  gain:{miss:.55, atk_sword1:.55, atk_dagger1:.75, atk_2h1:.55, atk_2h2:.55, atk_bow1:.6, atk_fist1:.6, atk_fist2:.6}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
+  gain:{miss:.55, atk_sword1:.55, atk_dagger1:.75, atk_2h1:.55, atk_2h2:.55, atk_bow1:.6, atk_fist1:.6, atk_fist2:.6, crit:.6}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
 };
 /* which recorded kind a weapon type is for the hero now: a one-handed sword is 'sword1' (a greatsword, the merchant's axes
    and two-handed blades are other kinds, not recorded yet) */
@@ -103,3 +104,6 @@ const SFXM = {t:-9};
       const k = sfxsKind('fist');
       if (k && SFXS.buf['atk_' + k]){ if (name.startsWith('mt_')){ const a = arguments, self = this; SFXS.blow(k, () => _pl.apply(self, a)); } return; } }
     return _pl.apply(this, arguments); }; }
+
+/* (v181) a critical hit: the recorded cue in place of the built-in drum */
+{ const _pl = SFX.play; SFX.play = function(name){ if (name === 'crit' && SFXS.buf.crit){ sfxsPlay('crit'); return; } return _pl.apply(this, arguments); }; }
