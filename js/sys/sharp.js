@@ -11,6 +11,8 @@
 'use strict';
 
 const SHARP = {k:0, ps:0, zoomAt:0, lastZ:1};
+// (v186) phones and tablets start on สูง (a mid-range phone stuttered painting the sharpest sprites); a choice made in Settings stays
+try { const saved = JSON.parse(localStorage.getItem(SETKEY) || '{}'); if (!('sharp' in saved) && GFX.touch) SETTINGS.sharp = 1; } catch (e) {}
 function sharpWant(){
   const lvl = +SETTINGS.sharp || 0, p = GFX.P[GFX.preset] || GFX.P.high;
   if (!lvl || GFX.preset === 'low') return null;   // the Low preset is for weak machines: it keeps its own coarse sprites

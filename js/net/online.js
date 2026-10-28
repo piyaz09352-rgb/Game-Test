@@ -60,7 +60,7 @@ function netTick(dt){
   /* (v185) the lobby line (name, class, level, map, party) reaches every online player, so it is sent only when it
      changes (checked every 2 s; HP alone at most every 6 s and only in a party) plus a 20 s heartbeat — it used to go out
      every 2 s from everyone to everyone */
-  if (NET.lobbyT <= 0){ NET.lobbyT = 2; const lp = {n:netName(), j:S.job, l:S.lvl, m:MAP_ID, h:Math.round(S.hp / DER.maxhp * 100), pt:NET.party || null, ...(typeof partyPres === 'function' ? partyPres() : {})};
+  if (NET.lobbyT <= 0){ NET.lobbyT = 2; const lp = {n:netName(), j:S.job, l:S.lvl, m:MAP_ID, h:Math.round(S.hp / DER.maxhp * 100), pt:NET.party || null, ...(typeof GAMEV !== 'undefined' && GAMEV ? {gv:GAMEV} : {}), ...(typeof partyPres === 'function' ? partyPres() : {})};
     const now = performance.now(), last = NET.lastLobby || {}, at = NET.lastLobbyAt || -1e9; let ch = false;
     for (const k in lp) if (k !== 'h' && JSON.stringify(lp[k]) !== JSON.stringify(last[k])){ ch = true; break; }
     if (!ch && lp.h !== last.h && lp.pt && now - at > 6000) ch = true;
