@@ -900,7 +900,7 @@ function drawHuman(cx, cfg, P){
     else if (k === 'lop'){ for (const sd of [-1, 1]){ const b = add(hc, [sd * 6.4, 10.6, -.4]), m = add(hc, [sd * 11.6, 7.4, .4]), t = add(hc, [sd * 12.6, .4, .8]);
         G(); cap(cx, b, m, 2.1, 2.6, em, {tex:inner}); G(); cap(cx, m, t, 2.6, 1.7, em, {tex:inner}); } }
     else if (k === 'bear' || k === 'mouse'){ const r = k === 'mouse' ? 3.8 : 2.9; for (const sd of [-1, 1]){ G(); ell(cx, add(hc, [sd * (k === 'mouse' ? 8.4 : 7.6), k === 'mouse' ? 11.8 : 11.2, -.8]), r, r, em, {tex:n => (n[2] > .35 && Math.hypot(n[0], n[1]) < .62 ? {m:ei} : undefined)}); } }
-    G(); for (let a = -1.2; a <= 1.21; a += .15) ell(cx, add(hc, [Math.sin(a) * 12.2, 2.2 + Math.cos(a) * 12.2, -.4]), .8, .8, M[cfg.bandMat || cfg.earMat || 'white']); }
+    if (!cfg.earNoBand){ G(); for (let a = -1.2; a <= 1.21; a += .15) ell(cx, add(hc, [Math.sin(a) * 12.2, 2.2 + Math.cos(a) * 12.2, -.4]), .8, .8, M[cfg.bandMat || cfg.earMat || 'white']); } }   // (v164) the cat folk's own ears grow from the hair: no headband
   if (cfg.hairBow){ const bm = M[cfg.hairBow], c0 = add(hc, [6.2 + sw * .2, 11.6, 3]);
     for (const sd of [-1, 1]){ G(); ell(cx, add(c0, [sd * 2.6, .6, 0]), 2.9, 2, bm, {rz:1.6}); G(); cap(cx, add(c0, [sd * .6, -.4, .3]), add(c0, [sd * 1.8, -3.6, .6]), .9, .7, bm, {}); }
     G(); ell(cx, c0, 1.2, 1.2, M[cfg.bowKnot || cfg.hairBow]); }
@@ -922,6 +922,8 @@ function drawHuman(cx, cfg, P){
     }
     if (k === 'muff'){ G(); for (let a = -1.45; a <= 1.46; a += .14) ell(cx, add(hc, [Math.sin(a) * 11.8, -1.6 + Math.cos(a) * 13.6, -.4]), .9, .9, si); } }
   if (cfg.mask){ G(); ell(cx, add(hc, [0, -4.2, 2.8]), 10.6, 5.6, M[cfg.mask], {tex:n => (n[2] < .1 ? false : n[1] > .5 ? false : undefined)}); }
+  // (v164) a ninja's cloth mask: wraps the lower face from under the eyes to the chin, with a seam across the nose
+  if (cfg.ninjaMask){ G(); ell(cx, add(hc, [0, -6.6, .9]), 10.6, 4.8, M[cfg.ninjaMask], {rz:10.75, tex:n => (n[2] < -.35 ? false : n[1] > .62 ? false : Math.abs(n[1] - .5) < .08 ? {t:2} : undefined)}); }
   if (cfg.earring){ for (const sd of [-1, 1]){ const e0 = add(hc, [sd * 10.6, -3.2, .9]); G(); ell(cx, e0, 1.1, 1.1, M[cfg.earring]); G(); ell(cx, add(e0, [sd * .25, -2.5, .2]), cfg.earBig ? 1.8 : 1.35, cfg.earBig ? 2.4 : 1.7, M[cfg.earring]); } }
   if (cfg.pouch){ G(); ell(cx, lean([hipC[0] - 4.8, 10.6 + B, 3.4]), 2.4, 2.7, M.tan, {tex:n => (n[1] > .55 ? {m:M.leather} : undefined)}); }
   if (cfg.necklace || cfg.pendant){ G(); for (let a = -1.3; a <= 1.3; a += .2) dot(cx, lean([hipC[0] + Math.sin(a) * 5, 19.6 + B - Math.cos(a) * 1.6, Math.cos(a) * 5.4 + (cfg.chest ? .5 : 0)]), M[cfg.neckMat || 'gold'], 1); }
@@ -983,9 +985,9 @@ function drawHuman(cx, cfg, P){
         const len = (9.5 + Math.max(0, wt) * .3) * WPN_BIG * 1.15, a0 = add(h, mul(P2.wdir, .2)), a1 = add(h, mul(P2.wdir, len + .5));
         G(); cap(cx, a0, a1, 1.45, 1.0, strapM, {}); G(); ell(cx, a1, 1.0, 1.0, fit); G(); ell(cx, a0, 1.6, 1.6, fit, {rz:.5});
       }
-      else if (w === 'staff'){
-        // head over the right shoulder beside the head, the foot toward the left hip
-        const len = (20 + Math.max(0, wt) * .5) * (two ? .86 : .5) * WPN_BIG, tot = len + 6, tip = back(-10.6, 27.5, zb), sn = Math.min(.8, (27.5 - 3) / tot);
+      else if (w === 'staff' || cfg.axe){
+        // head over the right shoulder beside the head, the foot toward the left hip (v164: an axe hangs the same way, by its haft)
+        const len = cfg.axe ? (17 + Math.max(0, wt) * .7) * (two ? 1.45 : .88) * WPN_BIG * (two ? 1.02 : .82) : (20 + Math.max(0, wt) * .5) * (two ? .86 : .5) * WPN_BIG, tot = len + 6, tip = back(-10.6, 27.5, zb), sn = Math.min(.8, (27.5 - 3) / tot);
         P2.wdir = nrm(upper([-Math.sqrt(1 - sn * sn), sn, 0])); const h = add(tip, mul(P2.wdir, -len));
         sash(-6.2, 6.0, .55, strapM);
         drawWeapon(cx, w, P2, h, h, G, cf);
@@ -1313,7 +1315,22 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   (cx.wsegs || (cx.wsegs = [])).push(w === 'staff' ? [proj(cx, add(tip, mul(dir, -.4))), proj(cx, add(tip, mul(dir, 3.2)))]   // (v159) a staff glows at its head only, never along the shaft
     : [proj(cx, add(base, mul(dir, kat ? 2 : 1))), proj(cx, tip)]);   // the blade in this frame
   G();
-  if (w === 'sword'){
+  if (w === 'sword' && cfg.axe){
+    // (v164) the merchant line's axe: a wooden haft wrapped at the grip, an iron head with a curved bit (a bearded
+    // hand axe in one hand; a broad double-bit war axe in two), a steel cap on the butt
+    const wvR = [-dir[1], dir[0], 0], wv = Math.hypot(...wvR) < .25 ? [1, 0, 0] : nrm(wvR), hl = len * (two ? 1.02 : .82), grip = two ? 6.4 : 3.6;
+    cap(cx, add(base, mul(dir, -grip)), add(base, mul(dir, hl)), two ? 1.05 : .9, two ? .95 : .82, M[SH[wt] || 'wood'], {tex:(n, lo, q, t) => (t < grip / (hl + grip) && Math.abs(Math.sin(t * 40)) < .35 ? {m:M.leather, t:1} : undefined)});
+    G(); ell(cx, add(base, mul(dir, -grip - .6)), 1.1, 1.1, M.steel);
+    const hd = add(base, mul(dir, hl - (two ? 2.6 : 2))), bw = two ? 6.6 : 5, bh = two ? 5.4 : 3.8, metal = blade;
+    for (const sd of (two ? [-1, 1] : [1])){
+      G(); cap(cx, add(hd, mul(wv, sd * .6)), add(hd, mul(wv, sd * bw * .55)), two ? 1.5 : 1.2, two ? 1.1 : .9, metal, {tex:() => ({t:1})});   // the cheek
+      const edge = []; for (let i = 0; i <= 8; i++){ const u = -1 + i / 4; edge.push(add(add(hd, mul(wv, sd * bw * (1 - .22 * u * u))), mul(dir, u * bh))); }
+      G(); for (let i = 0; i < edge.length; i++){ cap(cx, add(hd, mul(wv, sd * bw * .45)), edge[i], .55, .5, metal, {rz:.45, tex:() => ({t:1})}); }
+      G(); for (let i = 0; i < edge.length - 1; i++) cap(cx, edge[i], edge[i + 1], .5, .5, M.white, {rz:.4, tex:() => ({t:0})});
+    }
+    if (!two){ G(); cap(cx, add(hd, mul(wv, -.6)), add(add(hd, mul(wv, -2.6)), mul(dir, -.6)), .9, .5, M.steel, {}); }   // a short spike on the back
+    G(); ell(cx, add(hd, mul(dir, two ? 2.6 : 2)), 1, 1, M.steel);
+  } else if (w === 'sword'){
     // (v159) a real sword, not a stick: a FLAT blade (laid as thin strips across its width) with bevelled bright edges, a
     // darker fuller down the middle and a point; a short ricasso, a crossguard with quillons bent toward the blade, a
     // wrapped grip and a pommel. Arming sword: blade about 6.5 widths long, guard 3 blade-widths, grip one hand.
@@ -1708,7 +1725,7 @@ function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
     return img;
   }
   const mb = MOBS[key], A = MOB_ACTIONS[act], fs = Math.ceil(mb.fs * K), F = new Frame(fs, fs + Math.ceil(fs * MOB_PAD)), cx = new Ctx(F, -dir * Math.PI / 4, fs / 2, fs - 6 * K, K * (mb.scale || 1));
-  if (mb.human){ drawHuman(cx, mb.human, humanPose(act, f, A.n, mb.human.weapon)); const img = finish(F, K); return img; }
+  if (mb.human){ drawHuman(cx, mb.human, humanPose(act, f, A.n, mb.human.weapon)); const img = finish(F, K); if (mb.human.paint && cx.head) paintHead(img, F, cx); return img; }
   mb.model(cx, act, f, A.n);
   return finish(F, K);
 }

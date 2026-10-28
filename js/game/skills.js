@@ -164,9 +164,9 @@ function execSkill(id, lv, t){
       if (sk.fx === 'punch') P.swing = 1;
       break;
     case 'bolt':
-      for (let i = 0; i < hits; i++) projs.push({k:sk.fx, x:P.x, y:P.y - 36, t, delay:i * .14, speed:sk.fx === 'ice' ? 470 : 540, wob:Math.random() * 6,
+      for (let i = 0; i < hits; i++) projs.push({k:sk.fx, x:P.x, y:P.y - 36, t, delay:i * (sk.fx === 'shuriken' || sk.fx === 'kunai' || sk.fx === 'coin' ? .08 : .14), speed:sk.fx === 'ice' ? 470 : sk.fx === 'kunai' || sk.fx === 'shuriken' ? 760 : 540, wob:Math.random() * 6,
         hit:() => { hitM(t, sk.dmg(lv)); if (sk.freeze) applyStatus(t, {freeze:sk.freeze(lv)}); if (sk.poison) applyStatus(t, {poison:sk.poison(lv)});
-          VFX.play({ice:'iceHit', holy:'holyHit', dart:'poisonHit'}[sk.fx] || 'fireHit', {x:t.x, y:t.y - MOB_H[t.type] * .5, m:t}); }});
+          VFX.play({ice:'iceHit', holy:'holyHit', dart:'poisonHit', hex:'hexHit', kunai:'slashHit', shuriken:'slashHit', coin:'coinHit'}[sk.fx] || 'fireHit', {x:t.x, y:t.y - MOB_H[t.type] * .5, m:t}); }});
       break;
     case 'ranged': {
       const mul = P.buffs.backstep ? P.buffs.backstep.nextShot : 1; delete P.buffs.backstep;

@@ -154,7 +154,8 @@ for (const [id, slot, th, en, lv, price, st] of GEAR_LIST){ const pack = slot ==
 const GEAR_SLOT = {shield:['โล่ (มือซ้าย)', 'Shield (left hand)'], pants:['กางเกง', 'Legs'], shoes:['รองเท้า', 'Footwear'], armor:['เกราะ', 'Armor'], head:['หมวก', 'Headgear'], ammo:['ลูกธนู', 'Arrows'], weapon:['อาวุธ', 'Weapon'], acc:['เครื่องประดับ', 'Accessory']};
 for (const id in GEAR) if (GEAR[id].st.wtype) ITEMS[id].wtype = GEAR[id].st.wtype;
 const lineOk = st => !(st && st.line && !jobChain().includes(st.line));   // class gear: only its own line
-const canWield = it => lineOk(it.st) && (!it.wtype || it.wtype === JOBS[S.job].weapon.type) && !(it.st && it.st.wtype === 'dagger' && it.st.hands === '2h' && !jobChain().includes('rogue'));   // twin daggers: the thief line only
+const canWield = it => lineOk(it.st) && (!it.wtype || it.wtype === JOBS[S.job].weapon.type) && !(it.st && it.st.wtype === 'dagger' && it.st.hands === '2h' && !jobChain().includes('rogue') && !jobChain().includes('ninja'))   // twin daggers / katana: the thief and ninja lines only
+  && (typeof wieldOk !== 'function' || wieldOk(it));   // (v164) extra rules (sys/newlines.js: axes for the merchant line only, and only axes for it)
 /* monsters drop gear near their level: armour, headgear, accessories, and weapons of the killer's own class */
 function gearDrop(m){
   const lvl = m.def.lvl, wt = JOBS[S.job].weapon.type;

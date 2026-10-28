@@ -839,6 +839,28 @@ const VFX = (() => {
       g.translate(x, y); g.rotate(T * 10); g.strokeStyle = col; g.lineWidth = 1; g.beginPath(); g.arc(0, 0, 5, 0, 4); g.stroke();
       if (GFX.fx && Math.random() < .7 * lvlMul()) emit({x:p.x, y:p.y + 14, z:14, vx:R(-8, 8), vz:R(-4, 6), life:R(.2, .4), size:R(1.2, 2), shape:'star', col});
     }
+    else if (p.k === 'hex'){
+      // (v164) a hex: a dark violet orb with a pale core and wisps trailing behind
+      g.globalCompositeOperation = 'lighter'; g.drawImage(glowTex('rgba(150,70,220,1)'), x - 14, y - 14, 28, 28); g.globalCompositeOperation = 'source-over';
+      g.fillStyle = 'rgba(40,10,60,1)'; g.beginPath(); g.arc(x, y, 4.2, 0, 7); g.fill(); g.fillStyle = 'rgba(220,180,255,1)'; g.beginPath(); g.arc(x - 1, y - 1, 1.6, 0, 7); g.fill();
+      if (GFX.fx && Math.random() < .6 * lvlMul()) emit({x:p.x, y:p.y + 14, z:14, vx:R(-10, 10), vz:R(-6, 6), life:R(.3, .6), size:R(2, 4), grow:6, shape:'smoke', col:'rgba(110,50,160,1)', add:false});
+    }
+    else if (p.k === 'kunai'){
+      // (v164) a kunai: a dark leaf blade, a wrapped grip and the ring at the end
+      g.translate(x, y); g.rotate(p.ang || 0); g.fillStyle = '#c8ccd4'; g.beginPath(); g.moveTo(8, 0); g.lineTo(1, -2.2); g.lineTo(-1, 0); g.lineTo(1, 2.2); g.closePath(); g.fill();
+      g.fillStyle = '#2a2a30'; g.fillRect(-6, -.9, 5, 1.8); g.strokeStyle = '#2a2a30'; g.lineWidth = 1; g.beginPath(); g.arc(-7.6, 0, 1.6, 0, 7); g.stroke();
+    }
+    else if (p.k === 'shuriken'){
+      // (v164) a four-point throwing star, spinning
+      g.translate(x, y); g.rotate(T * 22); g.fillStyle = '#b8bcc6'; g.beginPath();
+      for (let i = 0; i < 8; i++){ const a = i / 8 * Math.PI * 2, r = i % 2 ? 1.6 : 5.4; g.lineTo(Math.cos(a) * r, Math.sin(a) * r); } g.closePath(); g.fill();
+      g.fillStyle = '#4a4e58'; g.beginPath(); g.arc(0, 0, 1.1, 0, 7); g.fill();
+    }
+    else if (p.k === 'coin'){
+      // (v164) a gold coin, tumbling edge over face
+      const f = Math.abs(Math.sin(T * 18 + (p.wob || 0))); g.globalCompositeOperation = 'lighter'; g.drawImage(glowTex(GOLD), x - 8, y - 8, 16, 16); g.globalCompositeOperation = 'source-over';
+      g.fillStyle = '#e8b830'; g.beginPath(); g.ellipse(x, y, 3.6 * f + .6, 3.6, 0, 0, 7); g.fill(); g.fillStyle = '#fff0a0'; g.beginPath(); g.ellipse(x - .6 * f, y - .6, 1.8 * f + .2, 1.8, 0, 0, 7); g.fill();
+    }
     else if (p.k === 'ice'){
       // ice lance: a pale crystal spear in a cold halo, shedding snowflakes and mist
       g.globalCompositeOperation = 'lighter'; g.drawImage(glowTex(ICE), x - 16, y - 16, 32, 32); g.globalCompositeOperation = 'source-over';

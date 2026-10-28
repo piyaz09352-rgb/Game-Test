@@ -1053,8 +1053,13 @@ const BEAST = (() => {
   function make(key, spec){
     if (POINTY_HATS.includes(spec.hat)) spec = {...spec, hat:undefined};
     const fs = spec.fs || 64;
-    if (spec.arch === 'human' && spec.old) SPR.MOBS[key] = {name:key, fs, scale:spec.scale || 1, human:humanCfg(key, spec), model:() => {}};
-    else if (spec.arch === 'human') SPR.MOBS[key] = {name:key, fs:Math.max(fs, 96), scale:spec.scale || 1, model:hum2(key, spec)};   // natural build (v27)
+    // (v164) every humanoid monster wears the heroes' own body (the owner's call: the v27 "natural build" read as a lump
+    // of bread), dressed in its own skin, clothes, hair, hat, horns, fangs, wings and weapon; giants are drawn a size up,
+    // ghosts and ghouls thin
+    if (spec.arch === 'human'){ const body = humBody(key, spec), cfg = humanCfg(key, spec);
+      Object.assign(cfg, {paint:true, jag:.2, bangF:12, strands:10, spikes:spec.spikes ?? 14, spikeLen:spec.spikeLen ?? 4.6, bangs:!spec.hat || spec.hat === 'band' || spec.hat === 'headwrap', paintBangs:typeof BANG_SWEEP !== 'undefined' ? BANG_SWEEP : undefined, crown:3,
+        bodyScale:body === 'brute' ? 1.12 : body === 'gaunt' ? .96 : 1, slim:body === 'gaunt' ? .82 : body === 'brute' ? 1.18 : undefined, iris:spec.iris || (/preta|pop|ghoul|skel|krahang|wraith|ghost|phi/.test(key) ? 'irisRd' : 'irisBr')});
+      SPR.MOBS[key] = {name:key, fs:Math.max(fs, 96), scale:spec.scale || 1, human:cfg, model:() => {}}; }
     else if (spec.arch === 'quad' && !spec.old) SPR.MOBS[key] = (spec.head === 'elephant' || spec.wing) && fs < 96 ? {name:key, fs:96, scale:(spec.scale || 1) * ((spec.scale || 1) >= 2 ? 1 : 1.15), model:quad2(key, spec)} : {name:key, fs, scale:(spec.scale || 1) * ((spec.scale || 1) >= 2 ? 1 : 1.15), model:quad2(key, spec)};   // natural anatomy (v21)
     else if (spec.arch === 'bird' && spec.bat && !spec.old) SPR.MOBS[key] = {name:key, fs, scale:spec.scale || 1, model:bat2(key, spec)};   // natural bats (v23)
     else if (spec.arch === 'bird' && !spec.bat && !spec.old) SPR.MOBS[key] = {name:key, fs, scale:spec.scale || 1, model:bird2(key, spec)};   // natural birds (v21)
