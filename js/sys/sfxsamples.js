@@ -14,12 +14,13 @@ const SFXS = {
     atk_sword1:'audio/sfx/sword1_attack.mp3',   // (v173) a one-handed sword's normal attack: one blow, one sound
     atk_dagger1:'audio/sfx/dagger1_attack.mp3',   // (v174) a single dagger's normal attack
     atk_bow1:'audio/sfx/bow_shot.mp3',   // (v178) a bow's normal shot (the arrow's landing keeps its own sound)
+    atk_star1:'audio/sfx/shuriken_throw.mp3',   // (v185) the ninja's star thrown (its landing keeps the built-in "tink")
     atk_fist1:'audio/sfx/fist_attack1.mp3', atk_fist2:'audio/sfx/fist_attack2.mp3',   // (v179) the boxers' knuckles and gloves: first and second punch
     atk_2h1:'audio/sfx/twohand_attack1.mp3', atk_2h2:'audio/sfx/twohand_attack2.mp3',   // (v177) two-handed weapons that strike twice: first blow, second blow
     crit:'audio/sfx/critical2.mp3',   // (v181) every critical hit of the hero's (v184: louder, a new file name so no old copy is kept)
     miss:'audio/sfx/miss.mp3'   // (v172) every attack that misses ("Miss"), whoever swings it
   },
-  gain:{miss:.55, atk_sword1:.55, atk_dagger1:.75, atk_2h1:.55, atk_2h2:.55, atk_bow1:.6, atk_fist1:.6, atk_fist2:.6, crit:1}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
+  gain:{miss:.55, atk_sword1:.55, atk_dagger1:.75, atk_2h1:.55, atk_2h2:.55, atk_bow1:.6, atk_fist1:.6, atk_fist2:.6, atk_star1:.6, crit:1}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
 };
 /* which recorded kind a weapon type is for the hero now: a one-handed sword is 'sword1' (a greatsword, the merchant's axes
    and two-handed blades are other kinds, not recorded yet) */
@@ -36,6 +37,7 @@ function sfxsKind(w){
     if (w === 'fist' && !sfxsClaw()) return 'fist' + BA2.blow;
     return '2h' + BA2.blow; }
   if (w === 'bow') return 'bow1';
+  if (w === 'shuriken') return 'star1';   // (v185) a thrown star
   if (w === 'dagger'){   // (v174) a single dagger: not twin daggers (a worn มีดคู่, or the thief line's own pair) and not a two-handed katana
     const id = S.gear && S.gear.weapon, it = id && ITEMS[id], base = (it && it.base) || id || '';
     if (/^w_tdagger\d+$/.test(base) || (it && it.st && it.st.hands === '2h') || (!it && SPR.CHARS[S.job] && SPR.CHARS[S.job].twin)) return null;
@@ -78,7 +80,7 @@ function sfxsPlay(k, at){
     fallback(); };
   SFX.swing = function(w){ const a = arguments, self = this; SFXS.blow(sfxsKind(w), () => _sw.apply(self, a)); };
   SFX.hit = function(w){ const k = sfxsKind(w), raw = SFX.raw && SFX.raw();
-    if (k && k !== 'bow1' && SFXS.buf['atk_' + k] && !SFXS.files['hit_' + k]) return;   // the blow's recording already has its impact (an arrow still lands with its own)
+    if (k && k !== 'bow1' && k !== 'star1' && SFXS.buf['atk_' + k] && !SFXS.files['hit_' + k]) return;   // the blow's recording already has its impact (an arrow still lands with its own)
     if (k && raw){ const now = raw.ac.currentTime, at = now - SFXS.sw < SFXS.lag ? SFXS.sw + SFXS.lag : now;
       if (sfxsPlay('hit_' + k, at)) return; }
     return _hit.apply(this, arguments); };
