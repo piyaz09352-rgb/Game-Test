@@ -38,7 +38,7 @@ const SK8_NEW = {
   bladerhythm:{job:'blade', name:'จังหวะดาบ', en:'Blade Rhythm', max:10, type:'passive', pas:lv => ({autoPct:lv * .03, aspdPct:lv * .012, dbl:lv * .01}),
     desc:lv => L(`ตีปกติแรงขึ้น ${lv * 3}% · ตีเร็วขึ้น ${+(lv * 1.2).toFixed(1)}% · โอกาสตี 2 ครั้ง ${lv}%`, `Basic attacks +${lv * 3}% · ${+(lv * 1.2).toFixed(1)}% faster · ${lv}% double strike`)},
   guardstance:{job:'blade', name:'ท่าตั้งรับ', en:'Guard Stance', short:'ตั้งรับ', shortEn:'Guard', max:10, type:'buff', sp:() => 20, cd:40, fx:'goldshield', anim:'skill', act:'shout',
-    buff:lv => ({t:20, dmgRed:lv * .025, reflect:lv * .01, def:lv * 3}), desc:lv => L(`20 วิ · รับดาเมจ −${+(lv * 2.5).toFixed(1)}% · DEF +${lv * 3} · สะท้อน ${lv}%`, `20s · damage taken −${+(lv * 2.5).toFixed(1)}% · DEF +${lv * 3} · reflect ${lv}%`)},
+    buff:lv => ({t:20, dmgRed:+(lv * .03).toFixed(2)}), desc:lv => L(`20 วิ · รับดาเมจ −${lv * 3}%`, `20s · damage taken −${lv * 3}%`)},   // (v166) only the damage cut: DEF and reflect are Bastion's
   warpath:{job:'warlord', name:'วิถีขุนศึก', en:'Warpath', max:10, type:'passive', pas:lv => ({autoPct:lv * .04, critDmg:lv * .03, aspdPct:lv * .01}),
     desc:lv => L(`ตีปกติแรงขึ้น ${lv * 4}% · คริแรงขึ้น ${lv * 3}% · ตีเร็วขึ้น ${lv}%`, `Basic attacks +${lv * 4}% · crits +${lv * 3}% · ${lv}% faster`)},
   cleave:{job:'warlord', name:'ฟันซ้ำ', en:'Cleave', max:10, type:'passive', pas:lv => ({autoExtra:lv * .07, dbl:lv * .01}),

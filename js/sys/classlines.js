@@ -51,8 +51,8 @@ Object.assign(SKILLS, {
   vajrabody:{job:'bulwark', name:'กายวชิระ', en:'Vajra Body', max:10, type:'passive', pas:lv => ({dmgRed:lv * .015, def:lv * 3, hpPct:lv * .03, lastStand:lv >= 10 ? .3 : 0}),
     desc:lv => L(`รับดาเมจ −${+(lv * 1.5).toFixed(1)}% · DEF +${lv * 3} · Max HP +${lv * 3}%${lv >= 10 ? ' · รอดจากความตาย 1 ครั้งทุก 5 นาที' : ' · Lv 10: รอดจากความตาย'}`, `Damage taken −${+(lv * 1.5).toFixed(1)}% · DEF +${lv * 3} · Max HP +${lv * 3}%${lv >= 10 ? ' · survive a death every 5 min' : ' · Lv 10: survive a death'}`)},
   bastion:{job:'bulwark', name:'ปราการพิทักษ์', en:'Bastion', short:'ปราการ', shortEn:'Bastion', max:10, type:'buff', sp:() => 45, cd:45, fx:'goldshield', anim:'skill', req:{vajrabody:3},
-    buff:lv => ({t:30, def:lv * 10, dmgRed:+(lv * .02).toFixed(2), reflect:+(lv * .01).toFixed(2)}),
-    desc:lv => L(`30 วิ · DEF +${lv * 10} · รับดาเมจ −${lv * 2}% · สะท้อน ${lv}% · ส่งให้ผู้เล่นรอบตัวด้วย`, `30s · DEF +${lv * 10} · damage taken −${lv * 2}% · reflect ${lv}% · also reaches players around you`)},
+    buff:lv => ({t:30, def:lv * 12, reflect:+(lv * .02).toFixed(2)}),   // (v166) DEF and reflect for the party; the damage cut is Guard Stance's (self)
+    desc:lv => L(`30 วิ · DEF +${lv * 12} · สะท้อน ${lv * 2}% · ส่งให้ผู้เล่นรอบตัวด้วย`, `30s · DEF +${lv * 12} · reflect ${lv * 2}% · also reaches players around you`)},
   vanguard:{job:'bulwark', name:'ทัพหน้าทลาย', en:'Vanguard Crash', short:'ทัพหน้า', shortEn:'Crash', max:10, type:'aoeSelf', sp:lv => 30 + lv * 2, cd:6, radius:110, fx:'quake', anim:'skill', req:{vajrabody:1},
     hits:() => 3, every:.25, dmg:lv => 1.5 + lv * .25, st:lv => ({taunt:1, atkDown:[.02 * lv, 6]}),
     desc:lv => L(`รอบตัว 110 · 3 ครั้ง ครั้งละ ${pct(1.5 + lv * .25)} ATK · ดึงมอนทั้งหมด · ATK มอน −${lv * 2}% 6 วิ`, `Around you (110) · 3 hits × ${pct(1.5 + lv * .25)} ATK · taunts all · enemy ATK −${lv * 2}% for 6s`)},
