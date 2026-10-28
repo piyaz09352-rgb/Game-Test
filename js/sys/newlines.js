@@ -66,7 +66,7 @@ const NL_ST = {
   slow:v => [`ช้าลง ${nlP(v[0])} ${nlN(v[1])} วิ`, `Slowed ${nlP(v[0])} for ${nlN(v[1])}s`], poison:v => [`พิษ ${nlP(v[0])} ATK/วิ ${nlN(v[1])} วิ`, `Poison ${nlP(v[0])} ATK/s for ${nlN(v[1])}s`],
   defDown:v => [`DEF ศัตรู −${nlP(v[0])} ${nlN(v[1])} วิ`, `Enemy DEF −${nlP(v[0])} for ${nlN(v[1])}s`], atkDown:v => [`ATK ศัตรู −${nlP(v[0])} ${nlN(v[1])} วิ`, `Enemy ATK −${nlP(v[0])} for ${nlN(v[1])}s`],
   taunt:() => ['ดึงความสนใจมอน', 'Taunts'], shock:v => [`ช็อต ${nlN(v)} วิ`, `Shock ${nlN(v)}s`], freeze:v => [`แช่แข็ง ${nlP(v[0])} ${nlN(v[1])} วิ`, `Freeze ${nlP(v[0])} for ${nlN(v[1])}s`],
-  curse:v => [`คำสาป: ศัตรูรับดาเมจ +${nlP(v[0])} และเสีย ${nlP(v[2] || 0)} MATK/วิ ${nlN(v[1])} วิ`, `Curse: enemy takes +${nlP(v[0])} damage and ${nlP(v[2] || 0)} MATK/s for ${nlN(v[1])}s`],
+  curse:v => (v[2] ? [`คำสาป: ศัตรูรับดาเมจ +${nlP(v[0])} และเสีย ${nlP(v[2])} MATK/วิ ${nlN(v[1])} วิ`, `Curse: enemy takes +${nlP(v[0])} damage and ${nlP(v[2])} MATK/s for ${nlN(v[1])}s`] : [`ศัตรูรับดาเมจ +${nlP(v[0])} ${nlN(v[1])} วิ`, `Enemy takes +${nlP(v[0])} damage for ${nlN(v[1])}s`]),
   blind:v => [`มืดบอด ${nlN(v)} วิ (ตีพลาดครึ่งหนึ่ง)`, `Blind ${nlN(v)}s (misses half its blows)`], fear:v => [`หวาดกลัววิ่งหนี ${nlN(v)} วิ`, `Fear: runs away ${nlN(v)}s`],
   doom:v => [`คำสาปมรณะ: ครบ ${nlN(v[0])} วิ ระเบิด ${nlP(v[1])} MATK`, `Doom: after ${nlN(v[0])}s it bursts for ${nlP(v[1])} MATK`], charm:v => [`หลงเสน่ห์ ไม่โจมตี ${nlN(v)} วิ`, `Charmed: will not attack for ${nlN(v)}s`]};
 const nlSt = o => Object.entries(o || {}).filter(([k, v]) => NL_ST[k] && v).map(([k, v]) => NL_ST[k](v));
@@ -84,7 +84,7 @@ function nlDesc(s){
     if (s.heal) push([`ฟื้น HP ${nlP(s.healPct(lv))} ของ Max HP`, `Restores ${nlP(s.healPct(lv))} of Max HP`]);
     if (s.st) nlSt(s.st(lv)).forEach(push); else if (s.stun) push(NL_ST.stun(s.stun(lv)));
     if (s.knock) push([`กระเด็น`, `knockback`]);
-    if (s.buff){ const b = s.buff(lv); nlStats(b).forEach(push); if (b.dmgRed) push([`รับดาเมจ −${nlP(b.dmgRed)}`, `Damage taken −${nlP(b.dmgRed)}`]); if (b.stealth) push(['ล่องหน', 'Stealth']);
+    if (s.buff){ const b = s.buff(lv); nlStats(b).forEach(push); if (b.dmgRed) push([`รับดาเมจ −${nlP(b.dmgRed)}`, `Damage taken −${nlP(b.dmgRed)}`]); if (b.stealth) push(['ล่องหน', 'Stealth']); if (b.regenPct) push([`ฟื้น HP ${nlP(b.regenPct)} ของ Max HP ทุก ${nlN(b.every || 3)} วิ`, `restores ${nlP(b.regenPct)} of Max HP every ${nlN(b.every || 3)}s`]);
       if (b.sureCrit) push(['ตีถัดไปคริแน่นอน', 'next blow is a sure critical']); push([`นาน ${nlN(b.t)} วิ`, `for ${nlN(b.t)}s`]); if (s.team) push(['ส่งให้ผู้เล่นรอบตัวด้วย', 'also reaches players near you']); }
     if (s.pas){ const p = s.pas(lv); nlStats(p).forEach(push); if (p.dmgRed) push([`รับดาเมจ −${nlP(p.dmgRed)}`, `Damage taken −${nlP(p.dmgRed)}`]); if (p.lastStand) push(['รอดจากความตาย 1 ครั้งทุก 5 นาที', 'survives a deadly blow once every 5 minutes']); }
     if (s.dist) push([`ถอย/วาร์ป ${Math.round(s.dist(lv))}`, `moves ${Math.round(s.dist(lv))}`]);
@@ -138,22 +138,22 @@ nlAtk('coinbash', 'merchant', 'ทุ่มเหรียญ', 'Coin Bash', ['�
 nlAtk('coinvolley', 'merchant', 'โปรยเหรียญ', 'Coin Volley', ['โปรยเหรียญ', 'Coins'], {type:'bolt', fx:'coin', act:'throw', sp:lv => 10 + lv, cd:1.2, range:170, hits:() => 3, dmg:lv => .55 + lv * .12, bia:lv => 10 + lv * 6});
 nlPas('haggle', 'merchant', 'ต่อราคา', 'Haggle', lv => ({biaPct:lv * .02, critRes:lv}));
 nlPas('cartguard', 'merchant', 'เกวียนคุ้มกัน', 'Cart Guard', lv => ({def:lv * 2, hpPct:lv * .02}));
-nlBuf('merchantcry', 'merchant', 'ตะโกนขายของ', 'Market Cry', ['ตะโกนขาย', 'Cry'], {fx:'ramwai', act:'shout', sp:() => 25, cd:40, team:1, buff:lv => ({t:40, atkPct:+(lv * .015).toFixed(3), crit:+(lv * .5).toFixed(1)})});
+nlBuf('merchantcry', 'merchant', 'ตะโกนขายของ', 'Market Cry', ['ตะโกนขาย', 'Cry'], {fx:'ramwai', act:'shout', sp:() => 25, cd:40, team:1, buff:lv => ({t:40, atkPct:+(lv * .02).toFixed(2)})});
 nlPas('bigaxe', 'tradelord', 'ขวานใหญ่', 'Great Axe', lv => ({atkPct:lv * .025, critDmg:lv * .02}));
 nlAtk('axestorm', 'tradelord', 'พายุขวาน', 'Axe Storm', ['พายุขวาน', 'Storm'], {type:'aoeSelf', fx:'bladestorm', act:'whirl', sp:lv => 26 + lv * 2, cd:4, radius:100, hits:() => 4, every:.18, dmg:lv => .8 + lv * .12});
 nlAtk('goldrush', 'tradelord', 'ถล่มทอง', 'Gold Rush', ['ถล่มทอง', 'Gold Rush'], {type:'melee', fx:'coinBurst', act:'slam', sp:lv => 16 + lv * 2, cd:2.5, dmg:lv => 4 + lv * .65, bia:lv => 100 + lv * 60});
 nlAtk('cartcrash', 'tradelord', 'เข็นเกวียนทลาย', 'Cart Crash', ['เกวียนทลาย', 'Cart'], {type:'line', fx:'earthsplit', act:'heave', sp:lv => 24 + lv * 2, cd:4, len:180, width:34, dmg:lv => 2.5 + lv * .4, knock:30});
 nlAtk('debtcollect', 'tradelord', 'ทวงหนี้', 'Debt Collector', ['ทวงหนี้', 'Collect'], {type:'dash', fx:'charge', act:'lunge', sp:lv => 20 + lv * 2, cd:5, range:150, dmg:lv => 2 + lv * .35, stun:() => 1});
-nlBuf('tradewind', 'tradelord', 'ลมการค้า', 'Trade Winds', ['ลมการค้า', 'Winds'], {fx:'ramwai', act:'shout', sp:() => 35, cd:45, team:1, buff:lv => ({t:40, aspdPct:+(lv * .02).toFixed(2), flee:lv * 3})});
+nlBuf('tradewind', 'tradelord', 'ลมการค้า', 'Trade Winds', ['ลมการค้า', 'Winds'], {fx:'ramwai', act:'shout', sp:() => 35, cd:45, team:1, buff:lv => ({t:40, aspdPct:+(lv * .025).toFixed(3)})});
 nlPas('appraisal', 'tradelord', 'ตาทองประเมินค่า', 'Golden Eye', lv => ({crit:lv, biaPct:lv * .02}));
-nlBuf('moneywall', 'tradelord', 'กำแพงเงิน', 'Wall of Money', ['กำแพงเงิน', 'Money Wall'], {fx:'goldshield', sp:() => 30, cd:40, bia:lv => 200 + lv * 80, buff:lv => ({t:25, def:lv * 5, dmgRed:+(lv * .025).toFixed(3)})});
+nlBuf('moneywall', 'tradelord', 'กำแพงเงิน', 'Wall of Money', ['กำแพงเงิน', 'Money Wall'], {fx:'goldshield', sp:() => 30, cd:40, bia:lv => 200 + lv * 80, buff:lv => ({t:25, def:lv * 8})});
 nlPas('tycoonaxe', 'tycoon', 'ขวานเศรษฐี', "Tycoon's Axe", lv => ({atkPct:lv * .03, crit:lv}));
 nlAtk('goldenarc', 'tycoon', 'วงขวานทอง', 'Golden Arc', ['วงขวานทอง', 'Arc'], {type:'aoeSelf', fx:'bladestorm', act:'whirl', sp:lv => 40 + lv * 3, cd:4, radius:120, hits:() => 3, every:.2, dmg:lv => 1.6 + lv * .25});
 nlAtk('midasstrike', 'tycoon', 'หัตถ์ไมดาส', 'Midas Strike', ['ไมดาส', 'Midas'], {type:'melee', fx:'coinBurst', act:'slam', sig:1, sp:lv => 50 + lv * 4, cd:8, dmg:lv => 9 + lv * 1.2, st:() => ({stun:1.2}), bia:lv => 500 + lv * 250});
 nlAtk('coinstorm', 'tycoon', 'พายุเงินทอง', 'Storm of Gold', ['พายุทอง', 'Gold Storm'], {type:'aoeTarget', fx:'coinStorm', act:'throw', sp:lv => 45 + lv * 3, cd:5, range:220, radius:130, hits:() => 5, every:.25, dmg:lv => .9 + lv * .14, bia:lv => 150 + lv * 60});
 nlAtk('goldshower', 'tycoon', 'ห่าเหรียญทอง', 'Gold Shower', ['ห่าเหรียญ', 'Shower'], {type:'bolt', fx:'coin', act:'throw', sp:lv => 30 + lv * 2, cd:1.5, range:190, hits:() => 5, dmg:lv => .75 + lv * .1, bia:lv => 60 + lv * 30});
-nlBuf('grandmarket', 'tycoon', 'ตลาดนัดใหญ่', 'Grand Market', ['ตลาดใหญ่', 'Market'], {fx:'ramwai', act:'shout', sp:() => 55, cd:50, team:1, buff:lv => ({t:45, atkPct:+(lv * .02).toFixed(2), matkPct:+(lv * .02).toFixed(2), dmgRed:+(lv * .01).toFixed(2)})});
-nlBuf('goldbody', 'tycoon', 'กายทองคำ', 'Body of Gold', ['กายทอง', 'Gold Body'], {fx:'goldshield', sp:() => 45, cd:40, buff:lv => ({t:20, dmgRed:+(lv * .03).toFixed(2), reflect:+(lv * .01).toFixed(2)})});
+nlBuf('grandmarket', 'tycoon', 'ตลาดนัดใหญ่', 'Grand Market', ['ตลาดใหญ่', 'Market'], {fx:'ramwai', act:'shout', sp:() => 55, cd:50, team:1, buff:lv => ({t:45, crit:+(lv * .8).toFixed(1)})});
+nlBuf('goldbody', 'tycoon', 'กายทองคำ', 'Body of Gold', ['กายทอง', 'Gold Body'], {fx:'goldshield', sp:() => 45, cd:40, buff:lv => ({t:20, reflect:+(lv * .03).toFixed(2)})});
 nlPas('wealthaura', 'tycoon', 'บารมีเศรษฐี', 'Aura of Wealth', lv => ({biaPct:lv * .03, hpPct:lv * .02, critRes:lv}));
 
 /* ======================= เผ่าแมว (cat folk) ======================= */
@@ -164,49 +164,49 @@ nlAtk('tailwhip', 'catfolk', 'ฟาดหาง', 'Tail Whip', ['ฟาดห�
 nlAtk('meow', 'catfolk', 'เหมียวอ้อน', 'Pleading Meow', ['เหมียว', 'Meow'], {type:'aoeSelf', fx:'heartRing', act:'wai', sp:lv => 18 + lv, cd:12, radius:100, dmg:() => 0, st:lv => ({charm:1.5 + lv * .2, atkDown:[lv * .03, 8]})});
 nlHeal('catnap', 'catfolk', 'งีบแมว', 'Cat Nap', ['งีบแมว', 'Nap'], {act:'crouch', sp:lv => 14 + lv, healPct:lv => .06 + lv * .012});
 nlPas('ninelives', 'catfolk', 'เก้าชีวิต', 'Nine Lives', lv => ({hpPct:lv * .02, dodge:lv * .006}));
-nlBuf('purr', 'catfolk', 'ครางคู', 'Purr', ['ครางคู', 'Purr'], {fx:'ramwai', act:'wai', sp:() => 22, cd:35, team:1, buff:lv => ({t:30, flee:lv * 3, aspdPct:+(lv * .015).toFixed(3)})});
+nlBuf('purr', 'catfolk', 'ครางคู', 'Purr', ['ครางคู', 'Purr'], {fx:'ramwai', act:'wai', sp:() => 22, cd:35, team:1, buff:lv => ({t:30, regenPct:+(.01 + lv * .002).toFixed(3), every:3})});
 nlPas('wildclaws', 'lynx', 'กรงเล็บแมวป่า', 'Wildcat Claws', lv => ({fistAtk:lv * 4, crit:lv, critDmg:lv * .02}));
 nlAtk('furyswipe', 'lynx', 'ข่วนคลั่ง', 'Fury Swipes', ['ข่วนคลั่ง', 'Fury'], {type:'melee', fx:'clawRake', act:'rake', sp:lv => 20 + lv * 2, cd:2, hits:() => 6, every:.07, dmg:lv => .5 + lv * .07});
 nlAtk('moonpounce', 'lynx', 'กระโจนจันทร์', 'Moon Pounce', ['จันทร์', 'Moon'], {type:'dash', fx:'charge', act:'pounce', sp:lv => 24 + lv * 2, cd:4, range:170, dmg:lv => 3 + lv * .45, stun:() => .8});
 nlAtk('catcyclone', 'lynx', 'แมวหมุนพายุ', 'Cat Cyclone', ['แมวพายุ', 'Cyclone'], {type:'aoeSelf', fx:'clawRing', act:'whirl', sp:lv => 28 + lv * 2, cd:4, radius:100, hits:() => 5, every:.14, dmg:lv => .5 + lv * .08});
 nlAtk('shadowpaw', 'lynx', 'อุ้งเท้าเงา', 'Shadow Paw', ['อุ้งเงา', 'Paw'], {type:'line', fx:'pawLine', act:'rake', sp:lv => 22 + lv * 2, cd:3, len:160, width:30, dmg:lv => 2.4 + lv * .35});
-nlAtk('cuteface', 'lynx', 'หน้ามุ้งมิ้ง', 'Puppy-Eyes Kitty', ['มุ้งมิ้ง', 'Cute'], {type:'aoeSelf', fx:'heartRing', act:'wai', sp:lv => 30 + lv * 2, cd:14, radius:130, dmg:() => 0, st:lv => ({charm:1.5 + lv * .15, atkDown:[lv * .03, 10]})});
-nlBuf('catwalk', 'lynx', 'ย่างแมว', 'Catwalk', ['ย่างแมว', 'Catwalk'], {fx:'ramwai', act:'wai', sp:() => 30, cd:40, buff:lv => ({t:30, flee:lv * 4, aspdPct:+(lv * .02).toFixed(2)})});
+nlDeb('cuteface', 'lynx', 'หน้ามุ้งมิ้ง', 'Puppy-Eyes Kitty', ['มุ้งมิ้ง', 'Cute'], {fx:'heartRing', act:'wai', sp:lv => 20 + lv * 2, cd:10, st:lv => ({blind:4 + lv * .5})});
+nlSk('catwalk', 'lynx', 'ย่างแมว', 'Catwalk', ['ย่างแมว', 'Catwalk'], {type:'backstep', fx:'smokeBomb', act:'crouch', sp:lv => 12 + lv, cd:6, dist:lv => 70 + lv * 5, buff:lv => ({t:3, flee:lv * 8})});
 nlPas('luckycat', 'lynx', 'แมวกวักนำโชค', 'Lucky Cat', lv => ({crit:lv, biaPct:lv * .02, critRes:lv}));
 nlPas('royalclaws', 'catqueen', 'กรงเล็บราชินี', 'Royal Claws', lv => ({atkPct:lv * .03, crit:lv * 1.5}));
 nlAtk('thousandscratch', 'catqueen', 'พันรอยข่วน', 'Thousand Scratches', ['พันข่วน', 'Thousand'], {type:'melee', fx:'clawRake', act:'rake', sp:lv => 34 + lv * 3, cd:3, hits:() => 10, every:.06, dmg:lv => .45 + lv * .06});
-nlBuf('hunterinstinct', 'catqueen', 'สัญชาตญาณนักล่า', "Hunter's Instinct", ['นักล่า', 'Instinct'], {fx:'ramwai', act:'crouch', sp:() => 40, cd:40, buff:lv => ({t:20, aspdPct:+(lv * .02).toFixed(2), crit:lv})});
+nlBuf('hunterinstinct', 'catqueen', 'สัญชาตญาณนักล่า', "Hunter's Instinct", ['นักล่า', 'Instinct'], {fx:'ramwai', act:'crouch', sp:() => 40, cd:40, buff:lv => ({t:10, crit:lv * 3})});
 nlAtk('starpounce', 'catqueen', 'กระโจนดาวตก', 'Shooting Star Pounce', ['ดาวตก', 'Star'], {type:'aoeTarget', fx:'starPounce', act:'pounce', sig:1, sp:lv => 60 + lv * 4, cd:10, range:200, radius:110, dmg:lv => 6 + lv * .8, st:() => ({stun:1})});
 nlAtk('comettail', 'catqueen', 'หางดาวหาง', 'Comet Tail', ['ดาวหาง', 'Comet'], {type:'line', fx:'pawLine', act:'spinkick', sp:lv => 40 + lv * 3, cd:4, len:220, width:34, dmg:lv => 3.5 + lv * .5});
-nlAtk('royalcharm', 'catqueen', 'มนต์เสน่ห์ราชินี', 'Royal Charm', ['เสน่ห์', 'Charm'], {type:'aoeSelf', fx:'heartRing', act:'wai', sp:lv => 45 + lv * 3, cd:16, radius:160, dmg:() => 0, st:lv => ({charm:2 + lv * .2, atkDown:[lv * .04, 12]})});
-nlBuf('catblessing', 'catqueen', 'พรแมวมงคล', 'Blessing of the Lucky Cat', ['พรแมว', 'Blessing'], {fx:'ramwai', act:'wai', sp:() => 50, cd:50, team:1, buff:lv => ({t:40, crit:lv, flee:lv * 3, atkPct:+(lv * .015).toFixed(3)})});
+nlAtk('royalcharm', 'catqueen', 'มนต์เสน่ห์ราชินี', 'Royal Charm', ['เสน่ห์', 'Charm'], {type:'aoeSelf', fx:'heartRing', act:'wai', sp:lv => 45 + lv * 3, cd:16, radius:160, dmg:lv => 1 + lv * .2, st:lv => ({curse:[.1 + lv * .015, 8, 0]})});
+nlBuf('catblessing', 'catqueen', 'พรแมวมงคล', 'Blessing of the Lucky Cat', ['พรแมว', 'Blessing'], {fx:'ramwai', act:'wai', sp:() => 50, cd:50, team:1, buff:lv => ({t:40, atkPct:+(lv * .02).toFixed(2)})});
 nlPas('ninthlife', 'catqueen', 'ชีวิตที่เก้า', 'The Ninth Life', lv => ({dodge:lv * .008, hpPct:lv * .03, lastStand:lv >= 10 ? .3 : 0}));
 
 /* ======================= เผ่าหมา (dog folk) ======================= */
 nlPas('loyalheart', 'dogfolk', 'ใจภักดี', 'Loyal Heart', lv => ({hpPct:lv * .03, def:lv * 2}));
 nlAtk('guardbark', 'dogfolk', 'เห่าขู่', 'Warning Bark', ['เห่าขู่', 'Bark'], {type:'aoeSelf', fx:'barkRing', act:'shout', sp:lv => 12 + lv, cd:6, radius:110, dmg:lv => .5 + lv * .1, st:lv => ({taunt:1, atkDown:[lv * .02, 6]})});
-nlBuf('shieldwall', 'dogfolk', 'ยืนเฝ้า', 'Stand Guard', ['ยืนเฝ้า', 'Guard'], {fx:'goldshield', act:'guard', sp:() => 22, cd:30, buff:lv => ({t:25, def:lv * 5, dmgRed:+(lv * .015).toFixed(3)})});
+nlBuf('shieldwall', 'dogfolk', 'ยืนเฝ้า', 'Stand Guard', ['ยืนเฝ้า', 'Guard'], {fx:'goldshield', act:'guard', sp:() => 22, cd:30, buff:lv => ({t:25, def:lv * 6})});
 nlAtk('bite', 'dogfolk', 'งับ', 'Bite', ['งับ', 'Bite'], {type:'melee', fx:'biteSnap', act:'lunge', sp:lv => 8 + lv, cd:.8, dmg:lv => 1.8 + lv * .3, st:lv => ({defDown:[lv * .02, 6]})});
 nlAtk('tackle', 'dogfolk', 'พุ่งชน', 'Tackle', ['พุ่งชน', 'Tackle'], {type:'dash', fx:'charge', act:'lunge', sp:lv => 12 + lv, cd:3, range:150, dmg:lv => 1.6 + lv * .28, stun:() => .6});
-nlBuf('howl', 'dogfolk', 'หอนเรียกฝูง', 'Pack Howl', ['หอน', 'Howl'], {fx:'barkRing', act:'shout', sp:() => 25, cd:40, team:1, buff:lv => ({t:40, atkPct:+(lv * .015).toFixed(3), def:lv * 2})});
+nlBuf('howl', 'dogfolk', 'หอนเรียกฝูง', 'Pack Howl', ['หอน', 'Howl'], {fx:'barkRing', act:'shout', sp:() => 25, cd:40, team:1, buff:lv => ({t:40, atkPct:+(lv * .02).toFixed(2)})});
 nlPas('keennose', 'dogfolk', 'จมูกไว', 'Keen Nose', lv => ({crit:lv * .5, critRes:lv, flee:lv}));
 nlHeal('wagtail', 'dogfolk', 'กระดิกหาง', 'Wagging Tail', ['กระดิกหาง', 'Wag'], {act:'wai', sp:lv => 14 + lv, healPct:lv => .05 + lv * .01});
 nlPas('guardianpaw', 'houndknight', 'อุ้งเท้าผู้พิทักษ์', 'Guardian Paw', lv => ({dmgRed:lv * .015, shieldBlock:lv, critRes:lv}));
-nlBuf('ironfur', 'houndknight', 'ขนเหล็ก', 'Iron Fur', ['ขนเหล็ก', 'Iron Fur'], {fx:'goldshield', act:'guard', sp:() => 35, cd:35, buff:lv => ({t:30, def:lv * 8, reflect:+(lv * .01).toFixed(2)})});
+nlBuf('ironfur', 'houndknight', 'ขนเหล็ก', 'Iron Fur', ['ขนเหล็ก', 'Iron Fur'], {fx:'goldshield', act:'guard', sp:() => 35, cd:35, buff:lv => ({t:30, reflect:+(lv * .025).toFixed(3)})});
 nlAtk('crunch', 'houndknight', 'งับกระดูก', 'Bone Crunch', ['งับกระดูก', 'Crunch'], {type:'melee', fx:'biteSnap', act:'lunge', sp:lv => 18 + lv * 2, cd:2, hits:() => 2, every:.15, dmg:lv => 1.8 + lv * .25, st:() => ({stun:.4})});
 nlAtk('houndrush', 'houndknight', 'ฝูงพุ่ง', 'Hound Rush', ['ฝูงพุ่ง', 'Rush'], {type:'line', fx:'earthsplit', act:'lunge', sp:lv => 24 + lv * 2, cd:4, len:200, width:30, dmg:lv => 2.5 + lv * .35, knock:25});
 nlAtk('fangspin', 'houndknight', 'หมุนเขี้ยว', 'Fang Spin', ['หมุนเขี้ยว', 'Spin'], {type:'aoeSelf', fx:'bladestorm', act:'whirl', sp:lv => 24 + lv * 2, cd:4, radius:90, hits:() => 3, every:.18, dmg:lv => .8 + lv * .12});
-nlBuf('packhowl', 'houndknight', 'หอนรวมพล', 'Rallying Howl', ['รวมพล', 'Rally'], {fx:'barkRing', act:'shout', sp:() => 40, cd:45, team:1, buff:lv => ({t:40, atkPct:+(lv * .02).toFixed(2), aspdPct:+(lv * .015).toFixed(3)})});
-nlHeal('loyalvow', 'houndknight', 'คำสัตย์ภักดี', 'Vow of Loyalty', ['สัตย์ภักดี', 'Vow'], {act:'wai', sp:lv => 24 + lv * 2, healPct:lv => .08 + lv * .012});
+nlBuf('packhowl', 'houndknight', 'หอนรวมพล', 'Rallying Howl', ['รวมพล', 'Rally'], {fx:'barkRing', act:'shout', sp:() => 40, cd:45, team:1, buff:lv => ({t:40, aspdPct:+(lv * .025).toFixed(3)})});
+nlBuf('loyalvow', 'houndknight', 'คำสัตย์ภักดี', 'Vow of Loyalty', ['สัตย์ภักดี', 'Vow'], {fx:'heal', act:'wai', sp:() => 35, cd:40, team:1, buff:lv => ({t:30, regenPct:+(.012 + lv * .002).toFixed(3), every:3})});
 nlDeb('sniffout', 'houndknight', 'ดมกลิ่นจุดอ่อน', 'Sniff Out', ['ดมกลิ่น', 'Sniff'], {fx:'curseMark', sp:lv => 16 + lv, st:lv => ({defDown:[lv * .03, 12]})});
 nlPas('bangkaewblood', 'bangkaew', 'สายเลือดบางแก้ว', 'Bangkaew Blood', lv => ({hpPct:lv * .04, dmgRed:lv * .015, def:lv * 3}));
-nlBuf('stalwart', 'bangkaew', 'ยืนหยัดไม่ถอย', 'Stalwart', ['ยืนหยัด', 'Stalwart'], {fx:'goldshield', act:'guard', sp:() => 50, cd:45, team:1, buff:lv => ({t:30, dmgRed:+(lv * .02).toFixed(2), def:lv * 6})});
+nlBuf('stalwart', 'bangkaew', 'ยืนหยัดไม่ถอย', 'Stalwart', ['ยืนหยัด', 'Stalwart'], {fx:'goldshield', act:'guard', sp:() => 50, cd:45, team:1, buff:lv => ({t:30, dmgRed:+(lv * .02).toFixed(2)})});
 nlAtk('kingfang', 'bangkaew', 'เขี้ยวราชันย์', 'Fang of the King', ['เขี้ยวราชา', 'King Fang'], {type:'melee', fx:'biteSnap', act:'lunge', sig:1, sp:lv => 50 + lv * 4, cd:9, dmg:lv => 8 + lv * 1, st:() => ({stun:1.5})});
 nlAtk('wolfstorm', 'bangkaew', 'พายุหมาป่า', 'Wolf Storm', ['พายุหมาป่า', 'Wolves'], {type:'aoeSelf', fx:'bladestorm', act:'whirl', sp:lv => 40 + lv * 3, cd:5, radius:130, hits:() => 4, every:.18, dmg:lv => 1 + lv * .15});
 nlAtk('shieldcharge', 'bangkaew', 'กระแทกโล่', 'Shield Charge', ['กระแทกโล่', 'Charge'], {type:'dash', fx:'charge', act:'guard', sp:lv => 35 + lv * 3, cd:5, range:170, dmg:lv => 3 + lv * .45, stun:() => 1});
-nlAtk('lunarhowl', 'bangkaew', 'หอนจันทร์เพ็ญ', 'Full Moon Howl', ['จันทร์เพ็ญ', 'Moon Howl'], {type:'aoeSelf', fx:'barkRing', act:'shout', sp:lv => 40 + lv * 3, cd:12, radius:170, dmg:lv => .6 + lv * .1, st:lv => ({taunt:1, atkDown:[lv * .03, 10]})});
+nlAtk('lunarhowl', 'bangkaew', 'หอนจันทร์เพ็ญ', 'Full Moon Howl', ['จันทร์เพ็ญ', 'Moon Howl'], {type:'aoeSelf', fx:'barkRing', act:'shout', sp:lv => 40 + lv * 3, cd:14, radius:170, dmg:lv => .8 + lv * .12, st:lv => ({fear:2 + lv * .2})});
 nlPas('packleader', 'bangkaew', 'จ่าฝูง', 'Leader of the Pack', lv => ({atkPct:lv * .02, critRes:lv, hpPct:lv * .02}));
-nlHeal('guardianangel', 'bangkaew', 'เทวดาเฝ้าเจ้านาย', 'Guardian Angel', ['เทวดาเฝ้า', 'Angel'], {act:'wai', sp:lv => 40 + lv * 3, cd:15, healPct:lv => .1 + lv * .015});
+nlBuf('guardianangel', 'bangkaew', 'เทวดาเฝ้าเจ้านาย', 'Guardian Angel', ['เทวดาเฝ้า', 'Angel'], {fx:'heal', act:'wai', sp:lv => 40 + lv * 3, cd:45, buff:lv => ({t:6, dmgRed:+(.3 + lv * .02).toFixed(2)})});
 
 /* ======================= นินจา ======================= */
 nlPas('shinobiway', 'ninja', 'วิถีนินจา', 'Way of the Shinobi', lv => ({daggerAtk:lv * 3, crit:lv * .5, flee:lv}));
@@ -222,7 +222,7 @@ nlAtk('iai', 'shinobi', 'ชักดาบสายฟ้า', 'Lightning Draw'
 nlAtk('fuuton', 'shinobi', 'คาถาลม ใบมีดลม', 'Wind Release: Wind Blade', ['คาถาลม', 'Fuuton'], {type:'line', fx:'windBlade', act:'seal', elem:'wind', sp:lv => 22 + lv * 2, cd:3, len:200, width:30, dmg:lv => 2.2 + lv * .35});
 nlAtk('raiton', 'shinobi', 'คาถาสายฟ้า', 'Lightning Release', ['สายฟ้า', 'Raiton'], {type:'aoeTarget', fx:'thunder', act:'seal', elem:'wind', sp:lv => 26 + lv * 2, cd:3, range:200, radius:80, hits:() => 2, every:.25, dmg:lv => 1.8 + lv * .3, st:() => ({shock:1.5})});
 nlAtk('dragonflame', 'shinobi', 'คาถาไฟ มังกรเพลิง', 'Fire Release: Dragon Flame', ['มังกรเพลิง', 'Dragon'], {type:'line', fx:'fireLine', act:'seal', elem:'fire', sp:lv => 28 + lv * 2, cd:4, len:220, width:34, dmg:lv => 2.6 + lv * .4});
-nlBuf('shadowclone', 'shinobi', 'แยกเงาพราง', 'Shadow Clones', ['แยกเงา', 'Clones'], {fx:'shadowBlink', act:'seal', sp:() => 35, cd:35, buff:lv => ({t:20, flee:lv * 4, crit:lv})});
+nlBuf('shadowclone', 'shinobi', 'แยกเงาพราง', 'Shadow Clones', ['แยกเงา', 'Clones'], {fx:'shadowBlink', act:'seal', sp:() => 35, cd:35, buff:lv => ({t:20, flee:lv * 6})});
 nlAtk('shurikenstorm', 'shinobi', 'พายุดาวกระจาย', 'Shuriken Storm', ['ดาวกระจาย', 'Shuriken'], {type:'aoeTarget', fx:'shurikenRain', act:'throw', sp:lv => 24 + lv * 2, cd:3, range:200, radius:90, hits:() => 4, every:.15, dmg:lv => .5 + lv * .08});
 nlDeb('poisonkunai', 'shinobi', 'คุไนอาบพิษ', 'Poisoned Kunai', ['คุไนพิษ', 'Venom'], {fx:'poison', act:'throw', anim:'attack', sp:lv => 14 + lv, cd:4, st:lv => ({poison:[.25 + lv * .04, 8], slow:[.1 + lv * .02, 5]})});
 nlPas('kagemastery', 'kage', 'วิถีคาเงะ', 'Way of the Kage', lv => ({atkPct:lv * .03, crit:lv, critDmg:lv * .03}));
@@ -230,7 +230,7 @@ nlAtk('shadowflash', 'kage', 'ประกายเงาพันดาบ', 'T
 nlAtk('blinkstrike', 'kage', 'ก้าวพริบตา', 'Blink Strike', ['พริบตา', 'Blink'], {type:'dash', fx:'shadowBlink', act:'lunge', sp:lv => 30 + lv * 3, cd:4, range:200, dmg:lv => 3 + lv * .4, stun:() => .6});
 nlAtk('kirin', 'kage', 'คาถาสายฟ้า กิเลน', 'Lightning Release: Kirin', ['กิเลน', 'Kirin'], {type:'aoeTarget', fx:'kirin', act:'seal', elem:'wind', sig:1, sp:lv => 70 + lv * 5, cd:12, cast:() => 1.5, range:240, radius:140, dmg:lv => 7 + lv * .9, st:() => ({shock:2})});
 nlAtk('waterdragon', 'kage', 'คาถาน้ำ มังกรวารี', 'Water Release: Water Dragon', ['มังกรวารี', 'Water Dragon'], {type:'line', fx:'waterLine', act:'seal', elem:'water', sp:lv => 45 + lv * 3, cd:5, len:240, width:40, dmg:lv => 3.2 + lv * .45, st:lv => ({slow:[.2 + lv * .02, 5]})});
-nlBuf('thousandshadows', 'kage', 'พันเงาพราง', 'Thousand Shadows', ['พันเงา', 'Shadows'], {fx:'shadowBlink', act:'seal', sp:() => 50, cd:40, buff:lv => ({t:20, flee:lv * 5, dmgRed:+(lv * .015).toFixed(3), crit:lv})});
+nlBuf('thousandshadows', 'kage', 'พันเงาพราง', 'Thousand Shadows', ['พันเงา', 'Shadows'], {fx:'shadowBlink', act:'seal', sp:() => 50, cd:40, buff:lv => ({t:15, aspdPct:+(lv * .03).toFixed(2)})});
 nlAtk('kunairain', 'kage', 'ฝนคุไน', 'Kunai Rain', ['ฝนคุไน', 'Kunai Rain'], {type:'aoeTarget', fx:'kunaiRain', act:'throw', sp:lv => 40 + lv * 3, cd:4, range:220, radius:120, hits:() => 6, every:.12, dmg:lv => .5 + lv * .07});
 nlPas('silentkill', 'kage', 'สังหารเงียบ', 'Silent Killing', lv => ({crit:lv, critDmg:lv * .03, flee:lv * 2}));
 
@@ -266,4 +266,4 @@ for (const job of Object.keys(NL_JOBS)){ const P0 = SK8[job], list = [...P0.a, .
   // each style is learned in order: a skill asks for the one before it in its style (Lv 3; a signature asks for Lv 5)
   for (const st of ['a', 'b', 'c']){ const l = P0[st]; for (let i = 1; i < l.length; i++) SKILLS[l[i]].req = {[l[i - 1]]:SKILLS[l[i]].sig ? 5 : 3}; } }
 if (typeof CS_LINES !== 'undefined') for (const l of NL_LINES) if (!CS_LINES.includes(l)) CS_LINES.push(l);
-if (typeof AB !== 'undefined') for (const id of ['merchantcry', 'tradewind', 'grandmarket', 'purr', 'catblessing', 'howl', 'packhowl', 'stalwart']) if (!AB.buff.includes(id)) AB.buff.push(id);
+if (typeof AB !== 'undefined') for (const id of ['merchantcry', 'tradewind', 'grandmarket', 'purr', 'catblessing', 'howl', 'packhowl', 'stalwart', 'loyalvow']) if (!AB.buff.includes(id)) AB.buff.push(id);

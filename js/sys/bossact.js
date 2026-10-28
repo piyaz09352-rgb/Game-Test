@@ -100,6 +100,7 @@ function baRelease(m, b, bz, h){
       VFX.shake(b.sig ? 4 : 2.5);
   }
   if (b.sig){ skfxRing(x, y, 130 * bz, col[1], .6, 6, .05); skfxRing(x, y, 170 * bz, col[0], .7, 4, .12); }
+  try { baHeroFx(m, b, bz); } catch (e) {}
 }
 
 /* ---------- hooks: where moves begin ---------- */
@@ -217,3 +218,60 @@ function baBar(g, m, b, x, y){
   g.lineWidth = 3; g.strokeStyle = 'rgba(16,10,6,.9)'; g.strokeText(b.name, x, Y - 3); g.fillStyle = b.sig ? '#ffe9a0' : '#fff2e0'; g.fillText(b.name, x, Y - 3);
   g.restore();
 }
+
+/* ---------- (v166) a boss move that matches a hero skill goes off with that skill's own effect ----------
+   A slam cracks the ground like Earthsplit, a quake is the hero's Quake, a charge leaves the hero's charge trail, a
+   wave or breath is the hero's line skill of its element (Fire Line, Water Line, Wind Blade, Reaper Line), meteors fall
+   like the Meteor spell (Fire Rain for a fire boss), a vanish is Shadow Step, a summon is the conjurer's circle, a pounce
+   is Star Pounce, a curse ground is Hex Field, a miasma is the poison cloud. The boss's own marks and damage are unchanged. */
+const BA_LINE = {fire:'fireLine', water:'waterLine', wind:'windBlade', shadow:'reaperLine', earth:'earthsplit'};
+function baHeroFx(m, b, bz){
+  const x = m.x, y = m.y, e = m.def.elem || 'neutral', a = Math.atan2(P.y - y, P.x - x), ux = Math.cos(a), uy = Math.sin(a);
+  const id = b.sig && m.sig ? 'sig_' + m.sig.kind : b.id, line = len => { const k = BA_LINE[e]; if (k) VFX.play(k, {x, y, ux, uy, len, tx:P.x, ty:P.y}); };
+  switch (id){
+    case 'slam': case 'leap':
+      for (let i = 0; i < 4; i++){ const q = a + i * Math.PI / 2 + .4; VFX.play('earthsplit', {x, y, ux:Math.cos(q), uy:Math.sin(q), len:70 * bz}); } break;
+    case 'quake': case 'ring': case 'sig_quake': VFX.play('quake', {x, y, r:90 * bz}); break;
+    case 'charge': case 'dash': case 'stampede': VFX.play('charge', {x, y, x2:x + ux * 220, y2:y + uy * 220}); break;
+    case 'wave': case 'breath': case 'sig_wave': line(300); if (!BA_LINE[e]) VFX.play('waveslash', {x, y, tx:P.x, ty:P.y}); break;
+    case 'teleport': case 'shadowstep': VFX.play('shadowBlink', {x:b.x, y:b.y, x2:x, y2:y}); break;
+    case 'summon': VFX.play('conjure', {x, y}); break;
+    case 'pounce': case 'sig_pounce': VFX.play('starPounce', {x:P.x, y:P.y, r:90}); break;
+    case 'field': case 'sig_curse': if (e === 'shadow' || id === 'sig_curse') VFX.play('hexField', {x:P.x, y:P.y, r:70, dur:3}); break;
+    case 'miasma': VFX.play('smokeCloud', {x, y, r:90 * bz}); break;
+    case 'pull': case 'sig_vortex': VFX.play('darkStar', {x, y, r:70 * bz}); break;
+    case 'sig_pillars': VFX.play('holycircle', {x:P.x, y:P.y, r:80, dur:1.2}); break;
+  }
+}
+/* meteors are aimed when the move begins: the hero's Meteor (or Fire Rain) falls on the marked ground with them */
+{ const _bs = baStart;
+  baStart = function(m, id, kind, wind, name, sig){ const r = _bs.apply(this, arguments);
+    try { if (id === 'meteor' || (sig && m.sig && m.sig.kind === 'meteor')){ const x = P.x, y = P.y, e = m.def.elem;
+      if (e === 'fire') VFX.play('firerain', {x, y, r:100, dur:Math.max(1, wind + .4)}); else later(Math.max(0, (wind || 1) - .55), () => { if (!m.dead) VFX.play('meteor', {x, y, r:90, hits:5, every:.18}); }); } } catch (e) {}
+    return r; }; }
+
+/* ---------- (v166) a boss's weapon carries a faint glow of its power ----------
+   Laid along the blade the sprite drew this frame (SPR.WDRAWS), in the boss's element colour: a soft bloom that
+   breathes slowly (never blinks), a thin bright edge, and a few embers drifting off it. While a move winds up the glow
+   gathers to about twice as strong, then settles back after the release. */
+function baWeaponGlow(g, d, m){
+  const col = baCol(m), b = m.ba, wind = b && !b.rel ? baEase((T - b.t0) / b.wind) : b && b.rel ? Math.max(0, 1 - (T - b.tr) / .5) : 0;
+  const k = (.9 + Math.sin(T * 1.3 + (m.id || 0)) * .1) * (1 + wind * .9), seed = (m.id || 0) * .37;
+  g.save(); g.setTransform(d.mt); g.globalCompositeOperation = 'lighter'; g.lineCap = 'round';
+  for (const [x0, y0, x1, y1] of d.segs){
+    let ax = x0, ay = y0, bx = x1, by = y1; if (Math.hypot(bx - ax, by - ay) < 3){ const mx = (ax + bx) / 2, my = (ay + by) / 2; ax = mx; ay = my - 1.5; bx = mx; by = my + 1.5; }
+    for (const [w, al, c] of [[6.5, .09, col[2]], [4, .15, col[1]], [2.2, .24, col[1]], [.8, .36, col[0]]]){
+      g.globalAlpha = Math.min(1, al * k); g.strokeStyle = c; g.lineWidth = w; g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke(); }
+    const n = 3 + Math.round(wind * 3);
+    for (let i = 0; i < n; i++){ const ph = (T * .45 + i / n + seed) % 1, f = (i * .618 + seed) % 1, px = ax + (bx - ax) * f, py = ay + (by - ay) * f;
+      g.globalAlpha = Math.sin(ph * Math.PI) * .45 * Math.min(1.5, k); g.fillStyle = col[0];
+      g.beginPath(); g.arc(px + Math.sin(ph * 5 + i) * 1.2, py - ph * 7, .8 + (1 - ph) * .5, 0, 7); g.fill(); }
+  }
+  g.restore();
+}
+{ const _dm = drawMobW;
+  drawMobW = function(g, m){
+    const hum = m && m.def && m.def.boss && !m.dead && SPR.MOBS[m.type] && SPR.MOBS[m.type].human;
+    const n0 = hum ? SPR.WDRAWS.length : 0, r = _dm.apply(this, arguments);
+    if (hum && SPR.WDRAWS.length > n0){ const d = SPR.WDRAWS[SPR.WDRAWS.length - 1]; if (d.g === g && d.mt) try { baWeaponGlow(g, d, m); } catch (e) {} }
+    return r; }; }

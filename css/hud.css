@@ -588,3 +588,18 @@ dl.eqst div{padding:2px 2px}
 .hk.hkset b{font-size:15px;line-height:1}
 /* turned picture: the phone's own scrolling would follow the upright screen; finger scrolling is done in js/core/rotate.js */
 html.rot .win .pane,html.rot .win .wb *,html.rot #rail .menu,html.rot #dialog *,html.rot .clog{touch-action:none}
+/* (v166) skill window: tree + details side by side on wide screens, a points bar pinned to the bottom that is always
+   there (placing a point no longer pushes the tree down), and a − button to take back a point not yet confirmed */
+html body #win-skill .skbar{position:sticky;bottom:0;z-index:6;margin:10px 0 0;background:#fbf3e2;box-shadow:0 -6px 12px rgba(120,90,40,.12)}
+html body #win-skill .skbar:not(.on) span{color:#8a7650;font-weight:500}
+html body #win-skill .skmain{display:block}
+html body #win-skill .skn .btn.minus{position:absolute;left:-6px;top:-6px;width:22px;height:22px;min-width:0;padding:0;border-radius:50%;font:700 14px/20px var(--display);z-index:2}
+html body #win-skill .ska .btn.minus{margin-right:4px}
+@media (min-width:900px){
+  html body #ui.ui #win-skill,html body #win-skill{width:min(800px,calc(100% - 24px)) !important}
+  html body #win-skill .skmain{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:12px;align-items:start}
+  html body #win-skill .skmain .sktree{margin:0}
+  html body #win-skill .skmain .skdetail{position:sticky;top:0;flex-wrap:wrap;align-items:flex-start;margin:0}
+  html body #win-skill .skmain .skdetail .nm{flex:1 1 180px;min-width:0}
+  html body #win-skill .skmain .skdetail .ska{flex:1 0 100%;display:flex !important;flex-direction:row !important;justify-content:flex-end;align-items:center;gap:6px;margin-top:6px}
+}

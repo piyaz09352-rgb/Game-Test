@@ -65,7 +65,6 @@ function renderSkills(){
   let h = `<div class="sktop"><div class="pts${left > 0 ? ' has' : ''}"><span>Skill Point</span><b>${left}</b></div>
     <div class="sktabs" role="tablist">${tabs.map(t => { const id = t.replace('>', ''), pv = t.startsWith('>'); return `<button role="tab" class="skt${t === skTab ? ' on' : ''}${pv ? ' pv' : ''}" data-sktab="${t}" aria-selected="${t === skTab}"><small>${pv ? L('ถัดไป', 'Next') : 'Tier ' + JOBS[id].tier}</small>${nm(JOBS[id])}</button>`; }).join('')}</div></div>`;
   if (preview) h += `<p class="empty">${L(`ดูล่วงหน้า: สกิลของ${nm(jb)} (เปลี่ยน Job ที่ครูวายรา)`, `Preview: ${nm(jb)} skills (change Job with Master Vayra)`)}</p>`;
-  if (skPending()) h += `<div class="skconfirm"><span>${L(`ลงแต้ม ${skPending()} แต้ม`, `${skPending()} point${skPending() > 1 ? 's' : ''} placed`)}</span><button class="btn" data-skcancel="1">${L('ยกเลิก', 'Cancel')}</button><button class="btn gold" data-skok="1">${L('ยืนยัน', 'Confirm')}</button></div>`;
   // ---- skill tree: rows by prerequisite depth, each skill under the one it needs, lines drawn between them ----
   const ids = jb.skills, inJob = new Set(ids), depth = {};
   const dOf = id => depth[id] ?? (depth[id] = Math.max(0, ...Object.keys(SKILLS[id].req || {}).filter(k => inJob.has(k)).map(k => dOf(k) + 1)));
@@ -76,12 +75,14 @@ function renderSkills(){
     for (let d = 0; d < cols * 2; d++){ const c = want + (d % 2 ? -1 : 1) * Math.ceil(d / 2); if (c >= 0 && c < cols && !used.has(c)){ want = c; break; } }
     if (used.has(want)) want = [...Array(cols).keys()].find(c => !used.has(c)); used.add(want); col[id] = want; } });
   if (!SKSEL || !inJob.has(SKSEL)) SKSEL = ids.find(id => !preview && canRaise(id)) || ids[0];
-  h += `<div class="sktree" id="skTree" style="--cols:${cols};--rows:${rows.length}"><svg class="sklines" id="skLines"></svg>`;
+  // (v166) the tree and the chosen skill's card side by side (one above the other on a narrow screen); nothing above the tree
+  // changes size while points are placed, so the + under your finger stays where it is
+  h += `<div class="skmain"><div class="sktree" id="skTree" style="--cols:${cols};--rows:${rows.length}"><svg class="sklines" id="skLines"></svg>`;
   for (const id of ids){
     const s = SKILLS[id], lv = preview ? 0 : sklP(id), pend = SKP[id] || 0, ok = preview || reqMet(id), act = s.type !== 'passive', slot = S.hot.indexOf(id);
     h += `<div class="skn${act ? '' : ' pas'}${ok ? '' : ' lock'}${lv >= s.max ? ' max' : ''}${lv ? ' got' : ''}${SKSEL === id ? ' sel' : ''}" data-node="${id}" style="grid-row:${depth[id] + 1};grid-column:${col[id] + 1}">
       <button class="sknb" data-sksel="${id}" title="${skName(s)}"><span class="ski ico">${skillIcon(id)}</span>${slot >= 0 ? `<i class="sks">${slot + 1}</i>` : ''}<b>${skShort(s)}</b><span class="ct">${lv}/${s.max}${pend ? `<em>+${pend}</em>` : ''}</span></button>
-      ${preview ? '' : `<button class="btn plus" data-skill="${id}" aria-label="+ ${skName(s)}" ${canRaise(id) ? '' : 'disabled'}>+</button>`}</div>`;
+      ${preview ? '' : `<button class="btn plus" data-skill="${id}" aria-label="+ ${skName(s)}" ${canRaise(id) ? '' : 'disabled'}>+</button>`}${pend ? `<button class="btn minus" data-skminus="${id}" aria-label="− ${skName(s)}">−</button>` : ''}</div>`;
   }
   h += `</div>`;
   { const id = SKSEL, s = SKILLS[id], lv = preview ? 0 : sklP(id), pend = SKP[id] || 0, ok = !preview && reqMet(id), act = s.type !== 'passive', slot = S.hot.indexOf(id);
@@ -95,10 +96,12 @@ function renderSkills(){
         ${s.req ? `<small class="rq${ok || preview ? ' met' : ''}">${L('ต้องมี', 'Requires')}: ${reqText(s)}</small>` : ''}
         ${skAssign === id ? `<div class="slotpick">${[0, 1, 2, 3, 4, 5].map(i => `<button class="btn sm${S.hot[i] === id ? ' gold' : ''}" data-slot="${i}" data-sid="${id}">${i + 1}${S.hot[i] && S.hot[i] !== id ? `<small>${skShort(SKILLS[S.hot[i]]).slice(0, 4)}</small>` : ''}</button>`).join('')}</div>` : ''}
       </div>
-      <div class="ska">${preview ? '' : `<button class="btn plus" data-skill="${id}" aria-label="+ ${skName(s)}" ${canRaise(id) ? '' : 'disabled'}>+</button>`}
+      <div class="ska">${preview ? '' : `${pend ? `<button class="btn minus" data-skminus="${id}" aria-label="− ${skName(s)}">−</button>` : ''}<button class="btn plus" data-skill="${id}" aria-label="+ ${skName(s)}" ${canRaise(id) ? '' : 'disabled'}>+</button>`}
         ${!preview && act && skl(id) ? `<button class="btn sm slotb${slot >= 0 ? ' on' : ''}" data-assign="${id}" title="${L('ใส่ช่องลัด', 'Put on hotbar')}">${slot >= 0 ? L(`ช่อง ${slot + 1}`, `Slot ${slot + 1}`) : L('ใส่ช่อง', 'Slot')}</button>` : ''}</div>
     </div>`; }
-  h += `<p class="empty">${L('แตะสกิลในทรีเพื่อดูรายละเอียด · กด + เพื่อลงแต้ม แล้วกดยืนยัน · เส้นเชื่อม = สกิลที่ต้องมีก่อน', 'Tap a skill in the tree for details · press + to place points, then Confirm · lines show prerequisites')}</p>`;
+  h += `</div><p class="empty">${L('แตะสกิลในทรีเพื่อดูรายละเอียด · กด + เพื่อลงแต้ม (− เพื่อเอาคืน) แล้วกดยืนยัน · เส้นเชื่อม = สกิลที่ต้องมีก่อน', 'Tap a skill in the tree for details · press + to place points (− takes one back), then Confirm · lines show prerequisites')}</p>`;
+  if (!preview){ const n = skPending();   // always there, pinned to the bottom of the window
+    h += `<div class="skconfirm skbar${n ? ' on' : ''}"><span>${n ? L(`ลงแต้ม ${n} แต้ม · เหลือ ${left}`, `${n} point${n > 1 ? 's' : ''} placed · ${left} left`) : L(`Skill Point เหลือ ${left} · กด + ที่สกิล`, `${left} Skill Point${left === 1 ? '' : 's'} left · press + on a skill`)}</span><button class="btn" data-skcancel="1" ${n ? '' : 'disabled'}>${L('ยกเลิก', 'Cancel')}</button><button class="btn gold" data-skok="1" ${n ? '' : 'disabled'}>${L('ยืนยัน', 'Confirm')}</button></div>`; }
   $('#pane-skill').innerHTML = h;
   requestAnimationFrame(drawSkLines);
   if (UIS.open.auto) renderAuto();
@@ -175,6 +178,10 @@ document.addEventListener('click', e => {
   if (ds.stat){ const c = statCost(S.stats[ds.stat]); if (S.statPts >= c && S.stats[ds.stat] < STAT_CAP()){ S.statPts -= c; S.stats[ds.stat]++; derive(); dirty = true; } return; }
   if (ds.sktab){ skTab = ds.sktab; skAssign = null; renderSkills(); return; }
   if (ds.skill){ SKSEL = ds.skill; if (canRaise(ds.skill)){ SKP[ds.skill] = (SKP[ds.skill] || 0) + 1; renderSkills(); } return; }
+  if (ds.skminus){ const id = ds.skminus; SKSEL = id; if (SKP[id] > 0){ if (--SKP[id] <= 0) delete SKP[id];
+      // a skill that needed this one may no longer be allowed: take its pending points back too
+      for (let again = true; again;){ again = false; for (const k in SKP) if (!reqMet(k)){ delete SKP[k]; again = true; } }
+      renderSkills(); } return; }
   if (ds.skok){ confirmSkills(); return; }
   if (ds.skcancel){ for (const k in SKP) delete SKP[k]; renderSkills(); return; }
   if (ds.assign){ skAssign = skAssign === ds.assign ? null : ds.assign; renderSkills(); return; }

@@ -8,7 +8,20 @@
      picture in the middle and the amount in the corner. */
 'use strict';
 
-const BAG_CAP = 100;
+/* (v166) the bag starts at 150 slots; more are bought 10 at a time with Vayra Coins, each lot dearer than the last
+   (50, 65, 85, 110 … coins, ×1.3 each time) up to 350 slots. The extra slots belong to the hero (S.bagX). */
+const BAGX = {base:150, step:10, max:20, price:n => Math.round(50 * Math.pow(1.3, n) / 5) * 5};
+const bagCap = () => BAGX.base + BAGX.step * Math.min(BAGX.max, (S && S.bagX) | 0);
+function bagBuy(){
+  const n = (S.bagX | 0), fee = BAGX.price(n), have = (typeof ACC !== 'undefined' && ACC.coins) || 0;
+  if (n >= BAGX.max){ toast(L('กระเป๋าขยายเต็มที่แล้ว', 'The bag is as big as it gets')); return; }
+  if (have < fee){ toast(L(`ต้องใช้ ${fmtN(fee)} เหรียญวายรา (มี ${fmtN(have)})`, `Needs ${fmtN(fee)} Vayra Coins (you have ${fmtN(have)})`)); return; }
+  sysPrompt(L(`ขยายกระเป๋า +${BAGX.step} ช่อง (${bagCap()} → ${bagCap() + BAGX.step}) ราคา ${fmtN(fee)} เหรียญวายรา?`, `Add ${BAGX.step} bag slots (${bagCap()} → ${bagCap() + BAGX.step}) for ${fmtN(fee)} Vayra Coins?`), () => {
+    if (((ACC && ACC.coins) || 0) < fee || (S.bagX | 0) !== n) return;
+    ACC.coins -= fee; if (typeof accSave === 'function') accSave(); S.bagX = n + 1; save();
+    log(L(`ขยายกระเป๋าเป็น ${bagCap()} ช่อง`, `Bag enlarged to ${bagCap()} slots`), 'g'); if (typeof bagDraw === 'function') bagDraw(); });
+}
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-bagx]'); if (!b) return; e.stopPropagation(); bagBuy(); }, true);
 const bagCounts = id => { const it = ITEMS[id]; return !!it && it.kind !== 'key' && id !== 'shard'; };
 function bagUsed(){
   const worn = new Set(Object.values((S && S.gear) || {})); let n = 0;
@@ -16,9 +29,9 @@ function bagUsed(){
   return n;
 }
 /* would this item need a new slot, and is there one? */
-const bagFits = id => !bagCounts(id) || (S.inv[id] > 0 && !(ITEMS[id] && ITEMS[id].kind === 'gear' && ITEMS[id].base)) || bagUsed() < BAG_CAP;
+const bagFits = id => !bagCounts(id) || (S.inv[id] > 0 && !(ITEMS[id] && ITEMS[id].kind === 'gear' && ITEMS[id].base)) || bagUsed() < bagCap();
 const BAGF = {t:0};
-function bagFullToast(){ if (performance.now() - BAGF.t < 2500) return; BAGF.t = performance.now(); toast(L(`กระเป๋าเต็ม (${bagUsed()}/${BAG_CAP} ช่อง) · ของใหม่จะค้างอยู่บนพื้น`, `Bag full (${bagUsed()}/${BAG_CAP} slots) · new items stay on the ground`)); }
+function bagFullToast(){ if (performance.now() - BAGF.t < 2500) return; BAGF.t = performance.now(); toast(L(`กระเป๋าเต็ม (${bagUsed()}/${bagCap()} ช่อง) · ของใหม่จะค้างอยู่บนพื้น`, `Bag full (${bagUsed()}/${bagCap()} slots) · new items stay on the ground`)); }
 
 /* ground drops: a new kind does not go in when the bag is full */
 { const _p = pickLoot;
@@ -29,15 +42,15 @@ function bagFullToast(){ if (performance.now() - BAGF.t < 2500) return; BAGF.t =
 if (typeof helperScore === 'function'){ const _h = helperScore; helperScore = function(id){ return bagFits(id) ? _h.apply(this, arguments) : -1e9; }; }
 /* shops: no new kind when full */
 { const _q = qtyBuy; qtyBuy = function(id){ if (!bagFits(id)){ bagFullToast(); return; } return _q.apply(this, arguments); }; }
-if (typeof fgBuy === 'function'){ const _f = fgBuy; fgBuy = function(id){ const gr = typeof GEAR !== 'undefined' && GEAR[id]; if ((gr && gr.slot !== 'ammo' ? bagUsed() >= BAG_CAP : !bagFits(id))){ bagFullToast(); return; } return _f.apply(this, arguments); }; }
+if (typeof fgBuy === 'function'){ const _f = fgBuy; fgBuy = function(id){ const gr = typeof GEAR !== 'undefined' && GEAR[id]; if ((gr && gr.slot !== 'ammo' ? bagUsed() >= bagCap() : !bagFits(id))){ bagFullToast(); return; } return _f.apply(this, arguments); }; }
 
 /* the bag window: the count, and a 10 × 10 grid of equal squares */
 { const _bd = bagDraw;
   bagDraw = function(){ const r = _bd.apply(this, arguments); const foot = el('bagFoot'), used = bagUsed();
-    if (foot){ const full = used >= BAG_CAP; foot.innerHTML = `<span class="bcap${full ? ' full' : ''}">${L('ช่อง', 'Slots')} <b>${used}</b> / ${BAG_CAP}</span>${full ? ` <small class="bcapw">${L('เต็มแล้ว · ขายหรือฝากคลังเพื่อเก็บของใหม่', 'Full · sell or bank items to pick up more')}</small>` : ''}`; }
+    if (foot){ const cap = bagCap(), full = used >= cap, n = (S.bagX | 0); foot.innerHTML = `<span class="bcap${full ? ' full' : ''}">${L('ช่อง', 'Slots')} <b>${used}</b> / ${cap}</span>${n < BAGX.max ? ` <button class="btn sm bagx" data-bagx="1" title="${L('ซื้อช่องเพิ่มด้วยเหรียญวายรา', 'Buy more slots with Vayra Coins')}">+${BAGX.step} ◈ ${fmtN(BAGX.price(n))}</button>` : ''}${full ? ` <small class="bcapw">${L('เต็มแล้ว · ขายหรือฝากคลังเพื่อเก็บของใหม่', 'Full · sell or bank items to pick up more')}</small>` : ''}`; }
     const grid = el('bagGrid');
     if (grid && grid.classList.contains('grid')){
-      const filled = grid.querySelectorAll('.bslot:not(.empty)').length, want = BAG.tab === 'all' && !BAG.q ? Math.max(BAG_CAP, filled) : Math.max(40, filled);
+      const filled = grid.querySelectorAll('.bslot:not(.empty)').length, want = BAG.tab === 'all' && !BAG.q ? Math.max(bagCap(), filled) : Math.max(40, filled);
       const empties = [...grid.querySelectorAll('.bslot.empty')], have = filled + empties.length;
       if (have > want) empties.slice(0, have - want).forEach(e => e.remove());
       else if (have < want) grid.insertAdjacentHTML('beforeend', '<span class="bslot empty"></span>'.repeat(want - have)); }
@@ -53,5 +66,5 @@ html body #ui.ui .baggrid.grid .bslot > .bE{position:absolute !important;left:3p
 html body #ui.ui .baggrid.grid .bslot > .tcard.mini{position:absolute;inset:8%}
 html body #ui.ui .baggrid.grid .bslot:hover:not(.empty){transform:none !important}
 html body #ui.ui .baggrid.grid .bslot.sel{animation:none !important}
-#bagFoot .bcap{font-weight:700}#bagFoot .bcap b{color:#1f7a4a}#bagFoot .bcap.full b{color:#c0392b}#bagFoot .bcapw{color:#c0392b;font-weight:600}`;
+#bagFoot .bcap{font-weight:700}#bagFoot .bcap b{color:#1f7a4a}#bagFoot .bcap.full b{color:#c0392b}#bagFoot .bcapw{color:#c0392b;font-weight:600}#bagFoot .bagx{margin-left:8px;padding:2px 10px;font-size:12px}`;
   document.head.appendChild(st); }

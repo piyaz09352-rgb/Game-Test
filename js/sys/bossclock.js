@@ -24,8 +24,13 @@ const bckCyc = now => Math.floor(now / BCK.gap) * BCK.gap;   // start of this ro
 /* the last kill we know of, from our own game or the shared MVP board */
 function bckKillAt(map){ const id = MAPS[map] && MAPS[map].boss, r = typeof MVP !== 'undefined' && id ? MVP.recs[id] : null;
   return Math.max(BCK.kill[map] || 0, r && r.at && !r.up ? r.at : 0); }
-const bckKilled = (map, now) => bckKillAt(map) >= bckCyc(now == null ? wNow() : now);   // this round's boss is down
-function bckDue(map){ const now = wNow(); return bckKilled(map, now) ? bckCyc(now) + BCK.gap : now; }
+/* (v166) a boss that has just died never comes straight back: the next one waits for the first quarter-hour mark that is
+   at least BCK.rest (10 min) after the kill. It still follows the world clock (:00 :15 :30 :45) and the shared kill time,
+   so every player sees it at the same moment, but a kill at :44 no longer brings a new boss at :45 (it comes at :00). */
+BCK.rest = 10 * 60e3;
+const bckNext = map => { const k = bckKillAt(map); return k ? bckSlot(k + BCK.rest) : 0; };
+const bckKilled = (map, now) => (now == null ? wNow() : now) < bckNext(map);   // the last boss is down and its rest is not over
+function bckDue(map){ const now = wNow(); return bckKilled(map, now) ? bckNext(map) : now; }
 const bckSkip = () => typeof bossTimer === 'undefined' || bossTimer >= 1e8 || (typeof DG !== 'undefined' && DG.active) || (typeof BOSS_RESTORE !== 'undefined' && BOSS_RESTORE && T < BOSS_RESTORE.until);
 EV.on('tick', () => {
   if (typeof boss === 'undefined') return;

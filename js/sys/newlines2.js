@@ -94,6 +94,13 @@ function wieldOk(it){
 /* ======================= looks ======================= */
 const NLM = SPR.M;
 const nlTrim = (body, trim, mid) => n => (n[1] > .44 ? {m:NLM[trim]} : mid && n[2] > .5 && Math.abs(n[0]) < .05 && n[1] > -.4 ? {m:NLM[mid]} : undefined);
+/* (v166) the cat and dog folk wear a เกาะอก (a cloth wrapped round the chest, a gold hem at the top) and a โจงกระเบน
+   (a cloth wrapped into loose knee-length breeches), bare arms and calves, sandals, a few gold pieces (armlets, a
+   necklace, a crown or shoulder flames for the high ranks) and no cape or skirt, so the tail shows. A hero wears it
+   from the chest (heroines) or from mid-chest down like a waist wrap (heroes). */
+const nlKemban = (cloth, trim, belt, hi) => n => (n[1] > hi ? {m:NLM.skin} : n[1] > hi - .1 ? {m:NLM[trim]} : n[1] < -.45 && n[1] > -.66 ? {m:NLM[belt]} : Math.sin(n[0] * 15 + n[1] * 8) > .88 ? {dt:1} : undefined);
+const NL_WRAP = (cloth, trim, belt, kraben, extra) => ({top:cloth, sleeve:'skin', forearm:'skin', pants:kraben, baggy:true, sandals:trim, boots:'skin', bootCuff:null, belt, cape:null, skirt:null, armband:'gold',
+  topTex:nlKemban(cloth, trim, belt, .12), topTexF:nlKemban(cloth, trim, belt, .36), ...extra});
 const NL_LOOK = {
   occult:['rune', {name:'ไสยเวท', en:'Hexer', hair:'hairBlack', iris:'irisRd', top:'midnight', sleeve:'midnight', forearm:'charcoal', pants:'charcoal', boots:'charcoal', bootCuff:'plum', belt:'plum',
     hat:null, skirt:[11.6, 1.1, 6.4, 9.2, 'midnight', 'plum'], aura:'auraViolet', necklace:true, neckMat:'ivory', pendant:'gem', topTex:nlTrim('midnight', 'plum', 'ivory')}],
@@ -104,15 +111,15 @@ const NL_LOOK = {
   tradelord:['merchant', {name:'นายวาณิช', en:'Trade Master', twoHand:true, top:'teal', sleeve:'cream', belt:'gold', cape:'teal', capMat:'teal', armband:'gold', topTex:nlTrim('teal', 'gold', 'gold')}],
   tycoon:['tradelord', {name:'มหาเศรษฐีวาณิช', en:'Grand Tycoon', top:'sunset', sleeve:'ivory', cape:'scarlet', capeTex:'gold', hat:'crown', hatMat:'gold', crestMat:'gold', necklace:true, neckMat:'gold', pendant:'gold', aura:'auraGold'}],
   catfolk:['muay', {name:'เจ้าเหมียว', en:'Kitty Folk', hair:'hairOrange', iris:'irisGd', top:'sakura', sleeve:'cream', forearm:'skin', handWrap:'cream', pants:'cream', boots:'sakura', bootCuff:'white', belt:'gold',
-    hat:null, earKind:'cat', earNoBand:true, earMat:'hairOrange', earIn:'sakura', tail:'hairOrange', tailUp:1.5, tailW:1.5, fistClaw:'steel', clawTier:0, necklace:true, neckMat:'scarlet', pendant:'gold', aura:'auraGold', topTex:nlTrim('sakura', 'white')}],
-  lynx:['catfolk', {name:'แมวป่าจอมซน', en:'Wildcat Dancer', hair:'hairChestnut', earMat:'hairChestnut', tail:'tigerFur', top:'brownCl', sleeve:'skin', pants:'charcoal', boots:'charcoal', bootCuff:'tigerFur', belt:'tigerFur', fistClaw:'ember', clawTier:2, topTex:nlTrim('brownCl', 'tigerFur')}],
+    hat:null, earKind:'cat', earNoBand:true, earMat:'hairOrange', earIn:'sakura', tail:'hairOrange', tailUp:1.5, tailW:1.5, fistClaw:'steel', clawTier:0, necklace:true, neckMat:'scarlet', pendant:'gold', aura:'auraGold', topTex:nlTrim('sakura', 'white'), ...NL_WRAP('sakura', 'gold', 'gold', 'scarlet', {}), animal:'cat', faceFur:'hairOrange', muzzle:'white', faceStripes:'hairChestnut'}],
+  lynx:['catfolk', {name:'แมวป่าจอมซน', en:'Wildcat Dancer', hair:'hairChestnut', earMat:'hairChestnut', tail:'tigerFur', top:'brownCl', sleeve:'skin', pants:'charcoal', boots:'charcoal', bootCuff:'tigerFur', belt:'tigerFur', fistClaw:'ember', clawTier:2, topTex:nlTrim('brownCl', 'tigerFur'), ...NL_WRAP('brownCl', 'gold', 'tigerFur', 'charcoal', {}), faceFur:'hairChestnut', faceStripes:'hairBrown'}],
   catqueen:['lynx', {name:'ราชินีวิเชียรมาศ', en:'Royal Siamese', hair:'hairWhite', iris:'irisBl', earMat:'charcoal', earIn:'sakura', tail:'charcoal', top:'ivory', sleeve:'ivory', pants:'ivory', boots:'navy', bootCuff:'gold', belt:'gold',
-    cape:'navy', capeTex:'gold', hat:'crown', hatMat:'gold', crestMat:'gold', crestN:6, fistClaw:'sun', clawTier:5, topTex:nlTrim('ivory', 'gold', 'gold')}],
+    cape:'navy', capeTex:'gold', hat:'crown', hatMat:'gold', crestMat:'gold', crestN:6, fistClaw:'sun', clawTier:5, topTex:nlTrim('ivory', 'gold', 'gold'), ...NL_WRAP('ivory', 'gold', 'gold', 'navy', {}), faceFur:'ivory', muzzle:'ivory', facePoint:'charcoal', faceStripes:null, whisker:'dark'}],
   dogfolk:['blade', {name:'เจ้าตูบ', en:'Puppy Guard', hair:'hairChestnut', iris:'irisBr', top:'sky', sleeve:'sky', forearm:'skin', handWrap:'leather', pants:'navy', boots:'leather', bootCuff:'white', belt:'leather',
-    hat:null, pauldron:null, sideEar:'puppy', sideMat:'hairChestnut', sideIn:'sakura', tail:'hairChestnut', tailUp:2, tailW:1.7, necklace:true, neckMat:'scarlet', pendant:'gold', shield:['gold', 'sky', 'gold', .95, 'white'], aura:'auraWhite', topTex:nlTrim('sky', 'white')}],
-  houndknight:['dogfolk', {name:'อัศวินหมาเฝ้าวัง', en:'Hound Knight', top:'navy', sleeve:'navy', pauldron:'steel', cape:'sky', belt:'gold', shield:['steel', 'navy', 'gold', 1.05, 'gold'], topTex:nlTrim('navy', 'gold', 'steel')}],
+    hat:null, pauldron:null, sideEar:'puppy', sideMat:'hairChestnut', sideIn:'sakura', tail:'hairChestnut', tailUp:2, tailW:1.7, necklace:true, neckMat:'scarlet', pendant:'gold', shield:['gold', 'sky', 'gold', .95, 'white'], aura:'auraWhite', topTex:nlTrim('sky', 'white'), ...NL_WRAP('sky', 'gold', 'leather', 'navy', {}), animal:'dog', faceFur:'hairChestnut', muzzle:'cream'}],
+  houndknight:['dogfolk', {name:'อัศวินหมาเฝ้าวัง', en:'Hound Knight', top:'navy', sleeve:'navy', pauldron:'steel', cape:'sky', belt:'gold', shield:['steel', 'navy', 'gold', 1.05, 'gold'], topTex:nlTrim('navy', 'gold', 'steel'), ...NL_WRAP('navy', 'gold', 'gold', 'sky', {pauldron:'gold'})}],
   bangkaew:['houndknight', {name:'อัศวินบางแก้ว', en:'Bangkaew Paladin', hair:'hairWhite', sideMat:'hairChestnut', tail:'hairWhite', top:'ivory', sleeve:'ivory', pauldron:'gold', cape:'scarlet', capeTex:'gold',
-    shield:['gold', 'ivory', 'gold', 1.12, 'scarlet'], aura:'auraGold', topTex:nlTrim('ivory', 'gold', 'gold')}],
+    shield:['gold', 'ivory', 'gold', 1.12, 'scarlet'], aura:'auraGold', topTex:nlTrim('ivory', 'gold', 'gold'), ...NL_WRAP('ivory', 'gold', 'gold', 'scarlet', {pauldron:'gold'}), faceFur:'hairWhite', muzzle:'white'}],
   ninja:['rogue', {name:'นินจา', en:'Ninja', hair:'hairBlack', iris:'irisBr', top:'charcoal', sleeve:'charcoal', forearm:'charcoal', handWrap:'charcoal', pants:'charcoal', boots:'charcoal', bootCuff:'scarlet', belt:'scarlet',
     ninjaMask:'charcoal', hat:'band', bandMat:'steel', twin:false, aura:'auraWhite', topTex:nlTrim('charcoal', 'scarlet')}],
   shinobi:['ninja', {name:'นินจาเงา', en:'Shadow Shinobi', top:'midnight', sleeve:'midnight', pants:'midnight', bootCuff:'navy', belt:'navy', bandMat:'navy', cape:'scarlet', topTex:nlTrim('midnight', 'navy')}],
@@ -132,6 +139,10 @@ for (const [j, [b, o]] of Object.entries(NL_LOOK)){ const base = SPR.CHARS[b]; i
     if (line === 'catfolk' && !cfg.glove && !(wi && wi.st && wi.st.claw)){ cfg.fistClaw = base.fistClaw; cfg.clawTier = base.clawTier; }
     if (line === 'catfolk' && job !== 'catqueen'){ cfg.earMat = cfg.hair; if (job === 'catfolk') cfg.tail = cfg.hair; }
     if (base.ninjaMask) cfg.ninjaMask = base.ninjaMask;   // a look or a hat must not take the ninja's mask off
+    if (line === 'catfolk' || line === 'dogfolk'){   // the wrap stays on whatever is worn, and the face follows the hair (Siamese and Bangkaew keep their own coat)
+      for (const k of ['top', 'sleeve', 'forearm', 'pants', 'baggy', 'sandals', 'boots', 'bootCuff', 'belt', 'pauldron', 'armband']) if (!(k === 'top' && cfg.cosTop)) cfg[k] = base[k];
+      cfg.cape = null; cfg.skirt = null; cfg.chest = null; cfg.topTex = cfg.lashes ? base.topTexF : base.topTex;
+      if (job !== 'catqueen' && job !== 'bangkaew') cfg.faceFur = cfg.hair; }
     if (line === 'dogfolk'){ cfg.sideMat = job === 'bangkaew' ? base.sideMat : cfg.hair; if (job !== 'bangkaew') cfg.tail = cfg.hair; if (!gear.shield) cfg.shield = base.shield; }
     return key; }; }
 

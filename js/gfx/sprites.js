@@ -924,6 +924,10 @@ function drawHuman(cx, cfg, P){
   if (cfg.mask){ G(); ell(cx, add(hc, [0, -4.2, 2.8]), 10.6, 5.6, M[cfg.mask], {tex:n => (n[2] < .1 ? false : n[1] > .5 ? false : undefined)}); }
   // (v164) a ninja's cloth mask: wraps the lower face from under the eyes to the chin, with a seam across the nose
   if (cfg.ninjaMask){ G(); ell(cx, add(hc, [0, -6.6, .9]), 10.6, 4.8, M[cfg.ninjaMask], {rz:10.75, tex:n => (n[2] < -.35 ? false : n[1] > .62 ? false : Math.abs(n[1] - .5) < .08 ? {t:2} : undefined)}); }
+  // (v166) the cat and dog folk's own faces: a dog's muzzle with a black nose, a cat's two little whisker pads (the fur, nose, mouth and whiskers are painted on in paintHead)
+  if (cfg.animal === 'dog'){ G(); ell(cx, add(hc, [0, -6.9, 8.3]), 3.9, 2.5, M[cfg.muzzle || 'cream'], {rz:4.5, tex:n => (n[1] < -.5 && n[2] > .3 && Math.abs(n[0]) < .55 ? {t:2} : undefined)});
+    G(); ell(cx, add(hc, [0, -5.5, 12.4]), 1.75, 1.25, M.charcoal, {rz:1.2, tex:n => (n[1] > .5 && n[0] < 0 ? {t:0} : undefined)}); }
+  else if (cfg.animal === 'cat'){ for (const sd of [-1, 1]){ G(); ell(cx, add(hc, [sd * 1.45, -6.5, 9.1]), 1.75, 1.35, M[cfg.muzzle || 'white'], {rz:1.5}); } }
   if (cfg.earring){ for (const sd of [-1, 1]){ const e0 = add(hc, [sd * 10.6, -3.2, .9]); G(); ell(cx, e0, 1.1, 1.1, M[cfg.earring]); G(); ell(cx, add(e0, [sd * .25, -2.5, .2]), cfg.earBig ? 1.8 : 1.35, cfg.earBig ? 2.4 : 1.7, M[cfg.earring]); } }
   if (cfg.pouch){ G(); ell(cx, lean([hipC[0] - 4.8, 10.6 + B, 3.4]), 2.4, 2.7, M.tan, {tex:n => (n[1] > .55 ? {m:M.leather} : undefined)}); }
   if (cfg.necklace || cfg.pendant){ G(); for (let a = -1.3; a <= 1.3; a += .2) dot(cx, lean([hipC[0] + Math.sin(a) * 5, 19.6 + B - Math.cos(a) * 1.6, Math.cos(a) * 5.4 + (cfg.chest ? .5 : 0)]), M[cfg.neckMat || 'gold'], 1); }
@@ -1112,6 +1116,14 @@ function paintHead(img, F, cx){
   }
   const front = nz([0, 0, 1]);
   const dark = [42, 24, 30], white = [255, 252, 246];
+  // (v166) cat and dog folk: the face is fur (the skin re-coloured, its shading kept), a pale muzzle, tabby stripes or a Siamese mask
+  const ani = cfg.animal;
+  if (ani && cfg.faceFur){ const s0 = rgb(cfg.skinM || 'skin', 2), f0 = rgb(cfg.faceFur, 2), kk = [0, 1, 2].map(c => f0[c] / Math.max(1, s0[c]));
+    for (let i = 0, n = W * F.h; i < n; i++) if (isSkin(i)){ const o = i * 4; D[o] = Math.min(255, D[o] * kk[0]); D[o + 1] = Math.min(255, D[o + 1] * kk[1]); D[o + 2] = Math.min(255, D[o + 2] * kk[2]); }
+    if (front > .1){ const mz = cfg.muzzle ? rgb(cfg.muzzle, 1) : null, pt = cfg.facePoint ? rgb(cfg.facePoint, 1) : null, stp = cfg.faceStripes ? rgb(cfg.faceStripes, 1) : null;
+      const nmz = nrm([0, -.5, .87]); if (mz && nz(nmz) > .15) patch(nmz, [1, 0, 0], [0, 1, 0], 1, 4.6, (u, v) => ((u / 3.6) ** 2 + ((v + .2) / 2.4) ** 2 < 1 ? mz : null), i => isSkin(i));
+      if (pt){ const np = nrm([0, -.3, .95]); if (nz(np) > .15) patch(np, [1, 0, 0], [0, 1, 0], 1, 5, (u, v) => ((u / 3.4) ** 2 + ((v + .5) / 3) ** 2 < 1 ? pt : null), i => isSkin(i)); }
+      if (stp){ const nf = nrm([0, .5, .87]); if (nz(nf) > .1) patch(nf, [1, 0, 0], [0, 1, 0], 1, 4, (u, v) => { for (const c of [-1.6, 0, 1.6]) if (Math.abs(u - c * (1 + v * .08)) < .38 - Math.abs(v) * .06 && v > -1.4 && v < 2.2 - Math.abs(c) * .5) return stp; return null; }, i => isSkin(i)); } } }
   // ---- eyes ----
   if (front > .18 && !H.hatFace){
     for (const side of [-1, 1]){
@@ -1132,7 +1144,7 @@ function paintHead(img, F, cx){
         if ((u - .6) ** 2 + (v + 1.35) ** 2 < .18) return white;                                       // small glint
         const ie = ((u + out * .1) / 1.45) ** 2 + ((v + .2) / 2.3) ** 2;
         if (ie < 1){
-          if ((u / .6) ** 2 + ((v + .1) / 1.05) ** 2 < 1) return dark;                                  // pupil
+          if ((u / (ani === 'cat' ? .3 : .6)) ** 2 + ((v + .1) / (ani === 'cat' ? 1.45 : 1.05)) ** 2 < 1) return dark;   // pupil (a cat's is a slit)
           return v > .35 ? rgb(ir, 3) : v > -.9 ? rgb(ir, 2) : v > -1.7 ? rgb(ir, 1) : rgb(ir, 0);
         }
         return v > .9 ? [214, 206, 214] : white;                                                         // sclera (lid shadow on top)
@@ -1143,12 +1155,21 @@ function paintHead(img, F, cx){
     if (cfg.cute || cfg.blush) for (const side of [-1, 1]){ const nb = nrm([side * .5, -.36, .8]); if (nz(nb) > .15) patch(nb, nrm([nb[2], 0, -nb[0]]), [0, 1, 0], 1, 1.8, (u, v) => {
         const e = (u / 1.25) ** 2 + (v / .6) ** 2; if (e >= 1) return null; return (Math.abs(u - .3 + v * .6) < .16 || Math.abs(u + .4 + v * .6) < .16) && e < .7 ? [255, 236, 236] : [255, 150, 170]; }, i => isSkin(i)); }
     const nm = nrm([0, -.42, .9]);
-    if (nz(nm) > .2) patch(nm, [1, 0, 0], [0, 1, 0], .9, 2.2, (u, v) => {
+    if (ani === 'cat'){   // a pink nose, the little ω mouth, three whiskers a side
+      const nC = nrm([0, -.47, .88]); if (nz(nC) > .2) patch(nC, [1, 0, 0], [0, 1, 0], .9, 2.6, (u, v) => {
+        if (v > .55 && v < 1.55 && Math.abs(u) < (v - .55) * .95 + .12) return v > 1.35 ? [255, 190, 200] : [232, 120, 140];
+        if (Math.abs(u) < .14 && v > -.15 && v <= .6) return [96, 52, 58];
+        for (const sd of [-1, 1]){ const d = Math.hypot(u - sd * .62, v + .05); if (v < 0 && Math.abs(d - .62) < .16) return [96, 52, 58]; }
+        return null; }, i => isSkin(i));
+      const wc = cfg.whisker === 'dark' ? [70, 50, 50] : [250, 246, 238];
+      for (const sd of [-1, 1]){ const nw = nrm([sd * .5, -.5, .7]); if (nz(nw) < .05) continue; const tu = nrm([nw[2] * sd, 0, -nw[0] * sd]);
+        patch(nw, tu, [0, 1, 0], 1, 7, (u, v) => { if (u < .6 || u > 6.4) return null; for (const j of [-1, 0, 1]) if (Math.abs(v - j * (.55 + u * .16)) < .13) return wc; return null; }, i => isSkin(i) || D[i * 4 + 3] === 0); }
+    } else if (ani !== 'dog' && nz(nm) > .2) patch(nm, [1, 0, 0], [0, 1, 0], .9, 2.2, (u, v) => {
       if (P.mouth) return ((u / .9) ** 2 + ((v + .2) / .8) ** 2 < 1) ? (v > .2 ? [120, 40, 52] : [200, 90, 90]) : null;
       return (Math.abs(v - u * u * .22 + .1) < .38 && Math.abs(u) < 1.1) ? (cfg.lashes ? [208, 92, 110] : [150, 64, 70]) : null;
     }, i => isSkin(i));
     const nn = nrm([0, -.2, .98]);
-    if (nz(nn) > .3) patch(nn, [1, 0, 0], [0, 1, 0], .9, 1, (u, v) => (Math.abs(u - .3) < .5 && Math.abs(v) < .5 ? rgb('skin', 2) : null), i => isSkin(i));
+    if (!ani && nz(nn) > .3) patch(nn, [1, 0, 0], [0, 1, 0], .9, 1, (u, v) => (Math.abs(u - .3) < .5 && Math.abs(v) < .5 ? rgb('skin', 2) : null), i => isSkin(i));
     // a half mask across the eyes (face slot) and eyewear (eye slot), painted over the face
     const ne = nrm([0, -.2, .98]);
     if (cfg.halfMask && nz(ne) > .2){ const hm = cfg.halfMask;
@@ -1725,7 +1746,7 @@ function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
     return img;
   }
   const mb = MOBS[key], A = MOB_ACTIONS[act], fs = Math.ceil(mb.fs * K), F = new Frame(fs, fs + Math.ceil(fs * MOB_PAD)), cx = new Ctx(F, -dir * Math.PI / 4, fs / 2, fs - 6 * K, K * (mb.scale || 1));
-  if (mb.human){ drawHuman(cx, mb.human, humanPose(act, f, A.n, mb.human.weapon)); const img = finish(F, K); if (mb.human.paint && cx.head) paintHead(img, F, cx); return img; }
+  if (mb.human){ drawHuman(cx, mb.human, humanPose(act, f, A.n, mb.human.weapon)); const img = finish(F, K); if (mb.human.paint && cx.head) paintHead(img, F, cx); img.wsegs = cx.wsegs || null; return img; }   // (v166) where its weapon is, for the boss weapon glow
   mb.model(cx, act, f, A.n);
   return finish(F, K);
 }
@@ -1918,7 +1939,7 @@ function draw(g, sh, act, dir, t, x, y, o = {}){
   if (fr && fr.c){ const w = fr.c.width / K, l = dx + fr.x / K;
     if (flip){ g.save(); g.translate(2 * x - l, 0); g.scale(-1, 1); g.drawImage(fr.c, 0, dy + fr.y / K, w, fr.c.height / K); g.restore(); }
     else g.drawImage(fr.c, l, dy + fr.y / K, w, fr.c.height / K); }
-  const ws = e.ws && e.ws[f]; if (ws && WDRAWS.length < 200) WDRAWS.push({g, x, y, segs:ws.map(([a, b]) => [dx + a.x / K, dy + a.y / K, dx + b.x / K, dy + b.y / K])});
+  const ws = e.ws && e.ws[f]; if (ws && WDRAWS.length < 200) WDRAWS.push({g, x, y, mt:sh.kind === 'mob' && g.getTransform ? g.getTransform() : null, segs:ws.map(([a, b]) => flip ? [2 * x - dx - a.x / K, dy + a.y / K, 2 * x - dx - b.x / K, dy + b.y / K] : [dx + a.x / K, dy + a.y / K, dx + b.x / K, dy + b.y / K])});
   const ss = e.ss && e.ss[f]; if (ss && SDRAWS.length < 200) SDRAWS.push({g, x, y, segs:ss.map(([a, b]) => [dx + a.x / K, dy + a.y / K, Math.max(2, Math.hypot(b.x - a.x, b.y - a.y) / K)])});
   g.imageSmoothingEnabled = sm; g.imageSmoothingQuality = sq;
 }
