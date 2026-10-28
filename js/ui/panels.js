@@ -214,10 +214,11 @@ document.addEventListener('click', e => {
     else { if (nx >= 5) S.refine = Math.max(0, S.refine - 1); log(L(`ตีบวกล้มเหลว อาวุธเหลือ +${S.refine}`, `Refine failed, weapon is now +${S.refine}`), 'r'); banner(L(`ตีบวกล้มเหลว (+${S.refine})`, `Refine failed (+${S.refine})`)); VFX.play('refine', {x:P.x, y:P.y, ok:false}); }
     derive(); dirty = true; save(); return;
   }
-  if (ds.sellid){ const k = ds.sellid, n = ds.n === 'all' ? S.inv[k] || 0 : 1; if (!n || (ITEMS[k] && ITEMS[k].forgeOnly)) return; const each = Math.round(ITEMS[k].sell * marketRate(k) * (1 + (DER.pas.biaPct || 0)));
-    S.inv[k] -= n; if (S.inv[k] <= 0) delete S.inv[k]; S.bia += each * n; log(L(`ขาย ${nm(ITEMS[k])} ×${n} ได้ ${(each * n).toLocaleString()} เบี้ย`, `Sold ${nm(ITEMS[k])} ×${n} for ${(each * n).toLocaleString()} Bia`), 'g'); VFX.play('coins', {x:P.x, y:P.y - 30}); dirty = true; return; }
+  // (v184) only what is really in the bag can be sold: a ×1 on a row already sold used to take 1 from nothing (the count became NaN)
+  if (ds.sellid){ const k = ds.sellid, have = S.inv[k] > 0 ? S.inv[k] : 0, n = ds.n === 'all' ? have : Math.min(1, have); if (!n || !ITEMS[k] || ITEMS[k].forgeOnly){ traderRefresh(); return; } const each = Math.round(ITEMS[k].sell * marketRate(k) * (1 + (DER.pas.biaPct || 0)));
+    S.inv[k] -= n; if (S.inv[k] <= 0) delete S.inv[k]; S.bia += each * n; log(L(`ขาย ${nm(ITEMS[k])} ×${n} ได้ ${(each * n).toLocaleString()} เบี้ย`, `Sold ${nm(ITEMS[k])} ×${n} for ${(each * n).toLocaleString()} Bia`), 'g'); VFX.play('coins', {x:P.x, y:P.y - 30}); dirty = true; traderRefresh(); return; }
   if (ds.sellall){ let sum = 0; for (const k of Object.keys(S.inv)) if (ITEMS[k] && ITEMS[k].kind === 'etc'){ sum += Math.round(ITEMS[k].sell * marketRate(k) * (1 + (DER.pas.biaPct || 0))) * S.inv[k]; delete S.inv[k]; }
-    S.bia += sum; log(L(`ขายของทั้งหมดได้ ${sum.toLocaleString()} เบี้ย`, `Sold all loot for ${sum.toLocaleString()} Bia`), 'g'); VFX.play('coins', {x:P.x, y:P.y - 30}); dirty = true; return; }
+    S.bia += sum; log(L(`ขายของทั้งหมดได้ ${sum.toLocaleString()} เบี้ย`, `Sold all loot for ${sum.toLocaleString()} Bia`), 'g'); VFX.play('coins', {x:P.x, y:P.y - 30}); dirty = true; traderRefresh(); return; }
   if (ds.buygear){ const gr = GEAR[ds.buygear]; if (!gr || S.bia < gr.buy || S.lvl < gr.lv) return; S.bia -= gr.buy; addItem(gr.id, gr.pack || 1);
     if (gr.slot === 'ammo' && ammoFits(gr.id) && (!S.gear.ammo || !S.inv[S.gear.ammo] || !ammoFits(S.gear.ammo) || S.gear.ammo === gr.id)){ S.gear.ammo = gr.id; derive(); }
     log(L(`ซื้อ ${nm(gr)} · กด Q เพื่อสวมใส่`, `Bought ${nm(gr)} · press Q to wear it`), 'g'); toast(L('ซื้อแล้ว · สวมใส่ในหน้าต่างอุปกรณ์ (Q)', 'Bought · wear it in the Equipment window (Q)')); dirty = true; return; }

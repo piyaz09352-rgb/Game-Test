@@ -21,4 +21,4 @@ const SIZE_TH = {s:'เล็ก', m:'กลาง', l:'ใหญ่'};
 const SIZE_EN = {s:'Small', m:'Medium', l:'Large'};
 const RACE_TH = {plant:'พืช', brute:'สัตว์', undead:'ผี/อมตะ'};
 const RACE_EN = {plant:'Plant', brute:'Brute', undead:'Undead'};
-const SIZE_MOD = {fist:{s:1,m:1,l:.75}, dagger:{s:1,m:.85,l:.7}, sword:{s:.75,m:1,l:.75}, bow:{s:1,m:.9,l:.8}, staff:{s:1,m:1,l:1}};
+const SIZE_MOD = {fist:{s:1,m:1,l:.75}, dagger:{s:1,m:.85,l:.7}, sword:{s:.75,m:1,l:.75}, bow:{s:1,m:.9,l:.8}, staff:{s:1,m:1,l:1}, shuriken:{s:1,m:.95,l:.85}};   // (v184) the ninja's thrown stars

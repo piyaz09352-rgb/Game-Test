@@ -555,6 +555,7 @@ dl.eqst div{padding:2px 2px}
 .srow.locked{opacity:.5}
 .srow small.up{color:#9fe0a0}.srow small.down{color:#ff9a8a}
 .srow.total{border-color:rgba(227,176,75,.4)}
+.srow.sellalltop{position:sticky;top:0;z-index:2;margin-bottom:6px;background:#fff7e0;border:2px solid rgba(227,176,75,.75);box-shadow:0 2px 6px rgba(0,0,0,.12)}
 .ic.wm{font:600 12px var(--display);color:var(--gold-2)}
 .warps{max-height:none}
 

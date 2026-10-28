@@ -16,6 +16,10 @@ function npcPortrait(n){
   g.drawImage(c, fs / 2 - 16 * K, sh.anchor[1] - 46 * K, 32 * K, 32 * K, 0, 0, cv.width, cv.height);
 }
 const npcRole = n => L(n.role, n.roleEn);
+/* (v184) the market's list is drawn again after every sale, keeping the scroll: sold rows go, counts and prices update */
+function traderRefresh(){ const d = $('#dialog'), n = typeof NPCS !== 'undefined' && NPCS.find(x => x.id === 'trader'); if (!d || d.hidden || !n || !d.querySelector('[data-sellall],[data-sellid]')) return;
+  const scr = () => [...d.querySelectorAll('*')].filter(e => e.scrollHeight > e.clientHeight + 4 && /auto|scroll/.test(getComputedStyle(e).overflowY));
+  const tops = scr().map(e => e.scrollTop); openNpc(n); scr().forEach((e, i) => { if (tops[i]) e.scrollTop = tops[i]; }); }
 function openNpc(n){
   if (typeof NPC_OPEN !== 'undefined' && NPC_OPEN[n.id]){ NPC_OPEN[n.id](n); return; }
   const d = $('#dialog'); let say = '', body = '';
@@ -46,12 +50,13 @@ function openNpc(n){
     const etc = Object.keys(S.inv).filter(k => ITEMS[k] && ITEMS[k].kind === 'etc');
     const zb = 1 + (DER.pas.biaPct || 0), total = etc.reduce((s2, k) => s2 + Math.round(ITEMS[k].sell * marketRate(k) * zb) * S.inv[k], 0);
     say = L('ของจากทุกแคว้นเอามาได้หมด ราคาวันนี้ขึ้นลงตามตลาดนะ ดูให้ดีก่อนขาย', 'I buy loot from every region. Prices move with the market each day, so check before you sell.');
-    body = `<div class="sec">${L('ราคารับซื้อวันนี้', "Today's prices")}</div><div class="shop">${etc.length ? etc.map(k => { const r = marketRate(k), pr = Math.round(ITEMS[k].sell * r * zb);
+    // (v184) "sell everything" sits at the top, above the list, like the other shops (it used to be at the very bottom)
+    body = `<div class="sec">${L('ราคารับซื้อวันนี้', "Today's prices")}</div>${etc.length ? `<div class="srow total sellalltop"><span class="ic">${IC.bag}</span><div class="nm"><b>${L('ขายทั้งหมด', 'Sell everything')}</b><small>${L(`ของสะสม ${etc.length} ชนิด`, `${etc.length} kinds of loot`)}</small></div><span class="pr plus">+${total.toLocaleString()}</span><button class="btn gold sm" data-sellall="1">${L('ขายทั้งหมด', 'Sell all')}</button></div>` : ''}<div class="shop">${etc.length ? etc.map(k => { const r = marketRate(k), pr = Math.round(ITEMS[k].sell * r * zb);
         return `<div class="srow"><span class="ic">${itemIcon(k)}</span><div class="nm"><b>${nm(ITEMS[k])} <span class="ct">×${S.inv[k]}</span></b><small class="${r >= 1.1 ? 'up' : r <= .9 ? 'down' : ''}">${r >= 1 ? '▲' : '▼'} ${Math.round(r * 100)}% · ${L('ชิ้นละ', 'each')} ${pr.toLocaleString()} ${CUR()}</small></div>
         <button class="btn sm" data-sellid="${k}" data-n="1">×1</button><button class="btn sm" data-sellid="${k}" data-n="all">${L('ทั้งหมด', 'All')}</button></div>`; }).join('')
       : `<p class="hint">${L('ยังไม่มีของสะสมจะขาย', 'No loot to sell yet')}</p>`}</div>
       <div class="sec">${L('ของใช้เดินทาง', 'Travel supplies')}</div><div class="shop"><div class="srow"><span class="ic">${itemIcon('talisman')}</span><div class="nm"><b>${nm(ITEMS.talisman)}</b><small>${itemDesc('talisman')} · ${L('มี', 'have')} ${(S.inv.talisman || 0).toLocaleString()}</small></div><span class="pr">${ITEMS.talisman.buy.toLocaleString()}</span>${qtyBox('talisman', 'item')}</div></div>
-      ${etc.length ? `<div class="srow total"><span class="ic">${IC.bag}</span><div class="nm"><b>${L('ขายทั้งหมด', 'Sell everything')}</b></div><span class="pr plus">+${total.toLocaleString()}</span><button class="btn gold sm" data-sellall="1">${L('ขาย', 'Sell')}</button></div>` : ''}`;
+`;
   } else if (n.id === 'armorer'){
     say = L('เกราะ หมวก กางเกง รองเท้า โล่ ต่างหู แว่น หน้ากาก ลูกธนู ของดีทั้งนั้น ใส่แล้วกด Q ดูในหน้าต่างอุปกรณ์ได้เลย', 'Armour, helmets, arrows, all good work. Wear them from the Equipment window (Q).');
     const sec = (slot, title) => `<div class="sec">${title}</div><div class="shop">${GEAR_LIST.filter(g2 => g2[1] === slot).map(([id]) => { const gr = GEAR[id], own = (S.inv[id] || 0) + (S.gear && S.gear[slot] === id ? 1 : 0), lvOk = S.lvl >= gr.lv;
