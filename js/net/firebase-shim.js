@@ -54,7 +54,8 @@
 
   /* ---------- room over the Realtime Database ---------- */
   const safe = n => String(n).replace(/[.#$\[\]\/]/g, '_').slice(0, 80);
-  const DYN = new Set(['x', 'y', 'd', 'a', 'h', 'sp', 's', 'dead', 'r', 'ms', 'mq', 'em']);
+  const DYN = new Set(['x', 'y', 'd', 'a', 'h', 'sp', 's', 'dead', 'r', 'ms', 'mq', 'em', 'wc', 'wv', 'tg', 'me', 't', 'cm', 'af']);   // wc/wv/tg/me/t/cm: the monster sync, af: afflictions
+  const OPT = new Set(['cm', 'af', 'em', 'dead', 's', 'r', 'tg']);
   const TAG = Math.random().toString(36).slice(2, 10);
   function makeRoom(name){
     const key = safe(name), base = rtdb.ref(`rooms/${key}`), uid = auth.currentUser.uid, me = `${TAG}${key === 'lobby' ? '' : ''}`;
@@ -100,7 +101,7 @@
     void myPres;
     // the moving part of a presence (see onPeer): position, facing, action, HP/SP, sitting/dead, riding, the monster host's snapshot
     function split(p){ if (!p || typeof p !== 'object' || Array.isArray(p)) return [JSON.stringify(p ?? null), null];
-      const st = {}, dy = {}; let n = 0; for (const key in p){ if (DYN.has(key)){ dy[key] = p[key]; n++; } else st[key] = p[key]; }
+      const st = {}, dy = {}; let n = 0; for (const key in p){ if (DYN.has(key)){ if (!(OPT.has(key) && !p[key])){ dy[key] = p[key]; n++; } } else st[key] = p[key]; }   // an empty flag is left out (the reader sees it as off)
       return [JSON.stringify(st), n ? JSON.stringify(dy) : null]; }
     /* every room (not only the lobby): each time the connection comes back (phone slept, wifi blip) the server has already removed my node,
        so re-arm onDisconnect and write my node again with the latest presence — otherwise I stay invisible on that map until I change map */

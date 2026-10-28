@@ -7,8 +7,11 @@ const skip = !chromium && 'playwright not installed (run npm install)';
 test('idle hero is removed from the server; active hero stays', { skip, timeout: 240000 }, async () => {
   const { players, close } = await openPlayers(2, { merge: false });
   try {
-    for (const [i, p] of players.entries()){ await enterWorld(p.page, 'Hero' + i);
-      await p.page.evaluate(i => { S.lvl = 80; derive(); S.hp = DER.maxhp; loadMap(0); P.x = VSPAWN.x; P.y = VSPAWN.y; P.x += i * 150; AFK.limit = 8; AFK.warn = 4; afkPing(); }, i); }
+    // everyone enters first; the short AFK limit is set only once both are in (a slow machine took more than 8 s to bring
+    // the second hero in, and the first one had already been sent out by then: they never met)
+    for (const [i, p] of players.entries()){ await enterWorld(p.page, 'Hero' + i); await p.page.evaluate(() => { AFK.limit = 600; afkPing(); }); }
+    for (const [i, p] of players.entries())
+      await p.page.evaluate(i => { S.lvl = 80; derive(); S.hp = DER.maxhp; loadMap(0); P.x = VSPAWN.x; P.y = VSPAWN.y; P.x += i * 150; AFK.limit = 8; AFK.warn = 4; afkPing(); }, i);
     const [idle, busy] = players.map(p => p.page);
     await idle.waitForTimeout(2500); await idle.evaluate(() => { AFK.sig = ''; afkPing(); });
     await busy.waitForFunction(() => NET.ghosts.size >= 1, null, { timeout: 20000 }).catch(() => {});   // a slow machine needs longer to meet

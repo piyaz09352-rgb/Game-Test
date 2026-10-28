@@ -4,7 +4,7 @@
 'use strict';
 
 const SETKEY = 'vayrathen-settings-v1';
-const SETTINGS = {turn:false, lang:'th', gfx:'auto', showFps:false, control:'auto', dmgNumbers:true, shake:true, nightFx:true, nameTags:true, oName:true, oTitle:true, oGuild:true, oDmg:true, oPet:true, oSum:true, oFx:true, uiScale:1, botHp:45, autoSave:true, autoLoot:false, sfx:true, musicVol:35, sfxVol:60, kite:true, bgRun:true, keepAwake:true, restMin:5};
+const SETTINGS = {turn:false, lang:'th', gfx:'auto', showFps:false, control:'auto', dmgNumbers:true, shake:true, nightFx:true, nameTags:true, oName:true, oTitle:true, oGuild:true, oDmg:true, oPet:true, oSum:true, oFx:true, uiScale:1, botHp:45, autoSave:true, autoLoot:false, sfx:true, musicVol:35, sfxVol:60, kite:true, bgRun:true, keepAwake:true, restMin:5, sharp:2};
 try { Object.assign(SETTINGS, JSON.parse(localStorage.getItem(SETKEY) || '{}')); } catch (e) {}
 if (SETTINGS.rotV !== 2){ SETTINGS.rotV = 2; SETTINGS.turn = false; delete SETTINGS.autoRot; }   // start upright: no leftover turning from earlier versions
 const saveSettings = () => { try { localStorage.setItem(SETKEY, JSON.stringify(SETTINGS)); } catch (e) {} };
@@ -159,6 +159,8 @@ function renderSettings(){
     <div class="sec">${L('การแสดงผล', 'Display')}</div>
     <label class="set"><span><b>${L('คุณภาพกราฟิก', 'Graphics quality')}</b><small id="gfxNote">${gfxNote()}</small></span>
       <select id="set-gfx" data-set="gfx">${['auto', ...GFX.ORDER].map(m => `<option value="${m}" ${GFX.mode === m ? 'selected' : ''}>${m === 'auto' ? `${GFX_TH.auto} (${GFX_TH[GFX.guess]})` : GFX_TH[m]}</option>`).join('')}</select></label>
+    <label class="set"><span><b>${L('ความคมชัดตัวละครและมอน', 'Character sharpness')}</b><small>${L('สูงสุด: วาดตัวละคร มอน และ NPC ละเอียดเท่าจอและระยะซูม (กินเครื่องมากขึ้น) · ลดลงถ้าเครื่องกระตุก', 'Highest: heroes, monsters and NPCs drawn as finely as the screen and zoom allow (heavier) · lower it if the game stutters')}</small></span>
+      <select id="set-sharp" data-set="sharp">${opt('sharp', 0, L('ปกติ', 'Normal'))}${opt('sharp', 1, L('สูง', 'High'))}${opt('sharp', 2, L('สูงสุด (แนะนำ)', 'Highest (recommended)'))}</select></label>
     ${tg('kite', L('รักษาระยะ (สายเวท/ธนู)', 'Keep distance (casters & archers)'), L('ถอยออกเมื่อมอนเข้าประชิด แล้วโจมตีต่อจากระยะไกล', 'Step back when a monster closes in, then keep attacking from range'))}
     ${tg('showFps', L('แสดง FPS', 'Show FPS'), L('ดูความลื่นของเกมที่มุมจอ', 'See how smooth the game runs'))}
     ${tg('dmgNumbers', L('ตัวเลขดาเมจ', 'Damage numbers'), L('แสดงดาเมจ หลบ และ EXP ลอยบนหัว', 'Floating damage, misses and EXP'))}
