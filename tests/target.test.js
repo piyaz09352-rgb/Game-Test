@@ -24,7 +24,7 @@ test('closest first, lowest HP on a tie, re-picked out of range', { skip, timeou
   assert.deepStrictEqual(errors, [], 'no runtime errors');
 });
 
-test('attack button: a tap attacks, holding it opens a list of targets (v60), the one picked stays until it dies; no lock button', { skip, timeout: 120000 }, async () => {
+test('attack button: a tap attacks, holding it opens the kinds of monster around (v150), the one locked stays until it dies; no lock button', { skip, timeout: 120000 }, async () => {
   const { page, errors, close } = await openGame();
   try {
     await enterWorld(page, 'Lock', 'lock_user');
@@ -37,9 +37,10 @@ test('attack button: a tap attacks, holding it opens a list of targets (v60), th
       const ev = t => b.dispatchEvent(new PointerEvent(t, {bubbles:true, pointerId:7}));
       P.target = null; ev('pointerdown'); ev('pointerup'); out.tap = P.target === near && !TLK.hard;
       const t0 = T; ev('pointerdown'); T = t0 + .45; EV.emit('tick'); ev('pointerup');
-      const rows = [...document.querySelectorAll('#tpick .tpk-row')]; out.hold1 = TPK.open && rows.length === 2 && TPK.list[0] === near && TPK.list[1] === far;
-      rows[1].dispatchEvent(new PointerEvent('pointerup', {bubbles:true})); out.pickFar = !TPK.open && TLK.hard && TLK.m === far && P.target === far;
-      ev('pointerdown'); T = t0 + 1; EV.emit('tick'); ev('pointerup'); document.querySelectorAll('#tpick .tpk-row')[0].dispatchEvent(new PointerEvent('pointerup', {bubbles:true}));
+      // (v150) holding opens the list of KINDS of monster (hunttypes.js); 🎯 on a row locks the closest one of that kind
+      out.hold1 = TPK.open && (TPK.kinds || []).some(k => k.type === near.type && k.n === 2);
+      const go = document.querySelector(`#tpick [data-hgo="${near.type}"]`); go.dispatchEvent(new PointerEvent('pointerup', {bubbles:true}));
+      out.pickFar = !TPK.open && TLK.hard && TLK.m === near && P.target === near;
       out.hold2 = TLK.m === near; T = t0 + 3; EV.emit('tick'); out.stays = TLK.m === near;
       EV.emit('tick'); out.keep = P.target === near && nearestEnemy(120) === near;
       P.x -= 1200; EV.emit('tick'); out.farAway = TLK.m === near && P.target === near;

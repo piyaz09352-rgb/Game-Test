@@ -45,5 +45,7 @@ function styleCalNow(){
   return win.reduce((t, x) => t + c[x], 0) / win.length;
 }
 /* worked out again whenever the stats are (skills learned, job changed), not on every hit */
-{ const _d = derive; derive = function(){ const r = _d.apply(this, arguments); try { SCAL.k = styleCalNow(); } catch (e) { SCAL.k = 1; } return r; }; }
+{ const _d = derive; derive = function(){ const r = _d.apply(this, arguments); try { SCAL.k = styleCalNow(); } catch (e) { SCAL.k = 1; }
+    if (DER) DER._iv = DER.interval;   // the attack interval before buffs, taken after every wrapper that changes it (weapon kind, gear speed): attack-speed buffs work from it (ridefight.js)
+    return r; }; }
 HK.outMul.push(mult => mult * SCAL.k);

@@ -17,14 +17,14 @@ const KIT_DEF = [
   ['ranger', ['ธนูไม้ไผ่ศิษย์พราน', "Young Hunter's Bow"], ['เสื้อหนังศิษย์พราน', "Young Hunter's Jerkin"], ['ผ้าคาดศิษย์พราน', "Young Hunter's Band"], ['เครื่องรางศิษย์พราน', "Young Hunter's Charm"], 'dex', 'agi'],
   ['muay', ['ผ้าพันมือศิษย์มวย', "Young Boxer's Wraps"], ['ชุดซ้อมนักมวย', "Boxer's Training Shorts"], ['มงคลศิษย์มวย', "Young Boxer's Mongkhon"], ['ประเจียดศิษย์มวย', "Young Boxer's Prajiad"], 'str', 'agi'],
   ['healer', ['ไม้เท้าว่านศิษย์หมอ', "Apprentice Healer's Staff"], ['เสื้อคลุมศิษย์หมอยา', "Apprentice Healer's Robe"], ['ผ้าคาดศิษย์หมอยา', "Apprentice Healer's Band"], ['ถุงสมุนไพรนำโชค', 'Lucky Herb Pouch'], 'int', 'vit'],
-  ['rogue', ['มีดคู่ศิษย์ย่อง', "Young Prowler's Twin Knives"], ['ชุดพรางศิษย์ย่อง', "Young Prowler's Garb"], ['ผ้าปิดหน้าศิษย์ย่อง', "Young Prowler's Mask Cloth"], ['เครื่องรางศิษย์ย่อง', "Young Prowler's Charm"], 'agi', 'luk'],
+  ['rogue', ['มีดสั้นศิษย์ย่อง', "Young Prowler's Knife"], ['ชุดพรางศิษย์ย่อง', "Young Prowler's Garb"], ['ผ้าปิดหน้าศิษย์ย่อง', "Young Prowler's Mask Cloth"], ['เครื่องรางศิษย์ย่อง', "Young Prowler's Charm"], 'agi', 'luk'],
   ['summoner', ['คทาสังข์ศิษย์อัญเชิญ', "Apprentice Summoner's Conch Rod"], ['เสื้อคลุมศิษย์อัญเชิญ', "Apprentice Summoner's Robe"], ['ผ้าคาดศิษย์อัญเชิญ', "Apprentice Summoner's Band"], ['ตะกรุดศิษย์อัญเชิญ', "Apprentice Summoner's Takrut"], 'int', 'dex'],
   ['warlord', ['ดาบสองมือประจำการขุนศึก', "Warlord's Service Greatsword"], ['เกราะประจำการขุนศึก', "Warlord's Service Armour"], ['หมวกประจำการขุนศึก', "Warlord's Service Helm"], ['ตราประจำการขุนศึก', "Warlord's Service Seal"], 'str', 'vit'],
   ['astro', ['ไม้เท้าโหราประจำตำแหน่ง', "Court Astrologer's Staff"], ['เสื้อคลุมโหราประจำตำแหน่ง', "Court Astrologer's Robe"], ['มงคลโหราประจำตำแหน่ง', "Court Astrologer's Mongkhon"], ['ตราโหราประจำตำแหน่ง', "Court Astrologer's Seal"], 'int', 'dex'],
   ['warden', ['ธนูประจำการพรานพงไพร', "Forest Warden's Service Bow"], ['เกราะหนังพรานพงไพร', "Forest Warden's Leather Armour"], ['หมวกพรานพงไพร', "Forest Warden's Hat"], ['ตราพรานพงไพร', "Forest Warden's Seal"], 'dex', 'agi'],
   ['grandmaster', ['เชือกคาดชัยปรมาจารย์', "Grandmaster's Victory Wraps"], ['ชุดประลองปรมาจารย์', "Grandmaster's Bout Garb"], ['มงคลปรมาจารย์', "Grandmaster's Mongkhon"], ['ประเจียดปรมาจารย์', "Grandmaster's Prajiad"], 'str', 'agi'],
   ['physician', ['ไม้เท้าราชแพทย์ประจำวัง', "Royal Physician's Staff"], ['เสื้อคลุมราชแพทย์', "Royal Physician's Robe"], ['มงคลราชแพทย์', "Royal Physician's Mongkhon"], ['ตราราชแพทย์', "Royal Physician's Seal"], 'int', 'vit'],
-  ['bandit', ['มีดคู่ประจำตัวจอมโจร', "Shadow Bandit's Twin Knives"], ['ชุดพรางจอมโจรเงา', "Shadow Bandit's Garb"], ['หมวกจอมโจรเงา', "Shadow Bandit's Hood"], ['ตราจอมโจรเงา', "Shadow Bandit's Seal"], 'agi', 'luk'],
+  ['bandit', ['มีดสั้นประจำตัวจอมโจร', "Shadow Bandit's Knife"], ['ชุดพรางจอมโจรเงา', "Shadow Bandit's Garb"], ['หมวกจอมโจรเงา', "Shadow Bandit's Hood"], ['ตราจอมโจรเงา', "Shadow Bandit's Seal"], 'agi', 'luk'],
   ['sovereign', ['คทาประจำตัวจอมอัญเชิญ', "Sovereign's Service Sceptre"], ['เสื้อคลุมจอมอัญเชิญ', "Sovereign's Robe"], ['มงคลจอมอัญเชิญ', "Sovereign's Mongkhon"], ['ตราจอมอัญเชิญ', "Sovereign's Seal"], 'int', 'dex']
 ];
 /* looks and pictures borrow the matching shop pieces */

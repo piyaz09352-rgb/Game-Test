@@ -1,4 +1,4 @@
-/* VAYRATHEN — tests/chatall.test.js — (v141/143) "ทั้งหมด" shows chat + important news, not EXP lines or boss battle cries */
+/* VAYRATHEN — tests/chatall.test.js — (v159) the chat shows what players say, nothing else */
 'use strict';
 const test = require('node:test'), assert = require('node:assert');
 const { chromium, enterWorld, openGame } = require('./browser');
@@ -19,12 +19,12 @@ test('the All tab', { skip, timeout: 90000 }, async () => {
       chatTab = 'all'; renderChat(); const all = el('chatLog').textContent;
       chatTab = 'sys'; renderChat(); const sys = el('chatLog').textContent; chatTab = 'all'; renderChat();
       return {all, sys, world, bossName:nm(MOB[boss])}; });
-    assert.ok(r.all.includes('Base Level 12'), 'level ups show in All');
-    assert.ok(!r.all.includes(r.bossName + ': หนีไปไหน'), 'boss battle cries stay out of All');
-    assert.ok(!r.all.includes('EXP +120'), 'EXP lines stay out of All');
-    assert.ok(!r.all.includes('Card ยักษ์'), 'item finds stay out of All');
-    assert.ok(r.world.includes('สวัสดีโลก') && !r.world.includes('ได้ Card') && !r.world.includes(r.bossName + ':'), 'World tab: only what players say');
-    assert.ok(r.sys.includes(r.bossName + ': หนีไปไหน') && r.sys.includes('EXP +120'), 'both are in the System tab');
+    // (v159) the chat is for players only: one list, no tabs, and no level ups, EXP, boss cries or item finds in it
+    assert.ok(r.all.includes('สวัสดีโลก'), 'what players say shows');
+    assert.ok(!r.all.includes('Base Level 12'), 'level ups stay out');
+    assert.ok(!r.all.includes(r.bossName + ': หนีไปไหน'), 'boss battle cries stay out');
+    assert.ok(!r.all.includes('EXP +120'), 'EXP lines stay out');
+    assert.ok(!r.all.includes('Card ยักษ์') && !r.all.includes('ได้ Card'), 'item finds stay out');
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no runtime errors');
 });

@@ -276,6 +276,7 @@ function fgKeepList(){
   const pane = el('pane-forge'), old = pane && pane.querySelector('.rflist'), sc = old ? old.scrollTop : 0, psc = pane ? pane.scrollTop : 0;
   const ids = n => [...n.querySelectorAll('[data-rfsel]')].map(t => t.dataset.rfsel + '|' + t.textContent).join(',');
   const was = old && ids(old); WIN_RENDER.forge(); if (!pane) return;
+  if (typeof NOFL !== 'undefined') NOFL.flush(pane);   // (v161) merge the redraw now, so the list below is compared with what is on screen
   const nu = pane.querySelector('.rflist');
   if (old && nu && was === ids(nu)){ for (const t of old.querySelectorAll('[data-rfsel]')) t.classList.toggle('on', t.dataset.rfsel === RF.sel); nu.replaceWith(old); old.scrollTop = sc; }
   pane.scrollTop = psc;

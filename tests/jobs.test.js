@@ -123,10 +123,13 @@ test('old saves without the new skill tables or rentals load and refund points',
       // a Royal Physician saved under the old tables: Herbalism 10, Remedy 10, Compress 10, Resilience 5 · Elixir 10, Sleep 5 …
       const old = {v:2, job:'physician', skPts:0, skills:{herbalism:10, herbheal:10, poultice:10, holywater:5, smoke:5, resist:5, calm:3, thread:1, elixir:10, royaltext:10, holycircle:5, sleep:5, lifeelixir:5, toxiccloud:5, remedybody:5, mercy:3, ward:1}, pet:'hare', petd:null};
       const s = migrateSave(old);
-      return {pts:s.skPts, herbalism:s.skills.herbalism, elixir:s.skills.elixir, stash:s.petStash};
+      const over = Object.entries(old.skills).reduce((t, [k, v]) => t + (SKILLS[k] ? Math.max(0, v - SKILLS[k].max) : 0), 0), kept = Object.entries(s.skills).every(([k, v]) => !SKILLS[k] || v <= SKILLS[k].max);
+      return {pts:s.skPts, over, kept, stash:s.petStash};
     });
-    assert.strictEqual(r.pts, 24, 'the levels above the new maximums come back as points (exactly what the new damage skills cost; Compress now goes to 5)');
-    assert.strictEqual(r.herbalism, 5); assert.strictEqual(r.elixir, 6);
+    // (v159) the skill tables changed again (eight skills a tier); whatever the maximums are now, nothing stays above one
+    // and the levels above it come back as points
+    assert.ok(r.kept, 'no skill stays above its maximum');
+    assert.ok(r.pts >= r.over, `the levels above the maximums come back as points (${r.pts} ≥ ${r.over})`);
     assert.strictEqual(r.stash, undefined);
     assert.strictEqual(await page.evaluate(() => { S.pet = 'hare'; S.petd = null; petEnsure(); S.helper = null; return helperOf(); }), null, 'a caught pet is not a rented helper');
   } finally { await close(); }

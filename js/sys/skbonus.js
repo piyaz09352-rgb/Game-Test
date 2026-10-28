@@ -7,7 +7,8 @@
 
 const SKB = {job:null};
 const skNeed = j => (JOBS[j].skills || []).reduce((a, id) => a + (SKILLS[id] ? SKILLS[id].max : 0), 0);
-const skGap = j => Math.max(0, skNeed(j) - Math.max(0, (JOBS[j].jobMax || 1) - 1));
+// (v161) not for the eight-skill tiers (skills8.js): their 49 points are meant to fall short, so a build has to choose
+const skGap = j => (typeof SK8 !== 'undefined' && SK8[j] ? 0 : Math.max(0, skNeed(j) - Math.max(0, (JOBS[j].jobMax || 1) - 1)));
 function skBonusSync(){
   if (!S || !S.job || !JOBS[S.job]) return 0; S.skb = S.skb || {}; let add = 0;
   for (const j of jobChain()){ const owe = skGap(j), got = S.skb[j] | 0; if (owe > got){ add += owe - got; S.skb[j] = owe; } }

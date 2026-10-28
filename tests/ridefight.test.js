@@ -12,7 +12,7 @@ test('only Swordsman / Warlord keep riding when they attack', { skip, timeout: 6
       S.job = 'novice'; derive(); return out; });
     assert.deepStrictEqual(r, {blade:true, warlord:true, ranger:false, warden:false, rune:false, muay:false});
     // Rapid Fire (the old Mounted Archery) is a buff that speeds up attacks
-    const rf = await page.evaluate(() => new Promise(res => { S.job = 'warden'; S.lvl = 99; S.skills.mountedarcher = 3; derive(); const iv0 = DER.interval; S.sp = DER.maxsp; P.cds = {}; P.acd = 0; P.cast = null;
+    const rf = await page.evaluate(() => new Promise(res => { S.job = 'warden'; S.lvl = 99; S.skills.mountedarcher = SKILLS.mountedarcher.max; derive(); const iv0 = DER.interval; S.sp = DER.maxsp; P.cds = {}; P.acd = 0; P.cast = null;
       trySkill('mountedarcher'); setTimeout(() => res({iv0, iv1:DER.interval, buff:!!P.buffs.mountedarcher, type:SKILLS.mountedarcher.type}), 1500); }));
     assert.strictEqual(rf.type, 'buff'); assert.ok(rf.buff, 'the buff is on');
     assert.ok(rf.iv1 < rf.iv0 * .85, `faster attacks (${rf.iv0} → ${rf.iv1} s)`);

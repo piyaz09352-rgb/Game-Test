@@ -9,9 +9,9 @@ test('boatman: full-screen board sorted by level, a picture per region, Go warps
     await enterWorld(page);
     await page.evaluate(() => { S.bia = 1e6; S.visited[1] = 1; const n = NPCS.find(x => x.id === 'boatman'); P.x = n.x; P.y = n.y + 30; openNpc(n); });
     const r = await page.evaluate(() => { const b = el('warpGrid'), c = [...b.querySelectorAll('.wgc')], lv = c.map(x => +/Lv (\d+)/.exec(x.querySelector('.wglv').textContent)[1]), rc = b.getBoundingClientRect();
-      return {open:!b.hidden, n:c.length, sorted:lv.every((v, i) => !i || lv[i - 1] <= v), full:rc.width >= innerWidth - 1 && rc.height >= innerHeight - 1, pic:getComputedStyle(b.querySelector('.wgpic')).backgroundImage, dlg:el('dialog').hidden}; });
+      return {open:!b.hidden, n:c.length, sorted:lv.every((v, i) => !i || lv[i - 1] <= v), full:rc.width >= innerWidth * .55 && rc.width <= innerWidth * .62 + 2 && Math.abs(rc.left + rc.width / 2 - innerWidth / 2) < 4, pic:getComputedStyle(b.querySelector('.wgpic')).backgroundImage, dlg:el('dialog').hidden}; });
     assert.ok(r.open && r.dlg, 'the board replaces the dialog'); assert.strictEqual(r.n, await page.evaluate(() => MAPS.length));
-    assert.ok(r.sorted, 'cards sorted by level'); assert.ok(r.full, 'fills the screen'); assert.match(r.pic, /worldmap/);
+    assert.ok(r.sorted, 'cards sorted by level'); assert.ok(r.full, '(v158) 60% of the screen, centred, like every NPC window'); assert.match(r.pic, /worldmap/);
     await page.click('#warpGrid [data-warp="1"]');
     await page.waitForFunction(() => MAP_ID === 1);
     assert.ok(await page.evaluate(() => el('warpGrid').hidden), 'closed on arrival');

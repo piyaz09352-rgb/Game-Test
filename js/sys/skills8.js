@@ -189,6 +189,19 @@ for (const job of Object.keys(SK8)){ const list = JOBS[job] ? JOBS[job].skills :
       if (back) setTimeout(() => { if (typeof banner === 'function') banner(L(`ระบบสกิลใหม่: คืน Skill Point ${back} แต้ม · เลือกสายการเล่นแล้วลงใหม่ได้เลย (S)`, `New skill system: ${back} Skill Points returned · pick a style and place them again (S)`)); }, 1500); }
     return _d.apply(this, arguments); }; }
 
+/* ---------- (v161) the class bonus no longer tops up the eight-skill tiers ----------
+   skbonus.js used to add the points a class was short of to max every skill (31 a tier after v159), which let every
+   build learn everything. Those bonus points are taken back once: every skill is refunded and the points left are
+   what the Job Levels gave (the novice bonus stays). */
+{ const _d = derive; derive = function(){
+    if (S && S.skills && S._sk8 && !S._sk8b){ S._sk8b = 1; let bonus = 0;
+      for (const j in (S.skb || {})) if (SK8[j]){ bonus += S.skb[j] | 0; S.skb[j] = 0; }
+      if (bonus > 0){ let back = 0; for (const id in S.skills) back += S.skills[id] | 0; S.skills = {};
+        if (S.hot) S.hot = S.hot.map(h => (h && (h.k === 'skill' || SKILLS[h]) ? null : h));
+        S.skPts = Math.max(0, (S.skPts || 0) + back - bonus); dirty = true;
+        setTimeout(() => { if (typeof banner === 'function') banner(L(`ปรับแต้มสกิล: แต้มโบนัสที่ทำให้อัปได้ทุกสกิลถูกนำออก ${bonus} แต้ม · คืนแต้มทั้งหมดให้ลงสายใหม่ (S)`, `Skill points fixed: ${bonus} bonus points that let you max every skill were removed · all points refunded to place again (S)`)); }, 1500); } }
+    return _d.apply(this, arguments); }; }
+
 /* ---------- the skill window shows each skill's style ---------- */
 const sk8Style = id => { const s = SKILLS[id], line = s && SK8_LINE[s.job], st = SK8_OF[id]; return line && st ? SK8_PATH[line][st] : null; };
 { const _rs = renderSkills;

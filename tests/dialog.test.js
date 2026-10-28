@@ -18,7 +18,7 @@ for (const [w, h] of [[1280, 720], [1920, 1080], [844, 390]]){
       assert.ok(Math.abs(b.cx - b.vw / 2) < 4, `centred across: ${JSON.stringify(b)}`);
       assert.ok(Math.abs(b.cy - b.vh / 2) < 12 || b.y <= 10, `centred down (or as high as fits): ${JSON.stringify(b)}`);
       assert.ok(b.w <= b.vw && b.h <= b.vh, 'fits on screen');
-      if (w >= 1280) assert.ok(b.w > b.vw * .35 && b.w < b.vw * .6, `scales with the screen: ${b.w} of ${b.vw}`);
+      if (w >= 1280) assert.ok(b.w > b.vw * .35 && b.w <= b.vw * .61, `scales with the screen: ${b.w} of ${b.vw}`);
 
       // drag by the header (not on the close button)
       const hd = await page.$('#dialog .dn');

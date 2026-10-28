@@ -20,14 +20,14 @@ const shopMap = page => page.evaluate(() => {
   return Object.fromEntries(Object.entries(out).map(([k, s]) => [k, [...s]]));
 });
 
-test('every item is sold by exactly one shop; arrows at the general store and Blacksmith Phet', { skip, timeout: 180000 }, async () => {
+test('every item is sold by exactly one shop; (v158) the potion shop sells only potions, arrows at Blacksmith Phet', { skip, timeout: 180000 }, async () => {
   const { page, errors, close } = await openGame();
   try {
     await enterWorld(page);
     const m = await shopMap(page), ITEMS_AMMO = await page.evaluate(() => GEAR_LIST.filter(g => g[1] === 'ammo').map(g => g[0]));
     const dup = Object.entries(m).filter(([id, who]) => who.length > 1 && !(ITEMS_AMMO.includes(id) && who.join() === 'shop,smith')).map(([id, who]) => `${id}: ${who.join(' + ')}`);
     assert.deepStrictEqual(dup, [], 'nothing is sold in two places');
-    assert.deepStrictEqual(m.q_wood, ['shop', 'smith'], 'arrows: general store and Blacksmith Phet');
+    assert.deepStrictEqual(m.q_wood, ['smith'], 'arrows: Blacksmith Phet');
     assert.deepStrictEqual(m.redpot, ['shop'], 'potions: general store only');
     assert.ok(!(await page.evaluate(() => NPCS.some(n => n.id === 'armorer'))), 'the duplicate armourer is gone');
   } finally { await close(); }
@@ -54,12 +54,6 @@ test('buy any amount: type it, use − / + / MAX, hold +', { skip, timeout: 1800
     await page.click(`${box} [data-qmax]`);
     const mx = await page.evaluate(() => ({ n: +document.querySelector('#dialog .qty[data-qty="redpot"] .qn').value, can: Math.floor(S.bia / ITEMS.redpot.buy) }));
     assert.strictEqual(mx.n, Math.min(9999, mx.can), 'MAX fills what you can afford');
-    // arrows by the pack
-    await page.evaluate(() => { S.inv.q_wood = 0; });
-    await page.fill('#dialog .qty[data-qty="q_wood"] .qn', '3');
-    await page.click('#dialog [data-qbuy="q_wood"]');
-    const ar = await page.evaluate(() => ({ have: S.inv.q_wood || 0, pack: GEAR.q_wood.pack || 1 }));
-    assert.strictEqual(ar.have, 3 * ar.pack, '3 packs of arrows');
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no runtime errors');
 });

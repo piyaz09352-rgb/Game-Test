@@ -5,12 +5,13 @@ const test = require('node:test'), assert = require('node:assert');
 const { chromium, openGame, enterWorld } = require('./browser');
 const skip = !chromium && 'playwright not installed (run npm install)';
 
-test('skills: 4 active · 1 buff · 1 passive for every class, and the new effects work', { skip, timeout: 180000 }, async () => {
+test('skills: eight a tier, each in a style, and the new effects work', { skip, timeout: 180000 }, async () => {
   const { page, errors, close } = await openGame();
   try {
     await enterWorld(page);
-    const shape = await page.evaluate(() => Object.keys(JOBS).filter(j => j !== 'novice').map(j => [j, JOBS[j].skills.map(id => SKILLS[id].kind).join(',')]));
-    for (const [j, k] of shape) assert.strictEqual(k, 'active,active,active,active,buff,passive', `${j} has the 4/1/1 shape`);
+    // (v159) the 4/1/1 shape became eight skills a tier in three play styles (skills8.js)
+    const shape = await page.evaluate(() => Object.keys(SK8).map(j => [j, JOBS[j].skills.length, JOBS[j].skills.every(id => SKILLS[id] && SK8_OF[id])]));
+    for (const [j, n, styled] of shape) assert.ok(n === 8 && styled, `${j} has eight skills, each in a style`);
     await page.evaluate(() => loadMap(1)); await page.waitForTimeout(800);
     const r = await page.evaluate(() => {
       const out = {}; derive();

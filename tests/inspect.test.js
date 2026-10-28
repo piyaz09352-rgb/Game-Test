@@ -11,11 +11,11 @@ test('inspector shows each monster in each move; meter shows FPS', { skip, timeo
     const r = await page.evaluate(async () => { const c = el('confirm'); if (c) c.hidden = true;
       openWin('settings'); await new Promise(r => setTimeout(r, 300)); const inSettings = !!el('set-fpsm') && !!document.querySelector('[data-insopen]');
       el('set-fpsm').checked = true; el('set-fpsm').dispatchEvent(new Event('change', {bubbles:true})); closeWin('settings');
-      const before = mobs.length; INS.f = 'boss'; openWin('inspect'); await new Promise(r => setTimeout(r, 500));
+      const nb = () => mobs.filter(m => m.def && m.def.boss).length, before = nb(); INS.f = 'boss'; openWin('inspect'); await new Promise(r => setTimeout(r, 500));
       const pics = []; for (const a of ['idle', 'attack']){ INS.act = a; reWin('inspect'); await new Promise(r => setTimeout(r, 450)); pics.push(el('insCv').toDataURL()); }
       INS.f = 'real'; reWin('inspect'); const real = insList().length;
       await new Promise(r => setTimeout(r, 1200));
-      return {inSettings, bosses:(INS.f = 'boss', insList().length), real, drawn:pics[0].length > 5000, spawned:mobs.length - before, meter:(el('fpsMeter') || {}).textContent || ''}; });
+      return {inSettings, bosses:(INS.f = 'boss', insList().length), real, drawn:pics[0].length > 5000, spawned:nb() - before, meter:(el('fpsMeter') || {}).textContent || ''}; });
     assert.ok(r.inSettings, 'both are in Settings');
     assert.ok(r.bosses >= 15 && r.real >= 50, `lists: ${r.bosses} bosses, ${r.real} real animals`);
     assert.ok(r.drawn, 'the stage draws the monster');

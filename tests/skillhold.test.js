@@ -41,9 +41,9 @@ test('menu: no My House button; emotes open from the chat box', { skip, timeout:
     await enterWorld(page);
     assert.ok(!(await page.$('#rail .mb[data-win="house"]')), 'no house button');
     assert.ok(!(await page.$('#rail [data-emopen]')), 'no emote button in the menu');
-    assert.ok(await page.$('#chatForm .cemo[data-emopen]'), 'emote button in the chat input row');
+    assert.ok(await page.$('#chatForm .cemo[data-chemo]'), 'emoji / emote button in the chat input row');
     await page.evaluate(() => document.querySelector('#chatForm .cemo').click());
-    assert.ok(await page.evaluate(() => !el('emoWheel').hidden), 'emote wheel opens');
+    assert.ok(await page.evaluate(() => { const p = el('chatEmo'); return !!p && !p.hidden; }), '(v160) the emoji & emote panel opens');
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no runtime errors');
 });
