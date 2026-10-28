@@ -37,6 +37,22 @@ Object.assign(BGM_TRACKS, {
 });
 Object.assign(MAP_BGM, {5:'bgm_battle1', 6:'bgm_scifi1', 7:'bgm_nature2', 8:'bgm_battle2', 11:'bgm_nature3', 12:'bgm_nature3', 13:'bgm_tavern', 14:'bgm_nature1', 15:'bgm_nature1', 16:'bgm_tavern', 17:'bgm_scifi1', 18:'bgm_nature1', 19:'bgm_adventure', 20:'bgm_adventure', 21:'bgm_nature5', 22:'bgm_nature5', 23:'bgm_battle3', 24:'bgm_battle3', 25:'bgm_battle3', 26:'bgm_scifi2', 27:'bgm_scifi2', 28:'bgm_scifi2', 29:'bgm_scifi2', 30:'bgm_adventure', 31:'bgm_nature2', 32:'bgm_nature4', 33:'bgm_nature4', 34:'bgm_nature4', 35:'bgm_nature2', 36:'bgm_nature3', 37:'bgm_tavern', 38:'bgm_nature5', 39:'bgm_nature5', 40:'bgm_nature5', 41:'bgm_scifi1', 42:'bgm_battle3', 43:'bgm_battle3', 44:'bgm_battle3', 45:'bgm_scifi2', 46:'bgm_scifi2', 47:'bgm_scifi2', 48:'bgm_scifi2', 49:'bgm_scifi2', 50:'bgm_scifi2', 51:'bgm_battle2', 52:'bgm_nature1', 53:'bgm_battle1', 54:'bgm_scifi1', 55:'bgm_battle2', 56:'bgm_scifi1', 57:'bgm_nature1', 58:'bgm_adventure', 59:'bgm_adventure', 60:'bgm_adventure'});
 MAPS.forEach(m => { if (m.bgm && !MAP_BGM[m.id]) MAP_BGM[m.id] = m.bgm; });   // regions that bring their own song (data/world4.js)
+/* (v170) ten more of the player's songs (−14 LUFS, 128 kbps) take maps from the songs that were shared the most: the ice
+   lands, the heavens, the Himmapan forest and the caves now have two or three songs between them instead of one */
+Object.assign(BGM_TRACKS, {
+  bgm_dungeon:{src:'audio/bgm_dungeon.mp3', th:'ทางเข้าดันเจี้ยนลึกลับ · หอคอยคำสาป เขาวงกต', en:'Mysterious dungeon approach · cursed tower, maze'},
+  bgm_thai1:{src:'audio/bgm_thai1.mp3', th:'ผจญภัยแดนไทย 1 · เมืองโบราณ', en:'Thai adventure 1 · old cities'},
+  bgm_thai2:{src:'audio/bgm_thai2.mp3', th:'ผจญภัยแดนไทย 2 · หิมพานต์ชั้นนอก สระอโนดาต', en:'Thai adventure 2 · outer Himmapan, Anodat'},
+  bgm_thai3:{src:'audio/bgm_thai3.mp3', th:'ผจญภัยแดนไทย 3 · ไกรลาส สุเมรุ ดาวดึงส์', en:'Thai adventure 3 · Kailash, Meru, Tavatimsa'},
+  bgm_thai4:{src:'audio/bgm_thai4.mp3', th:'ผจญภัยแดนไทย 4 · วัดร้าง ป่าช้าวัด', en:'Thai adventure 4 · ruined temples'},
+  bgm_nature6:{src:'audio/bgm_nature6.mp3', th:'ธรรมชาติ 6 · ป่าดึกดำบรรพ์ ป่าโกงกาง', en:'Nature 6 · primeval woods, mangroves'},
+  bgm_fastnature1:{src:'audio/bgm_fastnature1.mp3', th:'ผจญภัยในธรรมชาติ 1 · ทุ่งดอกไม้', en:'Nature run 1 · flower fields'},
+  bgm_fastnature2:{src:'audio/bgm_fastnature2.mp3', th:'ผจญภัยในธรรมชาติ 2 · ป่าเห็ด สวนผลไม้', en:'Nature run 2 · mushroom wood, orchard'},
+  bgm_advmap2:{src:'audio/bgm_advmap2.mp3', th:'แผนที่ผจญภัย 2 · ป่าสน ฟยอร์ด แสงเหนือ', en:'Adventure map 2 · snow pines, fjord, aurora'},
+  bgm_advmap3:{src:'audio/bgm_advmap3.mp3', th:'แผนที่ผจญภัย 3 · ถ้ำผลึก ซากเรือ ยอดเขาหิมะ', en:'Adventure map 3 · crystal cave, ice wreck, storm peak'}});
+Object.assign(MAP_BGM, {54:'bgm_dungeon', 56:'bgm_dungeon', 13:'bgm_thai1', 16:'bgm_thai1', 14:'bgm_thai2', 15:'bgm_thai2', 19:'bgm_thai3', 20:'bgm_thai3', 30:'bgm_thai3',
+  5:'bgm_thai4', 8:'bgm_thai4', 61:'bgm_nature6', 62:'bgm_nature6', 34:'bgm_nature6', 31:'bgm_fastnature1', 36:'bgm_fastnature1', 52:'bgm_fastnature2', 32:'bgm_fastnature2',
+  45:'bgm_advmap2', 46:'bgm_advmap2', 47:'bgm_advmap2', 48:'bgm_advmap3', 49:'bgm_advmap3', 50:'bgm_advmap3'});
 const MAP_BGM_SKIP = ['village', 'battle', 'worldboss', 'title', 'camp'];
 /* a boss's own theme: starts when that boss is fighting you (or you attack it) and plays until it dies.
    Drop the song in audio/ under the name below; a boss without a file (or with a file that fails to load) keeps the normal battle music.
