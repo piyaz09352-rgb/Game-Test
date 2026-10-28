@@ -123,7 +123,7 @@ function bgmMul(k){
 EV.on('tick', dt => {
   const a = BGM.el; if (!a || !BGM.want) return;
   // (v90) a boss's last phase no longer speeds the music up: every song plays at its own pace
-  const want = 1; try { if ('preservesPitch' in a) a.preservesPitch = true; } catch (e) {}
+  const want = 1; if (!a._pp){ a._pp = 1; try { if ('preservesPitch' in a) a.preservesPitch = true; } catch (e) {} }   // (v182) once per song, not on every frame
   if (Math.abs(a.playbackRate - want) > .005) a.playbackRate += Math.sign(want - a.playbackRate) * Math.min(Math.abs(want - a.playbackRate), dt * .15);
 });
 { const _rs = renderSettings;

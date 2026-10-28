@@ -302,8 +302,16 @@ function nwWp(m, k){ const R = nwRng(nwHash(`${m.nid}|${k}`)), big = m.def.boss,
   const hx = m.whx ?? m.hx, hy = m.why ?? m.hy;   // the world's home spot (a holder's AI may move hx while it chases)
   const x = clamp(hx + Math.cos(a) * r, 30, W - 30), y = clamp(hy + Math.sin(a) * r * .7, 40, H - 30);
   return walkable(x, y, m.def.r) && !obstacles.some(o => Math.hypot(o.x - x, o.y - y) < o.r + m.def.r) ? {x, y} : {x:hx, y:hy}; }
-function nwWander(m, now){ const seg = m.def.boss ? 22000 : 7000, off = nwF(m.nid) * seg, k = Math.floor((now + off) / seg), u = ((now + off) % seg) / seg;
-  const a = nwWp(m, k); if (u < .6) return a; const b = nwWp(m, k + 1), t = (u - .6) / .4; return {x:a.x + (b.x - a.x) * t, y:a.y + (b.y - a.y) * t}; }
+/* (v182) a waypoint only changes every few seconds, but it was worked out again for every monster on every frame (a string
+   hash, a walkable check and a test against every obstacle on the map, twice): with a hundred monsters online that was
+   the biggest cost of a frame and fed the garbage collector. Each monster now keeps its last two waypoints. */
+function nwWpC(m, k){ const hx = m.whx ?? m.hx, hy = m.why ?? m.hy, c = m._wpc || (m._wpc = []);
+  for (const e of c) if (e.k === k && e.hx === hx && e.hy === hy) return e.p;
+  const p = nwWp(m, k); c.push({k, hx, hy, p}); if (c.length > 3) c.shift(); return p; }
+function nwWander(m, now){ const seg = m.def.boss ? 22000 : 7000;
+  if (m._woffN !== m.nid){ m._woffN = m.nid; m._woff = nwF(m.nid); }
+  const off = m._woff * seg, k = Math.floor((now + off) / seg), u = ((now + off) % seg) / seg;
+  const a = nwWpC(m, k); if (u < .6) return a; const b = nwWpC(m, k + 1), t = (u - .6) / .4; return {x:a.x + (b.x - a.x) * t, y:a.y + (b.y - a.y) * t}; }
 function nwUpd(m, dt){
   if (m.mine || !m.nid) return false;                       // I run its AI (or it only exists here)
   let tx, ty, fast = false;
