@@ -16,8 +16,8 @@ test('a heal and a shield reach the friend next to me, not one far away', { skip
     await B.evaluate(() => { S.hp = 10; delete P.buffs.goldshield; delete P.buffs.ward; });
     await A.evaluate(() => { S.job = 'physician'; derive(); execSkill('elixir', 6, null); execSkill('goldshield', 5, null); execSkill('ward', 1, null); execSkill('stealth', 5, null); });
     await B.waitForFunction(() => S.hp > 10 && P.buffs.goldshield && P.buffs.ward, null, { timeout: 30000 });
-    const b = await B.evaluate(() => ({def:P.buffs.goldshield.def, br:P.buffs.ward.barrier, stealth:!!P.buffs.stealth, hp:S.hp, max:DER.maxhp}));
-    assert.equal(b.def, 30); assert.ok(b.br > 0 && b.br <= b.max * 1.25); assert.equal(b.stealth, false, 'self-only buffs stay with the caster');
+    const b = await B.evaluate(() => ({def:P.buffs.goldshield.reflect, br:P.buffs.ward.barrier, stealth:!!P.buffs.stealth, hp:S.hp, max:DER.maxhp}));
+    assert.equal(b.def, .125);   // (v183) โล่ทองคำ reflects damage now (lv 5: 12.5%) assert.ok(b.br > 0 && b.br <= b.max * 1.25); assert.equal(b.stealth, false, 'self-only buffs stay with the caster');
     // a friend far away gets nothing
     await B.evaluate(() => { P.x += 1500; delete P.buffs.goldshield; });
     await A.waitForFunction(() => abNear().length === 0, null, { timeout: 30000 });

@@ -11,7 +11,7 @@ test('hands: names, data, pictures and shields agree', { skip, timeout: 120000 }
     await enterWorld(page);
     const r = await page.evaluate(() => {
       const bad = [];
-      const want = (wt, n) => wt === 'fist' || wt === 'bow' ? '2h' : wt === 'dagger' ? (/คู่|twin|คาตานะ|katana/i.test(n) ? '2h' : '1h') : wt === 'sword' ? (/สองมือ|greatsword/i.test(n) ? '2h' : '1h') : (/ไม้เท้ายาว|longstaff/i.test(n) ? '2h' : '1h');
+      const want = (wt, n) => wt === 'fist' || wt === 'bow' || wt === 'shuriken' ? '2h' : wt === 'dagger' ? (/คู่|twin|คาตานะ|katana/i.test(n) ? '2h' : '1h') : wt === 'sword' ? (/สองมือ|greatsword/i.test(n) ? '2h' : '1h') : (/ไม้เท้ายาว|longstaff/i.test(n) ? '2h' : '1h');
       for (const id in ITEMS){ const it = ITEMS[id]; if (!it || it.slot !== 'weapon' || !it.st || !it.st.wtype) continue; const b = (it.base && ITEMS[it.base]) || it;
         if (handsOf(it.st) !== want(it.st.wtype, b.name + ' ' + b.en)) bad.push(id); }
       const jobs = []; for (const k in JOBS){ const w = JOBS[k].weapon; if (w && w.hands !== want(w.type, w.name + ' ' + (w.en || ''))) jobs.push(k); }
