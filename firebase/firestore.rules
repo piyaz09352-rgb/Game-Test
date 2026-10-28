@@ -4,7 +4,7 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // GM (game master): put the same uids as GM_UIDS in js/net/firebase-config.js
     // (Firebase Console → Authentication → Users → User UID), e.g. return ['AbC123...', 'XyZ789...'];
-    function gmUids() { return []; }
+    function gmUids() { return ['fo6F3IFoT0d3htberU9x13RKAhr1']; }
     function signedIn() { return request.auth != null; }
     function isGM() { return signedIn() && request.auth.uid in gmUids(); }
 

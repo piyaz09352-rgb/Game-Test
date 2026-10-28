@@ -14,7 +14,7 @@ const FIREBASE_CONFIG = {
 /* GM (ผู้ดูแลเกม) บนเว็บ Firebase: ใส่ uid ของบัญชีที่เป็น GM (Firebase Console → Authentication → Users → User UID)
    แล้วใส่ uid เดียวกันใน firebase/firestore.rules (ฟังก์ชัน gmUids) ด้วย ไม่งั้นปุ่มฝั่งเซิร์ฟเวอร์จะถูกปฏิเสธ
    On claude.ai the GM is the artifact's owner instead (this list is not used there). See SETUP_ONLINE.md "GM และการรีเซตโลก". */
-const GM_UIDS = [];
+const GM_UIDS = ['fo6F3IFoT0d3htberU9x13RKAhr1'];   // (v184) the owner's GM account
 /* ซีซัน: เพิ่มเลขนี้แล้ว deploy ใหม่ = บังคับรีเซตทุกคนเริ่มจาก 0 (สำรองข้อมูลเก่าไว้ในเครื่อง/คลาวด์ส่วนตัวก่อนลบ) แม้ไม่มีสิทธิ์ GM
    Season: raise this number and deploy to force a world reset for everyone (each player's old data is archived first). */
 const RESET_SEASON = 2;   // 2 = the login system was rebuilt: every account starts again from 0 (old data is archived first)
