@@ -10,9 +10,9 @@
 
 const SFXS = {
   files:{
-    atk_sword1:'audio/sfx/sword1_swing.mp3', hit_sword1:'audio/sfx/sword1_hit.mp3'   // one-handed sword (นักดาบ, สายหมา …)
+    // (v169) the one-handed sword recordings were taken out at the owner's request (to be made again); nothing recorded for now
   },
-  gain:{atk_sword1:.42, hit_sword1:.5}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
+  gain:{}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
 };
 /* which recorded kind a weapon type is for the hero now: a one-handed sword is 'sword1' (a greatsword, the merchant's axes
    and two-handed blades are other kinds, not recorded yet) */
