@@ -222,7 +222,7 @@ nlAtk('iai', 'shinobi', 'ชักดาบสายฟ้า', 'Lightning Draw'
 nlAtk('fuuton', 'shinobi', 'คาถาลม ใบมีดลม', 'Wind Release: Wind Blade', ['คาถาลม', 'Fuuton'], {type:'line', fx:'windBlade', act:'seal', elem:'wind', sp:lv => 22 + lv * 2, cd:3, len:200, width:30, dmg:lv => 2.2 + lv * .35});
 nlAtk('raiton', 'shinobi', 'คาถาสายฟ้า', 'Lightning Release', ['สายฟ้า', 'Raiton'], {type:'aoeTarget', fx:'thunder', act:'seal', elem:'wind', sp:lv => 26 + lv * 2, cd:3, range:200, radius:80, hits:() => 2, every:.25, dmg:lv => 1.8 + lv * .3, st:() => ({shock:1.5})});
 nlAtk('dragonflame', 'shinobi', 'คาถาไฟ มังกรเพลิง', 'Fire Release: Dragon Flame', ['มังกรเพลิง', 'Dragon'], {type:'line', fx:'fireLine', act:'seal', elem:'fire', sp:lv => 28 + lv * 2, cd:4, len:220, width:34, dmg:lv => 2.6 + lv * .4});
-nlBuf('shadowclone', 'shinobi', 'แยกเงาพราง', 'Shadow Clones', ['แยกเงา', 'Clones'], {fx:'shadowBlink', act:'seal', sp:() => 35, cd:35, buff:lv => ({t:20, flee:lv * 6})});
+nlBuf('kagebunshin', 'shinobi', 'แยกเงาพราง', 'Shadow Clones', ['แยกเงา', 'Clones'], {fx:'shadowBlink', act:'seal', sp:() => 35, cd:35, buff:lv => ({t:20, flee:lv * 6})});
 nlAtk('shurikenstorm', 'shinobi', 'พายุดาวกระจาย', 'Shuriken Storm', ['ดาวกระจาย', 'Shuriken'], {type:'aoeTarget', fx:'shurikenRain', act:'throw', sp:lv => 24 + lv * 2, cd:3, range:200, radius:90, hits:() => 4, every:.15, dmg:lv => .5 + lv * .08});
 nlDeb('poisonkunai', 'shinobi', 'คุไนอาบพิษ', 'Poisoned Kunai', ['คุไนพิษ', 'Venom'], {fx:'poison', act:'throw', anim:'attack', sp:lv => 14 + lv, cd:4, st:lv => ({poison:[.25 + lv * .04, 8], slow:[.1 + lv * .02, 5]})});
 nlPas('kagemastery', 'kage', 'วิถีคาเงะ', 'Way of the Kage', lv => ({atkPct:lv * .03, crit:lv, critDmg:lv * .03}));
@@ -249,7 +249,7 @@ Object.assign(SK8, {
   houndknight:{a:['guardianpaw', 'ironfur'], b:['crunch', 'houndrush', 'fangspin'], c:['packhowl', 'loyalvow', 'sniffout']},
   bangkaew:{a:['bangkaewblood', 'stalwart'], b:['kingfang', 'wolfstorm', 'shieldcharge'], c:['lunarhowl', 'packleader', 'guardianangel']},
   ninja:{a:['shinobiway', 'quickslash', 'ninjadash'], b:['katon', 'suiton'], c:['kunaithrow', 'smokescreen', 'kawarimi']},
-  shinobi:{a:['bladeart', 'iai'], b:['fuuton', 'raiton', 'dragonflame'], c:['shadowclone', 'shurikenstorm', 'poisonkunai']},
+  shinobi:{a:['bladeart', 'iai'], b:['fuuton', 'raiton', 'dragonflame'], c:['kagebunshin', 'shurikenstorm', 'poisonkunai']},
   kage:{a:['kagemastery', 'shadowflash', 'blinkstrike'], b:['kirin', 'waterdragon'], c:['thousandshadows', 'kunairain', 'silentkill']}
 });
 Object.assign(SK8_PATH, {
@@ -265,5 +265,8 @@ for (const job of Object.keys(NL_JOBS)){ const P0 = SK8[job], list = [...P0.a, .
   for (const id of list){ SKILLS[id].job = job; SK8_OF[id] = P0.a.includes(id) ? 'a' : P0.b.includes(id) ? 'b' : 'c'; }
   // each style is learned in order: a skill asks for the one before it in its style (Lv 3; a signature asks for Lv 5)
   for (const st of ['a', 'b', 'c']){ const l = P0[st]; for (let i = 1; i < l.length; i++) SKILLS[l[i]].req = {[l[i - 1]]:SKILLS[l[i]].sig ? 5 : 3}; } }
+// (v166) guild war: each new line borrows the war skill that suits it (the hexer seals spells, the merchant cuts supplies,
+// the cat folk drag foes into the ring like the boxers, the dog folk raise the shield wall, the ninja hunts the medics)
+if (typeof GW_LINE !== 'undefined') Object.assign(GW_LINE, {occult:'seal', merchant:'cut', catfolk:'ring', dogfolk:'wall', ninja:'snipe'});
 if (typeof CS_LINES !== 'undefined') for (const l of NL_LINES) if (!CS_LINES.includes(l)) CS_LINES.push(l);
 if (typeof AB !== 'undefined') for (const id of ['merchantcry', 'tradewind', 'grandmarket', 'purr', 'catblessing', 'howl', 'packhowl', 'stalwart', 'loyalvow']) if (!AB.buff.includes(id)) AB.buff.push(id);

@@ -193,7 +193,7 @@ if (typeof SK_GLYPH !== 'undefined') Object.assign(SK_GLYPH, {
   guardianpaw:'paw', ironfur:'shield', crunch:'fang', houndrush:'chevron', fangspin:'spiral', packhowl:'banner', loyalvow:'hand', sniffout:'target',
   bangkaewblood:'heartshield', stalwart:'tower', kingfang:'crown', wolfstorm:'tornado', shieldcharge:'shieldbash', lunarhowl:'moon', packleader:'banner', guardianangel:'wings',
   shinobiway:'mask', quickslash:'cut', ninjadash:'dash', katon:'flame', suiton:'drop', kunaithrow:'dart', smokescreen:'smoke', kawarimi:'back',
-  bladeart:'swords2', iai:'bolt', fuuton:'wave', raiton:'bolt2', dragonflame:'flame', shadowclone:'ghost', shurikenstorm:'star', poisonkunai:'drop',
+  bladeart:'swords2', iai:'bolt', fuuton:'wave', raiton:'bolt2', dragonflame:'flame', kagebunshin:'ghost', shurikenstorm:'star', poisonkunai:'drop',
   kagemastery:'crown', shadowflash:'cuts', blinkstrike:'back', kirin:'bolt2', waterdragon:'waves', thousandshadows:'ghost', kunairain:'arrowdown', silentkill:'skull'
 });
 
@@ -251,3 +251,11 @@ const NL_FX = {
 /* ---------- the wiki ---------- */
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'newlines', t:['อาชีพใหม่ 5 สาย', 'Five new class lines'], b:() => `<ul>${NL_LINES.map(l => { const c = jobChain(JOBS[l].next && JOBS[JOBS[l].next[0]].next ? JOBS[JOBS[l].next[0]].next[0] : l);
   return `<li><b>${c.filter(j => j !== 'novice').map(j => L(JOBS[j].name, JOBS[j].en)).join(' → ')}</b> · ${L(JOBS[l].weapon.name, JOBS[l].weapon.en)} · ${JOBS[l].stat} · ${['a', 'b', 'c'].map(s => L(SK8_PATH[l][s][0], SK8_PATH[l][s][1])).join(' / ')}</li>`; }).join('')}</ul>`});
+
+/* (v166) the Shadow Shinobi's clone skill was named like an old Tiger Shade skill that skillfx2.js removes and refunds:
+   it is now 'kagebunshin'; points and the hotbar slot of a ninja who learned it move over */
+{ const _d = derive; derive = function(){
+    if (S && S.skills && S.skills.shadowclone && typeof NL_LINE_OF !== 'undefined' && NL_LINE_OF[S.job] === 'ninja'){
+      S.skills.kagebunshin = (S.skills.kagebunshin || 0) + S.skills.shadowclone; delete S.skills.shadowclone;
+      if (Array.isArray(S.hot)) S.hot = S.hot.map(h => (h === 'shadowclone' ? 'kagebunshin' : h)); }
+    return _d.apply(this, arguments); }; }

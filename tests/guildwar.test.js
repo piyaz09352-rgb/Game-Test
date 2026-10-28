@@ -35,7 +35,7 @@ test('guild war: skills, hits, falling, seal, cut and guild skills', { skip, tim
       out.label = buffEffect(P.buffs.gw_banner).length > 0;
       return out; });
     assert.strictEqual(r.none, null, 'no war skill before the 3rd job');
-    const ids = Object.values(r.lines); assert.ok(ids.length >= 7 && ids.every(Boolean), 'every 3rd job has a war skill');
+    const ids = Object.values(r.lines); assert.ok(ids.length >= 12 && ids.every(Boolean), 'every 3rd job has a war skill');   // (v166) the five new lines borrow one each
     assert.strictEqual(new Set(ids).size, 7, 'seven different war skills, one per line');
     assert.strictEqual(r.wall, .5); assert.ok(r.bar, 'the war bar shows in the siege');
     assert.ok(r.fell, 'a felled hero wakes at the warp stone with 40% HP'); assert.ok(r.friendly, 'no friendly fire');

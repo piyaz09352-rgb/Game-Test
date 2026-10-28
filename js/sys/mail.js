@@ -15,7 +15,7 @@ const ML_FEE = 100, ML_ITEM_FEE = 200, ML_MAX = 40, ML_SUBJ = 30, ML_MSG = 300;
 const ML = {rows:[], sub:null, uid:null, tab:'in', open:null, busy:false, known:null, to:null, toN:'', q:'', found:[], z:'', item:'', n:1, s:'', m:'', t:0};
 const mlOk = () => typeof NET !== 'undefined' && !!NET.db && !!NET.uid;
 const mlFee = (z, item) => ML_FEE + (item ? ML_ITEM_FEE : 0) + Math.round(Math.max(0, z) * .01);
-const mlValid = r => r && typeof r.to === 'string' && typeof r.from === 'string' && (r.at | 0) > 0;
+const mlValid = r => r && typeof r.to === 'string' && typeof r.from === 'string' && +r.at > 0;   // (v166) not (r.at | 0): a millisecond time does not fit in 32 bits, and on some days it turned negative and every letter vanished
 const mlHasAtt = r => !r.taken && ((r.z | 0) > 0 || (r.i && (r.n | 0) > 0) || (r.c | 0) > 0);
 const mlUnread = () => ML.rows.filter(r => !r.rd).length;
 /* what may go in an envelope: not quest keys, not forge-only dust, not the wedding ring */
