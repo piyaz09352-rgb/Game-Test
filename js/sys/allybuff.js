@@ -28,7 +28,7 @@ const abNear = () => (typeof NET === 'undefined' ? [] : [...NET.ghosts.values()]
       const near = abNear(); if (!near.length) return out;
       const d = {r:NET.mapName, x:Math.round(P.x), y:Math.round(P.y), k:id, lv:clamp(lv | 0, 1, sk.max || 10), n:netName()};
       if (AB.heal.includes(id)) d.h = Math.round(sk.heal(lv)); else d.b = sk.buff(lv);
-      NET.room.emit('sbuf', d).catch(() => {});
+      mapEmit('sbuf', d).catch(() => {});
       for (const g of near) VFX.play(sk.fx === 'goldshield' || sk.fx === 'barrier' ? sk.fx : 'heal', {x:g.x, y:g.y});
       addText(P.x, P.y - 66, L(`ส่งให้เพื่อน ${near.length} คน`, `Shared with ${near.length}`), '#9ff0c8', 12);
     } catch (e) {}
@@ -53,7 +53,7 @@ function onSbuf(msg){
   SFX.play(AB.heal.includes(id) ? 'heal' : 'buff');
   log(L(`${who} ใช้ ${nm(sk)} ให้คุณ`, `${who} cast ${nm(sk)} on you`), 'g'); dirty = true;
 }
-EV.on('netready', () => { if (NET.room) NET.room.on('sbuf', onSbuf, () => {}); });
+EV.on('netready', () => { if (NET.room) mapOn('sbuf', onSbuf, () => {}); });
 
 /* the skill tooltips say so */
 for (const id of [...AB.heal, ...AB.buff]){ const sk = SKILLS[id]; if (!sk || !sk.desc) continue; const _d = sk.desc;

@@ -153,12 +153,12 @@ function nmHit(m, dmg){
 function nmFlushHits(){
   if (!NM.hitQ.size || !NET.room || !NET.on) return;
   const h = [...NM.hitQ].slice(0, 30).map(([nid, [f, d]]) => [nid, +f.toFixed(5), Math.round(d)]); NM.hitQ.clear();
-  NET.room.emit('mh', {r:NET.mapName, h}).catch(() => {});
+  mapEmit('mh', {r:NET.mapName, h}).catch(() => {});
 }
 function nmKilled(m){ if (!nmActive() || !m.nid || !NET.room) return; nmFlushHits();
   const e = {r:NET.mapName, id:m.nid};
   if (NM.mode === 'world'){ e.at = wNow(); const k = nwSlotOf(m.nid); if (k){ e.k = k.key; e.g = k.g + 1; nwSetGen(k.key, k.g + 1, e.at); } else NM.deadX.add(m.nid); if (m === boss){ e.b = 1; if (typeof BCK !== 'undefined') BCK.kill[MAP_ID] = e.at; } }
-  NET.room.emit('mk', e).catch(() => {}); NM.byId.delete(m.nid); }
+  mapEmit('mk', e).catch(() => {}); NM.byId.delete(m.nid); }
 function onMh(msg){
   const d = msg.data || {}; if (msg.isMe || d.r !== NET.mapName || !Array.isArray(d.h)) return;
   for (const e of d.h.slice(0, 30)){ if (!Array.isArray(e)) continue; const m = NM.byId.get(e[0]); if (!m || m.dead) continue;
@@ -183,7 +183,7 @@ function onMk(msg){
 function nmSkillFx(id, t){
   if (!NET.room || !NET.on || !NET.mapRoom || NET.mapRoom.peers().length < 2) return;
   if ((NM.fxT || 0) > T) return; NM.fxT = T + .25;
-  NET.room.emit('fx', {r:NET.mapName, s:id, x:Math.round(P.x), y:Math.round(P.y), tx:Math.round(t ? t.x : P.x), ty:Math.round(t ? t.y : P.y), e:DER.welem}).catch(() => {});
+  mapEmit('fx', {r:NET.mapName, s:id, x:Math.round(P.x), y:Math.round(P.y), tx:Math.round(t ? t.x : P.x), ty:Math.round(t ? t.y : P.y), e:DER.welem}).catch(() => {});
 }
 function onFx(msg){
   const d = msg.data || {}; if (msg.isMe || d.r !== NET.mapName || !SKILLS[d.s] || SETTINGS.oFx === false) return;
@@ -200,8 +200,8 @@ function onFx(msg){
     }
   } catch (e) {}
 }
-EV.on('netready', () => { if (!NET.room) return; NET.room.on('mh', onMh, () => {}); NET.room.on('mk', onMk, () => {}); NET.room.on('fx', onFx, () => {});
-  NET.room.on('wq', onWq, () => {}); NET.room.on('tq', onTq, () => {}); NET.room.on('ts', onTs, () => {}); NET.room.on('wg', onWg, () => {}); NET.room.on('ws', onWs, () => {}); });
+EV.on('netready', () => { if (!NET.room) return; mapOn('mh', onMh, () => {}); mapOn('mk', onMk, () => {}); mapOn('fx', onFx, () => {});
+  mapOn('wq', onWq, () => {}); mapOn('tq', onTq, () => {}); mapOn('ts', onTs, () => {}); mapOn('wg', onWg, () => {}); mapOn('ws', onWs, () => {}); });
 /* the tick: elect, publish or apply, flush hits */
 EV.on('tick', dt => {
   if (!NET.mapRoom){ if (nmActive()) nmStop(); return; }
@@ -254,13 +254,13 @@ function nwStart(){
   if (typeof log === 'function') log(L('แผนที่นี้เดินตามเวลาโลก: ทุกคนเห็นมอนชุดเดียวกัน', 'This map runs on the world clock: everyone sees the same monsters'));
 }
 function nwStop(){ NM.mode = null; for (const m of mobs){ m.netOwner = null; m.mine = false; m.nx = null; } }
-function nwAsk(){ if (NET.room && NET.on && NET.mapName) NET.room.emit('wq', {r:NET.mapName, me:NM.me}).catch(() => {}); }
+function nwAsk(){ if (NET.room && NET.on && NET.mapName) mapEmit('wq', {r:NET.mapName, me:NM.me}).catch(() => {}); }
 /* someone new asks for the slot table: the lowest peer id among the others answers */
 function onWq(msg){ const d = msg.data || {}; if (msg.isMe || NM.mode !== 'world' || d.r !== NET.mapName) return;
   const others = nmPeers().filter(p => p.peer !== d.me).map(p => p.peer).sort();   // (lobby and map rooms give different peer ids: the asker names its map id) if (others[0] !== NM.me) return;
   const g = Object.entries(NM.gen).filter(([, v]) => v.g > 0).slice(0, 300).map(([k, v]) => [k, v.g, v.at]);
   const h = mobs.filter(m => m.nid && !m.dead && m.hp < m.maxhp).slice(0, 60).map(m => [m.nid, Math.max(1, Math.round(m.hp / m.maxhp * 1000))]);   // wounds, so a returning player sees the same HP
-  NET.room.emit('wg', {r:NET.mapName, g, x:[...NM.deadX].slice(-60), h}).catch(() => {}); }
+  mapEmit('wg', {r:NET.mapName, g, x:[...NM.deadX].slice(-60), h}).catch(() => {}); }
 function onWg(msg){ const d = msg.data || {}; if (msg.isMe || NM.mode !== 'world' || d.r !== NET.mapName) return;
   if (Array.isArray(d.g)) for (const e of d.g.slice(0, 300)) if (Array.isArray(e) && typeof e[0] === 'string' && NM.keys.includes(e[0])) nwSetGen(e[0], +e[1] || 0, clamp(+e[2] || 0, 0, wNow() + 60e3));
   if (Array.isArray(d.x)) for (const id of d.x.slice(0, 60)) if (typeof id === 'string' && id.length < 40) NM.deadX.add(id);
@@ -276,7 +276,7 @@ function onWs(msg){ const d = msg.data || {}; if (msg.isMe || NM.mode !== 'world
 HK.spawn.push((m, opt) => { if (NM.mode !== 'world' || !opt || !opt.minion || opt.remote || m.nid || !NET.room || !NET.on) return;
   if (mobs.filter(o => o.wx && o.mine && !o.dead).length > 8) return;   // a boss calls a few, not an army
   nwAdopt(m, NM.tag + 'x' + (++NM.seq).toString(36)); m.wx = true; m.mine = true; m.netOwner = NM.me;
-  NET.room.emit('ws', {r:NET.mapName, id:m.nid, t:m.type, x:Math.round(m.x), y:Math.round(m.y), z:zoneCode(m.zone)}).catch(() => {}); });
+  mapEmit('ws', {r:NET.mapName, id:m.nid, t:m.type, x:Math.round(m.x), y:Math.round(m.y), z:zoneCode(m.zone)}).catch(() => {}); });
 /* what I hold, for my presence: id:x:y:dir:flags:hp‰|extra ; … */
 function nwHeld(){ const out = []; NM.holding = false;
   for (const m of mobs) if (m.nid && !m.dead && m.mine){ NM.holding = true; const ex = typeof mobEx === 'function' ? mobEx(m) : '';
@@ -395,7 +395,7 @@ function nwTick(dt){
    still sees monsters and bosses respawn with the rest. Small corrections glide in; big ones jump. */
 const NWT = {t:3, nonce:'', sent:0, off:new Map()};
 function onTq(msg){ const d = msg.data || {}; if (msg.isMe || d.r !== NET.mapName || typeof d.n !== 'string' || d.n.length > 12 || !NET.room) return;
-  NET.room.emit('ts', {r:NET.mapName, n:d.n, me:NM.me, t:Date.now()}).catch(() => {}); }
+  mapEmit('ts', {r:NET.mapName, n:d.n, me:NM.me, t:Date.now()}).catch(() => {}); }
 function onTs(msg){ const d = msg.data || {}; if (msg.isMe || d.r !== NET.mapName || d.n !== NWT.nonce || typeof d.me !== 'string') return;
   const now = Date.now(), rtt = now - NWT.sent; if (rtt < 0 || rtt > 4000 || !isFinite(+d.t)) return;
   const o = clamp(+d.t + rtt / 2 - now, -864e5, 864e5), old = NWT.off.get(d.me);
@@ -405,7 +405,7 @@ EV.on('tick', dt => {
   if (!NET.mapRoom || !NET.room || !NET.on){ NWT.off.clear(); return; }
   const ps = nmPeers(); if (ps.length < 2) { NWT.off.clear(); if (Math.abs(WCLK.off) > 0) WCLK.off = 0; return; }
   // (v130) on the wall clock, not game time: on a slow device game time runs slower and the clocks agreed too late
-  if (performance.now() >= (NWT.next || 0)){ NWT.next = performance.now() + 8000; NWT.nonce = Math.random().toString(36).slice(2, 10); NWT.sent = Date.now(); NET.room.emit('tq', {r:NET.mapName, n:NWT.nonce}).catch(() => {}); }
+  if (performance.now() >= (NWT.next || 0)){ NWT.next = performance.now() + 8000; NWT.nonce = Math.random().toString(36).slice(2, 10); NWT.sent = Date.now(); mapEmit('tq', {r:NET.mapName, n:NWT.nonce}).catch(() => {}); }
   // the median of everyone's clock (players still on this map, fresh samples), ours = 0
   const live = new Set(ps.map(p => p.peer)), now = Date.now(), v = [0];
   for (const [k, e] of NWT.off){ if (!live.has(k) || now - e.at > 60e3){ NWT.off.delete(k); continue; } v.push(e.o); }

@@ -49,7 +49,7 @@ function netTick(dt){
   NET.presT -= dt; NET.lobbyT -= dt; NET.dirT -= dt;
   if (NET.mapRoom && NET.presT <= 0){
     // up to 20 heroes share a map room: send less often as it fills so the room stays light (8/s alone → ~4/s full)
-    NET.presT = NET.mapRoom ? (NET.mapRoom.peers().length > 10 ? .25 : NET.mapRoom.peers().length > 4 ? .18 : .12) : .12;
+    NET.presT = NET.mapRoom ? (NET.mapRoom.peers().length > 10 ? .33 : NET.mapRoom.peers().length > 4 ? .25 : NET.mapRoom.peers().length > 1 ? .2 : .5) : .5;   // (v185) 5/s with company, 2/s alone on the map (no one downloads it), 3–4/s in a crowd
     if (typeof NM !== 'undefined' && (NM.host || NM.holding)) NET.presT = Math.max(NET.presT, .2);   // the monster host's presence carries the snapshot: keep it at 5/s
     const p = {n:netName(), j:S.job, l:S.lvl, x:Math.round(P.x), y:Math.round(P.y), d:P.dir || 0, a:P.act || 'idle', r:P.ride ? 1 : 0, h:Math.round(S.hp / DER.maxhp * 100), sp:Math.round(S.sp / DER.maxsp * 100), pt:NET.party || null, s:P.sit ? 1 : 0, dead:P.dead ? 1 : 0, g:(vg => { const a = GHOST_SLOTS.map(k => vg[k] || ''); while (a.length > 4 && !a[a.length - 1]) a.pop(); return a.join(','); })(typeof visGear === 'function' ? visGear(S.gear) : S.gear || {}), ti:S.title || '', gn:(S.guild && S.guild.name) || '', lk:SPR.lookKey(S.look), ...(typeof wbPres === 'function' ? wbPres() : {}), ...(typeof nmPres === 'function' ? nmPres() : {}), ...(typeof dgPres === 'function' ? dgPres() : {}), ...(typeof pvpPres === 'function' ? pvpPres() : {}), ...(typeof afPres === 'function' ? afPres() : {}), ...(typeof cosPres === 'function' ? cosPres() : {}), ...(typeof emoPres === 'function' ? emoPres() : {}), ...(typeof siegePres === 'function' ? siegePres() : {}), ...(typeof rfPres === 'function' ? rfPres() : {}), ...(typeof gmPres === 'function' ? gmPres() : {}), ...(typeof sumPres === 'function' ? sumPres() : {}), ...(typeof gfxPres === 'function' ? gfxPres() : {})};
     let ch = false; for (const k in p) if (p[k] !== NET.lastPres[k]){ ch = true; break; }
@@ -57,7 +57,14 @@ function netTick(dt){
     if (ch) NET.hbT = 10;
     if (ch){ NET.lastPres = p; NET.mapRoom.presence(p).catch(() => {}); }
   }
-  if (NET.lobbyT <= 0){ NET.lobbyT = 2; NET.room.presence({n:netName(), j:S.job, l:S.lvl, m:MAP_ID, h:Math.round(S.hp / DER.maxhp * 100), pt:NET.party || null, ...(typeof partyPres === 'function' ? partyPres() : {})}).catch(() => {}); }
+  /* (v185) the lobby line (name, class, level, map, party) reaches every online player, so it is sent only when it
+     changes (checked every 2 s; HP alone at most every 6 s and only in a party) plus a 20 s heartbeat — it used to go out
+     every 2 s from everyone to everyone */
+  if (NET.lobbyT <= 0){ NET.lobbyT = 2; const lp = {n:netName(), j:S.job, l:S.lvl, m:MAP_ID, h:Math.round(S.hp / DER.maxhp * 100), pt:NET.party || null, ...(typeof partyPres === 'function' ? partyPres() : {})};
+    const now = performance.now(), last = NET.lastLobby || {}, at = NET.lastLobbyAt || -1e9; let ch = false;
+    for (const k in lp) if (k !== 'h' && JSON.stringify(lp[k]) !== JSON.stringify(last[k])){ ch = true; break; }
+    if (!ch && lp.h !== last.h && lp.pt && now - at > 6000) ch = true;
+    if (ch || now - at > 20000){ NET.lastLobby = lp; NET.lastLobbyAt = now; NET.room.presence(lp).catch(() => {}); } }
   // players directory (for the ranking), only when something changed
   if (NET.db && NET.uid && NET.dirT <= 0 && !S.gmLocal){ NET.dirT = 30; const acc = typeof ACC !== 'undefined' ? ACC.name : '', sig = `${netName()}|${S.job}|${S.lvl}|${MAP_ID}|${S.shards || 0}|${acc}|${S.title || ''}|${(S.guild && S.guild.id) || ''}|${S.pvp ? S.pvp.r : 1000}|${Object.keys(S.ach || {}).length}|${(S.tower && S.tower.best) || 0}|${typeof housePub === 'function' ? JSON.stringify(housePub()) : ''}`;
     if (sig !== NET.dirSig){ NET.dirSig = sig; NET.db.doc(`players/${NET.uid}`).set({name:netName(), job:S.job, lvl:S.lvl, map:MAP_ID, shards:S.shards || 0, acc, title:S.title || '', guild:(S.guild && S.guild.id) || '', ach:Object.keys(S.ach || {}).length, pvp:S.pvp ? S.pvp.r : 1000, house:typeof housePub === 'function' ? housePub() : null, tower:(S.tower && S.tower.best) || 0, at:Date.now()}).catch(() => {}); } }

@@ -54,18 +54,23 @@
 
   /* ---------- room over the Realtime Database ---------- */
   const safe = n => String(n).replace(/[.#$\[\]\/]/g, '_').slice(0, 80);
+  const DYN = new Set(['x', 'y', 'd', 'a', 'h', 'sp', 's', 'dead', 'r', 'ms', 'mq', 'em']);
   const TAG = Math.random().toString(36).slice(2, 10);
   function makeRoom(name){
     const key = safe(name), base = rtdb.ref(`rooms/${key}`), uid = auth.currentUser.uid, me = `${TAG}${key === 'lobby' ? '' : ''}`;
     const peersRef = base.child('peers'), myRef = peersRef.child(me), evRef = base.child('ev');
     const peers = new Map(), topics = {}, peerCbs = [], conCbs = [], subs = [];
+    let lastJ = null, hasNode = false;
     let myPres = null, joinedAt = Date.now() + offset, left = false, conn = false;
     /* leftovers of my own earlier sessions in this room (page reloaded, tab crashed, second device): remove them, the newest session wins */
     peersRef.orderByChild('by').equalTo(uid).once('value').then(sn => { sn.forEach(c => { if (c.key !== me) c.ref.remove().catch(() => {}); }); }).catch(() => {});
     myRef.onDisconnect().remove(); myRef.set({by:uid, j:'null', t:fb.database.ServerValue.TIMESTAMP});
     const firePeers = () => { for (const f of peerCbs) try { f(list()); } catch (e) {} };
     const parse = s => { try { return JSON.parse(s); } catch (e){ return null; } };
-    const onPeer = s => { const v = s.val() || {}; peers.set(s.key, {peer:s.key, by:v.by, presence:parse(v.j), kind:'viewer', guest:false, isMe:s.key === me, sameTab:s.key === me, t:typeof v.t === 'number' ? v.t : 0}); firePeers(); };
+    /* (v185) a presence is kept in two parts: j = what rarely changes (name, class, gear, guild…), k = what moves (x, y,
+       facing, action, HP/SP…). A step only rewrites k, so every other player on the map downloads ~100 bytes instead of
+       the whole ~500-byte record, several times a second. Readers merge the two (k over j). */
+    const onPeer = s => { const v = s.val() || {}, pj = parse(v.j), pk = typeof v.k === 'string' ? parse(v.k) : null; peers.set(s.key, {peer:s.key, by:v.by, presence:pk && pj && typeof pj === 'object' ? {...pj, ...pk} : pj, kind:'viewer', guest:false, isMe:s.key === me, sameTab:s.key === me, t:typeof v.t === 'number' ? v.t : 0}); firePeers(); };
     /* a hero whose browser died without the server noticing stays in the room forever (a frozen "ghost" standing on the map):
        every client re-sends its presence at least every 10 s (online.js), so a peer silent for 45 s is dropped from the list */
     const pruneT = setInterval(() => { const now = Date.now() + offset; let ch = false;
@@ -83,7 +88,9 @@
       emit:async (topic, data) => { if (left) throw new Error('left'); const j = JSON.stringify(data ?? null); if (j.length > 60000) throw new Error('too big');
         const r = evRef.push(); await r.set({topic:String(topic), j, peer:me, by:uid, t:fb.database.ServerValue.TIMESTAMP}); setTimeout(() => r.remove().catch(() => {}), 15000); },
       on:(topic, fn) => { (topics[topic] = topics[topic] || []).push(fn); return () => { topics[topic] = (topics[topic] || []).filter(f => f !== fn); }; },
-      presence:async patch => { if (left) return; myPres = patch; await myRef.set({by:uid, j:JSON.stringify(patch ?? null), t:fb.database.ServerValue.TIMESTAMP}); },   // set (not update) with `by`: after a reconnect the server has already removed my node, and the rules reject a node without `by`
+      presence:async patch => { if (left) return; myPres = patch; const [js, ks] = split(patch);
+        if (js === lastJ && ks != null && hasNode){ await myRef.update({k:ks, t:fb.database.ServerValue.TIMESTAMP}); return; }
+        lastJ = js; hasNode = true; await myRef.set({by:uid, j:js, ...(ks != null ? {k:ks} : {}), t:fb.database.ServerValue.TIMESTAMP}); },   // set (not update) with `by`: after a reconnect the server has already removed my node, and the rules reject a node without `by`
       peers:list,
       onPeers:fn => { peerCbs.push(fn); fn(list()); return () => { const i = peerCbs.indexOf(fn); if (i >= 0) peerCbs.splice(i, 1); }; },
       onConnection:fn => { conCbs.push(fn); if (conn) fn(true); },
@@ -91,11 +98,15 @@
       leave:async () => { left = true; for (const f of subs) f(); try { myRef.onDisconnect().cancel(); await myRef.remove(); } catch (e) {} }
     };
     void myPres;
+    // the moving part of a presence (see onPeer): position, facing, action, HP/SP, sitting/dead, riding, the monster host's snapshot
+    function split(p){ if (!p || typeof p !== 'object' || Array.isArray(p)) return [JSON.stringify(p ?? null), null];
+      const st = {}, dy = {}; let n = 0; for (const key in p){ if (DYN.has(key)){ dy[key] = p[key]; n++; } else st[key] = p[key]; }
+      return [JSON.stringify(st), n ? JSON.stringify(dy) : null]; }
     /* every room (not only the lobby): each time the connection comes back (phone slept, wifi blip) the server has already removed my node,
        so re-arm onDisconnect and write my node again with the latest presence — otherwise I stay invisible on that map until I change map */
     const conRef = rtdb.ref('.info/connected');
     const onCon = s => { const c = !!s.val(); if (name === 'lobby'){ conn = c; for (const f of conCbs) try { f(c); } catch (e) {} }
-      if (c && !left) myRef.onDisconnect().remove().then(() => { if (!left) return myRef.set({by:uid, j:JSON.stringify(myPres ?? null), t:fb.database.ServerValue.TIMESTAMP}); }).catch(() => {}); };
+      if (c && !left) myRef.onDisconnect().remove().then(() => { if (left) return; const [js, ks] = split(myPres); lastJ = js; hasNode = true; return myRef.set({by:uid, j:js, ...(ks != null ? {k:ks} : {}), t:fb.database.ServerValue.TIMESTAMP}); }).catch(() => {}); };
     conRef.on('value', onCon); subs.push(() => conRef.off('value', onCon));
     return api;
   }

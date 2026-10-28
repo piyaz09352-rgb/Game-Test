@@ -22,7 +22,7 @@ const nbOn = () => typeof nmActive === 'function' && nmActive() && NET.room && N
     if (NB.ctx && NB.sk && !NB.remote && (key === 'warnCircle' || key === 'warnLine') && o && nbOn() && NB.ctx.nid){
       const m = NB.ctx, e = {r:NET.mapName, n:m.nid, s:NB.sk, k:key === 'warnCircle' ? 'c' : 'l', x:Math.round(o.x), y:Math.round(o.y), t:+(o.t || .8).toFixed(2)};
       if (e.k === 'c') e.rr = Math.round(o.r || 60); else { e.ux = +(+o.ux).toFixed(3); e.uy = +(+o.uy).toFixed(3); e.len = Math.round(o.len || 260); e.w = Math.round(o.w || 44); }
-      NET.room.emit('bz', e).catch(() => {});
+      mapEmit('bz', e).catch(() => {});
     }
     return _play(key, o);
   };
@@ -31,7 +31,7 @@ const nbOn = () => typeof nmActive === 'function' && nmActive() && NET.room && N
 EV.on('tick', () => {
   if (!nbOn()) return;
   for (const m of mobs){ const F = m.fz; if (!F || m.dead || !m.nid || F.remote) continue; const n = F.rings.length;
-    if (n > (m._nbR || 0)) for (let i = m._nbR || 0; i < n; i++){ const r = F.rings[i]; if (r._sent) continue; r._sent = true; NET.room.emit('bz', {r:NET.mapName, n:m.nid, s:'ring', k:'ring', x:Math.round(r.x), y:Math.round(r.y), t:0}).catch(() => {}); }
+    if (n > (m._nbR || 0)) for (let i = m._nbR || 0; i < n; i++){ const r = F.rings[i]; if (r._sent) continue; r._sent = true; mapEmit('bz', {r:NET.mapName, n:m.nid, s:'ring', k:'ring', x:Math.round(r.x), y:Math.round(r.y), t:0}).catch(() => {}); }
     m._nbR = n; }
 });
 /* the receiving side */
@@ -57,7 +57,7 @@ function onBz(msg){
       later(t + (s === 'charge' || s === 'dash' ? .25 : 0), () => { if (m.dead) return; const px = P.x - x, py = P.y - y, along = px * ux + py * uy, off = Math.abs(px * uy - py * ux); if (along > 0 && along < len && off < w / 2 + 6) nbHit(m, s, mult); }); }
   } finally { NB.remote = false; }
 }
-EV.on('netready', () => { if (NET.room) NET.room.on('bz', onBz, () => {}); });
+EV.on('netready', () => { if (NET.room) mapOn('bz', onBz, () => {}); });
 /* moves the snapshot carries: breath cone, death spin, soul vortex — checked against you here */
 EV.on('tick', dt => {
   if (!nbOn() || P.dead) return;

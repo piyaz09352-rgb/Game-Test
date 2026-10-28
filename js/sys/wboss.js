@@ -54,7 +54,7 @@ EV.on('tick', dt => {
   WB.left = w && w.active ? w.left : 0;
   // share my damage a few times a second
   if (typeof nmActive === 'function' && nmActive()) WB.acc = 0;
-  if (WB.m && WB.acc > 0 && (WB.sendT -= dt) <= 0){ WB.sendT = .5; if (NET.room && NET.on) NET.room.emit('wb', {k:'dmg', key:WB.key, f:+WB.acc.toFixed(5), m:MAP_ID}).catch(() => {}); WB.acc = 0; }
+  if (WB.m && WB.acc > 0 && (WB.sendT -= dt) <= 0){ WB.sendT = .5; if (NET.room && NET.on) mapEmit('wb', {k:'dmg', key:WB.key, f:+WB.acc.toFixed(5), m:MAP_ID}).catch(() => {}); WB.acc = 0; }
 });
 function onWb(msg){
   const d = msg.data || {}; if (msg.isMe || !WB.m || WB.m.dead || d.key !== WB.key || d.m !== MAP_ID) return;
@@ -63,13 +63,13 @@ function onWb(msg){
   const f = clamp(+d.f || 0, 0, .35); WB.m.hp -= f * WB.m.maxhp; WB.m.flash = .08;
   if (WB.m.hp <= 0) killMob(WB.m);
 }
-EV.on('netready', () => { if (NET.room) NET.room.on('wb', onWb, () => {}); });
+EV.on('netready', () => { if (NET.room) mapOn('wb', onWb, () => {}); });
 let wbPres = () => (WB.m && !WB.m.dead ? {wb:+(WB.m.hp / WB.m.maxhp).toFixed(3), wbk:WB.key} : {wb:null, wbk:null});
 /* the reward */
 const wbEligible = () => WB.my >= .005 || !(NET.room && NET.mapRoom && NET.mapRoom.peers().some(p => !p.isMe));
 const wbReward = m => {
   if (!m.wb) return; const key = WB.key; WB.m = null;
-  if (NET.room && NET.on){ if (WB.acc > 0) NET.room.emit('wb', {k:'dmg', key, f:+WB.acc.toFixed(5), m:MAP_ID}).catch(() => {}); WB.acc = 0; NET.room.emit('wb', {k:'dead', key, m:MAP_ID}).catch(() => {}); } S.wbDone = S.wbDone || {}; if (S.wbDone[key]) return; S.wbDone[key] = 1;
+  if (NET.room && NET.on){ if (WB.acc > 0) mapEmit('wb', {k:'dmg', key, f:+WB.acc.toFixed(5), m:MAP_ID}).catch(() => {}); WB.acc = 0; mapEmit('wb', {k:'dead', key, m:MAP_ID}).catch(() => {}); } S.wbDone = S.wbDone || {}; if (S.wbDone[key]) return; S.wbDone[key] = 1;
   if (!wbEligible()){ banner(L('ราหูพ่ายแพ้! แต่คุณช่วยไม่ถึงเกณฑ์รับรางวัล', 'Rahu has fallen! You did not deal enough damage for a reward')); return; }
   const Lv = m.def.lvl; S.bia += Lv * 400; coinAdd(10, L('บอสโลก', 'world boss'));
   const pool = GEAR_LIST.filter(g => g[1] !== 'ammo' && g[4] <= Lv && g[4] >= Lv - 35 && lineOk(g[6]) && (g[1] !== 'weapon' || g[6].wtype === JOBS[S.job].weapon.type));
