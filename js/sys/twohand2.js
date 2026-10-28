@@ -2,19 +2,19 @@
    A normal attack with a two-handed weapon is two blows: the second follows the first a moment later (0.18 s, or a
    little under half the attack interval when attacks are very fast), with its own swing, its own sound and its own
    hit. Each blow deals half, so the damage over time stays where the style calibration put it.
-   Two-handed here: greatswords, two-handed axes, twin daggers and the katana, knuckles / gloves / claws, and bows (a bow
-   looses two arrows). Staves and rods, one- or two-handed, are left as they are: a caster's orb stays one orb. */
+   Two-handed here: greatswords, two-handed axes, twin daggers and the katana, knuckles / gloves / claws. Staves and rods
+   (a caster's orb stays one orb) and bows (one arrow) are left as they are (v176). */
 'use strict';
 
 const BA2 = {half:0, busy:false};
 /* the weapon in hand is two-handed (and not a staff) */
 function ba2On(){
   if (!S || !JOBS[S.job]) return false;
-  const J = JOBS[S.job], wt = J.weapon && J.weapon.type; if (J.caster || wt === 'staff') return false;
+  const J = JOBS[S.job], wt = J.weapon && J.weapon.type; if (J.caster || wt === 'staff' || wt === 'bow' || J.ranged) return false;   // (v176) bows shoot one arrow
   const id = S.gear && S.gear.weapon, it = id && ITEMS[id];
   if (it && it.st && it.st.wtype === wt) return it.st.hands === '2h';
   // no weapon item of the class worn: the class's own weapon decides
-  if (wt === 'fist' || wt === 'bow') return true;
+  if (wt === 'fist') return true;
   if (J.weapon.hands === '2h') return true;
   const c = SPR.CHARS[S.job]; return !!(c && (c.twoHand || (wt === 'dagger' && c.twin)));
 }
