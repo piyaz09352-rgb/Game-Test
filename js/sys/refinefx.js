@@ -42,11 +42,11 @@ function rfWeaponFx(g, segs, rf, seed){
     if (L0 < 4){ const mx = (ax + bx) / 2, my = (ay + by) / 2; ax = mx; ay = my - 2; bx = mx; by = my + 2; }   // seen end-on: still a small bright spot
     const at = f => [ax + (bx - ax) * f, ay + (by - ay) * f], len = Math.max(4, Math.hypot(bx - ax, by - ay));
     // bloom: three widening strokes along the blade
-    const W = 1.6 + rf * .26;
+    const W = 1.4 + rf * .12;   // (v166) a narrower bloom: at +15 the blade was washed out to a white bar
     for (const [w, a] of [[W * 2.6, .07 + k * .07], [W * 1.6, .14 + k * .1], [W, .26 + k * .16]]){
       g.strokeStyle = `rgba(${c},${a * pul})`; g.lineWidth = w; g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke(); }
-    if (t >= 1){ g.strokeStyle = `rgba(255,255,255,${(.3 + k * .2) * pul})`; g.lineWidth = Math.max(1, W * .3); g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke(); }
-    if (t >= 4){ const h = (T * 120 + seed * 40) % 360; g.strokeStyle = `hsla(${h},100%,62%,${.4 * pul})`; g.lineWidth = W * .9; g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke(); }
+    if (t >= 1){ g.strokeStyle = `rgba(255,255,255,${(.16 + k * .1) * pul})`; g.lineWidth = Math.max(.7, W * .22); g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke(); }
+    if (t >= 4){ g.strokeStyle = `rgba(255,232,170,${.2 * pul})`; g.lineWidth = W * .6; g.beginPath(); g.moveTo(ax, ay); g.lineTo(bx, by); g.stroke(); }   // (v166) a warm gold edge, no cycling rainbow
     // glints riding the blade
     const n = 1 + Math.round(rf * .9) + t;
     for (let i = 0; i < n; i++){

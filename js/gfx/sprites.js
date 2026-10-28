@@ -1325,7 +1325,8 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   }
   const wt = cfg.wTier ?? -1, BL = ['steel', 'steel', 'ember', 'obsid', 'jade', 'sun'], SH = ['wood', 'wood', 'lacquer', 'charcoal', 'teal', 'gold'], ORB = ['orb', 'rune', 'ember', 'auraViolet', 'jade', 'sun'];
   const RFM = ['', 'rune', 'orb', 'auraGold', 'auraWhite'], rft = cfg.rfTier || 0;   // refine glow: blue → violet → gold → radiant
-  const blade = M[rft ? RFM[rft] : BL[wt] || 'steel'], guard = M[wt === 0 ? 'leather' : wt >= 3 ? 'gold' : 'gold'];
+  const blade = M[BL[wt] || 'steel'],   // (v166) a refined blade stays its own metal (it used to turn into glowing white at +13 and vanish into a blob of light); the glow is laid over it by refinefx.js
+        _rfm = RFM[rft], guard = M[wt === 0 ? 'leather' : wt >= 3 ? 'gold' : 'gold'];
   // (v159) one-handed blades and rods are visibly smaller than their two-handed kin: a 1H sword ×0.88, a greatsword ×1.45;
   // a rod ×0.72, a longstaff ×1.3; the katana is its own long single blade
   const kat = w === 'dagger' && !!cfg.katana, two = !!cfg.twoHand || kat;

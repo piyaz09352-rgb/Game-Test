@@ -26,8 +26,10 @@ function gfxPres(){ const r = gearRfs(); return {ga:GEARFX_ORD.map(z => r[z] || 
 function gfxParse(q){ const r = {}; if (!q || typeof q.ga !== 'string') return r; const a = q.ga.split(',').slice(0, 5); GEARFX_ORD.forEach((z, i) => { const v = clamp(+a[i] | 0, 0, 15); if (v && z) r[z] = v; }); return r; }
 
 function gearGlow(g, x, y, rfs, elem, wrf, seed, flip){
-  const zones = Object.keys(rfs), total = zones.reduce((a, z) => a + rfs[z], 0) + (wrf || 0);
-  if (!zones.length && total < 4) return;
+  // (v166) only the worn armour pieces light up the body: a +15 weapon used to count here too, so a hero with nothing but a
+  // refined weapon got lightning arcs crackling across the face even with the weapon put away (its glow belongs on the blade)
+  const zones = Object.keys(rfs), total = zones.reduce((a, z) => a + rfs[z], 0);
+  if (!zones.length) return;
   const c = GEARFX_COL[elem] || GEARFX_COL.neutral, pul = .8 + Math.sin(T * 2.2 + seed) * .2;
   g.save(); g.globalCompositeOperation = 'lighter';
   // 1) soft glow on each refined piece (gentle: never washes the sprite out)
@@ -52,9 +54,9 @@ function elemFx(g, x, y, e, lv, seed, c){
   if (e === 'wind' || e === 'spark+'){   // lightning: short jagged arcs that flick on and off around the body
     for (let a = 0; a < 1 + Math.round(lv * 2); a++){
       /* (v106) sparks stay on: no flicker */
-      const ang = (T * 1.7 + a * 2.1 + seed) % 6.28, r = 12 + a * 2, x0 = x + Math.cos(ang) * r, y0 = y - 30 + Math.sin(ang) * r * 1.4;
+      const ang = (T * 1.1 + a * 2.1 + seed) % 6.28, r = 13 + a * 2, x0 = x + Math.cos(ang) * r, y0 = y - 22 + Math.sin(ang) * r * .5;   // (v166) round the waist, below the face, and calmer
       g.strokeStyle = `rgba(${e === 'wind' ? '170,230,255' : '230,240,255'},${.45 + lv * .3})`; g.lineWidth = .9; g.beginPath(); g.moveTo(x0, y0);
-      for (let i = 1; i <= 4; i++){ const t = i / 4; g.lineTo(x0 + Math.cos(ang + 1.6) * 9 * t + Math.sin(T * 5 + i * 3 + a) * 2.4, y0 + Math.sin(ang + 1.6) * 9 * t + Math.cos(T * 6 + i * 2 + a) * 2.4); }
+      for (let i = 1; i <= 4; i++){ const t = i / 4; g.lineTo(x0 + Math.cos(ang + 1.6) * 8 * t + Math.sin(T * 1.8 + i * 3 + a) * 1.6, y0 + Math.sin(ang + 1.6) * 4 * t + Math.cos(T * 2.1 + i * 2 + a) * 1.6); }
       g.stroke(); g.fillStyle = 'rgba(255,255,255,.6)'; g.fillRect(x0 - .6, y0 - .6, 1.2, 1.2); }
     if (e === 'spark+') return;
   }
@@ -88,7 +90,7 @@ function elemFx(g, x, y, e, lv, seed, c){
     const e = gearElem(); if (e !== 'neutral' && segs && segs.length && rf >= 4){ g.save(); g.globalCompositeOperation = 'lighter';
       const [x0, y0, x1, y1] = segs[0], c = GEARFX_COL[e];
       for (let i = 0; i < 3 + Math.floor(rf / 4); i++){ const f = (T * .9 + i * .37 + seed) % 1, px = x0 + (x1 - x0) * f, py = y0 + (y1 - y0) * f;
-        if (e === 'wind'){ if (true){ g.strokeStyle = `rgba(${c},.7)`; g.lineWidth = .8; g.beginPath(); g.moveTo(px, py); g.lineTo(px + Math.sin(T * 5 + i) * 4, py - 3); g.lineTo(px + Math.cos(T * 43 + i) * 3, py - 6); g.stroke(); } }
+        if (e === 'wind'){ if (true){ g.strokeStyle = `rgba(${c},.7)`; g.lineWidth = .8; g.beginPath(); g.moveTo(px, py); g.lineTo(px + Math.sin(T * 5 + i) * 4, py - 3); g.lineTo(px + Math.cos(T * 2.3 + i) * 3, py - 6); g.stroke(); } }
         else { g.fillStyle = `rgba(${c},${.5 * Math.sin(f * Math.PI)})`; g.beginPath(); g.arc(px, py - f * 3, 1.1, 0, 7); g.fill(); } }
       g.restore(); }
     return r; };
