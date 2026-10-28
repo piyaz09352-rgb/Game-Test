@@ -13,10 +13,11 @@ const SFXS = {
     // (v169) the one-handed sword swing/hit recordings were taken out at the owner's request (to be made again)
     atk_sword1:'audio/sfx/sword1_attack.mp3',   // (v173) a one-handed sword's normal attack: one blow, one sound
     atk_dagger1:'audio/sfx/dagger1_attack.mp3',   // (v174) a single dagger's normal attack
+    atk_bow1:'audio/sfx/bow_shot.mp3',   // (v178) a bow's normal shot (the arrow's landing keeps its own sound)
     atk_2h1:'audio/sfx/twohand_attack1.mp3', atk_2h2:'audio/sfx/twohand_attack2.mp3',   // (v177) two-handed weapons that strike twice: first blow, second blow
     miss:'audio/sfx/miss.mp3'   // (v172) every attack that misses ("Miss"), whoever swings it
   },
-  gain:{miss:.55, atk_sword1:.55, atk_dagger1:.75, atk_2h1:.55, atk_2h2:.55}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
+  gain:{miss:.55, atk_sword1:.55, atk_dagger1:.75, atk_2h1:.55, atk_2h2:.55, atk_bow1:.6}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
 };
 /* which recorded kind a weapon type is for the hero now: a one-handed sword is 'sword1' (a greatsword, the merchant's axes
    and two-handed blades are other kinds, not recorded yet) */
@@ -24,6 +25,7 @@ function sfxsKind(w){
   if (!S) return null;
   // (v177) a blow of a two-handed weapon's double strike (twohand2.js): its own recording for the first and the second blow
   if (typeof BA2 !== 'undefined' && BA2.blow && typeof ba2On === 'function' && ba2On()) return '2h' + BA2.blow;
+  if (w === 'bow') return 'bow1';
   if (w === 'dagger'){   // (v174) a single dagger: not twin daggers (a worn มีดคู่, or the thief line's own pair) and not a two-handed katana
     const id = S.gear && S.gear.weapon, it = id && ITEMS[id], base = (it && it.base) || id || '';
     if (/^w_tdagger\d+$/.test(base) || (it && it.st && it.st.hands === '2h') || (!it && SPR.CHARS[S.job] && SPR.CHARS[S.job].twin)) return null;
@@ -66,7 +68,7 @@ function sfxsPlay(k, at){
     fallback(); };
   SFX.swing = function(w){ const a = arguments, self = this; SFXS.blow(sfxsKind(w), () => _sw.apply(self, a)); };
   SFX.hit = function(w){ const k = sfxsKind(w), raw = SFX.raw && SFX.raw();
-    if (k && SFXS.buf['atk_' + k] && !SFXS.files['hit_' + k]) return;   // the blow's recording already has its impact
+    if (k && k !== 'bow1' && SFXS.buf['atk_' + k] && !SFXS.files['hit_' + k]) return;   // the blow's recording already has its impact (an arrow still lands with its own)
     if (k && raw){ const now = raw.ac.currentTime, at = now - SFXS.sw < SFXS.lag ? SFXS.sw + SFXS.lag : now;
       if (sfxsPlay('hit_' + k, at)) return; }
     return _hit.apply(this, arguments); };
