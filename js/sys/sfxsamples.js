@@ -14,17 +14,26 @@ const SFXS = {
     atk_sword1:'audio/sfx/sword1_attack.mp3',   // (v173) a one-handed sword's normal attack: one blow, one sound
     atk_dagger1:'audio/sfx/dagger1_attack.mp3',   // (v174) a single dagger's normal attack
     atk_bow1:'audio/sfx/bow_shot.mp3',   // (v178) a bow's normal shot (the arrow's landing keeps its own sound)
+    atk_fist1:'audio/sfx/fist_attack1.mp3', atk_fist2:'audio/sfx/fist_attack2.mp3',   // (v179) the boxers' knuckles and gloves: first and second punch
     atk_2h1:'audio/sfx/twohand_attack1.mp3', atk_2h2:'audio/sfx/twohand_attack2.mp3',   // (v177) two-handed weapons that strike twice: first blow, second blow
     miss:'audio/sfx/miss.mp3'   // (v172) every attack that misses ("Miss"), whoever swings it
   },
-  gain:{miss:.55, atk_sword1:.55, atk_dagger1:.75, atk_2h1:.55, atk_2h2:.55, atk_bow1:.6}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
+  gain:{miss:.55, atk_sword1:.55, atk_dagger1:.75, atk_2h1:.55, atk_2h2:.55, atk_bow1:.6, atk_fist1:.6, atk_fist2:.6}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
 };
 /* which recorded kind a weapon type is for the hero now: a one-handed sword is 'sword1' (a greatsword, the merchant's axes
    and two-handed blades are other kinds, not recorded yet) */
+/* the fists in use are claws: a worn กรงเล็บ, or the cat folk's own claws with no gloves or knuckles worn */
+function sfxsClaw(){ const id = S.gear && S.gear.weapon, it = id && ITEMS[id], base = (it && it.base) || id || '';
+  if (/^w_claw\d+$/.test(base) || /_claw/.test(base)) return true;
+  if (it && it.st && it.st.wtype === 'fist') return !!(it.st.claw);
+  return typeof NL_LINE_OF !== 'undefined' && NL_LINE_OF[S.job] === 'catfolk'; }
 function sfxsKind(w){
   if (!S) return null;
   // (v177) a blow of a two-handed weapon's double strike (twohand2.js): its own recording for the first and the second blow
-  if (typeof BA2 !== 'undefined' && BA2.blow && typeof ba2On === 'function' && ba2On()) return '2h' + BA2.blow;
+  if (typeof BA2 !== 'undefined' && BA2.blow && typeof ba2On === 'function' && ba2On()){
+    // (v179) knuckles and gloves punch with the boxers' own sounds; claws (the cat folk, a worn กรงเล็บ) keep the blade-like two-handed ones
+    if (w === 'fist' && !sfxsClaw()) return 'fist' + BA2.blow;
+    return '2h' + BA2.blow; }
   if (w === 'bow') return 'bow1';
   if (w === 'dagger'){   // (v174) a single dagger: not twin daggers (a worn มีดคู่, or the thief line's own pair) and not a two-handed katana
     const id = S.gear && S.gear.weapon, it = id && ITEMS[id], base = (it && it.base) || id || '';
