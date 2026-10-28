@@ -6,7 +6,7 @@
    (a caster's orb stays one orb) and bows (one arrow) are left as they are (v176). */
 'use strict';
 
-const BA2 = {half:0, busy:false};
+const BA2 = {half:0, busy:false, blow:0};
 /* the weapon in hand is two-handed (and not a staff) */
 function ba2On(){
   if (!S || !JOBS[S.job]) return false;
@@ -21,17 +21,17 @@ function ba2On(){
 /* a blow made while BA2.half is set deals half */
 { const _pd = physDamage; physDamage = function(m, mult, elem){ if (BA2.half > 0) mult = (mult ?? 1) * .5; return _pd.call(this, m, mult, elem); }; }
 const ba2Halve = fn => function(){ BA2.half++; try { return fn.apply(this, arguments); } finally { BA2.half--; } };
-function ba2Blow(ba, t){
+function ba2Blow(ba, t, n){
   const n0 = typeof projs !== 'undefined' ? projs.length : 0;
-  BA2.half++; try { ba(t); } finally { BA2.half--; }
+  BA2.half++; BA2.blow = n; try { ba(t); } finally { BA2.half--; BA2.blow = 0; }   // blow 1 or 2: each has its own recorded sound (sfxsamples.js)
   if (typeof projs !== 'undefined') for (let i = n0; i < projs.length; i++){ const q = projs[i]; if (q && typeof q.hit === 'function' && !q._ba2){ q._ba2 = 1; q.hit = ba2Halve(q.hit); } }   // an arrow lands later: it is still half
 }
 { const _ba = basicAttack;
   basicAttack = function(t){
     if (BA2.busy || !t || !t.def || !ba2On()) return _ba.apply(this, arguments);
-    ba2Blow(_ba, t);
+    ba2Blow(_ba, t, 1);
     const gap = Math.min(.18, Math.max(.08, ((DER && DER.interval) || 1) * .45));
     later(gap, () => { if (!t || t.dead || P.dead || !S || !ba2On() || P.cast) return;
-      BA2.busy = true; try { ba2Blow(_ba, t); } finally { BA2.busy = false; } });
+      BA2.busy = true; try { ba2Blow(_ba, t, 2); } finally { BA2.busy = false; } });
   };
 }

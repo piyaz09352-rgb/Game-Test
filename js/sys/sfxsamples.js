@@ -13,14 +13,17 @@ const SFXS = {
     // (v169) the one-handed sword swing/hit recordings were taken out at the owner's request (to be made again)
     atk_sword1:'audio/sfx/sword1_attack.mp3',   // (v173) a one-handed sword's normal attack: one blow, one sound
     atk_dagger1:'audio/sfx/dagger1_attack.mp3',   // (v174) a single dagger's normal attack
+    atk_2h1:'audio/sfx/twohand_attack1.mp3', atk_2h2:'audio/sfx/twohand_attack2.mp3',   // (v177) two-handed weapons that strike twice: first blow, second blow
     miss:'audio/sfx/miss.mp3'   // (v172) every attack that misses ("Miss"), whoever swings it
   },
-  gain:{miss:.55, atk_sword1:.55, atk_dagger1:.75}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
+  gain:{miss:.55, atk_sword1:.55, atk_dagger1:.75, atk_2h1:.55, atk_2h2:.55}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
 };
 /* which recorded kind a weapon type is for the hero now: a one-handed sword is 'sword1' (a greatsword, the merchant's axes
    and two-handed blades are other kinds, not recorded yet) */
 function sfxsKind(w){
   if (!S) return null;
+  // (v177) a blow of a two-handed weapon's double strike (twohand2.js): its own recording for the first and the second blow
+  if (typeof BA2 !== 'undefined' && BA2.blow && typeof ba2On === 'function' && ba2On()) return '2h' + BA2.blow;
   if (w === 'dagger'){   // (v174) a single dagger: not twin daggers (a worn มีดคู่, or the thief line's own pair) and not a two-handed katana
     const id = S.gear && S.gear.weapon, it = id && ITEMS[id], base = (it && it.base) || id || '';
     if (/^w_tdagger\d+$/.test(base) || (it && it.st && it.st.hands === '2h') || (!it && SPR.CHARS[S.job] && SPR.CHARS[S.job].twin)) return null;
@@ -53,13 +56,15 @@ function sfxsPlay(k, at){
   /* (v173) one recording per blow (atk_<kind>): swing and impact in one sound, played as the blow starts; the separate
      hit sound is then left out for that weapon. The blow waits a moment before it sounds (the hit roll comes right after
      the swing begins): a miss plays the recorded miss in its place. */
-  SFX.swing = function(w){ const k = sfxsKind(w), rec = k && SFXS.buf['atk_' + k];
-    if (!rec) sfxsLoad('atk_' + k);
-    if (rec || SFXS.buf.miss){ const me = SFXS.pend = {w, args:arguments, self:this};
+  // the blow's sound: the recording of this kind, or the built-in one (fallback); a miss right after takes its place
+  SFXS.blow = (k, fallback) => { const rec = k && SFXS.buf['atk_' + k];
+    if (k && !rec) sfxsLoad('atk_' + k);
+    if (rec || SFXS.buf.miss){ const me = SFXS.pend = {};
       queueMicrotask(() => { if (SFXS.pend !== me) return; SFXS.pend = null;
-        if (rec && sfxsPlay('atk_' + k)){ const raw = SFX.raw(); SFXS.sw = raw ? raw.ac.currentTime : -9; } else _sw.apply(me.self, me.args); });
+        if (rec && sfxsPlay('atk_' + k)){ const raw = SFX.raw(); SFXS.sw = raw ? raw.ac.currentTime : -9; } else fallback(); });
       return; }
-    return _sw.apply(this, arguments); };
+    fallback(); };
+  SFX.swing = function(w){ const a = arguments, self = this; SFXS.blow(sfxsKind(w), () => _sw.apply(self, a)); };
   SFX.hit = function(w){ const k = sfxsKind(w), raw = SFX.raw && SFX.raw();
     if (k && SFXS.buf['atk_' + k] && !SFXS.files['hit_' + k]) return;   // the blow's recording already has its impact
     if (k && raw){ const now = raw.ac.currentTime, at = now - SFXS.sw < SFXS.lag ? SFXS.sw + SFXS.lag : now;
@@ -78,3 +83,12 @@ const SFXM = {t:-9};
     if (txt === 'Miss' && col === '#cfcfcf' && SFXS.buf.miss){ if (SFXS.pend) SFXS.pend = null;
       const now = performance.now(); if (now - SFXM.t > 60){ SFXM.t = now; sfxsPlay('miss'); } }
     return _at.apply(this, arguments); }; }
+
+/* (v177) knuckles, gloves and claws voice their blows through the boxing sounds (mt_* as the blow starts, mh_* when it
+   lands): in a two-handed double strike the recorded blows take their place */
+{ const _pl = SFX.play;
+  SFX.play = function(name){
+    if (typeof name === 'string' && typeof BA2 !== 'undefined' && BA2.blow && (name.startsWith('mt_') || name.startsWith('mh_'))){
+      const k = sfxsKind('fist');
+      if (k && SFXS.buf['atk_' + k]){ if (name.startsWith('mt_')){ const a = arguments, self = this; SFXS.blow(k, () => _pl.apply(self, a)); } return; } }
+    return _pl.apply(this, arguments); }; }
