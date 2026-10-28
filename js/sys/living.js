@@ -122,7 +122,7 @@ const LIVE = (() => {
     keep(A.ff, wantFF, () => ({x:cam.x + Math.random() * VW, y:cam.y + Math.random() * VH, ph:Math.random() * 9, sp:.5 + Math.random()}));
     for (const f of A.ff){ f.x += Math.sin(T * .7 * f.sp + f.ph) * dt * 12; f.y += Math.cos(T * .9 * f.sp + f.ph * 2) * dt * 8; }
     // a flock crossing the sky
-    if (out && !night && L){ A.birdT -= dt; if (A.birdT <= 0){ A.birdT = 14 + Math.random() * 18; const n = 3 + Math.floor(Math.random() * 4), dir = Math.random() < .5 ? 1 : -1, y0 = cam.y + VH * (.15 + Math.random() * .6), sp = 55 + Math.random() * 25;
+    if (false && out && !night && L){ A.birdT -= dt;   /* (v161) flocks are drawn by sys/birds.js now */ if (A.birdT <= 0){ A.birdT = 14 + Math.random() * 18; const n = 3 + Math.floor(Math.random() * 4), dir = Math.random() < .5 ? 1 : -1, y0 = cam.y + VH * (.15 + Math.random() * .6), sp = 55 + Math.random() * 25;
       for (let i = 0; i < n; i++) A.birds.push({x:cam.x + (dir > 0 ? -60 : VW + 60) - dir * (i % 2 ? i * 14 : i * 9), y:y0 + (i % 2 ? 1 : -1) * Math.ceil(i / 2) * 10, vx:dir * sp, vy:(Math.random() - .5) * 6, ph:Math.random() * 6, z:70 + Math.random() * 30}); } }
     for (const b of A.birds){ b.x += b.vx * dt; b.y += b.vy * dt; }
     A.birds = A.birds.filter(b => b.x > cam.x - 300 && b.x < cam.x + VW + 300);
@@ -147,7 +147,7 @@ const LIVE = (() => {
       g.globalAlpha = (night ? .35 : .16) * fl; g.drawImage(glowSprite(col), gx - r, gy - r, r * 2, r * 2); }   // (v59) one cached glow picture per colour, no gradient built per lamp per frame
     g.globalAlpha = 1;
     // fireflies
-    for (const f of A.ff){ const a = Math.max(0, Math.sin(T * 2.2 * f.sp + f.ph)); if (a < .05) continue; const x = f.x - cam.x, y = f.y - cam.y - 14;
+    for (const f of A.ff){ const a = .45 + .3 * Math.sin(T * .9 * f.sp + f.ph);   /* (v161) a slow glow, never switching on and off */ const x = f.x - cam.x, y = f.y - cam.y - 14;
       const gr = g.createRadialGradient(x, y, 0, x, y, 6); gr.addColorStop(0, `rgba(220,255,140,${a})`); gr.addColorStop(1, 'rgba(180,255,100,0)'); g.fillStyle = gr; g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill(); }
     g.restore();
     // chimney smoke from houses
@@ -167,7 +167,7 @@ const LIVE = (() => {
         const p0 = [w.x + (H1(s + cyc) - .5) * w.rx * 1.4, w.y + (H1(s + 1 + cyc) - .5) * w.ry * 1.2], p1 = [w.x + (H1(s + cyc + 1) - .5) * w.rx * 1.4, w.y + (H1(s + 2 + cyc) - .5) * w.ry * 1.2];
         const x = p0[0] + (p1[0] - p0[0]) * e - cam.x, y = p0[1] + (p1[1] - p0[1]) * e - cam.y - 10, fl = Math.abs(Math.sin(T * 40 + i));
         g.strokeStyle = '#2a6a8a'; g.lineWidth = 1; g.beginPath(); g.moveTo(x - 3, y); g.lineTo(x + 3, y); g.stroke();
-        g.fillStyle = `rgba(220,240,255,${.5 + fl * .3})`; g.beginPath(); g.ellipse(x, y - 1, 1.2, 3 * fl + .5, 0, 0, 7); g.fill(); } }
+        g.fillStyle = 'rgba(220,240,255,.62)'; g.beginPath(); g.ellipse(x, y - 1, 1.2, 3 * fl + .5, 0, 0, 7); g.fill(); } }
     // birds: shadows sweep the ground, the flock flaps above
     for (const b of A.birds){ const x = b.x - cam.x, y = b.y - cam.y, fl = Math.sin(T * 9 + b.ph);
       g.fillStyle = 'rgba(0,0,0,.14)'; g.beginPath(); g.ellipse(x, y, 4, 1.5, 0, 0, 7); g.fill();

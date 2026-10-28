@@ -22,10 +22,18 @@ EV.on('tick', () => {
   heroSheet = function(job = S.job, gear = S.gear, look = S.look){
     if (SHEATH.on && job === S.job && gear === S.gear) look = {...(look || {sex:'m', hair:0, color:''}), sh:1};
     return _hs.call(this, job, gear, look); }; }
-/* wings behind the body when the back carries something */
+/* (v161) wings stay on the back, over the body as real wings are, when the camera sees your back: only the strip
+   down the middle of the back is left open, so whatever is stowed there still shows between the wing roots
+   (v159 drew the wings behind the body instead, which looked as if they grew from the chest) */
 const sheathBack = () => { const j = JOBS[S.job], w = j && j.weapon && j.weapon.type; return w && w !== 'fist' || !!(S.gear && S.gear.shield); };
 if (typeof drawWings === 'function'){ const _dw = drawWings;
   drawWings = function(g, id, x, y, dir, t, o = {}){
-    const away = dir >= 3 && dir <= 5, mine = typeof P !== 'undefined' && typeof cam !== 'undefined' && Math.abs(x - (P.x - cam.x)) < 2 && Math.abs(y - (P.y - cam.y)) < 2;   // (v161) the hero is drawn at screen position
-    if (away && mine && (SHEATH.on || P.ride) && sheathBack()){ if (o.part === 'front') return; if (o.part === 'back') return _dw.call(this, g, id, x, y, dir, t, {...o, part:'front'}); }
-    return _dw.apply(this, arguments); }; }
+    const away = dir >= 3 && dir <= 5, mine = typeof P !== 'undefined' && typeof cam !== 'undefined' && Math.abs(x - (P.x - cam.x)) < 2 && Math.abs(y - (P.y - cam.y)) < 2;
+    if (!(away && mine && o.part === 'front' && (SHEATH.on || P.ride) && sheathBack())) return _dw.apply(this, arguments);
+    const k = o.scale || 1, top = y - (o.ride ? 44 : 29) * k, bot = y - (o.ride ? 14 : 4) * k, hw = 6.5 * k;
+    g.save(); g.beginPath(); g.rect(-1e4, -1e4, 2e4, 2e4); g.rect(x - hw, top, hw * 2, bot - top); g.clip('evenodd');
+    try { return _dw.apply(this, arguments); } finally { g.restore(); } }; }
+/* (v161) other players see it too: while your weapon is put away, the look you send carries the "stowed" mark
+   (lookKey's "s"), so their game draws you with the weapon on your back. Riding already stows it on every screen. */
+if (typeof gfxPres === 'function'){ const _g = gfxPres;
+  gfxPres = function(){ const r = _g.apply(this, arguments); return SHEATH.on && !P.ride ? {...r, lk:SPR.lookKey({...(S.look || {sex:'m', hair:0, color:''}), sh:1})} : r; }; }

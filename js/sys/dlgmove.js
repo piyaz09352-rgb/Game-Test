@@ -29,6 +29,10 @@ function dlgBox(d){
 const dlgSet = (d, o) => { for (const [p, v] of Object.entries(o)) d.style.setProperty(p, v, 'important'); };
 /* screen-scaled size: 60% of the screen wide, up to 60% tall; or the share the player picked */
 const DLG_SHARE = .6;
+/* (v161) a phone held sideways is short (about 390 px): 60% of that left two rows of a shop. Short screens keep the
+   60% width but may use up to 88% of the height (a little more as the screen gets shorter) */
+const dlgTall = b => { const H = b.h * (b.k || 1);   // real screen pixels (the box is in the zoomed container's units)
+  return H >= 560 ? DLG_SHARE : H <= 400 ? .88 : DLG_SHARE + (.88 - DLG_SHARE) * (560 - H) / 160; };
 function dlgSize(b){
   const fw = DLGM.size ? DLGM.size[0] : null, fh = DLGM.size ? DLGM.size[1] : null;
   const w = clamp(fw ? fw * b.w : b.w * DLG_SHARE, Math.min(320, b.w - 16), b.w - 16);
@@ -42,11 +46,11 @@ function dlgPlace(d, x, y, w, h){
   x = clamp(x, b.x0, b.x0 + Math.max(0, b.w - w)); y = clamp(y, b.y0, b.y0 + Math.max(0, b.h - 48));
   const room = b.y0 + b.h - y - 8;
   dlgSet(d, {left:x + 'px', top:y + 'px', right:'auto', bottom:'auto', transform:'none', width:w + 'px', 'max-width':'none', zoom:'1',
-    'max-height':Math.min(room, Math.round(b.h * (DLGM.size ? .92 : DLG_SHARE))) + 'px', height:h ? Math.min(hh, room) + 'px' : 'auto', animation:'none'});
+    'max-height':Math.min(room, Math.round(b.h * (DLGM.size ? .92 : dlgTall(b)))) + 'px', height:h ? Math.min(hh, room) + 'px' : 'auto', animation:'none'});
 }
 /* a fresh open: centre it, sized to the screen */
 function dlgCenter(d){
-  const b = dlgBox(d), z = dlgSize(b), w = z.w, h = z.h, mh = DLGM.size ? .92 : DLG_SHARE;
+  const b = dlgBox(d), z = dlgSize(b), w = z.w, h = z.h, mh = DLGM.size ? .92 : dlgTall(b);
   dlgSet(d, {width:w + 'px', height:h ? h + 'px' : 'auto', 'max-height':Math.round(b.h * mh) + 'px', transform:'none', zoom:'1', animation:'none'});
   const hh = h || Math.min(d.offsetHeight, b.h * mh);
   dlgPlace(d, b.x0 + (b.w - w) / 2, b.y0 + Math.max(8, (b.h - hh) / 2), w, h);

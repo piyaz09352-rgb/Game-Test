@@ -1509,8 +1509,8 @@ function lookKey(lk){
   return `${f ? 'f' : 'm'}${hs}${b36(ci)}${ei ? 'e' + b36(ei) : ''}${lk.rft > 0 ? 'r' + Math.min(4, lk.rft | 0) : ''}${lk.sh ? 's' : ''}`;
 }
 function parseLookKey(k){
-  const m = typeof k === 'string' && /^([mf])([0-9])([0-9a-z])(?:e([0-9a-z]))?(?:r([0-4]))?s?$/.exec(k); if (!m) return null;
-  return {sex:m[1], hair:+m[2], color:HAIR_COLORS[parseInt(m[3], 36)] || '', eye:m[4] ? IRIS_COLORS[parseInt(m[4], 36)] || '' : ''};
+  const m = typeof k === 'string' && /^([mf])([0-9])([0-9a-z])(?:e([0-9a-z]))?(?:r([0-4]))?(s)?$/.exec(k); if (!m) return null;
+  return {sex:m[1], hair:+m[2], color:HAIR_COLORS[parseInt(m[3], 36)] || '', eye:m[4] ? IRIS_COLORS[parseInt(m[4], 36)] || '' : '', ...(m[6] ? {sh:1} : {})};   // (v161) s: the weapon is put away
 }
 function applyLook(cfg, lk){
   const f = lk.sex === 'f', list = f ? HAIR_F : HAIR_M, st = {...(list[(lk.hair | 0) % list.length] || {})}, deco = st.deco; delete st.deco;
