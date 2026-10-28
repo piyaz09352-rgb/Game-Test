@@ -200,7 +200,7 @@ function useArrows(n = 1){
 function gearStatText(st){
   const out = [];
   if (st.elem) out.push(elemName(st.elem));
-  if (st.watk) out.push(`${st.claw ? L('กรงเล็บคู่', 'Twin claws') : st.glove ? L('นวมคู่', 'Boxing gloves') : st.wtype === 'dagger' && handsOf(st) === '2h' ? L('มีดคู่', 'Twin daggers') : L(...WTYPE[st.wtype])} (${st.wtype === 'shuriken' ? L('ถือมือเดียว · อาวุธสองมือ', 'one hand · two-handed class') : handsTxt(handsOf(st))}) · ATK ${st.watk}`);
+  if (st.watk) out.push(`${st.claw ? L('กรงเล็บคู่', 'Twin claws') : st.glove ? L('นวมคู่', 'Boxing gloves') : st.wtype === 'dagger' && handsOf(st) === '2h' ? L('มีดคู่', 'Twin daggers') : st.axe ? L('ขวาน', 'Axe') : L(...WTYPE[st.wtype])} (${st.wtype === 'shuriken' ? L('ถือมือเดียว · อาวุธสองมือ', 'one hand · two-handed class') : handsTxt(handsOf(st))}) · ATK ${st.watk}`);
   if (st.wmatk) out.push(`MATK ${st.wmatk}`);
   if (st.smatk) out.push(`MATK +${st.smatk}`);
   if (st.atk) out.push(`ATK +${st.atk}`);
