@@ -68,7 +68,7 @@ function rfWeaponFx(g, segs, rf, seed){
         for (let i = 0; i <= steps; i++){ const [px, py] = at(i / steps), o = (i && i < steps ? (Math.sin(T * 4 + i * 2.7 + a * 3 + seed) * (1.5 + t * .6)) : 0); g.lineTo(px + nx * o, py + ny * o); }
         g.stroke(); } }
     // a flare at the tip
-    if (rf >= 7){ const s = (1.6 + rf * .18) * pul, [tx, ty] = [bx, by];
+    if (rf >= 7){ const s = (1.6 + rf * .18) * pul * (L0 < 6 ? .55 : 1), [tx, ty] = [bx, by];   // (v166) a fist or a blade seen end-on: a smaller star
       const gr = g.createRadialGradient(tx, ty, 0, tx, ty, s * 1.3); gr.addColorStop(0, `rgba(255,255,255,${.35 + k * .2})`); gr.addColorStop(.35, `rgba(${c},${.35 + k * .3})`); gr.addColorStop(1, `rgba(${c},0)`);
       g.fillStyle = gr; g.beginPath(); g.arc(tx, ty, s * 1.3, 0, 7); g.fill();
       g.fillStyle = `rgba(255,255,255,${.3 + k * .15})`; rfStar(g, tx, ty, s * (t >= 4 ? 1.1 : .8), t >= 4 ? T * 1.6 : 0); }
@@ -77,13 +77,17 @@ function rfWeaponFx(g, segs, rf, seed){
 }
 /* fallback for a hero whose frame carries no weapon line: a small glow at the weapon hand */
 const rfHand = (x, y) => [[x + 6, y - 14, x + 6, y - 24]];
+/* (v166) the glow never covers the face: fists held up in a guard (boxers, cat folk claws) or a blade raised overhead
+   used to put the brightest part of a +15 glow right over the eyes. The head is cut out of the glow. */
+function rfFx(g, segs, rf, seed, x, y){ g.save(); g.beginPath(); g.rect(x - 400, y - 400, 800, 800); g.ellipse(x, y - 30, 12.5, 12.5, 0, 0, Math.PI * 2); g.clip('evenodd');
+  try { rfWeaponFx(g, segs, rf, seed); } finally { g.restore(); } }
 /* (v161) a weapon put away on the back does not shine over the body */
 { const _over = LIVE.drawOver;
   LIVE.drawOver = function(g, ...a){
     const r = _over.call(this, g, ...a);
-    if (S && !P.dead && !(typeof SHEATH !== 'undefined' && (SHEATH.on || P.ride))){ const x = P.x - cam.x, y = P.y - cam.y - (P.ride ? 14 : 0), rf = myWeaponRf(); if (rf){ const d = rfNear(x, y); rfWeaponFx(g, d ? d.segs : rfHand(x, y), rf, 1); } }
+    if (S && !P.dead && !(typeof SHEATH !== 'undefined' && (SHEATH.on || P.ride))){ const x = P.x - cam.x, y = P.y - cam.y - (P.ride ? 14 : 0), rf = myWeaponRf(); if (rf){ const d = rfNear(x, y); rfFx(g, d ? d.segs : rfHand(x, y), rf, 1, x, y); } }
     if (typeof NET !== 'undefined' && NET.ghosts && SETTINGS.oFx !== false) for (const gh of NET.ghosts.values()){ const rf = clamp((gh.q && gh.q.rf) | 0, 0, 15); if (!rf || (gh.q && (gh.q.dead || gh.q.r || /s$/.test(gh.q.lk || '')))) continue;
-      const x = gh.x - cam.x, y = gh.y - cam.y - (gh.q.r ? 14 : 0), d = rfNear(x, y); rfWeaponFx(g, d ? d.segs : rfHand(x, y), rf, (gh.peer || '').length); }
+      const x = gh.x - cam.x, y = gh.y - cam.y - (gh.q.r ? 14 : 0), d = rfNear(x, y); rfFx(g, d ? d.segs : rfHand(x, y), rf, (gh.peer || '').length, x, y); }
     return r;
   };
 }
