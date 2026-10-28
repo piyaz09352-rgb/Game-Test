@@ -34,7 +34,7 @@ test('skills: eight a tier, each in a style, and the new effects work', { skip, 
     assert.ok(r.fleeBack, 'flee goes back to normal after the swing');
     assert.ok(r.noBreak, 'the seal keeps the cast');
     assert.deepStrictEqual([r.sword.atkFlat, r.sword.def, +r.sword.hpPct.toFixed(2)], [30, 10, .3], 'Sword Mastery now carries Iron Body too');
-    assert.strictEqual(r.refund, 10); assert.ok(r.gone);
+    assert.ok(r.refund >= 10, 'the old points come back (v162: and a line never has fewer than its Job Levels gave)'); assert.ok(r.gone);
     // sacrifice: summons vanish and the blast lands
     const w = await page.evaluate(() => { S.job = 'himmaemperor'; S.lvl = 120; S.jlvl = 50; S.skills = {emperorgrace:10, emperorwrath:10, kaisorn:10}; derive();
       execSkill('kaisorn', 10, null); const n0 = SUMMONS.filter(s => s.kind === 'beast').length;
