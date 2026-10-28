@@ -23,7 +23,7 @@ test('combat caps', { skip, timeout: 60000 }, async () => {
       out.crit = seen; derive(); return out; });
     assert.strictEqual(r.iv150, 1); assert.strictEqual(r.iv180, .4); assert.strictEqual(r.iv190, .2); assert.strictEqual(r.iv199, .2, 'ASPD stops at 190');
     assert.strictEqual(r.back, 180);
-    assert.strictEqual(r.str, 210, 'stats are not clipped at a total');
+    assert.strictEqual(r.str - r.s0, 60, 'stats are not clipped at a total: ' + r.s0 + ' → ' + r.str);   // (v166) the starter gear can roll a point of STR of its own
     assert.ok(r.aspdStat <= 180, `stats alone stop at 180 (${r.aspdStat})`);
     assert.deepStrictEqual(r.red.map(x => +x.toFixed(2)), [0, .33, .5, .7]);
     assert.strictEqual(r.fleeHit, 1, 'a 2% roll still lands against huge Flee');
