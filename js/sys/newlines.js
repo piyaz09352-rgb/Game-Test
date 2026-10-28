@@ -97,7 +97,7 @@ function nlDesc(s){
   };
 }
 /* building blocks: nlPas = passive, nlBuf = buff, nlAtk = attack (any damaging type), nlDeb = debuff, nlHeal = heal */
-const nlSk = (id, job, th, en, short, o) => { const s = {id, job, name:th, en, short:short[0], shortEn:short[1], max:10, anim:'skill', ...o}; s.kind = s.type === 'passive' ? 'passive' : s.type === 'buff' ? 'buff' : 'active'; if (!s.sp) s.sp = () => 0; s.desc = nlDesc(s); SKILLS[id] = s; return s; };
+const nlSk = (id, job, th, en, short, o) => { const s = {id, job, name:th, en, short:short[0], shortEn:short[1], max:10, anim:'skill', ...o}; s.kind = s.type === 'passive' ? 'passive' : s.type === 'buff' ? 'buff' : 'active'; if (s.magic && !s.elem) s.elem = NL_LINE_OF[job] === 'occult' ? 'shadow' : 'neutral'; if (!s.sp) s.sp = () => 0; s.desc = nlDesc(s); SKILLS[id] = s; return s; };
 const nlPas = (id, job, th, en, pas, extra = {}) => nlSk(id, job, th, en, [th.slice(0, 6), en.split(' ')[0]], {type:'passive', pas, ...extra});
 const nlBuf = (id, job, th, en, short, o) => nlSk(id, job, th, en, short, {type:'buff', fx:'goldshield', act:'guard', cd:30, ...o});
 const nlAtk = (id, job, th, en, short, o) => nlSk(id, job, th, en, short, {anim:'attack', ...o});
