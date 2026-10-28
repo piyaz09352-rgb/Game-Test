@@ -12,14 +12,20 @@ const SFXS = {
   files:{
     // (v169) the one-handed sword swing/hit recordings were taken out at the owner's request (to be made again)
     atk_sword1:'audio/sfx/sword1_attack.mp3',   // (v173) a one-handed sword's normal attack: one blow, one sound
+    atk_dagger1:'audio/sfx/dagger1_attack.mp3',   // (v174) a single dagger's normal attack
     miss:'audio/sfx/miss.mp3'   // (v172) every attack that misses ("Miss"), whoever swings it
   },
-  gain:{miss:.55, atk_sword1:.55}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
+  gain:{miss:.55, atk_sword1:.55, atk_dagger1:.75}, buf:{}, busy:{}, fail:{}, sw:-9, lag:.08
 };
 /* which recorded kind a weapon type is for the hero now: a one-handed sword is 'sword1' (a greatsword, the merchant's axes
    and two-handed blades are other kinds, not recorded yet) */
 function sfxsKind(w){
-  if (w !== 'sword' || !S) return null;
+  if (!S) return null;
+  if (w === 'dagger'){   // (v174) a single dagger: not twin daggers (a worn มีดคู่, or the thief line's own pair) and not a two-handed katana
+    const id = S.gear && S.gear.weapon, it = id && ITEMS[id], base = (it && it.base) || id || '';
+    if (/^w_tdagger\d+$/.test(base) || (it && it.st && it.st.hands === '2h') || (!it && SPR.CHARS[S.job] && SPR.CHARS[S.job].twin)) return null;
+    return 'dagger1'; }
+  if (w !== 'sword') return null;
   if (typeof NL_LINE_OF !== 'undefined' && NL_LINE_OF[S.job] === 'merchant') return null;   // axes
   const id = S.gear && S.gear.weapon, it = id && ITEMS[id];
   if (it && it.st && it.st.hands === '2h') return null;
