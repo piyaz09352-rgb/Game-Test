@@ -65,11 +65,25 @@ function netTick(dt){
   if (NET.mapRoom) for (const pe of NET.mapRoom.peers()){
     if (pe.isMe || pe.kind !== 'viewer') continue; const q = pe.presence || {};
     if (typeof q.x !== 'number' || typeof q.y !== 'number') continue;
+    if (netIdleGhost(pe)){ NET.ghosts.delete(pe.peer); continue; }   // (v180) a hero frozen in place for 5 minutes is not drawn
     let g = NET.ghosts.get(pe.peer); if (!g){ g = {x:q.x, y:q.y, t:0}; NET.ghosts.set(pe.peer, g); }
     g.x += (clamp(q.x, 0, W) - g.x) * Math.min(1, dt * 10); g.y += (clamp(q.y, 0, H) - g.y) * Math.min(1, dt * 10);
     g.moving = Math.hypot(q.x - g.x, q.y - g.y) > 2; g.t += dt; g.peer = pe.peer; g.by = pe.by; g.q = q;
   }
   for (const [k, g] of NET.ghosts) if (!NET.mapRoom || !NET.mapRoom.peers().some(pe => pe.peer === k)) NET.ghosts.delete(k);
+}
+/* (v180) heroes stuck on the map: a session that stopped playing but never left the room (an old version still open in
+   a forgotten tab, a phone asleep with the page on screen, a browser that froze) kept sending the same presence, so it stood
+   on the map for good, often in a pile on the town's arrival spot. A hero whose position, pose, facing, HP and seat have not
+   changed for 5 minutes (the AFK kick removes a live player before that) is no longer drawn or counted for the
+   monsters and the world clock; the moment it moves again it is back. */
+const NET_IDLE = {ms:5 * 60e3, seen:new Map()};
+function netIdleGhost(pe){
+  const q = pe && pe.presence; if (!q) return false;
+  const sig = `${q.x}|${q.y}|${q.a}|${q.d}|${q.h}|${q.s}|${q.r}|${q.dead}|${q.sp}`, now = Date.now();
+  let e = NET_IDLE.seen.get(pe.peer); if (!e || e.sig !== sig){ e = {sig, t:now}; NET_IDLE.seen.set(pe.peer, e); }
+  if (NET_IDLE.seen.size > 400) for (const k of NET_IDLE.seen.keys()){ NET_IDLE.seen.delete(k); if (NET_IDLE.seen.size < 300) break; }
+  return now - e.t > NET_IDLE.ms;
 }
 /* a peer's worn gear from presence (untrusted: only real item ids in their proper slot are kept) */
 const GHOST_SLOTS = ['head', 'armor', 'weapon', 'acc', 'shield', 'pants', 'shoes'];   // v29: shield and legs are back in places 4–5

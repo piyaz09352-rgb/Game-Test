@@ -31,7 +31,7 @@
 const NM = {mode:null, leader:false, gen:{}, deadX:new Set(), keys:[], holding:false, wqT:0, host:false, slave:false, hostPeer:null, tag:Math.random().toString(36).slice(2, 4), seq:0, snapT:0, byId:new Map(), hitQ:new Map(), hitT:0, lastMq:-1, mq:0, fxT:0, me:null};
 const ZONE_C = () => ({a:ZA, b:ZB, n:ZN, z:MAPZ});
 const zoneCode = z => (z === ZA ? 'a' : z === ZB ? 'b' : z === ZN ? 'n' : 'z');
-const nmPeers = () => (NET.mapRoom ? NET.mapRoom.peers().filter(p => p.kind === 'viewer' && p.presence && p.presence.nm && !(typeof kickHas === 'function' && kickHas(p.presence.n))) : []);   // (kicklist.js: heroes the GM removed never count)
+const nmPeers = () => (NET.mapRoom ? NET.mapRoom.peers().filter(p => p.kind === 'viewer' && p.presence && p.presence.nm && !(typeof kickHas === 'function' && kickHas(p.presence.n)) && !(typeof netIdleGhost === 'function' && netIdleGhost(p))) : []);   // (v180) nor heroes frozen in place for 5 minutes   // (kicklist.js: heroes the GM removed never count)
 const nmActive = () => NM.host || NM.slave || NM.mode === 'world';
 const nmWorld = () => NM.mode === 'world';
 const nmMe = () => { const r = NET.mapRoom; const me = r && r.peers().find(p => p.sameTab); return me ? me.peer : null; };
