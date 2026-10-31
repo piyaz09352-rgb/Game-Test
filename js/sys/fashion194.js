@@ -342,3 +342,28 @@ Object.assign(MOUNT_X, {
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'fashion194', t:['คอลเลกชัน AI ล้ำยุค', 'AI · Future collection'], b:() => L(
   '<p>ชุดใหม่ 50 ชิ้นธีม AI หุ่นยนต์ และโลกอนาคต: ด้านหลัง 14 (เจ็ทแพ็ค แขนกล โดรน วงแหวนพลังงาน จอโฮโลแกรม ฯลฯ ไม่มีปีก) · ส่วนหัว 10 · ใบหน้า 8 · ชุดเซต 12 · สัตว์ขี่ 6</p><p>ลองสวมฟรีในตู้เสื้อผ้า ซื้อเก็บได้ที่ช่างตัดชุด ไม่เปลี่ยนค่าพลัง</p>',
   '<p>50 new pieces themed on AI, robots and the future: back 14 (jetpacks, mech arms, drones, energy rings, hologram screens… no wings) · head 10 · face 8 · outfits 12 · mounts 6</p><p>Try them free in the wardrobe, buy to keep from the tailor. No stats.</p>')});
+
+/* ---------- (v195) the Golden Jelly King wears the floating-hearts aura instead of wings ---------- */
+const JK_HEART = {c:['#ffe0ec', '#ff7aa8', '#e0306a'], glow:'255,120,170'};
+function jkHearts(g, m, x, y, part){
+  const h = ((typeof MOB_H !== 'undefined' && MOB_H[m.type]) || 40) * .62, k = Math.max(1, h / 40) * .75, top = y - h * 1.1, c = JK_HEART.c, t = T;
+  if (part === 'back'){ g.save(); g.globalCompositeOperation = 'lighter'; const cy = y - h * .5, gr = g.createRadialGradient(x, cy, 2, x, cy, h * .9); gr.addColorStop(0, `rgba(${JK_HEART.glow},.28)`); gr.addColorStop(1, `rgba(${JK_HEART.glow},0)`);
+    g.fillStyle = gr; g.beginPath(); g.ellipse(x, cy, h * .8, h * .95, 0, 0, 7); g.fill(); g.restore(); }
+  g.save();
+  for (let i = 0; i < 18; i++){ if ((i % 2 === 0) !== (part === 'back')) continue;
+    const ph = (t * .25 + BKC.hash(i, 1)) % 1, a = Math.sin(ph * Math.PI), px = x + (BKC.hash(i, 2) - .5) * h * 1.5 + Math.sin(t * .9 + i) * 3 * k, py = top + h * 1.15 - ph * h * 1.3;
+    g.globalAlpha = a * .95; BKC.heart(g, px, py, (2.8 + BKC.hash(i, 3) * 2.2) * k); g.fillStyle = i % 3 ? c[1] : c[0]; g.fill(); g.strokeStyle = c[2]; g.lineWidth = .6 * k; g.stroke(); }
+  g.restore();
+}
+{ const _dm = drawMobW; drawMobW = function(g, m){
+    const on = m && m.type === 'boss' && !m.dead && !(m.fz && m.fz.hidden), x = m.x - cam.x, y = m.y - cam.y;
+    if (on) jkHearts(g, m, x, y, 'back'); const r = _dm.apply(this, arguments); if (on) jkHearts(g, m, x, y, 'front'); return r; }; }
+
+/* (v195) one scrollbar in the wardrobe: the window itself stays put and only the list of pieces scrolls
+   (the list had its own height guess, a little taller than the window on laptops, so both scrolled) */
+{ const st = document.createElement('style'); st.textContent = `#pane-equip:has(> .cosw2.fw){overflow:hidden!important;display:flex;flex-direction:column;min-height:0}
+  #pane-equip:has(> .cosw2.fw) > :not(.cosw2){flex:none}
+  #pane-equip > .cosw2.fw{flex:1 1 auto;min-height:0;align-items:stretch}
+  .cosw2.fw > .eqstage{max-height:100%;overflow-y:auto;scrollbar-width:none}.cosw2.fw > .eqstage::-webkit-scrollbar{display:none}
+  .fw .wrcol{min-height:0;height:100%}
+  .fw .fwgrid{max-height:none!important;flex:1 1 auto;min-height:0}`; document.head.appendChild(st); }
