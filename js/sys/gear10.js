@@ -69,7 +69,8 @@ EV.on('kill', m => { if (!m || !m.def || !m.def.boss || m.minion || m.dummy) ret
 { const st = document.createElement('style'); st.textContent = `.g10line{font:600 11px var(--thai,sans-serif);color:#ffd36a}`; document.head.appendChild(st); }
 
 /* ---------- the item details, drawn anew ---------- */
-const G10_SLOT = {weapon:['อาวุธ', 'Weapon'], shield:['โล่', 'Shield'], head:['หมวก', 'Headgear'], armor:['เกราะ', 'Armour'], pants:['กางเกง', 'Legs'], shoes:['รองเท้า', 'Feet'], acc:['เครื่องประดับ', 'Accessory'], ammo:['ลูกธนู', 'Arrows']};
+const G10_SLOT = {weapon:['อาวุธ', 'Weapon'], shield:['โล่', 'Shield'], head:['หมวก', 'Headgear'], armor:['เกราะ', 'Armour'], pants:['กางเกง', 'Legs'], shoes:['รองเท้า', 'Feet'], acc:['เครื่องประดับ', 'Accessory'], };
+Object.defineProperty(G10_SLOT, 'ammo', {enumerable:true, get:() => (typeof ammoWant === 'function' && ammoWant() === 'star' ? ['ดาวกระจาย', 'Throwing stars'] : ['ลูกธนู', 'Arrows'])});   // (v190)
 const g10Num = s => String(s).replace(/(\d+\.\d{2,})/g, m => String(Math.round(+m * 10) / 10));
 const g10Chips = s => g10Num(String(s || '').replace(/<[^>]+>/g, '')).split(/\s·\s/).map(x => x.replace(/^◆\s*/, '').trim()).filter(x => x && !/เฉพาะสาย| line only/.test(x));
 function g10Src(id){ const it = ITEMS[id], b = ITEMS[baseOf(id)] || it, r = rarOf(id), src = (it && it.src) || (S.inst && S.inst[id] && S.inst[id].src);

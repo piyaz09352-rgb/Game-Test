@@ -184,14 +184,24 @@ const ammoFits = id => usesArrows() && !!ITEMS[id] && ITEMS[id].kind === 'ammo' 
 const ammoStarter = () => (ammoWant() === 'star' ? 's_iron' : 'q_wood');
 const ammoOther = () => GEAR_LIST.find(g => g[1] === 'ammo' && S.inv[g[0]] > 0 && S.lvl >= g[4] && ammoKind(g[0]) === ammoWant());
 function arrowCount(){ const id = S.gear && S.gear.ammo, n = id && ammoFits(id) ? S.inv[id] || 0 : 0; if (n) return n; const o = ammoOther(); return o ? S.inv[o[0]] : 0; }
+/* (v190) the ammo slot only ever holds what this class shoots: stars left from the ninja in a hunter's quiver (or arrows in
+   a ninja's pouch, or either on a class that shoots nothing) are taken out of the slot; they stay in the bag.
+   Run on the game tick by sys/shuriken.js (EV is made later than this file) */
+function ammoClean(){ if (typeof PAUSED !== 'undefined' && PAUSED || !S || !S.gear || !S.gear.ammo) return;
+  if (!ammoFits(S.gear.ammo)){ S.gear.ammo = null; derive(); dirty = true; } }
 /* take n arrows from the worn quiver; when it runs dry switch to any other arrows in the bag. false = none left */
 function useArrows(n = 1){
   if (!usesArrows()) return true;
   S.gear = S.gear || {};
   if (S.gear.ammo && !ammoFits(S.gear.ammo)) S.gear.ammo = null;   // arrows in a ninja's pouch (or stars in a quiver) do not count
-  if (!(S.gear.ammo && S.inv[S.gear.ammo] > 0)){ const other = ammoOther(); if (other){ S.gear.ammo = other[0]; derive(); toast(L(`เปลี่ยนเป็น${nm(ITEMS[other[0]])}`, `Switched to ${nm(ITEMS[other[0]])}`)); } }
-  const id = S.gear.ammo, have = id ? S.inv[id] || 0 : 0;
   const star = ammoWant() === 'star';
+  // (v190) nothing loaded = no shot: arrows (or stars) lying in the bag are not used until you load them yourself
+  // (it used to take any from the bag, so a hunter with an empty slot still shot). A loaded stack that runs out
+  // mid-fight is refilled from another stack of the same kind, so the slot is never empty while you have some.
+  if (!S.gear.ammo){ if (T - (P.noArrowT || -9) > 2){ P.noArrowT = T; toast(star ? L('ยังไม่ได้ใส่ดาวกระจาย · เปิดกระเป๋าแล้วกด "ใส่ดาวกระจาย"', 'No stars loaded · open the bag and load some') : L('ยังไม่ได้ใส่ลูกธนู · เปิดกระเป๋าแล้วกด "ใส่ลูกธนู"', 'No arrows loaded · open the bag and load some')); }
+    if (BOT.on){ setBot(false); banner(star ? L('Auto หยุด: ยังไม่ได้ใส่ดาวกระจาย', 'Auto stopped: no stars loaded') : L('Auto หยุด: ยังไม่ได้ใส่ลูกธนู', 'Auto stopped: no arrows loaded')); } return false; }
+  if (!(S.inv[S.gear.ammo] > 0)){ const other = ammoOther(); if (other){ S.gear.ammo = other[0]; derive(); toast(L(`เปลี่ยนเป็น${nm(ITEMS[other[0]])}`, `Switched to ${nm(ITEMS[other[0]])}`)); } }
+  const id = S.gear.ammo, have = id ? S.inv[id] || 0 : 0;
   if (!have){ if (T - (P.noArrowT || -9) > 2){ P.noArrowT = T; toast(star ? L('ดาวกระจายหมด! ซื้อได้ที่ร้านตีบวก (โรงตีเหล็ก)', 'Out of throwing stars! Buy more at the smith') : L('ลูกธนูหมด! ซื้อได้ที่ร้านป้าบัวคำ', 'Out of arrows! Buy more from Auntie Buakham\'s store')); }
     if (BOT.on){ setBot(false); banner(star ? L('Auto หยุด: ดาวกระจายหมด', 'Auto stopped: out of stars') : L('Auto หยุด: ลูกธนูหมด', 'Auto stopped: out of arrows')); } return false; }
   S.inv[id] = have - Math.min(have, n); if (!S.inv[id]){ delete S.inv[id]; } dirty = true;

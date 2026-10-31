@@ -42,9 +42,12 @@ function resize(){
     UIZ = clamp((f >= 1 ? Math.min(f, 1.75) : Math.pow(f, .5)) * us, .5, 2.2); }
   const ui = $('#ui'); ui.style.zoom = UIZ; ui.style.setProperty('--sh', SH / UIZ + 'px'); $('#wrap').style.setProperty('--sh', SH + 'px');
   DPR = Math.min(GFX.dpr, window.devicePixelRatio || 1);   // the quality preset caps the canvas resolution
-  cv.width = Math.round(SW * DPR); cv.height = Math.round(SH * DPR); cv.style.height = SH + 'px';
+  // (v190) only when the size really changes: setting a canvas's width or height (even to the same number) wipes it, and
+  // resize() runs whenever the HUD lays itself out again (opening a window, switching a tab, pressing a button), so the
+  // game picture and the minimap blinked on every click
+  const cw = Math.round(SW * DPR), ch = Math.round(SH * DPR); if (cv.width !== cw) cv.width = cw; if (cv.height !== ch) cv.height = ch; if (cv.style.height !== SH + 'px') cv.style.height = SH + 'px';
   applyPX(PX_AUTO * ZOOM.lvl);
-  const mmc = $('#minimap'), mw = mmc.clientWidth || (w < 700 ? 104 : 170); mmc.width = Math.round(mw * DPR); mmc.height = Math.round(mw * 2 / 3 * DPR);
+  const mmc = $('#minimap'), mw = mmc.clientWidth || (w < 700 ? 104 : 170); { const a = Math.round(mw * DPR), b = Math.round(mw * 2 / 3 * DPR); if (mmc.width !== a) mmc.width = a; if (mmc.height !== b) mmc.height = b; }
 }
 function setZoom(z, snap = true){
   if (snap){ let best = ZSTEPS[0]; for (const s of ZSTEPS) if (Math.abs(s - z) < Math.abs(best - z)) best = s; z = best; }

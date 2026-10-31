@@ -19,7 +19,9 @@ Object.assign(EQ_IC, {
   shoes:'<path d="M5 4h4v7.4l6.2 2.2c1 .4 1.4 1.2 1.4 2.4H3.6L5 4z"/><path d="M3.6 16h13"/>'
 });
 EQ_IC.acc2 = EQ_IC.acc;
-const EQ_LBL = {weapon:['อาวุธ', 'Weapon'], shield:['โล่', 'Shield'], pants:['กางเกง', 'Legs'], head:['หมวก', 'Head'], armor:['เกราะ', 'Armour'], shoes:['รองเท้า', 'Feet'], acc:['เครื่องประดับ 1', 'Accessory 1'], acc2:['เครื่องประดับ 2', 'Accessory 2'], ammo:['ลูกธนู', 'Arrows']};
+const EQ_LBL = {weapon:['อาวุธ', 'Weapon'], shield:['โล่', 'Shield'], pants:['กางเกง', 'Legs'], head:['หมวก', 'Head'], armor:['เกราะ', 'Armour'], shoes:['รองเท้า', 'Feet'], acc:['เครื่องประดับ 1', 'Accessory 1'], acc2:['เครื่องประดับ 2', 'Accessory 2']};
+// (v190) the ammo slot is named after what this class shoots: a ninja's says ดาวกระจาย, not ลูกธนู
+Object.defineProperty(EQ_LBL, 'ammo', {enumerable:true, get:() => (typeof ammoWant === 'function' && ammoWant() === 'star' ? ['ดาวกระจาย', 'Throwing stars'] : ['ลูกธนู', 'Arrows'])});
 const EQ_SOCKET = ['weapon', 'head', 'armor', 'shoes'];   // card sockets (accessories have none)
 const eqEmptyHint = sl => sl === 'shield' && !shieldOk() ? L('อาวุธนี้ใช้สองมือ · ถือโล่ไม่ได้', 'Your weapon takes both hands · no shield') : L('ซื้อที่ช่างตีเหล็กเพชร หรือดรอปจากมอน', 'Sold by Blacksmith Phet, or dropped by monsters');
 
