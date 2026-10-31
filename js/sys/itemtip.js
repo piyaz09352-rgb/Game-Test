@@ -68,6 +68,7 @@ function itHide(){ if (!ITIP.id) return; const t = el('itTip'); if (t) t.hidden 
 /* what the pointer is on: an item picture, or a list row with exactly one item in it (the Blacksmith's rows by their checkbox) */
 function itAt(t){
   if (!t || !t.closest || t.closest('#itTip')) return null;
+  { const c = t.closest('button,input,select,textarea,label,.qty,.btn'); if (c && !c.matches('[data-iid]') && !c.querySelector('[data-iid]')) return null; }   // (v192) never over a buy button, an amount box or a tick (the card covered what you were pressing); item tiles that are buttons (bag squares) still show it
   const p = t.closest('[data-iid]'); if (p && ITEMS[p.dataset.iid]) return p.dataset.iid;
   const bk = t.closest('.bkrow'), cb = bk && bk.querySelector('[data-bk]'); if (cb){ const id = cb.dataset.bk.split('|').slice(1).join('|'); if (ITEMS[id]) return id; }
   const row = t.closest('.srow,.item,.mkrow,.trow,.rwrow'); if (!row) return null;
