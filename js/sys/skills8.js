@@ -223,7 +223,7 @@ const sk8Style = id => { const s = SKILLS[id], line = s && SK8_LINE[s.job], st =
     if (det && p && !det.querySelector('.sk8line')) det.insertAdjacentHTML('afterbegin', `<small class="sk8line" style="--sty:${p[2]}">${L('สาย', 'Style')}: <b>${L(p[0], p[1])}</b>${SKILLS[sel].sig ? ` · <b>${L('สกิลประจำสาย', 'Signature')}</b>` : ''}</small>`);
     const top = pane.querySelector('.sktop'), job = typeof skTab !== 'undefined' ? String(skTab).replace('>', '') : S.job, line = SK8_LINE[job];
     if (top && line && !pane.querySelector('.sk8legend')){ const P0 = SK8_PATH[line];
-      top.insertAdjacentHTML('afterend', `<div class="sk8legend">${['a', 'b', 'c'].map(k => `<span style="--sty:${P0[k][2]}">${L(P0[k][0], P0[k][1])}</span>`).join('')}<small>${L('แต้มพอสำหรับราว 5 จาก 8 สกิล · เลือกสายที่จะเล่น', 'Points for about 5 of the 8 skills · choose your style')}</small></div>`); }
+      top.insertAdjacentHTML('afterend', `<div class="sk8legend">${['a', 'b', 'c'].map(k => `<span style="--sty:${P0[k][2]}">${L(P0[k][0], P0[k][1])}</span>`).join('')}<small>${L('5 สกิลต่อขั้น · แต้มพอลงเกือบครบทุกสกิล', '5 skills a tier · points for nearly all of them')}</small></div>`); }
     return r; }; }
 { const st = document.createElement('style');
   st.textContent = `

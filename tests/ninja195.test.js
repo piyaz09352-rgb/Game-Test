@@ -13,7 +13,7 @@ test('ninja: reworked skills, ricochet, clones, smoke, four elements', { skip, t
     await page.evaluate(() => loadMap(3)); await page.waitForTimeout(1000);
     const r = await page.evaluate(async () => {
       const out = {}, wait = s => new Promise(res => setTimeout(res, s * 1000));
-      const until = async (fn, max = 6) => { for (let i = 0; i < max * 10 && !fn(); i++) await wait(.1); return fn(); };   // game time can lag the clock under load
+      const until = async (fn, max = 8) => { for (let i = 0; i < max * 20 && !fn(); i++) advance(.05, false); return fn(); };   // steps game time itself: a page in the background is throttled and its clock stops
       S.job = 'kage'; S.lvl = 110; S.jlvl = 50; S.skPts = 0;
       S.skills = {shinobiway:10, quickslash:10, katon:10, suiton:10, smokescreen:10, bladeart:10, fuuton:10, kagebunshin:10, shurikenstorm:10, kagemastery:10, shadowflash:10, kirin:10, thousandshadows:10, silentkill:10, ninjadash:5, iai:3};
       derive(); out.refund = S.skPts; out.gone = !('iai' in S.skills) && !('ninjadash' in S.skills);
@@ -32,7 +32,7 @@ test('ninja: reworked skills, ricochet, clones, smoke, four elements', { skip, t
       return out;
     });
     assert.ok(r.refund >= 8 && r.gone, 'removed skills give their points back');
-    assert.deepStrictEqual(r.counts, [5, 4, 6], 'ninja 5 · shinobi 4 · kage 6 skills');
+    assert.deepStrictEqual(r.counts, [5, 5, 5], 'ninja · shinobi · kage: 5 skills each (v209)');
     assert.ok(r.mask, 'the mouth cloth is a wardrobe piece, not part of the class');
     assert.ok(r.marks.blind && r.marks.burn && r.marks.mres, 'twin stars blind, fire burns, water lowers magic resistance');
     assert.ok(r.bounce[0] > 0 && r.bounce[1] > 0 && r.bounce[2] > 0, 'the normal throw ricochets on to the next monsters');

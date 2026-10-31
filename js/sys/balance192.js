@@ -8,8 +8,8 @@
 'use strict';
 const LINE_POW = {   // [tier 1 (Lv <40), tier 2, tier 3, tier 4]
   blade:[.88, .88, .7, .88], rune:[1.6, 1.1, 1.12, 1.1], ranger:[.62, 1.05, 1.42, 1.4], muay:[.88, .8, 1.02, .82],
-  healer:[1.5, 1.4, 1.4, 1.3], rogue:[1.05, 1.15, 1.55, 1.5], summoner:[1.6, 1.05, .75, .7], occult:[3.3, 1.5, 1.4, 1.4],
-  merchant:[.82, .82, 1.22, .95], catfolk:[.85, .58, .72, .92], dogfolk:[.9, .74, .68, .88], ninja:[.52, 1.35, 1.45, 1.5]
+  healer:[1.9, 1.4, 1.4, 1.02], rogue:[1.05, 1.15, 1.55, 1.5], summoner:[2.6, 1.45, 1.15, .75], occult:[3.3, 1.5, 1.4, 1.4],
+  merchant:[.82, .82, 1.02, .95], catfolk:[.85, .58, .72, .92], dogfolk:[.9, .74, .68, .88], ninja:[.52, 1.35, 1.45, 1.5]
 };
 function linePow(){
   const ch = jobChain(), line = ch[1]; if (!line || !LINE_POW[line]) return 1;
@@ -27,3 +27,5 @@ const LINE_ACD = {rune:[.5, .55, .6, .6], healer:[.55, .55, .55, .55], occult:[.
 const LINE_SP = {occult:[.6, 1, 1, 1]};
 for (const id in SKILLS){ const sk = SKILLS[id], ln = typeof NL_LINE_OF !== 'undefined' && NL_LINE_OF[sk.job]; if (!ln || !LINE_SP[ln] || typeof sk.sp !== 'function' || sk._spLine) continue;
   const o = sk.sp; sk._spLine = 1; sk.sp = lv => { const ch = jobChain(), ti = Math.min(3, Math.max(0, ch.length - 2)); return ch[1] === ln ? Math.max(1, Math.round(o(lv) * LINE_SP[ln][ti])) : o(lv); }; }
+/* (v209) summoned beasts hit harder for the summoner line (its own spells barely matter: the beasts do the killing) */
+{ const _d = derive; derive = function(){ const r = _d.apply(this, arguments); if (DER && DER.pas && jobChain()[1] === 'summoner') DER.pas.sumAtk = (DER.pas.sumAtk || 0) + .9; return r; }; }

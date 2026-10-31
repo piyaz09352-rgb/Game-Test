@@ -13,7 +13,7 @@ test('mage: reworked line', { skip, timeout: 180000 }, async () => {
     await page.evaluate(() => loadMap(3)); await page.waitForTimeout(1000);
     const r = await page.evaluate(async () => {
       const out = {}, wait = s => new Promise(res => setTimeout(res, s * 1000));
-      const until = async (fn, max = 8) => { for (let i = 0; i < max * 10 && !fn(); i++) await wait(.1); return fn(); };   // game time can run slower than the clock under load
+      const until = async (fn, max = 8) => { for (let i = 0; i < max * 20 && !fn(); i++) advance(.05, false); return fn(); };   // steps game time itself: a page in the background is throttled and its clock stops
       S.job = 'archsage'; S.lvl = 110; S.jlvl = 50; S.skPts = 0;
       S.skills = {thunder:10, gravity:10, starveil:10, starstep:10, deluge:10, frostsea:5, wrath:3}; derive();
       out.refund = S.skPts; out.gone = !('frostsea' in S.skills); out.astro = JOBS.astro.skills.length;
@@ -26,7 +26,7 @@ test('mage: reworked line', { skip, timeout: 180000 }, async () => {
       return out;
     });
     assert.ok(r.refund >= 8 && r.gone, 'removed skills give their points back');
-    assert.strictEqual(r.astro, 6, 'astrologer: 6 skills');
+    assert.strictEqual(r.astro, 5, 'astrologer: 5 skills (v209)');
     assert.ok(r.chain >= 4, 'chain lightning jumps on to more monsters ' + JSON.stringify(r.chainDbg));
     assert.ok(r.pulled, 'gravity drags the monsters into the middle');
     assert.ok(r.pushed >= 3, 'the deluge throws monsters out of the circle');
