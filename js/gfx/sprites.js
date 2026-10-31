@@ -52,6 +52,7 @@ const DIR_TH = ['ใต้','ตะวันตกเฉียงใต้','ต
 /* ---------- materials ---------- */
 const hex = h => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
 const MATS = [], M = {};
+const TECH_HATS = ['headset', 'antenna', 'holoHalo', 'techCrown', 'mechHelm', 'vfin', 'ledBand'];   // (v194) AI headpieces
 const toHex = c => '#' + c.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
 /* a 4-tone ramp (light → dark) from one base colour, for generated monster palettes */
 function rampOf(name, base, o = {}){
@@ -781,7 +782,7 @@ function drawHuman(cx, cfg, P){
   if (cfg.beard){ G(); ell(cx, add(hc, [0, -6.5, 5.2]), 5.8, 4.6, M[cfg.beard], {tex:n => (n[2] < -.2 ? false : n[1] > .35 && Math.abs(n[0]) < .45 ? false : undefined)}); }
   const hairG0 = gid; G(); ell(cx, add(hc, [0, 1.0, -1.4]), 11.2, 11.2, M[cfg.hair], {tex:n => hairTex(n, cfg)});
   const sw = P.sway || 0;
-  if (cfg.spikes && !['wizard', 'cap', 'mala', 'lomphok', 'hermit', 'ngob', 'helm', 'crown'].includes(cfg.hat)){
+  if (cfg.spikes && !['wizard', 'cap', 'mala', 'lomphok', 'hermit', 'ngob', 'helm', 'crown', 'mechHelm'].includes(cfg.hat)){
     // messy locks: tapered tufts around the crown and back (never over the face), each its own outline group
     const n = cfg.spikes, L = cfg.spikeLen || 4.5, c0 = add(hc, [0, 1.2, -1.4]);
     for (let i = 0; i < n; i++){
@@ -802,7 +803,7 @@ function drawHuman(cx, cfg, P){
       G(); cap(cx, add(hc, [x * .9, 8.6, 6.8 - Math.abs(k) * .9]), add(hc, [x * 1.18 + sw * .2, 8.4 - drop, 10.2 - Math.abs(k) * 1.4]), 2.6, .5, M[cfg.hair], {});
     }
   }
-  cx.head = {hc, skinG, hairG0, hairG1:gid, P, cfg, hatTop:['wizard', 'cap', 'mala', 'lomphok', 'hermit', 'ngob', 'helm', 'crown'].includes(cfg.hat)};
+  cx.head = {hc, skinG, hairG0, hairG1:gid, P, cfg, hatTop:['wizard', 'cap', 'mala', 'lomphok', 'hermit', 'ngob', 'helm', 'crown', 'mechHelm'].includes(cfg.hat)};
   if (cfg.backHair){ G(); for (let i = 0; i <= 6; i++){ const k = i / 6; ell(cx, add(hc, upper([sw * k * 1.4, -2 - k * (cfg.backLen || 9), -6.5 - k * 1.5 - Math.abs(sw) * k])), (cfg.backW || 8.6) - k * 2.4, 4.5, M[cfg.hair], {tex:n => (Math.sin(Math.atan2(n[0], -n[2]) * 9) > .6 ? {dt:1} : undefined)}); } }
   if (cfg.ponytail){ G(); for (let i = 0; i <= 8; i++){ const k = i / 8; ell(cx, add(hc, upper([sw * k * 3, 4 - k * 11 + Math.abs(sw) * k * 2, -10.5 - Math.sin(k * 2.5) * 3 - Math.abs(sw) * k * 2])), 3.4 - k * 1.4, 3.4 - k * 1.4, M[cfg.hair]); } }
   if (cfg.sideLocks){ const len = cfg.sideLocks; for (const sd of [-1, 1]){ G(); for (let i = 0; i <= 7; i++){ const k = i / 7;
@@ -814,7 +815,7 @@ function drawHuman(cx, cfg, P){
       G(); for (let i = 0; i <= 8; i++){ const k = i / 8; ell(cx, add(hc, upper([sd * (10.6 + k * 2.6) + sw * k * 2, 5 - k * 15 + Math.abs(sw) * k * 2, -4.6 - k * 2.4 - Math.abs(sw) * k])), 3.5 - k * 1.5, 3.5 - k * 1.5, M[cfg.hair], {tex:n => (Math.sin(Math.atan2(n[0], n[1]) * 5 + k * 6) > .55 ? {dt:1} : undefined)}); } } }
   if (cfg.bun){ G(); ell(cx, add(hc, upper([0, 7.5, -8])), 4.6, 4.6, M[cfg.hair], {tex:n => (Math.sin(Math.atan2(n[0], n[1]) * 6) > .5 ? {dt:1} : undefined)}); G(); line(cx, add(hc, upper([-4, 9, -9])), add(hc, upper([5, 10.5, -8])), M.gold, {t:1}); }
   // (v194) thirty more hairstyles: new shapes (hidden on top under a full hat, like the spikes)
-  { const H = M[cfg.hair], topOk = !['wizard', 'cap', 'mala', 'lomphok', 'hermit', 'ngob', 'helm', 'crown'].includes(cfg.hat), curl = n => (Math.sin(n[0] * 9) * Math.sin(n[1] * 9) > .25 ? {dt:1} : undefined);
+  { const H = M[cfg.hair], topOk = !['wizard', 'cap', 'mala', 'lomphok', 'hermit', 'ngob', 'helm', 'crown', 'mechHelm'].includes(cfg.hat), curl = n => (Math.sin(n[0] * 9) * Math.sin(n[1] * 9) > .25 ? {dt:1} : undefined);
     const tie = cfg.tieMat ? M[cfg.tieMat] : M.gold;
     if (cfg.afro && topOk){ const A = cfg.afro, ac = add(hc, upper([0, 3.4, -3.6])); G(); ell(cx, ac, 14.6 * A, 13.2 * A, H, {rz:10.4 * A, tex:curl});
       // tight curls all over its surface (it read as a smooth helmet)
@@ -933,6 +934,37 @@ function drawHuman(cx, cfg, P){
       for (const sd of [-1, 1]){ G(); let p0 = add(hc, [sd * 5.4, 8, 2]);
         for (let j = 1; j <= 9; j++){ const k = j / 9, p1 = add(hc, [sd * (5.4 + k * 6) + sw * k, 8 + Math.sin(k * 2.2) * 9, 2 - k * 13]); cap(cx, p0, p1, 1.9 - k * 1.2, 1.9 - k * 1.5, j > 6 ? cm : hm, {}); p0 = p1; } }
       for (let i = 0; i < 4; i++){ G(); cap(cx, add(hc, [0, 10 - i * 1.5, -6 - i * 2.4]), add(hc, [sw * .3, 14.5 - i * 1.8, -8.5 - i * 2.6]), 1.2, .3, cm, {}); }
+    }
+  }
+  // (v194) AI / future headpieces: headset, twin antennas, digital halo, circuit crown, mecha helmet, V-fin, LED band
+  if (cfg.hat && TECH_HATS.includes(cfg.hat)){ const h = cfg.hat, hm = M[cfg.hatMat] ?? M.steel, cm = M[cfg.crestMat] ?? M.gem, arc = (r, y0, a0, a1, st, rr, m, z = -.4) => { for (let a = a0; a <= a1 + 1e-6; a += st) ell(cx, add(hc, [Math.sin(a) * r, y0 + Math.cos(a) * r, z]), rr, rr, m); };
+    if (h === 'headset'){
+      G(); arc(12.3, 2.2, -1.25, 1.25, .12, 1.15, hm);
+      for (const sd of [-1, 1]){ G(); ell(cx, add(hc, [sd * 11.6, 1.2, -.4]), 2.6, 4, hm, {tex:n => (n[1] > -.25 && n[1] < .25 ? {m:cm} : undefined)}); G(); ell(cx, add(hc, [sd * 12.6, 1.2, -.4]), 1.4, 2.4, cm, {et:0});
+        if (cfg.catEar){ G(); cap(cx, add(hc, [sd * 7.2, 11.2, -.6]), add(hc, [sd * 9 + sw * .4, 17.6, -1.2]), 3.2, .35, hm, {tex:n => (n[2] > .3 && Math.abs(n[0]) < .5 ? {m:cm} : undefined)}); } }
+      if (!cfg.catEar){ G(); cap(cx, add(hc, [-11.6, -1.4, 1]), add(hc, [-8.4, -6.2, 8.4]), .55, .5, hm, {}); G(); ell(cx, add(hc, [-7.6, -6.4, 9.2]), 1.1, 1.1, cm, {et:0}); }
+    } else if (h === 'antenna'){
+      G(); arc(12.1, 2.2, -1.2, 1.2, .14, .85, hm);
+      for (const sd of [-1, 1]){ G(); ell(cx, add(hc, [sd * 11.4, 1.8, -.4]), 2.2, 2.6, hm); const top = add(hc, [sd * 13.4 + sw * .8, 15.5, -2.4]);
+        G(); cap(cx, add(hc, [sd * 11.8, 3.6, -.6]), top, .55, .35, hm, {}); G(); ell(cx, top, 1.9, 1.9, cm, {et:0}); }
+    } else if (h === 'holoHalo'){
+      G(); for (let i = 0; i < 12; i++){ const a0 = i / 12 * Math.PI * 2; for (let a = a0; a < a0 + .38; a += .1) ell(cx, add(hc, [Math.sin(a) * 9, 18 + sw * .4, Math.cos(a) * 9 - 1.6]), .95, .95, i % 3 ? hm : cm, {et:0}); }
+      G(); for (let a = 0; a < Math.PI * 2; a += .2) ell(cx, add(hc, [Math.sin(a) * 6, 19.4 + sw * .4, Math.cos(a) * 6 - 1.6]), .6, .6, cm, {et:0});
+    } else if (h === 'techCrown'){
+      G(); ell(cx, add(hc, [0, 3, -.5]), 12, 12, hm, {tex:n => (n[1] > .24 && n[1] < .46 ? (Math.abs(Math.sin(Math.atan2(n[0], n[2]) * 6)) < .2 ? {m:cm} : undefined) : false)});
+      for (let i = -2; i <= 2; i++){ const a = i * .42, r = 11.4, ht = 8 - Math.abs(i) * 1.6; G(); cap(cx, add(hc, [Math.sin(a) * r, 7, Math.cos(a) * r - .5]), add(hc, [Math.sin(a) * (r + 1.2), 7 + ht, Math.cos(a) * (r + 1.2) - 1.5]), 1.4, .2, hm, {tex:n => (Math.abs(n[0]) < .25 ? {m:cm} : undefined)}); }
+      G(); ell(cx, add(hc, [0, 8.4, 11.4]), 1.7, 1.7, cm, {et:0});
+    } else if (h === 'mechHelm'){
+      G(); ell(cx, add(hc, [0, 3.2, -.6]), 12.6, 11.6, hm, {tex:n => (n[1] < -.4 ? false : n[2] > .55 && n[1] < .3 && n[1] > -.4 ? false : Math.abs(n[1] - .34) < .06 && n[2] > 0 ? {m:cm} : Math.abs(n[0]) < .06 && n[1] > .34 ? {m:cm} : undefined)});
+      G(); cap(cx, add(hc, [0, 14, 2]), add(hc, [sw * .5, 16, -12]), 1.8, .5, hm, {tex:() => ({m:cm})});
+      for (const sd of [-1, 1]){ G(); ell(cx, add(hc, [sd * 12.2, 2, -1]), 2.4, 3.2, hm, {tex:n => (Math.hypot(n[0], n[1]) < .45 ? {m:cm} : undefined)}); }
+    } else if (h === 'vfin'){
+      G(); ell(cx, add(hc, [0, 2.4, -.5]), 12, 12, hm, {tex:n => (n[1] > .26 && n[1] < .48 ? undefined : false)});
+      for (const sd of [-1, 1]){ G(); cap(cx, add(hc, [sd * 1.2, 8, 11]), add(hc, [sd * 10 + sw * .4, 19, 8]), 1.3, .25, M[cfg.finMat] ?? M.gold, {}); }
+      G(); ell(cx, add(hc, [0, 8.2, 11.6]), 2, 1.8, cm, {et:0});
+    } else if (h === 'ledBand'){
+      G(); ell(cx, add(hc, [0, 2.4, -.5]), 12, 12, hm, {tex:n => (n[1] > .22 && n[1] < .5 ? (Math.abs(n[1] - .36) < .05 ? {m:cm} : undefined) : false)});
+      for (const sd of [-1, 1]){ G(); ell(cx, add(hc, [sd * 11.6, 6.4, 1]), 1.8, 1.8, cm, {et:0}); }
     }
   }
   if (cfg.krabenTail && !ride && !sitK){ G(); cap(cx, lean([hipC[0], 10.2 + B, -5.6]), lean([hipC[0] + (P.sway || 0) * .4, 5.8 + B, -6.6]), 1.8, 1.2, M[cfg.pants], {}); }
@@ -1295,6 +1327,30 @@ function paintHead(img, F, cx){
           if (k > .9 && Math.abs(Math.sin(u * 1.6)) < .35) return rgb('gold', 0); return rgb(fm, Math.sin(u * 2 + v) > .6 ? 1 : 2); },
         visor:(u, v) => { const band = Math.abs(v - .2); if (band > 2 || Math.abs(u) > 11.2) return null;
           if (band < .5 && Math.abs(u) < 8) return eg ? rgb(eg, Math.abs(u) < 5 ? 0 : 1) : [24, 14, 22]; return band > 1.55 ? rgb(tr, 1) : rgb(fm, v > .2 ? 1 : 2); },
+        // (v194) AI / future face pieces
+        cybshade:(u, v) => { const au = Math.abs(u); if (au > 11.2) return null; const top = 2.1 - au * .04, bot = -1.5 + Math.max(0, au - 6) * .35;
+          if (v < top && v > bot && au > .6){ if (v > top - .45) return rgb(tr, 1); const sl = Math.abs((u * .5 + v) % 2.2); return sl < .25 ? rgb(eg || tr, 1) : rgb(fm, v > .4 ? 2 : 3); }
+          if (au <= .6 && Math.abs(v - 1) < .4) return rgb(tr, 1); return null; },
+        monocle:(u, v) => { const x = u - 3.9, y = v - .2, d = Math.hypot(x, y);
+          if (d < 2.3){ if (Math.abs(x) < .12 || Math.abs(y) < .12) return rgb(eg || tr, 1); return Math.abs(d - 1.3) < .16 ? rgb(eg || tr, 1) : null; }
+          if (d < 2.95) return rgb(tr, d < 2.6 ? 1 : 2); if (u > 6.4 && u < 10.8 && Math.abs(v - .2 - (u - 6.4) * .12) < .4) return rgb(fm, 1);
+          if (u > 1 && u < 3 && Math.abs(v - 3) < .25) return rgb(eg || tr, 1); return null; },
+        circuit:(u, v) => { for (const sd of [-1, 1]){ const x = u * sd; if (x < 5 || x > 10.6 || v > -.4 || v < -3.2) continue;
+            if (Math.abs(v + 1) < .26 && x < 9.2) return rgb(fm, 2); if (Math.abs(x - 9.2) < .26 && v < -1 && v > -2.6) return rgb(fm, 2); if (Math.abs(v + 2.6) < .26 && x > 7.4 && x < 9.2) return rgb(fm, 2);
+            if (Math.hypot(x - 5.3, v + 1) < .5 || Math.hypot(x - 7.4, v + 2.6) < .5) return rgb(fm, 0); }
+          if (Math.abs(u) < .26 && v > 2.4 && v < 4.4) return rgb(fm, 2); if (Math.hypot(u, v - 2.2) < .5) return rgb(tr, 0); return null; },
+        respirator:(u, v) => { const k = face(u, v, 10.2, 7.4, -1.8); if (k > 1 || v > -.5) return null; const au = Math.abs(u);
+          if (v > -1.05) return rgb(tr, 1); if (au > 4.6 && au < 8 && v < -1.3){ const d = Math.hypot(au - 6.3, v + 2.3); return d < 1.3 ? (Math.sin(d * 9) > 0 ? rgb(fm, 3) : rgb(tr, 1)) : rgb(fm, 2); }
+          if (au < 2.2 && v < -1.4) return Math.abs(Math.sin(v * 5)) < .45 ? rgb(eg || tr, 1) : rgb(fm, 3); return rgb(fm, v > -2 ? 1 : 2); },
+        ledface:(u, v) => { const k = face(u, v, 10.6, 7.6, -1.2); if (k > 1) return null; if (k > .86) return rgb(tr, 1);
+          const px = Math.round(u * 1.1), py = Math.round(v * 1.1), on = (px, py) => { for (const ex of [-4, 4]){ const dx = px - ex; if (py === 1 + -Math.abs(dx) && Math.abs(dx) <= 2) return true; }
+            if (py === -4 && Math.abs(px) <= 2) return true; if (py === -3 && Math.abs(px) === 3) return true; return false; };
+          if (on(px, py)) return rgb(eg || 'cyanGlow', 1); return (px + py) % 2 ? rgb(fm, 3) : [14, 16, 24]; },
+        scanline:(u, v) => { const au = Math.abs(u); if (au > 11.2) return null; const band = Math.abs(v - .3 - au * au * .006);
+          if (band < .55) return au < 8 ? rgb(eg || tr, au < 2 ? 0 : 1) : rgb(fm, 1); if (band < 1.1) return rgb(fm, v > .3 ? 2 : 3); if (au > 9.4 && au < 11.2 && Math.abs(v - .3) < 1.8) return rgb(tr, 1); return null; },
+        techmark:(u, v) => { for (const sd of [-1, 1]){ const x = u * sd - 3.9, y = v + .9; if (y < 0 && y > -1.3 && Math.abs(x) < (y + 1.3) * .75) return rgb(fm, 2); }
+          if (u > -10.4 && u < -6.8 && v > -2.6 && v < -.8){ const c = Math.floor((u + 10.4) * 2.5); return [1, 0, 1, 1, 0, 1, 0, 0, 1][c] ? rgb(tr, 3) : null; }
+          if (u > 6.4 && u < 9.6 && Math.abs(v + 1.6) < .2) return rgb(fm, 2); if (Math.hypot(u - 9.8, v + 1.6) < .45) return rgb(fm, 2); return null; },
         tiger:(u, v) => { const k = face(u, v); if (k > 1) return null; const e = eye(u, v, 1.9, 1.1); if (e !== 0) return e;
           if (Math.sin(Math.abs(u) * 1.25 - v * .35) > .72 && Math.abs(u) > 2.4) return rgb(tr, 3); if (Math.abs(u) < .7 && v > 2) return rgb(tr, 3);
           if (Math.abs(v + 4.4) < .35 && Math.abs(u) < 2) return [30, 18, 24]; return k > .86 ? rgb(tr, 1) : tone(v, k); },

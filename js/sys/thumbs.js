@@ -58,7 +58,8 @@ function cthRender(id){
     g.beginPath(); g.moveTo(x - r * 3, y); g.lineTo(x, y + r * .7); g.lineTo(x + r * 3, y); g.lineTo(x, y - r * .7); g.closePath(); g.fill(); } }
   return c.toDataURL('image/png');
 }
-function cthApply(node, url){ node.style.backgroundImage = `url(${url})`; node.classList.add('th'); node.dataset.thk = node.dataset.cthk; }
+function cthApply(node, url){ node.style.backgroundImage = `url(${url})`; node.classList.add('th'); node.classList.remove('slt');   // (v194) the bright-theme pass may have lit the dark swatch before the picture came: that hid it
+  node.dataset.thk = node.dataset.cthk; }
 /* cache: in memory, and kept in this browser so reopening the wardrobe is instant */
 const CTH_LS = 'vay-cth-v4';   // (v123) v3 kept pictures drawn before some wing kinds existed: blank cards — start fresh
 try { localStorage.removeItem('vay-cth-v3'); } catch (e) {}
