@@ -1482,14 +1482,16 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   const len = (cfg.axe && w === 'sword' ? AXE_K[two ? 1 : 0] : 1) * (kat ? (19.5 + Math.max(0, wt) * .5) * WPN_BIG : ((w === 'sword' ? 17 : w === 'staff' ? 20 : 9.5) + Math.max(0, wt) * (w === 'sword' ? .7 : w === 'staff' ? .5 : .3)) * (w === 'sword' ? (two ? 1.45 : .88) : w === 'staff' ? (two ? .86 : .5) : 1) * WPN_BIG * (w === 'dagger' ? 1.15 : 1));   // daggers a touch more: they were the hardest to see
   let dir = P.wdir || rotX(rotX([0, -1, 0], P.armR + P.wpn), P.lean);
   if (w === 'staff' && P.ring >= 0) dir = nrm([0, 1, .25]);
-  const base = add(hR, mul(dir, w === 'staff' ? -6 : -.8)), tip = add(hR, mul(dir, len));
+  // (v211) an axe is held up the haft, not at its very end: the head sits closer to the hands and the haft runs on past the lower hand
+  const axeHL = cfg.axe && w === 'sword' ? len * (two ? .8 : .7) : 0;
+  const base = add(hR, mul(dir, w === 'staff' ? -6 : -.8)), tip = axeHL ? add(base, mul(dir, axeHL)) : add(hR, mul(dir, len));
   (cx.wsegs || (cx.wsegs = [])).push(w === 'staff' ? [proj(cx, add(tip, mul(dir, -.4))), proj(cx, add(tip, mul(dir, 3.2)))]   // (v159) a staff glows at its head only, never along the shaft
     : [proj(cx, add(base, mul(dir, kat ? 2 : 1))), proj(cx, tip)]);   // the blade in this frame
   G();
   if (w === 'sword' && cfg.axe){
     // (v164) the merchant line's axe: a wooden haft wrapped at the grip, an iron head with a curved bit (a bearded
     // hand axe in one hand; a broad double-bit war axe in two), a steel cap on the butt
-    const wvR = [-dir[1], dir[0], 0], wv = Math.hypot(...wvR) < .25 ? [1, 0, 0] : nrm(wvR), hl = len * (two ? 1.02 : .82), grip = two ? 5.6 : 3.4;
+    const wvR = [-dir[1], dir[0], 0], wv = Math.hypot(...wvR) < .25 ? [1, 0, 0] : nrm(wvR), hl = axeHL, grip = two ? 5.6 + len * .22 : 3.4 + len * .12;   // (v211) total length kept; the hands moved up the haft
     cap(cx, add(base, mul(dir, -grip)), add(base, mul(dir, hl)), two ? 1.05 : .9, two ? .95 : .82, M[SH[wt] || 'wood'], {tex:(n, lo, q, t) => (t < grip / (hl + grip) && Math.abs(Math.sin(t * 40)) < .35 ? {m:M.leather, t:1} : undefined)});
     G(); ell(cx, add(base, mul(dir, -grip - .6)), 1.1, 1.1, M.steel);
     const hd = add(base, mul(dir, hl - (two ? 2.2 : 1.7))), bw = two ? 4.6 : 3.7, bh = two ? 3.9 : 2.9, metal = blade;
