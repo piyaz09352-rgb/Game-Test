@@ -61,3 +61,10 @@ EV.on('draw', () => {
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'boss192', t:['บอส: ต้องรวมปาร์ตี้', 'Bosses: bring a party'], b:() => L(
   '<p>บอสออกแบบให้สู้กันเป็นปาร์ตี้ 3–5 คน (HP ×3.5 · ตีแรง ×1.5 · เร็วขึ้น) คนเดียวเลเวลเท่ากันสู้ไม่ไหว</p><p><b>รัศมีมรณะ</b>: วงแดงรอบตัวบอส ยืนในวงจะโดนตีแรงขึ้น 15% และขอบจอเป็นสีแดง</p><p><b>คลั่ง</b>: เลือดเหลือ 30% บอสทุกตัวคลั่ง ตีแรงและเร็วขึ้น</p>',
   '<p>Bosses are built for a party of 3–5 (HP ×3.5 · hits ×1.5 · faster): one hero of the same level cannot win alone</p><p><b>Dread aura</b>: a red ring around the boss; inside it you take 15% more and the screen edges glow red</p><p><b>Berserk</b>: at 30% HP every boss goes berserk, hitting harder and faster</p>')});
+/* (v207) damage to bosses by class line — the boss report (BOSS=1, after the 12-line rework) showed the boxer killing
+   bosses alone in about 2 minutes while the hunter and the summoner managed a third of the average; this evens their
+   part in a party fight without touching how they hunt ordinary monsters */
+const LINE_BOSS = {muay:.55, ranger:1.7, summoner:1.9};
+{ const _ad = applyDamage; applyDamage = function(m, res, sk){
+    if (m && m.def && m.def.boss && res && res.dmg > 0 && !res.miss && typeof jobChain === 'function'){ const k = LINE_BOSS[jobChain()[1]]; if (k && k !== 1) res = {...res, dmg:Math.max(1, Math.round(res.dmg * k))}; }
+    return _ad.apply(this, arguments.length > 1 ? [m, res, ...[].slice.call(arguments, 2)] : arguments); }; }

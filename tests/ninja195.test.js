@@ -13,6 +13,7 @@ test('ninja: reworked skills, ricochet, clones, smoke, four elements', { skip, t
     await page.evaluate(() => loadMap(3)); await page.waitForTimeout(1000);
     const r = await page.evaluate(async () => {
       const out = {}, wait = s => new Promise(res => setTimeout(res, s * 1000));
+      const until = async (fn, max = 6) => { for (let i = 0; i < max * 10 && !fn(); i++) await wait(.1); return fn(); };   // game time can lag the clock under load
       S.job = 'kage'; S.lvl = 110; S.jlvl = 50; S.skPts = 0;
       S.skills = {shinobiway:10, quickslash:10, katon:10, suiton:10, smokescreen:10, bladeart:10, fuuton:10, kagebunshin:10, shurikenstorm:10, kagemastery:10, shadowflash:10, kirin:10, thousandshadows:10, silentkill:10, ninjadash:5, iai:3};
       derive(); out.refund = S.skPts; out.gone = !('iai' in S.skills) && !('ninjadash' in S.skills);
@@ -24,9 +25,9 @@ test('ninja: reworked skills, ricochet, clones, smoke, four elements', { skip, t
       execSkill('quickslash', 10, m); execSkill('katon', 10, m); execSkill('suiton', 10, m); await wait(1);
       out.marks = {blind:m.st.blind > 0, burn:m.burnT > T, mres:m._mresP > 0};
       addItem('s_iron', 100); S.gear.ammo = 's_iron';
-      let d0 = dmg(); basicAttack(m); await wait(1); out.bounce = dmg().map((v, i) => v - d0[i]);
-      execSkill('kagebunshin', 10, null); d0 = dmg(); basicAttack(m); await wait(1); out.clone = dmg()[0] - d0[0];
-      d0 = dmg(); execSkill('kirin', 10, m); await wait(1.2); out.kirin = dmg().map((v, i) => v - d0[i]);
+      let d0 = dmg(); basicAttack(m); await until(() => dmg()[2] - d0[2] > 0); await wait(.3); out.bounce = dmg().map((v, i) => v - d0[i]);
+      execSkill('kagebunshin', 10, null); d0 = dmg(); basicAttack(m); await until(() => dmg()[0] - d0[0] > out.bounce[0] * 1.4); out.clone = dmg()[0] - d0[0];
+      d0 = dmg(); execSkill('kirin', 10, m); await until(() => dmg().filter((v, i) => v - d0[i] > 0).length >= 3); out.kirin = dmg().map((v, i) => v - d0[i]);
       execSkill('smokescreen', 10, null); S.hp = DER.maxhp; mobAttack(m, 5, true); out.smoke = S.hp === DER.maxhp;
       return out;
     });
