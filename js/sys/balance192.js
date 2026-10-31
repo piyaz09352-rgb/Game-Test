@@ -7,7 +7,7 @@
    1 = unchanged. Re-run the report after any change. */
 'use strict';
 const LINE_POW = {   // [tier 1 (Lv <40), tier 2, tier 3, tier 4]
-  blade:[.88, .88, .7, .8], rune:[1.6, 1.1, 1.12, 1.1], ranger:[.62, 1.05, 1.42, 1.4], muay:[.95, .82, 1.06, .88],
+  blade:[.88, .88, .7, .88], rune:[1.6, 1.1, 1.12, 1.1], ranger:[.62, 1.05, 1.42, 1.4], muay:[.88, .8, 1.02, .82],
   healer:[1.5, 1.4, 1.4, 1.3], rogue:[1.05, 1.15, 1.55, 1.5], summoner:[1.6, 1.05, .75, .7], occult:[3.3, 1.5, 1.4, 1.4],
   merchant:[.82, .82, 1.22, .95], catfolk:[.85, .8, .88, .95], dogfolk:[.95, .95, .8, .97], ninja:[.52, 1.35, 1.45, 1.5]
 };
