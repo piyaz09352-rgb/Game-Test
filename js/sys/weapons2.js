@@ -21,7 +21,9 @@
 
 /* ---------- the katana takes the twin daggers' place ---------- */
 const KATANA_TIER = [['ฝึกหัด', 'Apprentice'], ['เหล็กกล้า', 'Steel'], ['ยันต์เพลิง', 'Ember'], ['นิลกาฬ', 'Obsidian'], ['นาคราช', 'Naga'], ['สุริยเทพ', 'Solar'], ['อัคนีกาฬ', 'Infernal'], ['วชิระ', 'Vajra'], ['เทวราช', 'Devaraja'], ['หิมพานต์', 'Himmapan'], ['จักรพรรดิ', 'Chakravartin']];
-const isKatana = st => !!(st && st.wtype === 'dagger' && (st.hands === '2h' || st.katana) && !st.claw);
+const isKatana = st => !!(st && st.wtype === 'dagger' && (st.hands === '2h' || st.katana) && !st.claw && !st.twin);
+// (v194) a two-handed dagger NAMED a twin dagger (the Shadow Tiger's own pair) is a pair of daggers, not a katana
+for (const [id, it] of Object.entries(ITEMS)) if (/^k_/.test(id) && it && it.kind === 'gear' && it.st && it.st.wtype === 'dagger' && it.st.hands === '2h' && !it.st.katana && /มีดคู่|twin dagger/i.test(`${it.name || ''} ${it.en || ''}`)) it.st.twin = 1;   // class weapons only (the shop's katanas were named twin daggers before their rename)
 function katanaRename(){
   for (const g of GEAR_LIST){ const m = /^w_tdagger(\d+)$/.exec(g[0]); if (!m) continue; const t = KATANA_TIER[+m[1]] || KATANA_TIER[0];
     g[2] = `คาตานะ${t[0]}`; g[3] = `${t[1]} Katana`; g[6].katana = 1; g[6].hands = '2h';

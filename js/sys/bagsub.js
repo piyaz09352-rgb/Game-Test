@@ -77,5 +77,12 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
 /* twice as big squares */
 html body #ui.ui .baggrid.grid,html body #ui.ui .invcombo #pane-bag .baggrid.grid{grid-template-columns:repeat(auto-fill,minmax(84px,1fr))!important;gap:8px!important}
 html body #ui.ui .baggrid.grid .bslot{min-height:84px;aspect-ratio:1/1}
+/* (v194) a long item card (options, sockets, the comparison) pushed the Wear button out of the window, where it could
+   not be pressed: the grid gives way and scrolls, the card scrolls inside, and its buttons stay pinned at its foot */
+#pane-bag .bagw,#pane-bag .bagb{min-height:0}
+#pane-bag .bagmain{display:flex;flex-direction:column;min-height:0;max-height:100%}
+#pane-bag .bagmain > .baggrid{flex:1 1 auto;min-height:96px;overflow-y:auto}
+#pane-bag .bagmain > #bagInfo{flex:0 1 auto;min-height:0;max-height:64%;overflow-y:auto}
+#pane-bag #bagInfo .gdx-act{position:sticky;bottom:0;z-index:3;padding-top:6px;background:linear-gradient(rgba(253,246,232,0),#fdf6e8 35%)}
 html body #ui.ui .baggrid.grid .bslot svg:first-of-type,html body #ui.ui .baggrid.grid .bslot .sico{width:72%!important;height:72%!important}`;
   document.head.appendChild(st); }
