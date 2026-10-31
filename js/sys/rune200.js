@@ -85,7 +85,7 @@ const rnPull = (cx, cy, r, near = 18) => { for (const m of mobs){ if (m.dead || 
     if (id === 'earthswallow' && tg){ const x = tg.x, y = tg.y, rr = SKILLS.earthswallow.radius;
       for (const m of mobs) if (!m.dead && !m.def.boss && Math.hypot(m.x - x, m.y - y) < rr + m.def.r) applyStatus(m, {root:3});
       later(3.2, () => { for (const m of mobs) if (!m.dead && Math.hypot(m.x - x, m.y - y) < rr + m.def.r) applyDamage(m, skillMagic(m, 6, 'earth'), SKILLS.earthswallow);
-        try { skfxBurst(x, y, 30, 18, {s0:60, s1:220, p:{size:3, col:'#c08a4a'}}); skfxRing(x, y, rr, '#e8c890', .45, 4); skfxShake(5); } catch (e) {} }); }
+        try { skfxShake(5); } catch (e) {} }); }   // (v201) the eruption itself is drawn by grandfx200.js
     return r; }; }
 { const _ad = applyDamage; applyDamage = function(m, res, sk){ const r = _ad.apply(this, arguments), id = sk && sk.id;
     if (m && !m.dead && res && !res.miss && !res.poison){
