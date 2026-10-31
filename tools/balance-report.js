@@ -13,6 +13,7 @@ const SIM_SEC = +process.argv[2] || 300;
 const LEVELS = [15, 45, 80, 115];
 
 async function main(){
+  if (process.env.REPORT_ONLY) return writeOut([], []);   // (v196) rebuild the report from docs/balance-rows.json only
   const { page, errors, close } = await openGame({ width: 1280, height: 720 });
   const rows = [];
   try {
@@ -24,8 +25,19 @@ async function main(){
       rows.push(r); console.log(JSON.stringify(r));
     }
   } finally { await close(); }
-  if (process.env.BOSS) fs.writeFileSync(path.join(__dirname, '..', 'docs', 'BALANCE_BOSS.md'), bossReport(rows));
-  else fs.writeFileSync(path.join(__dirname, '..', 'docs', 'BALANCE.md'), report(rows));
+  writeOut(rows, errors);
+}
+function writeOut(rows, errors){
+  // (v196) the last result of every line is kept in docs/balance-rows.json: a run limited with LINES= updates those
+  // lines and the report still lists every line (it used to be overwritten with just the lines that ran)
+  const store = path.join(__dirname, '..', 'docs', process.env.BOSS ? 'balance-boss-rows.json' : 'balance-rows.json');
+  let all = []; try { all = JSON.parse(fs.readFileSync(store, 'utf8')); } catch (e) {}
+  const LINE_ORDER = ['blade', 'rune', 'ranger', 'muay', 'healer', 'rogue', 'summoner', 'occult', 'merchant', 'catfolk', 'dogfolk', 'ninja'];
+  const key = r => r.line + '|' + r.lv, fresh = new Set(rows.map(key)), order = [...new Set([...LINE_ORDER, ...all.map(r => r.line), ...rows.map(r => r.line)])];
+  all = [...all.filter(r => !fresh.has(key(r))), ...rows].sort((a, b) => order.indexOf(a.line) - order.indexOf(b.line) || a.lv - b.lv);
+  fs.writeFileSync(store, JSON.stringify(all, null, 0).replace(/\},\{/g, '},\n{'));
+  if (process.env.BOSS) fs.writeFileSync(path.join(__dirname, '..', 'docs', 'BALANCE_BOSS.md'), bossReport(all));
+  else fs.writeFileSync(path.join(__dirname, '..', 'docs', 'BALANCE.md'), report(all));
   if (errors.length) console.log('page errors:', errors.slice(0, 5));
 }
 

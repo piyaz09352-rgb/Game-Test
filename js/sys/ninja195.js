@@ -65,6 +65,8 @@ NJD('kirin', {name:'จตุรธาตุ', en:'Four Elements', short:'จต
   desc:lv => L(`เรียกดาวกระจาย 4 ธาตุ ดิน น้ำ ลม ไฟ ทำดาเมจ 3 ครั้ง ครั้งละ ${njDmg('kirin')(lv)} MATK รัศมี 90 · แต่ละครั้งใช้ธาตุที่แรงที่สุดกับมอนตัวนั้น · ร่าย 1 วิ`, `Calls the stars of all four elements — earth, water, wind, fire — for 3 strikes of ${njDmg('kirin')(lv)} MATK (radius 90) · each strike uses whichever element hurts that monster most · cast 1 s`)});
 NJD('thousandshadows', {name:'พันเงา', en:'Thousand Shadows', buff:() => ({t:15, shred:1}),
   desc:lv => L(`15 วิ · ดาวปกติลดต้านเวทเป้า ${3 + Math.floor(lv / 2)}% ทุกครั้งที่โดน (สะสมสูงสุด 30%) · ชิ่งเพิ่มอีก 2 ครั้ง`, `15 s · each normal throw lowers the target's magic resistance by ${3 + Math.floor(lv / 2)}% (stacks to 30%) · 2 more ricochets`)});
+NJD('kunairain', {name:'ฝนดาวกระจาย', en:'Star Rain', short:'ฝนดาว', shortEn:'Star Rain', fx:'shurikenRain',
+  desc:lv => L(`ดาวกระจายตกเป็นฝนรอบเป้า รัศมี 120 · 6 ครั้ง ครั้งละ ${njDmg('kunairain')(lv)} MATK`, `Stars rain down round the target (radius 120) · 6 hits of ${njDmg('kunairain')(lv)} MATK`)});   // (v196) was ฝนคุไน: the line throws stars now
 NJD('silentkill', {pas:lv => ({moveUp:lv * .015}),
   desc:lv => L(`ติดตัว · เดินเร็วขึ้น ${(lv * 1.5).toFixed(1)}%`, `Passive · ${(lv * 1.5).toFixed(1)}% faster on foot`)});
 

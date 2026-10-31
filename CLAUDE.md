@@ -8,5 +8,5 @@
   which replaces the whole site — a partial pack (v188) left the site without its CSS. Unzip it into an empty folder,
   serve it and enter the game before sending. Full packs are git-ignored (too big).
   Only for a real update (a version with several changes); a small fix needs no pack — just commit and push.
-- Balance: `node tools/balance-report.js 300` (Auto plays every class at Lv 15/45/80/115 → docs/BALANCE.md); `BOSS=1` for solo boss fights → docs/BALANCE_BOSS.md; `LINES=rune,occult` to limit. Tune in js/sys/balance192.js · mobs192.js · boss192.js · economy.js, then re-run.
+- Balance: `node tools/balance-report.js 300` (Auto plays every class at Lv 15/45/80/115 → docs/BALANCE.md); `BOSS=1` for solo boss fights → docs/BALANCE_BOSS.md; `LINES=rune,occult` to limit. (Each run keeps the other lines in docs/balance-rows.json; `REPORT_ONLY=1` rebuilds the report.) Tune in js/sys/balance192.js · mobs192.js · boss192.js · economy.js, then re-run.
 - Tests: `npm run test:fast` (set `CHROMIUM_PATH=/opt/pw-browsers/chromium` in the cloud container).

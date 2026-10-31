@@ -367,3 +367,18 @@ function jkHearts(g, m, x, y, part){
   .cosw2.fw > .eqstage{max-height:100%;overflow-y:auto;scrollbar-width:none}.cosw2.fw > .eqstage::-webkit-scrollbar{display:none}
   .fw .wrcol{min-height:0;height:100%}
   .fw .fwgrid{max-height:none!important;flex:1 1 auto;min-height:0}`; document.head.appendChild(st); }
+
+/* ---------- (v196) mouth cloths: the ninja's own mask left the class look and became five face pieces anyone can wear ---------- */
+const NJ_CLOTH = [
+  ['f_njmask', 'ผ้าปิดปากนินจาดำ', 'Black Ninja Mouth Cloth', 'charcoal', 50],
+  ['f_njmaskr', 'ผ้าปิดปากนินจาแดง', 'Crimson Ninja Mouth Cloth', 'scarlet', 50],
+  ['f_njmaskn', 'ผ้าปิดปากนินจากรมท่า', 'Navy Ninja Mouth Cloth', 'navy', 50],
+  ['f_njmaskw', 'ผ้าปิดปากนินจาขาว', 'White Ninja Mouth Cloth', 'white', 50],
+  ['f_njmaskv', 'ผ้าปิดปากนินจาม่วง', 'Violet Ninja Mouth Cloth', 'plum', 50]
+];
+for (const [id, th, en, mat, price] of NJ_CLOTH){ const look = {ninjaMask:mat};
+  COSTUME[id] = {slot:'mask', th, en, src:'coin', price:{c:price}, grand:false, sw:[mat, mat], look}; SPR.GEAR_LOOK[id] = look; }
+// a ninja who already played with the mask keeps the black one for free (once per account)
+EV.on('tick', () => { if (typeof ACC === 'undefined' || !ACC || ACC.njClothGift || !S || !S.lvl || !(JOBS[S.job] && JOBS[S.job].weapon.type === 'shuriken')) return;
+  ACC.njClothGift = 1; ACC.wardrobe = ACC.wardrobe || {}; ACC.wardrobe.f_njmask = 1; if (typeof accSave === 'function') accSave(true);
+  if (typeof log === 'function') log(L('ผ้าปิดปากนินจาย้ายไปอยู่ในตู้เสื้อผ้าแล้ว (หมวดใบหน้า) · ได้รับผ้าปิดปากนินจาดำฟรี', 'The ninja mouth cloth moved to the wardrobe (Face tab) · the black one is yours for free'), 'g'); });
