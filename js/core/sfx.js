@@ -11,7 +11,7 @@ const SFX = (() => {
   let ac = null, master = null, mus = null, mbus = null, fxg = null, noiseBuf = null;
   const vol = () => (typeof SETTINGS === 'undefined' ? {m:.35, s:.6} : {m:(SETTINGS.musicVol ?? 35) / 100, s:(SETTINGS.sfxVol ?? 60) / 100 * (SETTINGS.sfx === false ? 0 : 1)});
   function ctx(){
-    if (ac) { if (ac.state === 'suspended') ac.resume(); return ac; }
+    if (ac) { if (ac.state === 'suspended' && !SFX.away) ac.resume(); return ac; }   // (v188) not while the phone is busy (a call, another app): bgm.js sets SFX.away
     try { ac = new (window.AudioContext || window.webkitAudioContext)(); } catch (e) { return null; }
     master = ac.createGain(); master.connect(ac.destination);
     mus = ac.createGain(); mus.connect(master); fxg = ac.createGain(); fxg.connect(master); applyVol();

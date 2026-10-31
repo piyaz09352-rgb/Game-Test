@@ -34,7 +34,8 @@ function resize(){
   const top = brect($('#wrap')).top + window.scrollY;
   SW = w; SH = Math.max(200, Math.round(vpH() - top - pb));
   // auto balance: about 270 world units of height on any screen (v83: closer, so heroes and monsters read bigger; half steps keep pixels even)
-  PX_AUTO = clamp(Math.round(SH / 270 * 2) / 2, 2, 4.5);
+  // (v188) the camera sits 20% further out at every zoom step (phones too: their 2 px floor becomes 1.6 px)
+  PX_AUTO = clamp(Math.round(SH / 270 * 2) / 2, 2, 4.5) * .8;
   // one UI scale for every screen: proportional above 1280×720, gently smaller below it (square-root curve, so phone
   // text and buttons stay readable and touchable), times the player's own size setting (Settings → UI size)
   { const f = SH > SW * 1.15 ? Math.min(SH / 1280, SW / 720) : Math.min(SH / 720, SW / 1280), us = typeof SETTINGS !== 'undefined' ? +SETTINGS.uiScale || 1 : 1;

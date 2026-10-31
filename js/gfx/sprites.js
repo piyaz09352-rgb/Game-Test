@@ -998,7 +998,7 @@ function drawHuman(cx, cfg, P){
       }
       else if (w === 'staff' || cfg.axe){
         // head over the right shoulder beside the head, the foot toward the left hip (v164: an axe hangs the same way, by its haft)
-        const len = cfg.axe ? (17 + Math.max(0, wt) * .7) * (two ? 1.45 : .88) * WPN_BIG * (two ? 1.02 : .82) : (20 + Math.max(0, wt) * .5) * (two ? .86 : .5) * WPN_BIG, tot = len + 6, tip = back(-10.6, 27.5, zb), sn = Math.min(.8, (27.5 - 3) / tot);
+        const len = cfg.axe ? (17 + Math.max(0, wt) * .7) * (two ? 1.45 : .88) * WPN_BIG * (two ? 1.02 : .82) * AXE_K[two ? 1 : 0] : (20 + Math.max(0, wt) * .5) * (two ? .86 : .5) * WPN_BIG, tot = len + 6, tip = back(-10.6, 27.5, zb), sn = Math.min(.8, (27.5 - 3) / tot);
         P2.wdir = nrm(upper([-Math.sqrt(1 - sn * sn), sn, 0])); const h = add(tip, mul(P2.wdir, -len));
         sash(-6.2, 6.0, .55, strapM);
         drawWeapon(cx, w, P2, h, h, G, cf);
@@ -1313,6 +1313,7 @@ function hairTex(n, cfg){
 }
 /* (v101) held weapons drawn bigger (length × WPN_BIG, sword blades a little wider) so the weapon reads at game zoom */
 const WPN_BIG = 1.3;
+const AXE_K = [.6, .68];   // (v188) one-handed · two-handed axe length against a sword of the same hands (they were as long as swords)
 function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   if (!w || w === 'fist') return;
   if (w === 'bow'){
@@ -1355,7 +1356,8 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   // (v159) one-handed blades and rods are visibly smaller than their two-handed kin: a 1H sword ×0.88, a greatsword ×1.45;
   // a rod ×0.72, a longstaff ×1.3; the katana is its own long single blade
   const kat = w === 'dagger' && !!cfg.katana, two = !!cfg.twoHand || kat;
-  const len = kat ? (19.5 + Math.max(0, wt) * .5) * WPN_BIG : ((w === 'sword' ? 17 : w === 'staff' ? 20 : 9.5) + Math.max(0, wt) * (w === 'sword' ? .7 : w === 'staff' ? .5 : .3)) * (w === 'sword' ? (two ? 1.45 : .88) : w === 'staff' ? (two ? .86 : .5) : 1) * WPN_BIG * (w === 'dagger' ? 1.15 : 1);   // daggers a touch more: they were the hardest to see
+  // (v188) the merchant's axes are short hand axes: AXE_K shortens the whole weapon (haft, swing trail) and its head
+  const len = (cfg.axe && w === 'sword' ? AXE_K[two ? 1 : 0] : 1) * (kat ? (19.5 + Math.max(0, wt) * .5) * WPN_BIG : ((w === 'sword' ? 17 : w === 'staff' ? 20 : 9.5) + Math.max(0, wt) * (w === 'sword' ? .7 : w === 'staff' ? .5 : .3)) * (w === 'sword' ? (two ? 1.45 : .88) : w === 'staff' ? (two ? .86 : .5) : 1) * WPN_BIG * (w === 'dagger' ? 1.15 : 1));   // daggers a touch more: they were the hardest to see
   let dir = P.wdir || rotX(rotX([0, -1, 0], P.armR + P.wpn), P.lean);
   if (w === 'staff' && P.ring >= 0) dir = nrm([0, 1, .25]);
   const base = add(hR, mul(dir, w === 'staff' ? -6 : -.8)), tip = add(hR, mul(dir, len));
@@ -1368,7 +1370,7 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
     const wvR = [-dir[1], dir[0], 0], wv = Math.hypot(...wvR) < .25 ? [1, 0, 0] : nrm(wvR), hl = len * (two ? 1.02 : .82), grip = two ? 6.4 : 3.6;
     cap(cx, add(base, mul(dir, -grip)), add(base, mul(dir, hl)), two ? 1.05 : .9, two ? .95 : .82, M[SH[wt] || 'wood'], {tex:(n, lo, q, t) => (t < grip / (hl + grip) && Math.abs(Math.sin(t * 40)) < .35 ? {m:M.leather, t:1} : undefined)});
     G(); ell(cx, add(base, mul(dir, -grip - .6)), 1.1, 1.1, M.steel);
-    const hd = add(base, mul(dir, hl - (two ? 2.6 : 2))), bw = two ? 6.6 : 5, bh = two ? 5.4 : 3.8, metal = blade;
+    const hd = add(base, mul(dir, hl - (two ? 2.2 : 1.7))), bw = two ? 5.4 : 4.1, bh = two ? 4.4 : 3.1, metal = blade;
     for (const sd of (two ? [-1, 1] : [1])){
       G(); cap(cx, add(hd, mul(wv, sd * .6)), add(hd, mul(wv, sd * bw * .55)), two ? 1.5 : 1.2, two ? 1.1 : .9, metal, {tex:() => ({t:1})});   // the cheek
       const edge = []; for (let i = 0; i <= 8; i++){ const u = -1 + i / 4; edge.push(add(add(hd, mul(wv, sd * bw * (1 - .22 * u * u))), mul(dir, u * bh))); }

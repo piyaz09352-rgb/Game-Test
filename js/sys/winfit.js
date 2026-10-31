@@ -5,8 +5,8 @@
    with brect() and corrected, a few passes, like wincenter.js. Runs on open, on resize, and when the UI turns compact. */
 'use strict';
 const WF_M = 4, WF_WIDE = 720;   // margin; widest a window gets on a phone held sideways
-const WF_FULL = ['equip', 'bag'];   // (v58) the bag · equipment window fills the whole screen on a phone
-const WF_BIG = ['forge'];          // (v132) the smith's workshop takes 80% of the screen both ways
+const WF_FULL = ['equip', 'bag', 'forge', 'craft', 'guild', 'siege', 'market'];   // (v58) the bag · equipment window fills the whole screen on a phone · (v188) so do the NPC workshops (long lists)
+const WF_BIG = [];                 // (v132–v187) the smith's workshop took 80% of the screen; v188: whole screen like the other workshops
 function winFit(id){
   const w = el('win-' + id), ui = el('ui'); if (!w || w.hidden || !ui) return;
   const props = ['left', 'top', 'width', 'height', 'right', 'bottom', 'transform', 'margin'];

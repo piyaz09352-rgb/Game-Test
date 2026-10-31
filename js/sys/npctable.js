@@ -56,9 +56,11 @@ new MutationObserver(() => { const d = document.getElementById('dialog'); if (d 
 const NPC_WINS = ['forge', 'craft', 'guild', 'siege', 'market'];
 if (typeof WC_IDS !== 'undefined') for (const w of NPC_WINS) if (!WC_IDS.includes(w)) WC_IDS.push(w);
 { const st = document.createElement('style');
-  st.textContent = NPC_WINS.map(w => `#ui #win-${w}`).join(',') + `{width:calc(60vw / var(--uiz,1)) !important;max-width:calc(60vw / var(--uiz,1)) !important;
+  // (v188) only the big-screen UI: a phone or a tablet held upright (compact UI) sizes them in winfit.js. This 60% cap
+  // used to apply there too, so they opened half as wide as every other window and pushed to the left edge
+  st.textContent = NPC_WINS.map(w => `#ui:not(.compact) #win-${w}`).join(',') + `{width:calc(60vw / var(--uiz,1)) !important;max-width:calc(60vw / var(--uiz,1)) !important;
     height:calc(60vh / var(--uiz,1)) !important;max-height:calc(60vh / var(--uiz,1)) !important;display:flex;flex-direction:column}` +
-    `@media (max-height:560px){` + NPC_WINS.map(w => `#ui #win-${w}`).join(',') + `{height:calc(86vh / var(--uiz,1)) !important;max-height:calc(86vh / var(--uiz,1)) !important}}` +   /* (v161) a phone on its side: more of the short screen */
+    `@media (max-height:560px){` + NPC_WINS.map(w => `#ui:not(.compact) #win-${w}`).join(',') + `{height:calc(86vh / var(--uiz,1)) !important;max-height:calc(86vh / var(--uiz,1)) !important}}` +   /* (v161) a phone on its side: more of the short screen */
     NPC_WINS.map(w => `#ui #win-${w}[hidden]`).join(',') + `{display:none !important}` +
     NPC_WINS.map(w => `#ui #win-${w} > .pane`).join(',') + `{flex:1 1 auto;min-height:0;max-height:none !important;overflow:auto}`;
   document.head.appendChild(st); }
