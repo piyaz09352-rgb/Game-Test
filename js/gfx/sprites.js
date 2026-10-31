@@ -117,6 +117,13 @@ mat('orb',    ['#ffffff','#efe4ff','#c4a8ff','#9370ea'], {emissive:true});
 mat('rune',   ['#ffffff','#d8f0ff','#8fd0ff','#5aa0e8'], {emissive:true});
 mat('slime',  ['#e6fbff','#86d4ec','#48a4cc','#2a6c9a']);
 mat('slimeG', ['#fff8cc','#f5cc50','#d0961e','#8c5a14']);
+// (v193) the Golden Jelly King: a warmer, more colourful body (gold into peach and rose), a glowing halo, feathered wings with rainbow tips
+mat('slimeRoyal', ['#fffbe6','#ffd86a','#ff9e7a','#d65a8a']);
+mat('haloGlow', ['#ffffff','#fff3b0','#ffd34a','#c8901a'], {emissive:true});
+mat('featherW', ['#ffffff','#f4f2ff','#d8d4f0','#a8a0d0']);
+mat('tipPink', ['#fff0f8','#ffb0dc','#ff6ab0','#c03a80'], {emissive:true});
+mat('tipAqua', ['#f0ffff','#a8f4ff','#40d0f0','#1a8ab8'], {emissive:true});
+mat('tipViolet', ['#f6f0ff','#d0b8ff','#9a70ff','#5a3ac0'], {emissive:true});
 mat('slimeE', ['#ffffff','#2a3a48','#1c2834','#101820'], {noEdge:true});
 mat('fur',    ['#ffffff','#f1e6d2','#d3c2a6','#9c8a72']);
 mat('furPink',['#ffd6dc','#eea4b0','#c97888','#94505e']);
@@ -1633,7 +1640,7 @@ function slimeModel(big){
     if (act === 'attack'){ sq = [1.15, .8, 1.2, 1][f]; lun = [0, -1, 5, 1][f]; hop = [0, 0, 2, 0][f]; }
     if (act === 'hurt'){ sq = [.78, .9][f]; eyes = 'hurt'; }
     if (act === 'die'){ melt = [.15, .45, .7, .9][f]; eyes = 'closed'; }
-    const body = big ? M.slimeG : M.slime;
+    const body = big ? M.slimeRoyal : M.slime;
     const r = 9 * S, h = (1 - melt) / sq;
     const yc = (r * .82 * h) + hop * S;
     cx.gid = 1;
@@ -1647,11 +1654,25 @@ function slimeModel(big){
     }});
     cx.gid = 2;
     if (melt < .6) for (let i = 0; i < 6; i++){ const k = i / 6; ell(cx, [0, yc + r * .7 * h + k * 6 * S * h, lun * S - k * 1.5 * S], (4.6 - k * 4) * S, (4.6 - k * 4) * S * .9, body, {}); }
-    if (big){
-      cx.gid = 3; const cy = yc + r * .75 * h + 6 * S * h;
-      frustum(cx, [0, 0, lun * S - 3], cy + 3, cy + 1, 9, 9, M.crown, {});
-      for (let i = 0; i < 5; i++){ const a = i / 5 * Math.PI * 2; cx.gid = 4 + i; cap(cx, [Math.cos(a) * 8, cy + 2, lun * S - 3 + Math.sin(a) * 8], [Math.cos(a) * 7, cy + 8 + (i % 2) * 2, lun * S - 3 + Math.sin(a) * 7], 1.6, .6, M.crown, {}); }
-      cx.gid = 10; ell(cx, [0, cy + 3.5, lun * S - 3 + 9], 1.8, 1.8, M.gem, {});
+    if (big && melt < .9){
+      // an angel's halo floats above the crest, bobbing (it was a crown)
+      const top = yc + r * .75 * h + 6 * S * h, hy = top + 7 + Math.sin(ph) * 1.2, hz = lun * S - 2, HR = 8.5;
+      for (let i = 0; i < 16; i++){ const a0 = i / 16 * Math.PI * 2, a1 = (i + 1) / 16 * Math.PI * 2; cx.gid = 3 + (i % 3);
+        cap(cx, [Math.cos(a0) * HR, hy, hz + Math.sin(a0) * HR * .45], [Math.cos(a1) * HR, hy, hz + Math.sin(a1) * HR * .45], 1.1, 1.1, M.haloGlow, {}); }
+      // feathered wings from both sides: long flight feathers fanned up and back, a row of short soft coverts over their
+      // roots, flapping slowly; rainbow tips on the long ones
+      const flap = Math.sin(ph) * .16 + (act === 'attack' ? [0, -.15, .3, 0][f] || 0 : 0), tips = [M.tipPink, M.tipAqua, M.tipViolet], WS = S / 2.55;
+      for (const sd of [-1, 1]){ const rx = sd * r * .72, ry = yc + r * .2, rz = lun * S - r * .5;
+        for (let j = 0; j < 10; j++){ const t = j / 9, ang = (.05 + t * 1.25) + flap * (.6 + t * .6), len = (14 + Math.sin(t * Math.PI * .9) * 10) * WS * 1.9;
+          const dx = Math.cos(ang) * len, dy = Math.sin(ang) * len, a = [rx, ry + t * 4 * WS, rz - t * 2], b = [rx + sd * dx, ry + dy, rz - 4 - t * 3];
+          cx.gid = 20 + (sd > 0 ? 12 : 0) + j; cap(cx, a, b, 3.4 * WS * 1.6, 2.2 * WS * 1.6, M.featherW, {});
+          const tip = [b[0] + sd * Math.cos(ang) * 4 * WS * 1.6, b[1] + Math.sin(ang) * 4 * WS * 1.6, b[2] - .5];
+          cx.gid = 46 + (sd > 0 ? 12 : 0) + j; cap(cx, b, tip, 2.2 * WS * 1.6, 1.1 * WS * 1.6, tips[j % 3], {}); }
+        for (let j = 0; j < 6; j++){ const t = j / 5, ang = (.25 + t * 1.0) + flap * .8, len = (8 + Math.sin(t * Math.PI) * 4) * WS * 1.9;
+          cx.gid = 72 + (sd > 0 ? 8 : 0) + j; cap(cx, [rx, ry + 2 * WS, rz + 1], [rx + sd * Math.cos(ang) * len, ry + Math.sin(ang) * len, rz - 1], 4.2 * WS * 1.6, 3 * WS * 1.6, M.featherW, {}); } }
+      // a rainbow of gems around its belly
+      const gem = [M.tipPink, M.haloGlow, M.tipAqua, M.tipViolet];
+      for (let i = 0; i < 4; i++){ const a = -.9 + i * .6; cx.gid = 90 + i; ell(cx, [Math.sin(a) * r * .95, yc - r * .25, lun * S + Math.cos(a) * r * .55], 1.4, 1.4, gem[i], {}); }
     }
   };
 }

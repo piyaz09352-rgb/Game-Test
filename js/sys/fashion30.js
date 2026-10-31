@@ -565,7 +565,9 @@ document.addEventListener('click', e => { const b = e.target.closest && e.target
   .fw .wrtabs{display:flex;flex-wrap:wrap;gap:6px}.fw .wrtabs button{border:1px solid rgba(232,194,106,.55);background:linear-gradient(180deg,#2a3563,#171e3d);color:var(--rn-cream,#f7edd6);border-radius:9px;padding:5px 14px;font:600 13px var(--thai,sans-serif);cursor:pointer}
   .fw .wrtabs button.on{background:linear-gradient(180deg,#fff0c2,#e8c26a 50%,#b8862f);color:#2a1a00;border-color:#fff0c2}
   .fw .fwgrid{max-height:calc(100dvh - 210px);overflow-y:auto;overscroll-behavior:contain;padding-right:4px}
-  .fw .fwgrid > .sec:first-child{margin-top:0}`;
+  .fw .fwgrid > .sec:first-child{margin-top:0;position:sticky;top:0;z-index:2;padding:4px 2px;background:linear-gradient(#fdf6e8 75%,rgba(253,246,232,0))}
+  /* (v193) every card the same height: a name takes at most two lines */
+  .fw .coslist .cosit b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.5em;line-height:1.25em;word-break:break-word}`;
   document.head.appendChild(st); }
 
 /* the tailor: every collection for sale (coins), grouped */
