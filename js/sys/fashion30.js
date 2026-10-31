@@ -511,7 +511,9 @@ if (!GHOST_SLOTS.includes('mask')) GHOST_SLOTS.push('mask');
     const c0 = COSTUME[id]; if (!c0 || c0.slot !== 'mask') return _rf.apply(this, arguments);
     const c = document.createElement('canvas'); c.width = CTH_W; c.height = CTH_H; const g = c.getContext('2d'), SC = CTH_W / 120, s = 3.5 * SC;
     const bg = g.createRadialGradient(CTH_W / 2, CTH_H * .55, 4, CTH_W / 2, CTH_H * .55, CTH_W * .75); bg.addColorStop(0, 'rgba(255,214,120,.42)'); bg.addColorStop(1, 'rgba(255,220,150,0)'); g.fillStyle = bg; g.fillRect(0, 0, CTH_W, CTH_H);
-    try { g.setTransform(s, 0, 0, s, CTH_W / 2, CTH_H * .5 + CTH_HEAD * s); cthHero(g, {weapon:cthWeapon() || null, mask:id}, 0); } catch (e) { return null; }
+    // (v198) pieces painted on the face (glasses, visors, marks, mouth cloths) are shown close up: at head size they were too small to make out
+    const lk = c0.look || {}, close = !!(lk.faceMask || lk.ninjaMask), z = close ? 5.6 * SC : s, fy = close ? CTH_HEAD - 9.5 : CTH_HEAD;
+    try { g.setTransform(z, 0, 0, z, CTH_W / 2, CTH_H * .5 + fy * z); cthHero(g, {weapon:null, mask:id}, 0); } catch (e) { return null; }
     return c.toDataURL('image/png'); }; }
 
 /* ---------- wearing ---------- */

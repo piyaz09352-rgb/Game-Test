@@ -15,6 +15,7 @@ const cthKind = id => (typeof WINGS !== 'undefined' && WINGS[id] ? 'wing' : type
 function cthKey(id){
   const k = cthKind(id); if (!k) return null;
   if (k === 'mount' || k === 'pet') return id + (k === 'mount' ? '|' + S.job + '|' + SPR.lookKey(S.look) : '');
+  if (k === 'mask') return `${id}|${S.job}|${SPR.lookKey(S.look)}|z3`;   // (v198) face pieces drawn close up, without the weapon
   return `${id}|${S.job}|${SPR.lookKey(S.look)}|${cthWeapon()}`;
 }
 /* portraits show the hero in plain clothes with their weapon, so wearing or changing gear never re-renders them */

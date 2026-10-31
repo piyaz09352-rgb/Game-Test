@@ -22,3 +22,8 @@ const LINE_ACD = {rune:[.5, .55, .6, .6], healer:[.55, .55, .55, .55], occult:[.
 { const _d = derive; derive = function(){ const r = _d.apply(this, arguments); const ch = jobChain(), line = ch[1], ti = Math.min(3, Math.max(0, ch.length - 2));
     if (DER && line){ if (LINE_CAST[line]) DER.castMul *= LINE_CAST[line][ti]; if (LINE_ACD[line]) DER.acdMul = (DER.acdMul || 1) * LINE_ACD[line][ti]; }
     return r; }; }
+/* (v198) SP cost × by tier: the report showed the hexer at Lv 15 limited by SP, not damage (most SP potions of any
+   line, little time casting), so its skills cost less SP while it is still on its first job */
+const LINE_SP = {occult:[.6, 1, 1, 1]};
+for (const id in SKILLS){ const sk = SKILLS[id], ln = typeof NL_LINE_OF !== 'undefined' && NL_LINE_OF[sk.job]; if (!ln || !LINE_SP[ln] || typeof sk.sp !== 'function' || sk._spLine) continue;
+  const o = sk.sp; sk._spLine = 1; sk.sp = lv => { const ch = jobChain(), ti = Math.min(3, Math.max(0, ch.length - 2)); return ch[1] === ln ? Math.max(1, Math.round(o(lv) * LINE_SP[ln][ti])) : o(lv); }; }

@@ -382,3 +382,27 @@ for (const [id, th, en, mat, price] of NJ_CLOTH){ const look = {ninjaMask:mat};
 EV.on('tick', () => { if (typeof ACC === 'undefined' || !ACC || ACC.njClothGift || !S || !S.lvl || !(JOBS[S.job] && JOBS[S.job].weapon.type === 'shuriken')) return;
   ACC.njClothGift = 1; ACC.wardrobe = ACC.wardrobe || {}; ACC.wardrobe.f_njmask = 1; if (typeof accSave === 'function') accSave(true);
   if (typeof log === 'function') log(L('ผ้าปิดปากนินจาย้ายไปอยู่ในตู้เสื้อผ้าแล้ว (หมวดใบหน้า) · ได้รับผ้าปิดปากนินจาดำฟรี', 'The ninja mouth cloth moved to the wardrobe (Face tab) · the black one is yours for free'), 'g'); });
+
+/* ---------- (v198) wardrobe filter: all · owned · new (40–50 pieces a tab was a lot to scroll through) ---------- */
+const FWF = {mode:'all'};
+const FWF_NEW = id => AI_IDS.has(id) || /^f_njmask/.test(id);
+function fwfApply(){ const grid = document.querySelector('#pane-equip .fwgrid'); if (!grid) return;
+  for (const b of grid.querySelectorAll('[data-costry]')){ const id = b.dataset.costry, ok = FWF.mode === 'all' || (FWF.mode === 'own' ? cosHave(id) : FWF_NEW(id)); b.style.display = ok ? '' : 'none'; }
+  for (const sec of grid.querySelectorAll(':scope > .sec')){ const list = sec.nextElementSibling; if (!list || !list.classList.contains('coslist')) continue;
+    const any = [...list.children].some(b => b.style.display !== 'none'); list.style.display = any ? '' : 'none'; if (sec !== grid.firstElementChild) sec.style.display = any ? '' : 'none'; }
+  let empty = grid.querySelector('.fwfempty'); const none = ![...grid.querySelectorAll('[data-costry]')].some(b => b.style.display !== 'none');
+  if (none && !empty){ empty = document.createElement('p'); empty.className = 'hint fwfempty'; empty.textContent = L('ยังไม่มีชิ้นในหมวดนี้ · ลองสวมฟรีได้ที่ "ทั้งหมด"', 'Nothing here yet · try pieces on free under "All"'); grid.appendChild(empty); }
+  if (!none && empty) empty.remove(); }
+{ const _rw = renderWardrobe;
+  renderWardrobe = function(){ const r = _rw.apply(this, arguments);
+    try { const tabs = document.querySelector('#pane-equip .fw .wrtabs'); if (tabs && !tabs.parentElement.querySelector('.fwfilter')){ const bar = document.createElement('div'); bar.className = 'fwfilter';
+        bar.innerHTML = [['all', 'ทั้งหมด', 'All'], ['own', 'มีแล้ว', 'Owned'], ['new', '✦ ของใหม่', '✦ New']].map(([k, th, en]) => `<button class="${FWF.mode === k ? 'on' : ''}" data-fwf="${k}">${L(th, en)}</button>`).join('');
+        tabs.after(bar); }
+      fwfApply(); } catch (e) {}
+    return r; }; }
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-fwf]'); if (!b) return; FWF.mode = b.dataset.fwf;
+  document.querySelectorAll('#pane-equip .fwfilter button').forEach(x => x.classList.toggle('on', x.dataset.fwf === FWF.mode)); fwfApply();
+  const g = document.querySelector('#pane-equip .fwgrid'); if (g) g.scrollTop = 0; });
+{ const st = document.createElement('style'); st.textContent = `.fw .fwfilter{display:flex;gap:6px;flex:none}
+  .fw .fwfilter button{border:1px solid rgba(90,120,170,.45);background:#fffdf6;color:#3a3020;border-radius:999px;padding:2px 12px;font:600 12px var(--thai,sans-serif);cursor:pointer}
+  .fw .fwfilter button.on{background:#2a6ab8;color:#fff;border-color:#2a6ab8}`; document.head.appendChild(st); }
