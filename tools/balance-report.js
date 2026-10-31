@@ -79,6 +79,7 @@ async function simOne({ line, lv, sec, boss: bossMode }){
   warpTo(mapId);
   // boss mode: the map's boss next to you, nothing else around
   let bossM = null;
+  if (typeof BOTG !== 'undefined') BOTG.r = bossMode ? 0 : 190;   // (v206) Auto keeps off monsters near warp gates; a test boss may stand by one
   if (bossMode){ const bt = MAPS[mapId].boss;
     // away from the camp (a boss hit from a safe zone teleports away with full HP: sys/bosssafe.js)
     const safe = typeof CAMP !== 'undefined' && CAMP ? CAMP : {x: P.x, y: P.y};
@@ -92,14 +93,14 @@ async function simOne({ line, lv, sec, boss: bossMode }){
   EV.on('kill', onKill);
   const expNow = () => { let e = S.exp; for (let l = lv; l < S.lvl; l++) e += nextBase(l); return e; };
   exp0 = expNow();
-  setBot(true); if (bossMode && S.bot) S.bot.avoidBoss = false;   // Auto avoids bosses by default
+  setBot(true); if (bossMode){ if (typeof botSet === 'function') botSet(); if (S.bot) S.bot.avoidBoss = false; }   // Auto avoids bosses by default
   const stepT = .05; let t = 0, hpLowest = 1; const tm = {cast:0, sit:0, move:0, other:0};
   while (t < sec && !(bossM && bossM.dead)){
     advance(stepT, false); t += stepT;
     if (!BOT.on) setBot(true);
     hpLowest = Math.min(hpLowest, S.hp / DER.maxhp);
     tm[P.cast ? 'cast' : P.sit ? 'sit' : P.moving ? 'move' : 'other'] += stepT;
-    if (P.dead || S.hp <= 0){ deaths++; P.dead = false; S.hp = DER.maxhp; S.sp = DER.maxsp; if (typeof MAP_ID !== 'undefined' && MAP_ID !== mapId) warpTo(mapId); setBot(true); if (bossMode && S.bot) S.bot.avoidBoss = false; if (bossM){ P.x = bossM.x - 120; P.y = bossM.y; } }
+    if (P.dead || S.hp <= 0){ deaths++; P.dead = false; S.hp = DER.maxhp; S.sp = DER.maxsp; if (typeof MAP_ID !== 'undefined' && MAP_ID !== mapId) warpTo(mapId); setBot(true); if (bossMode){ if (typeof botSet === 'function') botSet(); if (S.bot) S.bot.avoidBoss = false; } if (bossM){ P.x = bossM.x - 120; P.y = bossM.y; } }
     if (MAP_ID !== mapId){ warpTo(mapId); setBot(true); }
     if (bossM && !bossM.dead){ P.target = bossM; if (bossMode) for (const m of mobs) if (m !== bossM && !m.minion && !m.def.boss && !m.dead) { m.dead = true; m.deadT = 99; } }
     if ((S.inv[potId] || 0) < 300) { /* counted below */ }
