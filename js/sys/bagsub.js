@@ -86,3 +86,13 @@ html body #ui.ui .baggrid.grid .bslot{min-height:84px;aspect-ratio:1/1}
 #pane-bag #bagInfo .gdx-act{position:sticky;bottom:0;z-index:3;padding-top:6px;background:linear-gradient(rgba(253,246,232,0),#fdf6e8 35%)}
 html body #ui.ui .baggrid.grid .bslot svg:first-of-type,html body #ui.ui .baggrid.grid .bslot .sico{width:72%!important;height:72%!important}`;
   document.head.appendChild(st); }
+/* (v194) the skill window: the tree scrolls on its own and the picked skill's card (with its − +) stays in view beside
+   it; the points bar, tier tabs and the confirm bar never move. The whole window used to scroll, so reaching a lower
+   skill carried its card and buttons out of sight, and the confirm bar covered the bottom row. */
+{ const st = document.createElement('style'); st.textContent = `
+#win-skill .wb{min-height:0}
+#pane-skill{display:flex;flex-direction:column;overflow:hidden!important;min-height:0}
+#pane-skill > .sktop,#pane-skill > .sk8legend,#pane-skill > .empty,#pane-skill > .skconfirm{flex:none;position:static!important}
+#pane-skill > .skmain{flex:1 1 auto;min-height:0;align-items:start}
+#pane-skill > .skmain > #skTree{max-height:100%;overflow-y:auto;overscroll-behavior:contain}
+#pane-skill > .skmain > .skdetail{max-height:100%;overflow-y:auto;align-self:start}`; document.head.appendChild(st); }

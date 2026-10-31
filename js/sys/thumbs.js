@@ -100,10 +100,10 @@ requestAnimationFrame(cthWork);
 function cthWarm(){
   if (typeof S === 'undefined' || !S || !S.look || typeof PAUSED !== 'undefined' && PAUSED) return setTimeout(cthWarm, 3000);
   const ids = [...(typeof WINGS !== 'undefined' ? Object.keys(WINGS) : []), ...(typeof XCOS !== 'undefined' ? Object.keys(XCOS) : []), ...(typeof COSTUME !== 'undefined' ? Object.keys(COSTUME) : [])];
-  // three pictures every 0.2 s (the game draws every frame, so the browser seldom has idle time to offer)
-  let i = 0; const step = () => { let n = 0; while (i < ids.length && n < 3){ const id = ids[i++], key = cthKey(id); if (!key || CTH.cache.has(key)) continue;
+  // one picture every 0.15 s, so no frame ever waits long (the game draws every frame, so the browser seldom has idle time to offer)
+  let i = 0; const step = () => { let n = 0; while (i < ids.length && n < 1){ const id = ids[i++], key = cthKey(id); if (!key || CTH.cache.has(key)) continue;
       const url = cthRender(id); CTH.cache.set(key, url || ''); if (url) cthSave(); n++; }
-    if (i < ids.length) setTimeout(step, 200); };
+    if (i < ids.length) setTimeout(step, 150); };
   step();
 }
 setTimeout(cthWarm, 6000);
