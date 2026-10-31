@@ -813,6 +813,36 @@ function drawHuman(cx, cfg, P){
   if (cfg.twintail){ for (const sd of [-1, 1]){ G(); ell(cx, add(hc, upper([sd * 9.6, 6.2, -3.4])), 2.4, 2.4, M[cfg.belt === 'gold' ? 'gold' : 'scarlet']);
       G(); for (let i = 0; i <= 8; i++){ const k = i / 8; ell(cx, add(hc, upper([sd * (10.6 + k * 2.6) + sw * k * 2, 5 - k * 15 + Math.abs(sw) * k * 2, -4.6 - k * 2.4 - Math.abs(sw) * k])), 3.5 - k * 1.5, 3.5 - k * 1.5, M[cfg.hair], {tex:n => (Math.sin(Math.atan2(n[0], n[1]) * 5 + k * 6) > .55 ? {dt:1} : undefined)}); } } }
   if (cfg.bun){ G(); ell(cx, add(hc, upper([0, 7.5, -8])), 4.6, 4.6, M[cfg.hair], {tex:n => (Math.sin(Math.atan2(n[0], n[1]) * 6) > .5 ? {dt:1} : undefined)}); G(); line(cx, add(hc, upper([-4, 9, -9])), add(hc, upper([5, 10.5, -8])), M.gold, {t:1}); }
+  // (v194) thirty more hairstyles: new shapes (hidden on top under a full hat, like the spikes)
+  { const H = M[cfg.hair], topOk = !['wizard', 'cap', 'mala', 'lomphok', 'hermit', 'ngob', 'helm', 'crown'].includes(cfg.hat), curl = n => (Math.sin(n[0] * 9) * Math.sin(n[1] * 9) > .25 ? {dt:1} : undefined);
+    const tie = cfg.tieMat ? M[cfg.tieMat] : M.gold;
+    if (cfg.afro && topOk){ const A = cfg.afro, ac = add(hc, upper([0, 3.4, -3.6])); G(); ell(cx, ac, 14.6 * A, 13.2 * A, H, {rz:10.4 * A, tex:curl});
+      // tight curls all over its surface (it read as a smooth helmet)
+      for (let i = 0; i < 26; i++){ const a = i * 2.399, y = -.25 + 1.15 * ((i * .618) % 1), r = Math.sqrt(Math.max(0, 1 - y * y)), d = [Math.sin(a) * r, y, Math.cos(a) * r];
+        if (d[2] > .35 && d[1] < .45) continue; G(); ell(cx, add(ac, [d[0] * 14 * A, d[1] * 12.6 * A, d[2] * 9.8 * A]), 3.2 * A, 3.2 * A, H, {tex:curl}); } }
+    if (cfg.bowl) for (let i = 0; i < 11; i++){ const a = (i / 10 - .5) * 3.6 + Math.PI, x0 = Math.sin(a) * 11.2, z0 = Math.cos(a) * 11.2 - 1;   // a bowl's rim at ear height, all round but the face
+      G(); ell(cx, add(hc, upper([x0, -.6, z0])), 3.4, 2.6, H, {}); }
+    if (cfg.pompadour && topOk){ G(); ell(cx, add(hc, upper([0, 9.6, 3.2])), 8.6, 5.2, H, {rz:6.4, tex:n => (Math.sin(n[0] * 6 + n[2] * 3) > .6 ? {dt:1} : undefined)}); G(); ell(cx, add(hc, upper([0, 11.4, -1])), 7.4, 3.6, H, {rz:7}); }
+    if (cfg.mohawk && topOk) for (let i = 0; i < 7; i++){ const a = -.35 + i * .42, d = nrm([0, Math.cos(a), Math.sin(a) * -1 + .55]), base = add(hc, upper(mul(d, 9.4))), len = 6.4 + Math.sin(i / 6 * Math.PI) * 3.4;
+      G(); cap(cx, base, add(base, mul(d, len)), 2.9, .5, H, {}); }
+    if (cfg.curls && topOk) for (let i = 0; i < 22; i++){ const a = i * 2.399 + .3, y = .1 + .85 * ((i * .618) % 1), r = Math.sqrt(1 - y * y), d = [Math.sin(a) * r, y, Math.cos(a) * r];
+      if (d[2] > .45 && d[1] < .55) continue; G(); ell(cx, add(hc, upper(add([0, 1, -1.4], mul(d, 10.6)))), 3.1, 3.1, H, {tex:curl}); }
+    if (cfg.braid){ G(); for (let i = 0; i <= 11; i++){ const k = i / 11; ell(cx, add(hc, upper([(i % 2 ? .9 : -.9) + sw * k * 2, -1 - k * cfg.braid, -9.6 - k * 2 - Math.abs(sw) * k])), 2.6 - k * .9, 2.2 - k * .7, H, {tex:n => (n[0] * (i % 2 ? 1 : -1) > .3 ? {dt:1} : undefined)}); }
+      G(); ell(cx, add(hc, upper([sw * 2, -2 - cfg.braid, -11.6 - Math.abs(sw)])), 1.4, 1.4, tie); }
+    if (cfg.twinBraid) for (const sd of [-1, 1]){ G(); for (let i = 0; i <= 9; i++){ const k = i / 9; ell(cx, add(hc, upper([sd * (9.8 + k * .6) + (i % 2 ? .6 : -.6) + sw * k, 1 - k * cfg.twinBraid, 2.6 - k * 1.2])), 2.3 - k * .7, 2 - k * .6, H, {}); }
+      G(); ell(cx, add(hc, upper([sd * 10.4 + sw, -.2 - cfg.twinBraid, 1.4])), 1.3, 1.3, tie); }
+    if (cfg.drills) for (const sd of [-1, 1]){ G(); for (let i = 0; i <= 12; i++){ const k = i / 12, sp = k * Math.PI * 5; ell(cx, add(hc, upper([sd * (10.8 + Math.cos(sp) * 1.6) + sw * k, 3 - k * cfg.drills, -1.6 + Math.sin(sp) * 1.6])), 3.4 - k * 2, 2.6 - k * 1.5, H, {tex:n => (n[1] > .3 ? {dt:-1} : undefined)}); }
+      G(); ell(cx, add(hc, upper([sd * 9.8, 5.4, -1.4])), 1.6, 1.6, tie); }
+    if (cfg.sideTail){ const sd = cfg.sideTail; G(); ell(cx, add(hc, upper([sd * 9.4, 6.8, -4.2])), 2.2, 2.2, tie);
+      G(); for (let i = 0; i <= 9; i++){ const k = i / 9; ell(cx, add(hc, upper([sd * (11 + Math.sin(k * 2.4) * 3) + sw * k * 2, 6 - k * 16, -5 - k * 2])), 3.6 - k * 1.8, 3.6 - k * 1.8, H, {tex:n => (Math.sin(Math.atan2(n[0], n[1]) * 5 + k * 6) > .55 ? {dt:1} : undefined)}); } }
+    if (cfg.lowTail){ G(); ell(cx, add(hc, upper([0, -2.2, -11.4])), 2.3, 2.3, tie); G(); for (let i = 0; i <= 9; i++){ const k = i / 9; ell(cx, add(hc, upper([sw * k * 2.4, -3 - k * cfg.lowTail, -12.6 - k * 2.4 - Math.sin(k * 2) * 1.4])), 3.6 - k * 1.4, 3.6 - k * 1.4, H, {tex:n => (Math.sin(Math.atan2(n[0], n[1]) * 5 + k * 5) > .55 ? {dt:1} : undefined)}); } }   // stands clear of the back so you can see it
+    if (cfg.odango && topOk) for (const sd of [-1, 1]){ G(); ell(cx, add(hc, upper([sd * 6.6, 9.4, -3.6])), 4.2, 4.2, H, {tex:n => (Math.sin(Math.atan2(n[0], n[2]) * 6) > .5 ? {dt:1} : undefined)}); G(); ell(cx, add(hc, upper([sd * 5, 7.4, -.8])), 1.2, 1.2, tie); }
+    if (cfg.wave){ G(); for (let i = 0; i <= 9; i++){ const k = i / 9; ell(cx, add(hc, upper([Math.sin(k * Math.PI * 3) * 1.8 + sw * k * 1.6, -2 - k * cfg.wave, -6.8 - k * 1.6 - Math.abs(sw) * k])), (cfg.backW || 9.6) - k * 2.2 + Math.cos(k * Math.PI * 3) * .9, 4.6, H, {tex:n => (Math.sin(Math.atan2(n[0], -n[2]) * 7 + k * 4) > .55 ? {dt:1} : undefined)}); } }
+    if (cfg.dreads) for (let j = 0; j < 9; j++){ const a = (j / 8 - .5) * 2.4, x0 = Math.sin(a) * 9.4, z0 = -Math.cos(a) * 9.4 - 1.4;
+      G(); cap(cx, add(hc, upper([x0, 2, z0])), add(hc, upper([x0 * 1.15 + sw * 1.5, 2 - cfg.dreads - (j % 3), z0 * 1.1 - 1])), 1.6, 1.1, H, {tex:(n, lo, q, t) => (Math.sin(t * 22) > .4 ? {dt:1} : undefined)}); }
+    if (cfg.wolf) for (let j = 0; j < 7; j++){ const a = (j / 6 - .5) * 2.6, x0 = Math.sin(a) * 9.6, z0 = -Math.cos(a) * 9.6 - 1;
+      G(); cap(cx, add(hc, upper([x0, 1, z0])), add(hc, upper([x0 * 1.25 + sw, -4 - (j % 2) * 3, z0 * 1.15 - 1.4])), 3, .6, H, {}); }
+  }
   // hats
   if (cfg.hat === 'wizard'){
     G(); frustum(cx, add(hc, [0, 0, -.8]), hc[1] + 7.2, hc[1] + 6.4, 12.6, 12.6, M.indigoD, {g:cx.gid});
@@ -1442,6 +1472,10 @@ const BANG_SWEEP = [[-6.4, -1.4, -3.6, 1.6], [-3.8, -.7, -2.6, 1.7], [-1.2, .1, 
 const BANG_SHARP = [[-6.6, -2.2, -4.4, 1.4], [-3.6, -1.4, -3.8, 1.5], [-.6, -.2, -4.6, 1.6], [2.4, 1.2, -3.4, 1.5], [5.4, 2.2, -4.2, 1.4]];
 const BANG_SIDE = [[-6.2, .6, -4.8, 1.8], [-3.2, 1.4, -4.2, 1.9], [-.2, 2.2, -3.6, 1.9], [2.8, 2.8, -2.8, 1.7], [5.8, 3.0, -2.2, 1.5]];
 const BANG_SOFT = [[-5.8, -.8, -3.0, 2.0], [-2.2, -.2, -2.4, 2.1], [1.6, .4, -2.6, 2.1], [5.2, 1.0, -3.0, 1.9]];
+// (v194) blunt fringe (straight across) · curtain fringe (parted in the middle) · a swoop over one eye
+const BANG_BLUNT = [[-6.4, -1.0, -3.6, 1.9], [-3.2, -1.0, -3.6, 1.95], [0, -1.0, -3.6, 1.95], [3.2, -1.0, -3.6, 1.95], [6.4, -1.0, -3.6, 1.9]];
+const BANG_CURTAIN = [[-6.4, 1.2, -2.4, 1.8], [-3.4, .2, -3.6, 1.9], [3.4, .2, -3.6, 1.9], [6.4, 1.2, -2.4, 1.8]];
+const BANG_SWOOP = [[-6.8, -3.0, -5.4, 2.2], [-3.8, -2.2, -5.0, 2.2], [-.8, -1.0, -4.4, 2.1], [2.4, .6, -3.2, 1.8], [5.6, 1.8, -2.4, 1.5]];
 const CHARS = {
   // ages: the villager is a 15-year-old (a little shorter); every class is a young adult of about 18
   // ages: the villager is a 15-year-old (a little shorter); every class is a young adult of about 18.
@@ -1570,6 +1604,39 @@ const HAIR_F = [{backHair:true, backLen:17, backW:10.2, sideLocks:15, ponytail:f
   HS({backHair:true, backLen:14, backW:9.6, sideLocks:12, spikes:12, spikeLen:3.6, paintBangs:BANG_SIDE, deco:['ribbon', 'teal']}),  // 6 side-swept long
   HS({ponytail:true, sideLocks:15, spikes:10, spikeLen:3.2, jag:.12, crown:2, deco:['ribbon', 'gold']}),                            // 7 ponytail + long locks
   HS({twintail:true, backHair:true, backLen:12, backW:9.2, sideLocks:6, spikes:10, spikeLen:3, paintBangs:BANG_SOFT, deco:['hairpin', 'hairLilac']})];   // 8 long twin tails
+/* (v194) thirty more, fifteen each — every one with its own silhouette */
+HAIR_M.push(
+  HS({afro:1, spikes:0, paintBangs:BANG_SOFT}),                                                       // 9 afro
+  HS({mohawk:true, spikes:0, paintBangs:BANG_SHARP, short:true}),                                     // 10 mohawk
+  HS({pompadour:true, spikes:10, spikeLen:2.6, paintBangs:BANG_SWEEP}),                              // 11 pompadour
+  HS({spikes:8, spikeLen:3, paintBangs:BANG_SWOOP, sideLocks:5}),                                    // 12 swoop over one eye
+  HS({curls:true, spikes:0, paintBangs:BANG_SOFT}),                                                   // 13 short curls
+  HS({lowTail:9, spikes:12, spikeLen:3.2, paintBangs:BANG_CURTAIN, tieMat:'leather'}),                // 14 low tail, curtain fringe
+  HS({braid:20, spikes:10, spikeLen:3.4, paintBangs:BANG_SIDE, tieMat:'gold'}),                       // 15 long single braid
+  HS({spikes:20, spikeLen:7.4, crown:9, jag:.3, paintBangs:BANG_SHARP}),                              // 16 tall spiky
+  HS({backHair:true, backLen:8, backW:9, spikes:10, spikeLen:3.4, paintBangs:BANG_CURTAIN, sideLocks:9}),   // 17 curtain fringe, shoulder length
+  HS({sideTail:1, spikes:12, spikeLen:3.4, paintBangs:BANG_SIDE, tieMat:'scarlet'}),                  // 18 side tail
+  HS({wolf:true, spikes:22, spikeLen:4.4, jag:.24, paintBangs:BANG_SHARP, sideLocks:8}),              // 19 wolf cut
+  HS({dreads:16, spikes:6, spikeLen:2.6, paintBangs:BANG_SOFT}),                                      // 20 dreadlocks
+  HS({spikes:0, paintBangs:BANG_BLUNT, bowl:true}),                                                   // 21 bowl cut
+  HS({wave:11, backW:9.2, spikes:8, spikeLen:3, paintBangs:BANG_SWEEP}),                              // 22 wavy shoulder length
+  HS({twinBraid:13, spikes:12, spikeLen:3.6, paintBangs:BANG_SHARP, tieMat:'leather'}));              // 23 twin braids
+HAIR_F.push(
+  HS({backHair:true, backLen:21, backW:10.4, sideLocks:15, spikes:0, paintBangs:BANG_BLUNT, deco:['hairpin', 'scarlet']}),   // 9 hime cut
+  HS({odango:true, sideLocks:7, spikes:8, spikeLen:2.8, paintBangs:BANG_SWEEP, tieMat:'hairPink'}),                        // 10 double buns
+  HS({drills:16, sideLocks:0, spikes:8, spikeLen:3, paintBangs:BANG_SOFT, tieMat:'gold', deco:['ribbon', 'crimson']}),     // 11 drill curls
+  HS({sideTail:-1, sideLocks:8, spikes:10, spikeLen:3.2, paintBangs:BANG_SIDE, tieMat:'hairSky'}),                         // 12 side ponytail
+  HS({braid:24, sideLocks:9, spikes:8, spikeLen:3, paintBangs:BANG_SWEEP, tieMat:'hairLilac'}),                             // 13 long braid
+  HS({twinBraid:15, sideLocks:0, spikes:9, spikeLen:3, paintBangs:BANG_BLUNT, tieMat:'scarlet'}),                           // 14 twin braids
+  HS({wave:22, backW:10.6, sideLocks:12, spikes:8, spikeLen:3, paintBangs:BANG_SIDE, deco:['hairpin', 'gold']}),            // 15 long waves
+  HS({curls:true, sideLocks:6, spikes:0, paintBangs:BANG_SOFT, deco:['hairpin', 'hairPink']}),                              // 16 curly bob
+  HS({lowTail:16, sideLocks:12, spikes:9, spikeLen:3, paintBangs:BANG_CURTAIN, tieMat:'teal'}),                             // 17 low ponytail
+  HS({backHair:true, backLen:15, backW:9.8, bun:true, sideLocks:10, spikes:8, spikeLen:3, paintBangs:BANG_SWEEP}),          // 18 half-up
+  HS({afro:.82, sideLocks:0, spikes:0, paintBangs:BANG_SOFT, deco:['ribbon', 'hairSky']}),                                  // 19 afro puff
+  HS({spikes:20, spikeLen:2.2, jag:.1, paintBangs:BANG_SWOOP, sideLocks:3}),                                                // 20 pixie cut
+  HS({backHair:true, backLen:17, backW:10, sideLocks:13, spikes:8, spikeLen:3, paintBangs:BANG_CURTAIN}),                   // 21 curtain fringe, long
+  HS({odango:true, twintail:true, sideLocks:5, spikes:8, spikeLen:2.8, paintBangs:BANG_SOFT, tieMat:'hairMint'}),           // 22 buns + tails
+  HS({pompadour:true, lowTail:12, sideLocks:6, spikes:8, spikeLen:2.6, paintBangs:BANG_SWEEP, tieMat:'scarlet'}));          // 23 rockabilly
 const HAIR_COLORS = ['', 'hairBlack', 'hairBrown', 'hairBlonde', 'hairAuburn', 'hairSilver', 'hairNavy', 'maroon', 'hairPink', 'hairTeal',
   'hairWhite', 'hairViolet', 'hairGreen', 'hairCrimson', 'hairAsh', 'hairGold', 'hairChestnut', 'hairOrange', 'hairRose', 'hairLilac', 'hairSky', 'hairMint'];
 const IRIS_COLORS = ['', 'irisBr', 'irisBl', 'irisGr', 'irisVi', 'irisRd', 'irisGd', 'irisPk', 'irisSv', 'irisTl'];
@@ -1579,11 +1646,11 @@ const b36 = n => (n | 0).toString(36);
 function lookKey(lk){
   if (!lk) return 'm00';
   const f = lk.sex === 'f', hs = (lk.hair | 0) % (f ? HAIR_F : HAIR_M).length, ci = Math.max(0, HAIR_COLORS.indexOf(lk.color || '')), ei = Math.max(0, IRIS_COLORS.indexOf(lk.eye || ''));
-  return `${f ? 'f' : 'm'}${hs}${b36(ci)}${ei ? 'e' + b36(ei) : ''}${lk.rft > 0 ? 'r' + Math.min(4, lk.rft | 0) : ''}${lk.sh ? 's' : ''}`;
+  return `${f ? 'f' : 'm'}${b36(hs)}${b36(ci)}${ei ? 'e' + b36(ei) : ''}${lk.rft > 0 ? 'r' + Math.min(4, lk.rft | 0) : ''}${lk.sh ? 's' : ''}`;
 }
 function parseLookKey(k){
-  const m = typeof k === 'string' && /^([mf])([0-9])([0-9a-z])(?:e([0-9a-z]))?(?:r([0-4]))?(s)?$/.exec(k); if (!m) return null;
-  return {sex:m[1], hair:+m[2], color:HAIR_COLORS[parseInt(m[3], 36)] || '', eye:m[4] ? IRIS_COLORS[parseInt(m[4], 36)] || '' : '', ...(m[6] ? {sh:1} : {})};   // (v161) s: the weapon is put away
+  const m = typeof k === 'string' && /^([mf])([0-9a-z])([0-9a-z])(?:e([0-9a-z]))?(?:r([0-4]))?(s)?$/.exec(k); if (!m) return null;   // (v194) the style is one base-36 character (0–9 then a–z): old keys read as before
+  return {sex:m[1], hair:parseInt(m[2], 36), color:HAIR_COLORS[parseInt(m[3], 36)] || '', eye:m[4] ? IRIS_COLORS[parseInt(m[4], 36)] || '' : '', ...(m[6] ? {sh:1} : {})};   // (v161) s: the weapon is put away
 }
 function applyLook(cfg, lk){
   const f = lk.sex === 'f', list = f ? HAIR_F : HAIR_M, st = {...(list[(lk.hair | 0) % list.length] || {})}, deco = st.deco; delete st.deco;
