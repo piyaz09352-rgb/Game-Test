@@ -42,7 +42,7 @@ test('skills: eight a tier, each in a style, and the new effects work', { skip, 
       execSkill('kaisorn', 10, null); const n0 = SUMMONS.filter(s => s.kind === 'beast').length;
       const m = mobs.find(x => !x.dead && !x.def.boss); m.maxhp = m.hp = 1e7; P.x = m.x - 30; P.y = m.y; window.__m = m;
       execSkill('emperorwrath', 10, null); return {n0, n1:SUMMONS.filter(s => s.kind === 'beast').length, n:S6X.n}; });
-    await page.waitForTimeout(600);
+    await page.waitForFunction(() => __m.hp < 1e7, null, {timeout:6000}).catch(() => {});   // game time can lag the clock under load
     assert.strictEqual(w.n0, 1); assert.strictEqual(w.n1, 0); assert.strictEqual(w.n, 1);
     assert.ok(await page.evaluate(() => __m.hp < 1e7), 'the wrath blast hits');
   } finally { await close(); }
