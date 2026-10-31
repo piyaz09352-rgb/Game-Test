@@ -8,11 +8,11 @@
 const BAG_SUB = [
   ['sword1', 'ดาบ', 'Swords'], ['sword2', 'ดาบสองมือ', 'Greatswords'], ['dagger1', 'มีดสั้น', 'Daggers'], ['dagger2', 'มีดคู่', 'Twin daggers'],
   ['staff1', 'คทา', 'Rods'], ['staff2', 'ไม้เท้ายาว', 'Long staves'], ['fist', 'สนับมือ', 'Knuckles'], ['bow', 'ธนู', 'Bows'], ['weapon', 'อาวุธอื่น', 'Other weapons'],
-  ['shield', 'โล่', 'Shields'], ['head', 'หมวก', 'Head'], ['armor', 'เสื้อ', 'Body'], ['pants', 'กางเกง', 'Legs'], ['shoes', 'รองเท้า', 'Feet'], ['acc', 'เครื่องประดับ', 'Accessories'], ['ammo', 'ลูกธนู', 'Arrows']];
+  ['shield', 'โล่', 'Shields'], ['head', 'หมวก', 'Head'], ['armor', 'เสื้อ', 'Body'], ['pants', 'กางเกง', 'Legs'], ['shoes', 'รองเท้า', 'Feet'], ['acc', 'เครื่องประดับ', 'Accessories'], ['ammo', 'ลูกธนู', 'Arrows'], ['star', 'ดาวกระจาย', 'Throwing stars']];
 /* which chip an item belongs to */
 function bagSubOf(id){
   const it = ITEMS[id]; if (!it) return null;
-  if (it.kind === 'ammo') return 'ammo';
+  if (it.kind === 'ammo') return it.st && it.st.star ? 'star' : 'ammo';   // (v190) throwing stars have their own chip
   if (it.kind !== 'gear') return null;
   if (it.slot !== 'weapon') return it.slot;
   const b = typeof hdBase === 'function' ? hdBase(id) || it : it, wt = it.wtype || (it.st && it.st.wtype) || b.wtype || (b.st && b.st.wtype);
@@ -37,7 +37,7 @@ function bagWeaponLines(id){
   return (BAG_WL[key] = [...lines]);
 }
 /* the chips an item shows under: its class lines (weapons) or its slot */
-function bagSubsOf(id){ const k = bagSubOf(id); if (!k) return []; if (k === 'ammo' || !ITEMS[id] || ITEMS[id].slot !== 'weapon') return [k]; const ls = bagWeaponLines(id); return ls.length ? ls.map(l => 'c:' + l) : ['weapon']; }
+function bagSubsOf(id){ const k = bagSubOf(id); if (!k) return []; if (k === 'ammo' || k === 'star' || !ITEMS[id] || ITEMS[id].slot !== 'weapon') return [k]; const ls = bagWeaponLines(id); return ls.length ? ls.map(l => 'c:' + l) : ['weapon']; }
 const bagMyLine = () => bagLineOf(S.job);
 BAG.sub = '';
 /* it replaces the older, coarser slot row (bagplus.js: อาวุธ · หมวก · เกราะ …): that row is hidden and left on "all" */
