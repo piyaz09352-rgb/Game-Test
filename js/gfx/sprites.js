@@ -509,10 +509,23 @@ const SK_POSE = {
    then chopped down in front of the body, the hips behind it, then back to guard. The hands stay near the middle of
    the chest so the other hand can close on the hilt (drawHuman grip2); the one-handed side swing is not used. */
 function twoHandChop(P, f){
-  P.armR = [.95, 2.85, 2.1, .75, .7][f]; P.elbR = [.45, .55, .15, .05, .35][f]; P.outR = [.05, .02, 0, -.06, .03][f]; P.wpn = [1.55, .95, 1.15, 1.65, 1.65][f];
-  P.armL = [.9, 2.7, 2.0, .7, .65][f]; P.elbL = [.5, .6, .2, .1, .4][f]; P.outL = [.05, .02, 0, -.06, .03][f];
-  P.lean = [0, -.14, .06, .26, .06][f]; P.twist = [0, -.08, .02, .1, .02][f]; P.sway = [0, .2, -.1, -.3, -.1][f];
-  P.legL = [0, -.1, .3, .5, .12][f]; P.legR = -P.legL * .7; P.bob = [0, .4, -.1, -1.1, -.25][f];
+  // (v210) a real overhead chop, as heavy weapons swing in action games: guard with the head up in front, wind up over
+  // the shoulder, raised beside the head (the big chibi head hid it when it went straight overhead), bring it over the top, and drive it down to the ground in front with
+  // a step, bent knees and a forward lean; then haul it back up. It used to stop level with the shoulders, like a thrust.
+  // The weapon points along armR + elbR·0.7 + wpn − 0.1 (0 down · π/2 forward · π up · past π behind).
+  P.armR = [.9, 2.5, 2.2, .95, .9][f]; P.elbR = [.5, .4, .2, .05, .3][f]; P.outR = [.05, -.2, -.2, -.04, .03][f]; P.gripUp = f === 1 || f === 2; P.wRoll = [0, .95, .4, 0, 0][f]; P.wpn = [1.3, .65, .35, .1, 1.2][f];
+  P.armL = [.85, 2.6, 2.2, .9, .85][f]; P.elbL = [.55, .45, .25, .1, .35][f]; P.outL = [.05, .02, 0, -.04, .03][f];
+  P.lean = [0, -.16, 0, .34, .12][f]; P.twist = [0, -.12, -.02, .12, .04][f]; P.sway = [0, .3, 0, -.4, -.15][f];
+  P.legL = [0, -.12, .25, .55, .2][f]; P.legR = -P.legL * .7; P.bob = [0, .5, .1, -1.6, -.5][f];
+  return P;
+}
+/* (v210) a one-handed axe is chopped, not swept: the elbow goes up and out and the axe high beside the head, then it comes down
+   at a slant with the hips behind it, bites low in front and follows through; the free arm swings back for balance */
+function axeChop1(P, f){
+  P.armR = [.55, 2.3, 2.0, 1.05, .45][f]; P.elbR = [.9, .9, .3, .05, .25][f]; P.outR = [.2, .6, .35, -.05, .1][f]; P.wRoll = [0, .7, .3, 0, 0][f]; P.wpn = [1.0, .95, .3, .1, .45][f];
+  P.armL = [.25, .75, .35, -.35, -.1][f]; P.elbL = [.4, .9, .6, .3, .35][f]; P.outL = [.2, .25, .2, .3, .2][f];
+  P.lean = [0, -.12, .06, .3, .16][f]; P.twist = [0, -.42, -.05, .36, .2][f]; P.sway = [0, .45, -.1, -.6, -.3][f];
+  P.legL = [0, -.15, .3, .52, .22][f]; P.legR = -P.legL * .7; P.bob = [0, .35, -.1, -1.3, -.6][f];
   return P;
 }
 function humanPose(act, f, n, weapon){
@@ -771,20 +784,22 @@ function drawHuman(cx, cfg, P){
     G(); ell(cx, hand, cfg.handWrap ? 2.4 : 2.2, cfg.handWrap ? 2.4 : 2.2, M[cfg.handWrap || cfg.skinM || 'skin'], {});
     return {hand, dir:nrm([hand[0] - el[0], hand[1] - el[1], hand[2] - el[2]])};
   };
+  const wRot = v => (P.wRoll ? rotZ(v, P.wLeft ? -P.wRoll : P.wRoll) : v);   // (v210) a weapon cocked out to the side (a wind-up beside the head)
   const arm0 = (side, pitch, out, elb) => { const sh = lean([hipC[0] + side * 6.0 * (cfg.slim || 1), 19.4 + B, 0]), el = add(sh, upper(rotX(rotZ([0, -4.1, 0], side * out), -pitch)));
     return add(el, upper(rotX(rotZ([0, -3.8, 0], side * out * .6), -(pitch + elb)))); };
   const grip2 = !P.noWeapon && !ride && !cfg.sheathed && (cfg.twoHand || cfg.katana) && (cfg.weapon === 'sword' || cfg.weapon === 'staff' || cfg.weapon === 'dagger') && !(cfg.weapon === 'staff' && P.ring >= 0);
   let AR, AL;
   if (grip2){
-    const wa = P.wLeft ? P.armL + P.elbL * .7 : P.armR + P.elbR * .7, wd = nrm(upper(rotX([0, -1, 0], -(wa + P.wpn - .1))));
+    const wa = P.wLeft ? P.armL + P.elbL * .7 : P.armR + P.elbR * .7, wd = nrm(upper(wRot(rotX([0, -1, 0], -(wa + P.wpn - .1)))));
     // the weapon hand keeps its pose but is drawn in toward the front of the body, so the other hand can close on the
     // hilt just below it: both hands on the grip, like a real two-handed hold
     const side = P.wLeft ? 1 : -1, posed = arm0(side, P.wLeft ? P.armL : P.armR, P.wLeft ? P.outL : P.outR, P.wLeft ? P.elbL : P.elbR);
     // (v197) the grip is drawn in toward the chest only as far as needed for BOTH hands to reach it (short chibi arms
     // stretch 25% at most): in wide swings the other hand used to stop short of the hilt, so it looked one-handed
     const front = lean([hipC[0] + side * 1.6, 15.2 * .45 + (posed[1] - B) * .55 + B, 4.2]), shOff = lean([hipC[0] - side * 6.0 * (cfg.slim || 1), 19.4 + B, 0]), shMain = lean([hipC[0] + side * 6.0 * (cfg.slim || 1), 19.4 + B, 0]), reach = 7.85 * 1.22;
-    let main, off; for (const k of [.5, .62, .74, .86, 1]){ main = lerp3(posed, front, k); off = add(main, mul(wd, -3.1));
-      if (Math.hypot(off[0] - shOff[0], off[1] - shOff[1], off[2] - shOff[2]) <= reach && Math.hypot(main[0] - shMain[0], main[1] - shMain[1], main[2] - shMain[2]) <= reach) break; }
+    // (v210) gripUp: a wind-up keeps the hands up high instead of pulling them in to the chest
+    let main, off; for (const k of (P.gripUp ? [0, .15, .3, .5, .62, .74, .86, 1] : [.5, .62, .74, .86, 1])){ main = lerp3(posed, front, k); off = add(main, mul(wd, -3.1));
+      if (Math.hypot(off[0] - shOff[0], off[1] - shOff[1], off[2] - shOff[2]) <= reach * (P.gripUp ? 1.15 : 1) && Math.hypot(main[0] - shMain[0], main[1] - shMain[1], main[2] - shMain[2]) <= reach) break; }
     if (P.wLeft){ AL = armTo(1, main); AR = armTo(-1, off); } else { AR = armTo(-1, main); AL = armTo(1, off); }
   } else { AR = arm(-1, P.armR, P.outR, P.elbR); AL = arm(1, P.armL, P.outL, P.elbL); }
   const handR = AR.hand, handL = AL.hand;
@@ -1118,7 +1133,7 @@ function drawHuman(cx, cfg, P){
   // weapon follows the forearm
   if (!P.noWeapon && !stow){
     const wa = P.wLeft ? P.armL + P.elbL * .7 : P.armR + P.elbR * .7;
-    P.wdir = nrm(upper(rotX([0, -1, 0], -(wa + P.wpn - .1))));
+    P.wdir = nrm(upper(wRot(rotX([0, -1, 0], -(wa + P.wpn - .1)))));
     drawWeapon(cx, cfg.weapon, P, P.wLeft ? handL : handR, P.wLeft ? handR : handL, () => (cx.gid = gid++), cfg);
   }
   // a second one-handed weapon in the free hand
@@ -1420,7 +1435,7 @@ function hairTex(n, cfg){
 }
 /* (v101) held weapons drawn bigger (length × WPN_BIG, sword blades a little wider) so the weapon reads at game zoom */
 const WPN_BIG = 1.3;
-const AXE_K = [.6, .68];   // (v188) one-handed · two-handed axe length against a sword of the same hands (they were as long as swords)
+const AXE_K = [.55, .5];   // (v210) smaller again: the war axe stood nearly as tall as the character
 function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   if (!w || w === 'fist') return;
   if (w === 'bow'){
@@ -1474,10 +1489,10 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   if (w === 'sword' && cfg.axe){
     // (v164) the merchant line's axe: a wooden haft wrapped at the grip, an iron head with a curved bit (a bearded
     // hand axe in one hand; a broad double-bit war axe in two), a steel cap on the butt
-    const wvR = [-dir[1], dir[0], 0], wv = Math.hypot(...wvR) < .25 ? [1, 0, 0] : nrm(wvR), hl = len * (two ? 1.02 : .82), grip = two ? 6.4 : 3.6;
+    const wvR = [-dir[1], dir[0], 0], wv = Math.hypot(...wvR) < .25 ? [1, 0, 0] : nrm(wvR), hl = len * (two ? 1.02 : .82), grip = two ? 5.6 : 3.4;
     cap(cx, add(base, mul(dir, -grip)), add(base, mul(dir, hl)), two ? 1.05 : .9, two ? .95 : .82, M[SH[wt] || 'wood'], {tex:(n, lo, q, t) => (t < grip / (hl + grip) && Math.abs(Math.sin(t * 40)) < .35 ? {m:M.leather, t:1} : undefined)});
     G(); ell(cx, add(base, mul(dir, -grip - .6)), 1.1, 1.1, M.steel);
-    const hd = add(base, mul(dir, hl - (two ? 2.2 : 1.7))), bw = two ? 5.4 : 4.1, bh = two ? 4.4 : 3.1, metal = blade;
+    const hd = add(base, mul(dir, hl - (two ? 2.2 : 1.7))), bw = two ? 4.6 : 3.7, bh = two ? 3.9 : 2.9, metal = blade;
     for (const sd of (two ? [-1, 1] : [1])){
       G(); cap(cx, add(hd, mul(wv, sd * .6)), add(hd, mul(wv, sd * bw * .55)), two ? 1.5 : 1.2, two ? 1.1 : .9, metal, {tex:() => ({t:1})});   // the cheek
       const edge = []; for (let i = 0; i <= 8; i++){ const u = -1 + i / 4; edge.push(add(add(hd, mul(wv, sd * bw * (1 - .22 * u * u))), mul(dir, u * bh))); }
@@ -1915,6 +1930,7 @@ function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
     const cfg = CHARS[key], A = ACTIONS[act], fs = Math.ceil(FS * K), F = new Frame(fs, fs), cx = new Ctx(F, -dir * Math.PI / 4, fs / 2, ANCHOR_Y * K, K * (cfg.bodyScale || 1));
     let P = humanPose(act, f, A.n, cfg.weapon);
     if (act === 'attack' && cfg.twoHand && cfg.weapon === 'sword') P = twoHandChop(P, f);   // (v197) greatswords and war axes: both hands, overhead chop
+    else if (act === 'attack' && cfg.axe && cfg.weapon === 'sword') P = axeChop1(P, f);   // (v210) a hand axe chops down at a slant
     if (ONE_HAND.includes(cfg.weapon) && !cfg.twoHand && DAGGER_LEFT.includes(dir)) P = mirrorArms(P);   // one-handed weapons are carried in the hand the camera can see
     drawHuman(cx, cfg, P);
     const img = finish(F, K);
