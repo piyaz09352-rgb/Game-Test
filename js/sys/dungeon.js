@@ -47,7 +47,7 @@ function dgSpawnWave(){
     for (let k = 0; k < 20 && !walkable(x, y, MOB[type].r); k++){ x = W / 2 + rand(-300, 300); y = H / 2 + rand(-220, 220); }
     const m = spawnMob(type, x, y, {zone:MAPZ}); m.dgc = code; m.def = dgDef(type, code); m.maxhp = m.hp = m.def.hp; m.dg = true; m.split = true; m.aggro = true;
     if (boss3){ m.bcd = 3; m.roamT = 99; VFX.play('bossArrive', {x, y}); } else VFX.play('bossSummon', {x, y}); }
-  banner(boss3 ? L(`♛ ผู้พิทักษ์ ${nm(MOB[mp.boss])} ปรากฏ!`, `♛ The guardian ${nm(MOB[mp.boss])} appears!`) : L(`ด่านที่ ${DG.wave}/4`, `Wave ${DG.wave}/4`)); SFX.play(boss3 ? 'wbhorn' : 'quest'); dgLabel();
+  banner(boss3 ? L(`♛ ผู้พิทักษ์ ${nm(MOB[mp.boss])} ปรากฏ!`, `♛ The guardian ${nm(MOB[mp.boss])} appears!`) : L(`ด่านที่ ${DG.wave}/4`, `Wave ${DG.wave}/4`)); (boss3 || SFX.play('quest')); dgLabel();
 }
 function dgKilled(m){ if (!DG.active || !m.dg || !m.def.boss || DG.done) return; DG.done = true; dgReward(); }
 function dgReward(){

@@ -85,7 +85,7 @@ function twSpawn(){
     const [bx, by] = twSpot(0, 1, 200), g = twMob(mp.boss, bx, by, f); g.bcd = 3; g.roamT = 99; VFX.play('bossArrive', {x:bx, y:by});
     if (typeof DG3 !== 'undefined') DG3.phase = 0;
     for (let i = 0; i < 2; i++){ const [x, y] = twSpot(i, 2, 170), m = twMob(kinds[i % kinds.length], x, y, f); if (twElite(f) && typeof dgElite === 'function') dgElite(m, L('หัวหน้า', '')); }
-    banner(L(`ชั้น ${f} · ♛ ผู้พิทักษ์ ${nm(MOB[mp.boss])}`, `Floor ${f} · ♛ Guardian ${nm(MOB[mp.boss])}`)); SFX.play('wbhorn');
+    banner(L(`ชั้น ${f} · ♛ ผู้พิทักษ์ ${nm(MOB[mp.boss])}`, `Floor ${f} · ♛ Guardian ${nm(MOB[mp.boss])}`));
   } else {
     const n = 5 + Math.min(6, Math.floor(f / 8));
     for (let i = 0; i < n; i++){ const [x, y] = twSpot(i, n, 150); twMob(kinds[(i + f) % kinds.length], x, y, f); VFX.play('bossSummon', {x, y}); }

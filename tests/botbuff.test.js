@@ -25,9 +25,7 @@ test('auto keeps buffs and summons up without recasting them early', { skip, tim
       out.beastOut = botPick(m);
       SUMMONS[0].t = 23.5; out.beastNearEnd = botPick(m);
       SUMMONS.length = 0; out.beastDied = botPick(null);
-      // the tiger (summon type) is no longer fired like an attack while it is out
-      only('warden', 'tiger'); SUMMONS.length = 0; SUMMONS.push({kind:'tiger', t:0, dur:20, x:P.x, y:P.y});
-      out.tigerOut = botPick(m); SUMMONS.length = 0; out.tigerGone = botPick(m);
+      // (v193) the tiger was the only 'summon'-type skill; the hunter rework removed it, so that case is gone
       return out;
     });
     assert.strictEqual(r.buffFirst, 'warcry', 'a missing buff is cast');
@@ -37,8 +35,6 @@ test('auto keeps buffs and summons up without recasting them early', { skip, tim
     assert.strictEqual(r.beastOut, null, 'no new call while the beast is out');
     assert.strictEqual(r.beastNearEnd, 'callsingha', 'called again when nearly over');
     assert.strictEqual(r.beastDied, 'callsingha', 'called again at once when it died, even with no target');
-    assert.strictEqual(r.tigerOut, null, 'the tiger is not spammed while out');
-    assert.strictEqual(r.tigerGone, 'tiger', 'the tiger is called when gone');
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no runtime errors');
 });

@@ -89,7 +89,8 @@ function drawWings(g, id, x, y, dir, t, o = {}){
   g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(0, -6, 0, 0, -6, 34 * k); gr.addColorStop(0, `rgba(${W.glow},${.14 + .06 * Math.sin(t * 2)})`); gr.addColorStop(1, `rgba(${W.glow},0)`); g.fillStyle = gr; g.beginPath(); g.ellipse(0, -6, 34 * k, 22 * k, 0, 0, 7); g.fill(); g.restore();
   const sides = side ? [dir === 2 ? 1 : -1] : [-1, 1];
   for (const s of sides){
-    g.save(); g.scale(s * (side ? .5 : dir === 0 || dir === 4 ? 1 : .8) * fold, fold); if (side) g.translate(-6, 0); else if (dir !== 0 && dir !== 4) g.translate((dir === 1 || dir === 5 ? 1 : -1) * s * 2, 0);
+    // (v193) from the side the near wing fans out behind your back at nearly full size, tilted up (it was squeezed to half and tucked behind the body)
+    g.save(); g.scale(s * (side ? .85 : dir === 0 || dir === 4 ? 1 : .8) * fold, fold); if (side){ g.translate(3, 0); g.rotate(-.12); } else if (dir !== 0 && dir !== 4) g.translate((dir === 1 || dir === 5 ? 1 : -1) * s * 2, 0);
     g.translate(2.5, 0); g.rotate(-fl - (o.sit ? .3 : 0)); g.scale(k, k);
     g.shadowColor = `rgba(${W.glow},.85)`; g.shadowBlur = blur;
     wingShape(g, W, t, s);
@@ -99,7 +100,7 @@ function drawWings(g, id, x, y, dir, t, o = {}){
   { const G = [[34, -24], [44, -10], [28, 8], [18, -20], [40, -28], [10, -8]], gs = g.getTransform().a;
     g.save(); g.globalCompositeOperation = 'lighter';
     for (const s of sides) for (let i = 0; i < G.length; i++){ const tw = Math.pow(Math.max(0, Math.sin(t * (2.2 + i * .37) + i * 2.1 + s * 1.3)), 8); if (tw < .04) continue;
-      const px = s * G[i][0] * k * (side ? .5 : 1) * fold, py = G[i][1] * k * fold, r = (1.2 + tw * 2.6) * (W.kind === 'satan' ? 1.15 : 1);
+      const px = s * G[i][0] * k * (side ? .85 : 1) * fold, py = G[i][1] * k * fold, r = (1.2 + tw * 2.6) * (W.kind === 'satan' ? 1.15 : 1);
       g.fillStyle = `rgba(${W.glow},${tw * .5})`; g.beginPath(); g.arc(px, py, r * 1.8, 0, 7); g.fill();
       g.fillStyle = `rgba(255,255,255,${tw})`; g.beginPath(); g.moveTo(px, py - r * 2.4); g.lineTo(px + r * .35, py); g.lineTo(px, py + r * 2.4); g.lineTo(px - r * .35, py); g.closePath(); g.fill();
       g.beginPath(); g.moveTo(px - r * 2.4, py); g.lineTo(px, py + r * .35); g.lineTo(px + r * 2.4, py); g.lineTo(px, py - r * .35); g.closePath(); g.fill(); }

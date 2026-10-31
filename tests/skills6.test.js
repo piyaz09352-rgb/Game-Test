@@ -11,7 +11,9 @@ test('skills: eight a tier, each in a style, and the new effects work', { skip, 
     await enterWorld(page);
     // (v159) the 4/1/1 shape became eight skills a tier in three play styles (skills8.js)
     const shape = await page.evaluate(() => Object.keys(SK8).map(j => [j, JOBS[j].skills.length, JOBS[j].skills.every(id => SKILLS[id] && SK8_OF[id])]));
-    for (const [j, n, styled] of shape) assert.ok(n === 8 && styled, `${j} has eight skills, each in a style`);
+    // (v193) the hunter line was reworked by the owner: some of its skills were removed on purpose (6 · 4 · 6)
+    const RG = {ranger:6, warden:4, sylvan:6};
+    for (const [j, n, styled] of shape) assert.ok(n === (RG[j] || 8) && styled, `${j} has ${RG[j] || 8} skills, each in a style`);
     await page.evaluate(() => loadMap(1)); await page.waitForTimeout(800);
     const r = await page.evaluate(() => {
       const out = {}; derive();

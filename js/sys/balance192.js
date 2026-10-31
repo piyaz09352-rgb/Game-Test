@@ -7,9 +7,9 @@
    1 = unchanged. Re-run the report after any change. */
 'use strict';
 const LINE_POW = {   // [tier 1 (Lv <40), tier 2, tier 3, tier 4]
-  blade:[.88, .88, .78, .8], rune:[1.6, 1.4, 1.2, 1.25], ranger:[.62, 1.05, 1.3, 1.35], muay:[.95, .82, .98, .88],
+  blade:[.88, .88, .7, .8], rune:[1.6, 1.4, 1.2, 1.25], ranger:[.62, 1.05, 1.3, 1.35], muay:[.95, .82, .98, .88],
   healer:[1.5, 1.4, 1.4, 1.3], rogue:[1.05, 1.05, 1.45, 1.35], summoner:[1.6, 1.05, .75, .7], occult:[2.8, 1.5, 1.4, 1.4],
-  merchant:[.88, .92, 1.1, .9], catfolk:[.85, .8, .88, .95], dogfolk:[.95, .95, .8, .97], ninja:[.6, 1.15, 1.4, 1.4]
+  merchant:[.88, .92, 1.35, .95], catfolk:[.85, .8, .88, .95], dogfolk:[.95, .95, .8, .97], ninja:[.6, 1.15, 1.4, 1.4]
 };
 function linePow(){
   const ch = jobChain(), line = ch[1]; if (!line || !LINE_POW[line]) return 1;
