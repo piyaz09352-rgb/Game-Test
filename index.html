@@ -22,6 +22,16 @@
 <link rel="stylesheet" href="css/chatglass.css?v=111">
 <link rel="stylesheet" href="css/hudname.css?v=111">
 <link rel="stylesheet" href="css/sunlit.css?v=111">
+<!-- (v188) opened without its folders (index.html double-clicked inside the zip, or only some files uploaded): no CSS loads,
+     so the "turn your device" notice showed as a giant icon. Keep it hidden without CSS, and say what to do instead. -->
+<style>.rotate{display:none}#filesMissing{display:none}</style>
+<script>addEventListener('load', function(){ var r = document.getElementById('rotate'); if (r && getComputedStyle(r).position === 'fixed') return;   /* css/hud.css loaded */
+  var d = document.getElementById('filesMissing'); if (d) d.style.cssText = 'display:block;max-width:640px;margin:60px auto;padding:24px 28px;font:16px/1.7 sans-serif;color:#222;background:#fff7e0;border:2px solid #d9a441;border-radius:14px'; });</script>
+<div id="filesMissing" role="alert"><b>เปิดเกมไม่ได้: ไฟล์เกมไม่ครบ</b><br>
+  หน้านี้หาโฟลเดอร์ <code>css</code> และ <code>js</code> ไม่เจอ<br>
+  · ถ้าเปิดจากไฟล์ zip: คลิกขวาที่ไฟล์ zip → <b>แตกไฟล์ทั้งหมด (Extract All)</b> แล้วเปิด <code>index.html</code> ในโฟลเดอร์ที่แตกออกมา<br>
+  · ถ้าเป็นเว็บ: อัปขึ้นให้ครบทั้งโฟลเดอร์ (<code>index.html</code> คู่กับ <code>assets</code> <code>audio</code> <code>css</code> <code>js</code>)<br><br>
+  <small>Game files are missing: extract the whole zip (Extract All) and open index.html from the extracted folder, or upload the whole folder.</small></div>
 <div class="rotate" id="rotate" role="alert">
   <div class="rot-card">
     <svg class="rot-ic" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="8" width="24" height="44" rx="4"/><path d="M29 46h6"/><path d="M50 22a18 18 0 016 14M56 36l-4-3M56 36l3-4"/></svg>
