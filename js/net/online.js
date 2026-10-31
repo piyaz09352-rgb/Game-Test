@@ -300,5 +300,9 @@ document.addEventListener('click', e => {
 document.addEventListener('change', e => { if (e.target.id === 'importFile' && e.target.files[0]){ importSave(e.target.files[0]); e.target.value = ''; } });
 document.addEventListener('keydown', e => {
   const inp = el('chatIn'); if (!inp) return;
-  if (e.target === inp){ e.stopPropagation(); if (e.key === 'Enter' && !e.isComposing){ e.preventDefault(); chatSubmit(); } if (e.key === 'Escape') inp.blur(); return; }
+  if (e.target === inp){ e.stopPropagation();
+    if (e.key === 'Enter' && !e.isComposing){ e.preventDefault();
+      if (!inp.value.trim()){ inp.value = ''; inp.blur(); if (typeof chatSet === 'function') chatSet(false); return; }   // (v189) Enter on an empty box closes the chat again
+      chatSubmit(); }
+    if (e.key === 'Escape') inp.blur(); return; }
 }, true);
