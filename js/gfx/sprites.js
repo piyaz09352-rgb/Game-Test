@@ -505,6 +505,16 @@ const SK_POSE = {
 };
 
 /* ---------- human model ---------- */
+/* (v197) a two-handed weapon (greatsword, war axe) is swung with both hands on the grip: brought up over the head,
+   then chopped down in front of the body, the hips behind it, then back to guard. The hands stay near the middle of
+   the chest so the other hand can close on the hilt (drawHuman grip2); the one-handed side swing is not used. */
+function twoHandChop(P, f){
+  P.armR = [.95, 2.85, 2.1, .75, .7][f]; P.elbR = [.45, .55, .15, .05, .35][f]; P.outR = [.05, .02, 0, -.06, .03][f]; P.wpn = [1.55, .95, 1.15, 1.65, 1.65][f];
+  P.armL = [.9, 2.7, 2.0, .7, .65][f]; P.elbL = [.5, .6, .2, .1, .4][f]; P.outL = [.05, .02, 0, -.06, .03][f];
+  P.lean = [0, -.14, .06, .26, .06][f]; P.twist = [0, -.08, .02, .1, .02][f]; P.sway = [0, .2, -.1, -.3, -.1][f];
+  P.legL = [0, -.1, .3, .5, .12][f]; P.legR = -P.legL * .7; P.bob = [0, .4, -.1, -1.1, -.25][f];
+  return P;
+}
 function humanPose(act, f, n, weapon){
   const P = {bob:0, legL:0, legR:0, liftL:0, liftR:0, armL:.1, armR:.1, outL:.16, outR:.16, elbL:.28, elbR:.28, lean:0, twist:0, hipX:0, fall:0, wpn:1.7,
     eyes:'open', sit:false, spin:0, draw:0, glow:0, ring:-1, mouth:0, kneel:0, head:0, sway:0, aura:-1, sparks:-1, lasso:null, ride:null, tuck:0, roll:0, noWeapon:false, breath:0};
@@ -770,7 +780,11 @@ function drawHuman(cx, cfg, P){
     // the weapon hand keeps its pose but is drawn in toward the front of the body, so the other hand can close on the
     // hilt just below it: both hands on the grip, like a real two-handed hold
     const side = P.wLeft ? 1 : -1, posed = arm0(side, P.wLeft ? P.armL : P.armR, P.wLeft ? P.outL : P.outR, P.wLeft ? P.elbL : P.elbR);
-    const front = lean([hipC[0] + side * 1.6, 15.2 + B, 4.2]), main = lerp3(posed, front, .5), off = add(main, mul(wd, -3.1));
+    // (v197) the grip is drawn in toward the chest only as far as needed for BOTH hands to reach it (short chibi arms
+    // stretch 25% at most): in wide swings the other hand used to stop short of the hilt, so it looked one-handed
+    const front = lean([hipC[0] + side * 1.6, 15.2 * .45 + (posed[1] - B) * .55 + B, 4.2]), shOff = lean([hipC[0] - side * 6.0 * (cfg.slim || 1), 19.4 + B, 0]), shMain = lean([hipC[0] + side * 6.0 * (cfg.slim || 1), 19.4 + B, 0]), reach = 7.85 * 1.22;
+    let main, off; for (const k of [.5, .62, .74, .86, 1]){ main = lerp3(posed, front, k); off = add(main, mul(wd, -3.1));
+      if (Math.hypot(off[0] - shOff[0], off[1] - shOff[1], off[2] - shOff[2]) <= reach && Math.hypot(main[0] - shMain[0], main[1] - shMain[1], main[2] - shMain[2]) <= reach) break; }
     if (P.wLeft){ AL = armTo(1, main); AR = armTo(-1, off); } else { AR = armTo(-1, main); AL = armTo(1, off); }
   } else { AR = arm(-1, P.armR, P.outR, P.elbR); AL = arm(1, P.armL, P.outL, P.elbL); }
   const handR = AR.hand, handL = AL.hand;
@@ -1900,6 +1914,7 @@ function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
   if (kind === 'char'){
     const cfg = CHARS[key], A = ACTIONS[act], fs = Math.ceil(FS * K), F = new Frame(fs, fs), cx = new Ctx(F, -dir * Math.PI / 4, fs / 2, ANCHOR_Y * K, K * (cfg.bodyScale || 1));
     let P = humanPose(act, f, A.n, cfg.weapon);
+    if (act === 'attack' && cfg.twoHand && cfg.weapon === 'sword') P = twoHandChop(P, f);   // (v197) greatswords and war axes: both hands, overhead chop
     if (ONE_HAND.includes(cfg.weapon) && !cfg.twoHand && DAGGER_LEFT.includes(dir)) P = mirrorArms(P);   // one-handed weapons are carried in the hand the camera can see
     drawHuman(cx, cfg, P);
     const img = finish(F, K);
