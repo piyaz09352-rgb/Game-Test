@@ -272,12 +272,13 @@ function msHandIn(){
 /* ---------- where things stand on the current map ---------- */
 const MS = {spots:[], elite:null, map:-1, say:''};
 function msRng(seed){ let x = seed >>> 0 || 1; return () => { x = (x * 1664525 + 1013904223) >>> 0; return x / 4294967296; }; }
-function msFree(cx, cy, r0, r1, rnd, avoid, gap = 110){
+function msFree(cx, cy, r0, r1, rnd, avoid, gap = 110, ok = null){
   for (let i = 0; i < 260; i++){ const a = rnd() * 6.283, r = r0 + rnd() * (r1 - r0), x = Math.round(cx + Math.cos(a) * r), y = Math.round(cy + Math.sin(a) * r);
     if (typeof walkable === 'function' && !walkable(x, y, 18)) continue;
     if (typeof waterAt === 'function' && waterAt(x, y, 10)) continue;
     if (typeof GATES !== 'undefined' && GATES.some(g => Math.hypot(g.x - x, g.y - y) < 100)) continue;
     if (avoid.some(p => Math.hypot(p.x - x, p.y - y) < gap)) continue;
+    if (ok && !ok(x, y)) continue;
     return {x, y}; }
   return null;
 }
@@ -285,9 +286,11 @@ function msPlace(mapId){
   MS.map = mapId; MS.spots = []; MS.elite = null; const ch = MS_CH[mapId]; if (!ch) return;
   const rnd = msRng(mapId * 977 + 13), base = mapId === 0 ? (NPCS.find(n => n.id === 'teller') || NPCS[0] || {x:W / 2, y:H / 2}) : (CAMP || {x:W / 2, y:H / 2});
   const avoid = NPCS.map(n => ({x:n.x, y:n.y}));
-  for (let i = 0; i < 3; i++){ const p = msFree(base.x, base.y, mapId === 0 ? 220 : 280, mapId === 0 ? 700 : 760, rnd, [...avoid, ...MS.spots], 150); if (p) MS.spots.push(p); }
+  // (v218) every spot must be reachable on foot from the camp (tools/story-audit.js found one that was not)
+  const reach = (x, y) => typeof findPath !== 'function' || !!findPath(base.x, base.y + 30, x, y);
+  for (let i = 0; i < 3; i++){ const p = msFree(base.x, base.y, mapId === 0 ? 220 : 280, mapId === 0 ? 700 : 760, rnd, [...avoid, ...MS.spots], 150, reach); if (p) MS.spots.push(p); }
   while (MS.spots.length < 3) MS.spots.push({x:clamp(base.x + (MS.spots.length - 1) * 160, 60, W - 60), y:clamp(base.y + 200, 60, H - 60)});
-  MS.elite = msFree(base.x, base.y, 330, 620, rnd, [...avoid, ...MS.spots], 160) || {x:clamp(base.x + 340, 60, W - 60), y:base.y};
+  MS.elite = msFree(base.x, base.y, 330, 620, rnd, [...avoid, ...MS.spots], 160, reach) || {x:clamp(base.x + 340, 60, W - 60), y:base.y};
 }
 function msNpcObj(d, x, y){ return {id:d.id, name:d.name, en:d.en, role:d.role[0], roleEn:d.role[1], x, y, ms:true}; }
 function msLookOf(d){
