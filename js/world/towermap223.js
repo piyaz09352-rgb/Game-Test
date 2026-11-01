@@ -145,6 +145,7 @@ EV.on('tick', dt => {
   if (TW.phase !== 'rest' || !TWM.open){ return; }
   if (typeof DG3 !== 'undefined' && DG3.boonOpen) return;
   const s = twmStairs();
+  { const d = el('dialog'); if (d && !d.hidden && d.dataset.npc === 'tl_chandra') return; }   // (v229) Chandra is telling a chapter: the stairs wait, and Auto does not walk off
   if (Math.hypot(P.x - s.x, P.y - s.y) < 56){ twmClimb(); return; }
   if (TW.restT <= .05){ TWM.open = false; const e = twmEntry(); P.x = e.x; P.y = e.y; return; }   // the stairs carried you up anyway
   if (typeof BOT !== 'undefined' && BOT.on && !(BOT.pause > 0) && !P.dead){ P.tx = s.x; P.ty = s.y + 20; if (!P.ride){ P.ride = true; if (typeof renderHotbar === 'function') renderHotbar(); } }   // Auto takes the stairs

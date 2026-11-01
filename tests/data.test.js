@@ -137,6 +137,15 @@ test('element table: every attack element against every defence element has a va
   bad(out);
 });
 
+test('element table: water > fire > earth > wind > water, each beats one and loses to one (v230)', () => {
+  const elemMod = g('elemMod'), out = [], four = ['water', 'fire', 'earth', 'wind'];
+  four.forEach((e, i) => { const prey = four[(i + 1) % 4], foe = four[(i + 3) % 4];
+    if (elemMod(e, prey) !== 1.5) out.push(`${e} should beat ${prey}`); if (elemMod(prey, e) !== .5) out.push(`${prey} should be weak against ${e}`);
+    const strong = four.filter(d => elemMod(e, d) > 1), weak = four.filter(d => d !== e && elemMod(e, d) < 1);
+    if (strong.length !== 1) out.push(`${e} beats ${strong.length} elements`); if (weak.length !== 1) out.push(`${e} is weak against ${weak.length} other elements`); void foe; });
+  bad(out);
+});
+
 test('English mode: names switch language', () => {
   const en = load(DATA, { lang: 'en' });
   assert.strictEqual(en('nm(JOBS.novice)'), JOBS.novice.en);
