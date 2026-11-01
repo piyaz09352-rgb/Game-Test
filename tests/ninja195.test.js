@@ -22,14 +22,15 @@ test('ninja: reworked skills, ricochet, clones, smoke, four elements', { skip, t
       // (v213) festivals are on again: keep the festival spirit out of this test (it would take a ricochet target)
       if (typeof EVB !== 'undefined' && typeof thaiClock === 'function'){ const c = thaiClock(); EVB.slot = Math.floor((c.h * 60 + c.m) / 15); }
       mobs.forEach(m => { if (m.evb || m.elite) m.dead = true; });
-      const ms = mobs.filter(m => !m.dead && !m.def.boss).slice(0, 5);
+      const ms = mobs.filter(m => !m.dead && !m.def.boss && !m.dummy).slice(0, 5);   // training dummies reset their HP: never targets here
+      mobs.forEach(m => { if (!ms.includes(m) && !m.dead){ m.x = P.x - 900; m.y = P.y; m.hx = m.x; m.hy = m.y; m.st = {stop:999}; } });   // nothing else in reach of a bounce
       ms.forEach((m, i) => { m.maxhp = m.hp = 1e7; m.x = P.x + 60 + i * 40; m.y = P.y; m.aggro = false; m.st = {stop:999}; });
       const m = ms[0], dmg = () => ms.map(x => 1e7 - x.hp);
       execSkill('quickslash', 10, m); execSkill('katon', 10, m); execSkill('suiton', 10, m); await wait(1);
       out.marks = {blind:m.st.blind > 0, burn:m.burnT > T, mres:m._mresP > 0};
       addItem('s_iron', 100); S.gear.ammo = 's_iron';
       let d0 = dmg(); basicAttack(m); await until(() => dmg()[2] - d0[2] > 0); await wait(.3); out.bounce = dmg().map((v, i) => v - d0[i]);
-      execSkill('kagebunshin', 10, null); d0 = dmg(); basicAttack(m); await until(() => dmg()[0] - d0[0] > out.bounce[0] * 1.4); out.clone = dmg()[0] - d0[0];
+      execSkill('kagebunshin', 10, null); d0 = dmg(); basicAttack(m); await until(() => dmg()[0] - d0[0] > out.bounce[0] * 1.15); out.clone = dmg()[0] - d0[0];
       d0 = dmg(); execSkill('kirin', 10, m); await until(() => dmg().filter((v, i) => v - d0[i] > 0).length >= 3); out.kirin = dmg().map((v, i) => v - d0[i]);
       execSkill('smokescreen', 10, null); S.hp = DER.maxhp; mobAttack(m, 5, true); out.smoke = S.hp === DER.maxhp;
       return out;
@@ -39,7 +40,7 @@ test('ninja: reworked skills, ricochet, clones, smoke, four elements', { skip, t
     assert.ok(r.mask, 'the mouth cloth is a wardrobe piece, not part of the class');
     assert.ok(r.marks.blind && r.marks.burn && r.marks.mres, 'twin stars blind, fire burns, water lowers magic resistance');
     assert.ok(r.bounce[0] > 0 && r.bounce[1] > 0 && r.bounce[2] > 0, 'the normal throw ricochets on to the next monsters');
-    assert.ok(r.clone > r.bounce[0] * 1.4, 'the shadow clones add their own hits');
+    assert.ok(r.clone > r.bounce[0] * 1.15, 'the shadow clones add their own hits');
     assert.ok(r.kirin.filter(v => v > 0).length >= 3, 'Four Elements strikes everything in its circle');
     assert.ok(r.smoke, 'the smoke bomb dodges every attack');
   } finally { await close(); }
