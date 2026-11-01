@@ -1,123 +1,128 @@
-/* VAYRATHEN — css/login233.css — (v233) the new login screen, after the owner's design
-   The owner's painting: the realm of floating palaces and waterfalls with the VAYRATHEN crest and the little singha
-   on the left, and on the right an ornate gold-framed card (a gem on top, blue/cream tabs, soft fields, a big gold
-   button with gems at its ends, guest and forgotten-password links, a TH/EN pill) with Discord and Settings below.
-   The scenery and crest are the owner's picture (assets/ui/login-bg.webp); the card is the game's own login form
-   (js/sys/auth.js, nothing renamed), styled here. Only while signing in (.title-card.authing); the character screens
-   keep their card on the same picture. Loaded last. */
+/* VAYRATHEN — css/login233.css — the login screen, after the owner's design (v233; rebuilt in v234)
+   v234: the owner found the first version plain and asked whether it followed the golden ratio. It did not. Now:
+   · the gold frame IS the design's frame: its crown, side bars and base are cut from the owner's picture
+     (assets/ui/frame-top / frame-mid / frame-bot.webp, transparent round the outside). The crown and base keep their
+     shape; the side bars repeat, so the register tab (taller) uses the same frame;
+   · everything inside is sized in units of the card's own width (container units), so the card scales like a
+     picture and keeps its proportions on every screen, and the proportions are golden (φ = 1.618):
+       content width = 61.8% of the card (the design measures 59%) · button height = field height × φ ·
+       button text = body text × φ · tab text = body text × √φ · spacing steps 1 : φ : φ² : φ³ ·
+       the crest's centre and the card's centre stand at 0.382 : 1 from the left edge;
+   · labels sit inside the fields as in the design, the guest and forgotten-password links share one row with a
+     divider, a tagline with ornaments closes the card (js/sys/login234.js arranges these; auth.js is untouched).
+   Only while signing in (.title-card.authing); the character list shares the picture. Loaded last. */
 
 /* ---------- the picture ---------- */
 html body #title{background:#8ccff5 url('../assets/ui/login-bg.webp') left center / cover no-repeat !important;-webkit-backdrop-filter:none !important;backdrop-filter:none !important}
 html body #title::before,html body #title::after{display:none !important}
-@media (max-aspect-ratio:3/2){html body #title{background-position:-110px center !important}}   /* 4:3 screens: keep the crest clear of the card */
+@media (max-aspect-ratio:3/2){html body #title{background-position:-110px center !important}}
 
-/* ---------- the card column on the right ---------- */
-html body #title .title-card.authing{justify-self:end;align-self:center;width:min(540px,41vw);max-height:calc(100% - 16px);overflow-y:auto;overflow-x:visible;margin:0 4.5vw 0 0;padding:30px 6px 6px;
-  background:none !important;border:0 !important;box-shadow:none !important;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;scrollbar-width:thin}
+/* ---------- the card: its width sets every size inside (cqw = 1% of it) ---------- */
+html body #title .title-card.authing{
+  --uz:var(--uiz, 1);   /* the game zooms its UI layer on big screens: sizes here are divided back */
+  --cw:calc(min(47vw, calc((100vh - 64px) * .8), 820px) / var(--uz));
+  --b:2.9cqw;
+  --s1:1.25cqw; --s2:2.02cqw; --s3:3.27cqw; --s4:5.3cqw;
+  --fh:7.2cqw;
+  container-type:inline-size;justify-self:end;align-self:center;width:var(--cw) !important;max-width:none !important;max-height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;
+  margin:0 calc(29.3vw / var(--uz) - var(--cw) / 2) 0 0 !important;
+  padding:0 !important;background:none !important;border:0 !important;box-shadow:none !important;display:flex;flex-flow:row wrap;justify-content:center;align-content:center}
+html body #title .title-card.authing:has(#auBox[data-m="reg"]){--cw:calc(min(42vw, calc((100vh - 64px) * .66), 720px) / var(--uz))}
+html body #title .title-card.authing::-webkit-scrollbar{display:none}
 html body #title .title-card.authing::before,html body #title .title-card.authing::after{display:none !important}
-html body #title .title-card.authing > .t-eyebrow,html body #title .title-card.authing > h2,html body #title .title-card.authing > .t-sub,html body #title .title-card.authing > .t-save{display:none !important}   /* the crest is in the picture */
-html body #title .title-card.authing > #titleBody{grid-column:1 / -1;order:0}
-html body #title .title-card.authing > .supdcbig{order:1}
-html body #title .title-card.authing > .t-btns{order:2;margin:0 !important;display:block !important}
-html body #title .title-card.authing > .supbig{order:3}
+html body #title .title-card.authing > .t-eyebrow,html body #title .title-card.authing > h2,html body #title .title-card.authing > .t-sub,html body #title .title-card.authing > .t-save{display:none !important}
+html body #title .title-card.authing > #titleBody{flex:0 0 100%;width:100%;order:0}
 
-/* ---------- the gold frame ---------- */
-html body #title .authing .au-box{position:relative;width:auto !important;margin:0 !important;padding:30px 30px 18px !important;border-radius:20px !important;border:7px solid transparent !important;
-  background:linear-gradient(180deg,#fffbf2,#f8eedb 60%,#f3e5c8) padding-box,linear-gradient(135deg,#fff3b0,#d99a22 22%,#fff0a8 45%,#b97818 68%,#ffe28a 85%,#c8861c) border-box !important;
-  box-shadow:0 0 0 2px #7a4810,0 0 0 7px rgba(255,214,110,.6),0 0 0 9px rgba(122,72,16,.55),0 18px 44px rgba(30,14,0,.45),inset 0 0 0 2px rgba(255,255,255,.7) !important;overflow:visible !important}
-html body #title .authing .au-box .au-fx{display:none !important}
-/* the gem crowning the frame */
-html body #title .authing .au-box::before{content:"" !important;display:block !important;bottom:auto !important;right:auto !important;position:absolute !important;inset:auto !important;left:50% !important;top:-27px !important;width:40px !important;height:40px !important;padding:0 !important;z-index:3 !important;
-  transform:translateX(-50%) rotate(45deg);border-radius:8px !important;-webkit-mask:none !important;mask:none !important;opacity:1 !important;
-  background:linear-gradient(135deg,#fff6c0,#e3a72a 45%,#a8680e) !important;box-shadow:0 0 0 2px #6a3e0c,0 4px 10px rgba(60,30,0,.4),0 0 18px rgba(255,220,120,.8) !important}
-html body #title .authing .au-box::after{content:"" !important;display:block !important;bottom:auto !important;right:auto !important;border:0 !important;position:absolute !important;inset:auto !important;left:50% !important;top:-15px !important;width:17px !important;height:17px !important;padding:0 !important;z-index:4 !important;
-  transform:translateX(-50%) rotate(45deg);border-radius:3px !important;-webkit-mask:none !important;mask:none !important;opacity:1 !important;
-  background:linear-gradient(135deg,#e8fbff,#6cd4ff 45%,#1c78d0) !important;box-shadow:0 0 10px rgba(120,220,255,.9),inset 0 0 0 1.5px rgba(255,255,255,.7) !important}
-/* gold flourishes on the four corners */
-html body #title .authing .au-cn{position:absolute !important;width:44px !important;height:44px !important;border:0 !important;border-radius:0 !important;z-index:2;pointer-events:none;display:block !important;opacity:1 !important;box-shadow:none !important;animation:none !important;
-  background:radial-gradient(circle at 6px 6px,#bdf0ff 0 3.5px,#1c78d0 4.5px,#fff0a8 5.5px,transparent 6.5px) !important}
-html body #title .authing .au-cn::before,html body #title .authing .au-cn::after{content:"";position:absolute;background:linear-gradient(90deg,#fff1a8,#d08f1c);border-radius:4px;box-shadow:0 0 0 1.5px #7a4810}
-html body #title .authing .au-cn::before{left:0;top:0;width:44px;height:8px;z-index:-1}
-html body #title .authing .au-cn::after{left:0;top:0;width:8px;height:44px;z-index:-1;background:linear-gradient(180deg,#fff1a8,#d08f1c)}
-html body #title .authing .au-cn.tl{left:-11px !important;top:-11px !important;right:auto !important;bottom:auto !important;transform:none !important}
-html body #title .authing .au-cn.tr{right:-11px !important;top:-11px !important;left:auto !important;bottom:auto !important;transform:scaleX(-1) !important}
-html body #title .authing .au-cn.bl{left:-11px !important;bottom:-11px !important;right:auto !important;top:auto !important;transform:scaleY(-1) !important}
-html body #title .authing .au-cn.br{right:-11px !important;bottom:-11px !important;left:auto !important;top:auto !important;transform:scale(-1,-1) !important}
+/* ---------- the frame: crown above, repeating side bars, base below ---------- */
+html body #title .authing .au-box{position:relative;width:100% !important;max-width:none !important;box-sizing:border-box;
+  margin:calc(100cqw * 138 / 880) 0 calc(100cqw * 208 / 880 * .26) !important;
+  padding:var(--s3) 19.1cqw var(--s2) !important;
+  border:0 !important;border-radius:0 !important;box-shadow:none !important;overflow:visible !important;
+  background:url('../assets/ui/frame-mid.webp') top center / 100% auto repeat-y !important;min-height:20cqw}
+html body #title .authing .au-box .au-fx,html body #title .authing .au-cn{display:none !important}
+html body #title .authing .au-box::before,html body #title .authing .au-box::after{content:"" !important;display:block !important;position:absolute !important;left:0 !important;right:0 !important;width:100% !important;padding:0 !important;
+  pointer-events:none !important;z-index:0 !important;border:0 !important;border-radius:0 !important;box-shadow:none !important;opacity:1 !important;transform:none !important;-webkit-mask:none !important;mask:none !important;animation:none !important}
+html body #title .authing .au-box::before{top:auto !important;bottom:100% !important;height:calc(100cqw * 138 / 880) !important;background:url('../assets/ui/frame-top.webp') bottom center / 100% 100% no-repeat !important}
+html body #title .authing .au-box::after{bottom:auto !important;top:calc(100% - 100cqw * 208 / 880 * .74) !important;height:calc(100cqw * 208 / 880) !important;background:url('../assets/ui/frame-bot.webp') top center / 100% 100% no-repeat !important}
+html body #title .authing .au-box > *:not(.au-fx){position:relative;z-index:1}
 
-/* ---------- TH / EN ---------- */
-html body #title .authing .au-lang{position:absolute !important;top:10px !important;right:14px !important;left:auto !important;z-index:5;padding:3px 14px !important;border-radius:999px !important;border:2px solid #fff !important;
-  background:linear-gradient(180deg,#5cb8ff,#1e6ac8) !important;color:#fff !important;font:800 12.5px/1.3 Sarabun,"Noto Sans Thai",sans-serif !important;box-shadow:0 0 0 2px #c9871e,0 2px 6px rgba(20,60,120,.35) !important}
+/* ---------- TH | EN ---------- */
+html body #title .authing .au-lang{position:absolute !important;top:var(--s2) !important;right:12.5cqw !important;left:auto !important;z-index:3 !important;display:flex !important;padding:.35cqw !important;gap:0;border-radius:999px !important;
+  border:.45cqw solid #d9a63a !important;background:linear-gradient(#fffaf0,#efe4cc) !important;box-shadow:0 .4cqw 1cqw rgba(80,50,10,.25) !important;font:800 calc(var(--b) * .8)/1 Sarabun,"Noto Sans Thai",sans-serif !important;color:#3a2a18 !important;min-width:0 !important;height:auto !important}
+html body #title .authing .au-lang span{padding:.9cqw 2cqw;border-radius:999px}
+html body #title .authing .au-lang span.on{background:linear-gradient(#4aa8f4,#1e6ac8);color:#fff;text-shadow:0 1px 1px rgba(0,30,80,.5)}
 
-/* ---------- tabs ---------- */
-html body #title .authing .au-tabs{display:grid !important;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0 14px !important;padding:0 !important;background:none !important;border:0 !important;box-shadow:none !important}
+/* ---------- tabs: blue (chosen) and cream, pointed ends ---------- */
+html body #title .authing .au-tabs{display:grid !important;grid-template-columns:1fr 1fr;gap:0;margin:var(--s4) -4cqw var(--s4) !important;padding:0 !important;background:none !important;border:0 !important;box-shadow:none !important}
 html body #title .authing .au-tabs .au-pill{display:none !important}
-html body #title .authing .au-tabs [role="tab"]{height:46px !important;border-radius:14px 4px 14px 4px !important;border:3px solid #d9a63a !important;font:800 17px/1 Sarabun,"Noto Sans Thai",sans-serif !important;cursor:pointer;
-  background:linear-gradient(180deg,#fbf0d6,#ecdab2) !important;color:#5a3a14 !important;text-shadow:0 1px 0 #fff !important;box-shadow:inset 0 2px 0 rgba(255,255,255,.7),0 2px 0 rgba(122,72,16,.35) !important;transition:filter .15s}
-html body #title .authing .au-tabs [role="tab"][aria-selected="true"]{background:linear-gradient(180deg,#62c0ff,#2a86e0 55%,#1a5fbe) !important;color:#fff !important;text-shadow:0 1px 2px rgba(0,30,80,.6) !important;border-color:#f2c862 !important;
-  box-shadow:inset 0 2px 0 rgba(255,255,255,.45),0 0 0 2px #8a5410,0 3px 8px rgba(20,70,150,.4) !important}
-html body #title .authing .au-tabs [role="tab"]:hover{filter:brightness(1.05)}
+html body #title .authing .au-tabs [role="tab"]{height:calc(var(--fh) * 1.04) !important;padding:.45cqw !important;border:0 !important;border-radius:0 !important;cursor:pointer;
+  clip-path:polygon(4% 0,96% 0,100% 50%,96% 100%,4% 100%,0 50%);font:800 calc(var(--b) * 1.272)/1 Sarabun,"Noto Sans Thai",sans-serif !important;
+  background:linear-gradient(180deg,#fbf2dc,#ecdcb8) content-box,linear-gradient(180deg,#f2d27a,#b97818) border-box !important;color:#3a2410 !important;text-shadow:0 1px 0 #fff !important;box-shadow:none !important}
+html body #title .authing .au-tabs [role="tab"][aria-selected="true"]{background:linear-gradient(180deg,#5cbcff,#2a86e0 55%,#175db8) content-box,linear-gradient(180deg,#fff0a0,#c8861c) border-box !important;color:#fff !important;text-shadow:0 .2cqw .4cqw rgba(0,30,80,.6) !important}
 
-/* ---------- fields ---------- */
-html body #title .authing .au-l{font:700 12.5px Sarabun,"Noto Sans Thai",sans-serif !important;color:#7a5428 !important;margin:0 0 3px 4px !important}
-html body #title .authing .au-in{height:50px !important;border-radius:13px !important;border:2px solid #d8c6a2 !important;background:linear-gradient(180deg,#efe9df,#f8f4ec) !important;
-  box-shadow:inset 0 2px 4px rgba(90,60,20,.14),0 1px 0 #fff !important;transition:border-color .15s,box-shadow .15s}
-html body #title .authing .au-in:focus-within{border-color:#3a9cf0 !important;box-shadow:inset 0 2px 4px rgba(90,60,20,.1),0 0 0 3px rgba(58,156,240,.25) !important}
-html body #title .authing .au-in input{font:600 16px Sarabun,"Noto Sans Thai",sans-serif !important;color:#3a2410 !important;background:transparent !important}
-html body #title .authing .au-in input::placeholder{color:#9a8a76 !important}
-html body #title .authing .au-ic{color:#6a5640 !important}
-html body #title .authing .au-eye{width:38px !important;height:38px !important;border-radius:50% !important;background:linear-gradient(180deg,#fff,#efe6d6) !important;border:1.5px solid #d8c6a2 !important;color:#3a2410 !important}
-html body #title .authing .au-f.bad .au-in{border-color:#e0503a !important;box-shadow:0 0 0 3px rgba(224,80,58,.2) !important}
-html body #title .authing .au-meter span{color:#6a4a20 !important}
-html body #title .authing .au-row{margin:12px 2px 4px !important}
-html body #title .authing .au-keep span{font:700 14px Sarabun,"Noto Sans Thai",sans-serif !important;color:#3a2410 !important}
-html body #title .authing .au-link,html body #title .authing .au-guest{background:none !important;border:0 !important;box-shadow:none !important;color:#1d5fc0 !important;font:700 14.5px Sarabun,"Noto Sans Thai",sans-serif !important;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:4px 2px !important}
-html body #title .authing .au-guest{display:block !important;width:100% !important;height:auto !important;margin:6px 0 0 !important;text-align:center}
-html body #title .authing .au-err.show{background:#fff0ec !important;border:1.5px solid #f0a090 !important;color:#b02a14 !important;border-radius:10px !important}
+/* ---------- fields: the name inside, as in the design ---------- */
+html body #title .authing .au-grid{display:grid !important;grid-template-columns:1fr !important;gap:var(--s3) !important}
+html body #title .authing .au-l{position:absolute !important;width:1px !important;height:1px !important;overflow:hidden !important;clip:rect(0 0 0 0) !important;white-space:nowrap !important}
+html body #title .authing .au-in{height:var(--fh) !important;padding:0 var(--s2) !important;gap:var(--s2) !important;border-radius:1.6cqw !important;border:.3cqw solid #cdb88f !important;
+  background:linear-gradient(180deg,#ece6db,#f7f2e8) !important;box-shadow:inset 0 .35cqw .7cqw rgba(90,60,20,.16),0 .15cqw 0 #fff !important}
+html body #title .authing .au-in:focus-within{border-color:#3a9cf0 !important;box-shadow:inset 0 .35cqw .7cqw rgba(90,60,20,.1),0 0 0 .5cqw rgba(58,156,240,.25) !important}
+html body #title .authing .au-in input{font:600 var(--b) Sarabun,"Noto Sans Thai",sans-serif !important;color:#3a2410 !important;background:transparent !important;height:100% !important}
+html body #title .authing .au-in input::placeholder{color:#8a7a66 !important}
+html body #title .authing .au-ic{color:#6a5640 !important;width:calc(var(--b) * 1.272) !important;height:calc(var(--b) * 1.272) !important}
+html body #title .authing .au-ic svg{width:100% !important;height:100% !important}
+html body #title .authing .au-eye{width:calc(var(--fh) * .78) !important;height:calc(var(--fh) * .78) !important;margin-right:-1cqw !important;border-radius:1.4cqw !important;background:linear-gradient(180deg,#fff,#ece2d0) !important;border:.25cqw solid #cdb88f !important;color:#3a2410 !important}
+html body #title .authing .au-f.bad .au-in{border-color:#e0503a !important;box-shadow:0 0 0 .5cqw rgba(224,80,58,.2) !important}
+html body #title .authing .au-meter{margin-top:var(--s1) !important}
+html body #title .authing .au-meter span{color:#6a4a20 !important;font-size:calc(var(--b) * .7) !important}
+html body #title .authing .au-row{margin:var(--s3) 0 0 !important;display:flex !important;align-items:center}
+html body #title .authing .au-keep span{font:700 calc(var(--b) * .95) Sarabun,"Noto Sans Thai",sans-serif !important;color:#2a1a08 !important}
+html body #title .authing .au-keep input{width:calc(var(--b) * 1.272) !important;height:calc(var(--b) * 1.272) !important}
+html body #title .authing .au-err.show{margin-top:var(--s2) !important;background:#fff0ec !important;border:.25cqw solid #f0a090 !important;color:#b02a14 !important;border-radius:1.2cqw !important;font-size:calc(var(--b) * .8) !important}
 
-/* ---------- the big gold button, with gems at its ends ---------- */
-html body #title .authing .au-go{position:relative;height:58px !important;margin:10px 0 4px !important;border-radius:16px !important;border:3px solid #fff0a8 !important;
-  background:linear-gradient(180deg,#ffe98a,#ffbf2e 45%,#f29a12 75%,#e0820c) !important;color:#4a2200 !important;font:900 22px/1 Sarabun,"Noto Sans Thai",sans-serif !important;text-shadow:0 1px 0 rgba(255,255,255,.6) !important;letter-spacing:.5px;
-  box-shadow:0 0 0 2px #a05a08,0 6px 0 #8a4806,0 10px 18px rgba(120,60,0,.4),inset 0 3px 0 rgba(255,255,255,.55) !important;transition:transform .08s,filter .15s}
-html body #title .authing .au-go::before,html body #title .authing .au-go::after{content:"" !important;display:block !important;position:absolute !important;top:50% !important;bottom:auto !important;width:16px !important;height:16px !important;border-radius:3px;transform:translateY(-50%) rotate(45deg) !important;animation:none !important;opacity:1 !important;
-  background:linear-gradient(135deg,#e8fbff,#6cd4ff 45%,#1c78d0);box-shadow:0 0 0 2px #fff0a8,0 0 0 3.5px #a05a08,0 0 8px rgba(120,220,255,.8)}
-html body #title .authing .au-go::before{left:16px !important;right:auto !important}
-html body #title .authing .au-go::after{right:16px !important;left:auto !important}
+/* ---------- the big gold button: height = field × φ, text = body × φ, a gem at each end ---------- */
+html body #title .authing .au-go{position:relative;display:block;width:calc(100% + 8cqw) !important;margin:var(--s3) -4cqw 0 !important;height:calc(var(--fh) * 1.618) !important;padding:.6cqw !important;
+  clip-path:polygon(5% 0,95% 0,100% 50%,95% 100%,5% 100%,0 50%);border:0 !important;border-radius:0 !important;
+  background:radial-gradient(ellipse at 50% 30%,rgba(255,255,255,.55),transparent 55%) content-box,linear-gradient(180deg,#ffe48a,#ffb624 48%,#ef8e10 78%,#d2700a) content-box,linear-gradient(180deg,#fff4b8,#b0680c) border-box !important;
+  color:#3e1c00 !important;font:900 calc(var(--b) * 1.618)/1 Sarabun,"Noto Sans Thai",sans-serif !important;text-shadow:0 .2cqw 0 rgba(255,255,255,.6) !important;letter-spacing:.2cqw;box-shadow:none !important;transition:transform .08s,filter .15s}
+html body #title .authing .au-go::before,html body #title .authing .au-go::after{content:"" !important;display:block !important;position:absolute !important;top:50% !important;bottom:auto !important;width:3.4cqw !important;height:3.4cqw !important;border-radius:.6cqw;
+  transform:translateY(-50%) rotate(45deg) !important;animation:none !important;opacity:1 !important;background:linear-gradient(135deg,#eafcff,#62d0ff 45%,#1870c8) !important;box-shadow:0 0 0 .45cqw #fff0a8,0 0 0 .8cqw #a05a08,0 0 1.6cqw rgba(120,220,255,.8) !important}
+html body #title .authing .au-go::before{left:6.5cqw !important;right:auto !important}
+html body #title .authing .au-go::after{right:6.5cqw !important;left:auto !important}
 html body #title .authing .au-go:hover:not(:disabled){filter:brightness(1.05)}
-html body #title .authing .au-go:active:not(:disabled){transform:translateY(3px);box-shadow:0 0 0 2px #a05a08,0 3px 0 #8a4806,inset 0 3px 0 rgba(255,255,255,.55) !important}
+html body #title .authing .au-go:active:not(:disabled){transform:translateY(.5cqw)}
 html body #title .authing .au-go:disabled,html body #title .authing .au-go.busy{filter:saturate(.6) brightness(.95)}
-html body #title .authing .au-hint{color:#6a4a20 !important;font:600 12.5px/1.45 Sarabun,"Noto Sans Thai",sans-serif !important;text-align:center}
+html body #title .authing .au-hint{display:none !important}
 
-/* ---------- Discord · Settings · Support under the frame ---------- */
-html body #title .title-card.authing > .supdcbig,html body #title .title-card.authing > .supbig,html body #title .title-card.authing > .t-btns .tbtn{display:flex !important;align-items:center;justify-content:center;gap:6px;width:100% !important;height:44px !important;margin:0 !important;padding:0 10px !important;
-  border-radius:12px 4px 12px 4px !important;border:2.5px solid #e9b84a !important;background:linear-gradient(180deg,#3a58b8,#1e3480 60%,#16265e) !important;color:#fff !important;text-decoration:none !important;
-  font:800 14.5px/1 Sarabun,"Noto Sans Thai",sans-serif !important;text-shadow:0 1px 2px rgba(0,0,0,.4) !important;box-shadow:0 0 0 2px #6a3e0c,0 4px 10px rgba(10,20,60,.4),inset 0 2px 0 rgba(255,255,255,.25) !important;white-space:nowrap;cursor:pointer}
-html body #title .title-card.authing > .supdcbig{background:linear-gradient(180deg,#7686ff,#4a58e0 60%,#3640b8) !important}
+/* ---------- guest | forgotten password, then the tagline ---------- */
+html body #title .authing .au-links{display:flex;align-items:center;justify-content:center;gap:var(--s3);margin:var(--s3) 0 0}
+html body #title .authing .au-links i.sep{display:block !important;flex:none;width:.3cqw !important;height:calc(var(--b) * 1.4) !important;background:#5a4a3a !important;opacity:.6;position:static !important}
+html body #title .authing .au-link,html body #title .authing .au-guest{display:inline-flex !important;align-items:center;gap:var(--s1);width:auto !important;height:auto !important;margin:0 !important;padding:.5cqw 0 !important;background:none !important;border:0 !important;box-shadow:none !important;
+  color:#1650b8 !important;font:700 calc(var(--b) * .95)/1.2 Sarabun,"Noto Sans Thai",sans-serif !important;text-decoration:underline;text-underline-offset:.6cqw;cursor:pointer;white-space:nowrap}
+html body #title .authing .au-links .ico{font-size:calc(var(--b) * 1.2);text-decoration:none;display:inline-block}
+html body #title .authing #auBox[data-m="reg"] .au-links .au-forgot,html body #title .authing #auBox[data-m="reg"] .au-links i.sep{display:none !important}
+html body #title .authing .au-row .au-forgot{display:none !important}
+html body #title .authing .au-tagline{display:flex;align-items:center;gap:var(--s2);margin:var(--s3) 0 0;color:#4a3420;font:600 calc(var(--b) * .78)/1.3 Sarabun,"Noto Sans Thai",sans-serif;text-align:center;justify-content:center}
+html body #title .authing .au-tagline::before,html body #title .authing .au-tagline::after{content:"";flex:1;height:.25cqw;background:linear-gradient(90deg,transparent,#b98a3a);max-width:14cqw}
+html body #title .authing .au-tagline::after{background:linear-gradient(270deg,transparent,#b98a3a)}
 
-/* ---------- smaller screens ---------- */
-@media (max-height:700px){
-  html body #title .title-card.authing{width:min(470px,46vw);padding-top:24px;gap:8px}
-  html body #title .authing .au-box{padding:24px 20px 12px !important}
-  html body #title .authing .au-in{height:42px !important}
-  html body #title .authing .au-go{height:48px !important;font-size:19px !important}
-  html body #title .authing .au-tabs [role="tab"]{height:40px !important;font-size:15.5px !important}
-  html body #title .authing .au-hint{display:none !important}
-  html body #title .title-card.authing > .supdcbig,html body #title .title-card.authing > .supbig,html body #title .title-card.authing > .t-btns .tbtn{height:38px !important;font-size:13px !important}
+/* ---------- Discord · Settings · Support: under the base, pointed ends ---------- */
+html body #title .title-card.authing > .t-btns{display:contents !important}
+html body #title .title-card.authing > .supdcbig{order:1}
+html body #title .title-card.authing > .t-btns .tbtn{order:2}
+html body #title .title-card.authing > .supbig{order:3}
+html body #title .title-card.authing > .supdcbig,html body #title .title-card.authing > .supbig,html body #title .title-card.authing > .t-btns .tbtn{display:inline-flex !important;align-items:center;justify-content:center;gap:var(--s1);
+  width:30cqw !important;height:calc(var(--fh) * 1.04) !important;margin:0 .8cqw !important;padding:.5cqw !important;border:0 !important;border-radius:0 !important;
+  clip-path:polygon(6% 0,94% 0,100% 50%,94% 100%,6% 100%,0 50%);background:linear-gradient(180deg,#34509e,#1c2f72 60%,#152456) content-box,linear-gradient(180deg,#ffe28a,#b07018) border-box !important;
+  color:#fff !important;text-decoration:none !important;font:800 calc(var(--b) * .9)/1 Sarabun,"Noto Sans Thai",sans-serif !important;text-shadow:0 .2cqw .4cqw rgba(0,0,0,.45) !important;box-shadow:none !important;white-space:nowrap;cursor:pointer}
+
+/* ---------- phones held sideways ---------- */
+@media (max-height:460px){
+  html body #title .title-card.authing{--cw:calc(min(46vw, calc(100vh * .82), 420px) / var(--uz));--b:3.5cqw;--fh:8.6cqw;--s3:2.4cqw;--s4:3.6cqw;margin-right:calc(3vw / var(--uz)) !important}
+  html body #title .title-card.authing:has(#auBox[data-m="reg"]){--cw:calc(min(42vw, calc(100vh * .7), 360px) / var(--uz))}
+  html body #title .authing .au-tagline{display:none}
 }
-@media (max-height:440px){
-  html body #title .title-card.authing{width:min(400px,50vw);margin-right:2.5vw;padding-top:20px}
-  html body #title .authing .au-box{padding:20px 14px 8px !important}
-  html body #title .authing .au-l{display:none !important}
-  html body #title .authing .au-in{height:38px !important}
-  html body #title .authing .au-tabs{margin:4px 0 8px !important}
-  html body #title .authing .au-tabs [role="tab"]{height:34px !important;font-size:14px !important}
-  html body #title .authing .au-go{height:42px !important;font-size:17px !important;margin:6px 0 2px !important}
-  html body #title .authing .au-row{margin:6px 2px 0 !important}
-  html body #title .authing .au-login .au-grid{grid-template-columns:1fr !important;gap:6px !important}   /* one field per row, never squeezed side by side */
-  html body #title .authing .au-lang{top:4px !important;right:10px !important;padding:1px 10px !important;font-size:11px !important}
-  html body #title .authing .au-tabs{margin-top:14px !important}
-}
 
-/* ---------- the character list: on the right too, so the crest stays in view (the wide character maker stays centred) ---------- */
+/* ---------- the character list: on the right too, so the crest stays in view (the wide maker stays centred) ---------- */
 html body #title .title-card:not(.authing):has(.slots):not(:has(.maker)){justify-self:end;margin-right:4vw !important;width:min(640px,49vw) !important}
-html body #title .title-card:not(.authing):has(.slots):not(:has(.maker)) > :is(.t-eyebrow,h2,.t-sub){display:none !important}   /* the crest is in the picture */
+html body #title .title-card:not(.authing):has(.slots):not(:has(.maker)) > :is(.t-eyebrow,h2,.t-sub){display:none !important}
 @media (max-height:440px){html body #title .title-card:not(.authing):has(.slots):not(:has(.maker)){width:min(460px,54vw) !important;margin-right:2vw !important}}
