@@ -15,7 +15,7 @@ function evGlow(){ if (EV_GLOW) return EV_GLOW; const c = document.createElement
 
 const EVENTS = {
   okpansa:{th:'ออกพรรษา · ตักบาตรเทโว', en:'End of Buddhist Lent', from:[10, 1], to:[10, 31], col:'#ffd27a', tok:['เหรียญเทโว', 'Tevo token'], sp:['ภูตประทีปเทโว', 'Tevo Lamp Spirit']},
-  loykrathong:{th:'ลอยกระทง', en:'Loy Krathong', from:[11, 15], to:[11, 30], col:'#ffb24a', tok:['เหรียญกระทง', 'Krathong token'], sp:['ภูตโคมยี่เป็ง', 'Yi Peng Lantern Spirit']},
+  loykrathong:{th:'ลอยกระทง', en:'Loy Krathong', from:[11, 1], to:[11, 30], col:'#ffb24a', tok:['เหรียญกระทง', 'Krathong token'], sp:['ภูตโคมยี่เป็ง', 'Yi Peng Lantern Spirit']},
   newyear:{th:'ปีใหม่', en:'New Year', from:[12, 28], to:[1, 3], col:'#ffe066', tok:['เหรียญพลุ', 'Firework token'], sp:['ภูตพลุเคาท์ดาวน์', 'Countdown Spirit']},
   songkran:{th:'สงกรานต์', en:'Songkran', from:[4, 10], to:[4, 16], col:'#6ad0ff', tok:['เหรียญสาดน้ำ', 'Splash token'], sp:['ภูตขันเงิน', 'Silver Bowl Spirit']}
 };
@@ -32,7 +32,7 @@ const EVENT_EXP = 1.1;
     c_ev_songkran:{slot:'top', ev:'songkran', th:'ชุดลายดอกสาดน้ำ', en:'Splash Festival Shirt', tok:40, look:{top:'sky', sleeve:'sky', forearm:'skin', pants:'tech', bootCuff:'sky', belt:'sun', skirtM:'sky', skirtT:'sun', topTex:tx.combo(tx.dots(CM.sun), tx.hem(CM.sakura, .48))}},
     hc_ev_songkran:{slot:'head', ev:'songkran', th:'มาลัยดอกมะลิ', en:'Jasmine Garland', tok:20, look:{hat:'band', bandMat:'pearl'}}
   };
-  for (const id in ev){ const c = {...ev[id], src:'event'}; COSTUME[id] = c; SPR.GEAR_LOOK[id] = c.slot === 'top' ? {...TOP0, ...c.look} : {...c.look}; }
+  for (const id in ev){ const c = {...ev[id], src:'event'}; COSTUME[id] = c; SPR.GEAR_LOOK[id] = c.slot === 'top' ? {...TOP0, ...c.look} : {...c.look}; (window.EV_COS = window.EV_COS || {})[id] = c; }   // (v213) kept aside: the new wardrobe (fashion30.js) clears COSTUME
   COS_SRC.event = ['เทศกาล (เหรียญเทศกาล)', 'Festival (tokens)'];
 }
 /* which festival is on (Thai date) */
@@ -75,7 +75,7 @@ const EVD = {p:[], fw:[], t:0};
 function evNightK(){ const h = thHour(); return h >= 18 || h < 6 ? 1 : h >= 17 ? h - 17 : h < 7 ? 7 - h : 0; }
 EV.on('tick', dt => {
   const id = evShow(); EVD.t += dt; if (!id || PAUSED){ EVD.p.length = 0; EVD.fw.length = 0; return; }
-  const low = typeof GFX !== 'undefined' && GFX.preset === 'low', cap = low ? 14 : 40, nk = evNightK();
+  const low = typeof GFX !== 'undefined' && GFX.preset === 'low', cap = low ? 10 : 24, nk = evNightK();   // (v213) fewer sky lanterns: the festival was switched off for stutter in v104
   // sky lanterns (Loy Krathong / Yi Peng and Ok Phansa) rise at dusk and night; Songkran: water drops in the wind
   if ((id === 'loykrathong' || id === 'okpansa') && nk > 0 && EVD.p.length < cap * nk && Math.random() < dt * 2.2)
     EVD.p.push({k:'lan', x:Math.random() * SW, y:SH + 20, vx:(Math.random() - .5) * 8, vy:-(14 + Math.random() * 16), s:.7 + Math.random() * .6, ph:Math.random() * 6});
@@ -84,8 +84,8 @@ EV.on('tick', dt => {
   EVD.p = EVD.p.filter(p => p.y > -40 && p.y < SH + 30 && p.x > -40 && p.x < SW + 40);
   // fireworks at night (New Year every night, Loy Krathong now and then)
   const fwRate = id === 'newyear' ? 1.1 : id === 'cny' ? .6 : id === 'bungfai' ? .5 : id === 'loykrathong' ? .25 : 0;
-  if (fwRate && nk > .5 && !low && Math.random() < dt * fwRate && EVD.fw.length < 6){
-    const hue = [45, 0, 200, 300, 120, 30][(Math.random() * 6) | 0], n = 26 + ((Math.random() * 14) | 0), cx = SW * (.15 + Math.random() * .7), cy = SH * (.12 + Math.random() * .25);
+  if (fwRate && nk > .5 && !low && Math.random() < dt * fwRate && EVD.fw.length < 3){
+    const hue = [45, 0, 200, 300, 120, 30][(Math.random() * 6) | 0], n = 20 + ((Math.random() * 10) | 0), cx = SW * (.15 + Math.random() * .7), cy = SH * (.12 + Math.random() * .25);
     EVD.fw.push({cx, cy, hue, t:0, sp:[...Array(n)].map((_, i) => ({a:i / n * 6.283 + Math.random() * .2, v:60 + Math.random() * 50}))});
     if (typeof SFX !== 'undefined' && Math.random() < .5) SFX.play('coin');
   }
@@ -105,14 +105,15 @@ EV.on('draw', () => {
   ctx.globalCompositeOperation = 'lighter';
   for (const f of EVD.fw){ const k = f.t / 1.8, a = Math.max(0, 1 - k);
     if (f.t < .25){ ctx.fillStyle = `hsla(${f.hue},100%,80%,.9)`; ctx.fillRect(f.cx - 1, f.cy + (1 - f.t / .25) * SH * .3, 2, 6); continue; }
+    ctx.fillStyle = f.col || (f.col = `hsl(${f.hue},100%,78%)`); ctx.globalAlpha = a;   // (v213) one colour per burst, not a new colour string per spark
     for (const s of f.sp){ const r = s.v * Math.min(1, (f.t - .25) * 1.6) * z, x = f.cx + Math.cos(s.a) * r, y = f.cy + Math.sin(s.a) * r + (f.t - .25) * (f.t - .25) * 26;
-      ctx.fillStyle = `hsla(${f.hue},100%,${65 + 25 * a}%,${a})`; ctx.fillRect(x - 1.2 * z, y - 1.2 * z, 2.4 * z, 2.4 * z); } }
+      ctx.fillRect(x - 1.2 * z, y - 1.2 * z, 2.4 * z, 2.4 * z); }
+    ctx.globalAlpha = 1; }
   ctx.restore();
 });
 /* world layer: lantern boats (krathong) on the water at Loy Krathong, splash rings at Songkran, temple lamps at Ok Phansa */
 function evKrathong(g, x, y, t, s){
-  const fl = .8 + Math.sin(t * 8 + x) * .2, gr = g.createRadialGradient(x, y - 4, 0, x, y - 4, 18);
-  gr.addColorStop(0, `rgba(255,190,90,${.4 * fl})`); gr.addColorStop(1, 'rgba(255,150,40,0)'); g.fillStyle = gr; g.fillRect(x - 18, y - 22, 36, 36);
+  const fl = .8 + Math.sin(t * 8 + x) * .2; g.globalAlpha = .45 * fl; g.drawImage(evGlow(), x - 18, y - 22, 36, 36); g.globalAlpha = 1;   // (v213) the cached glow, not a new gradient each frame
   g.fillStyle = 'rgba(30,60,30,.9)'; g.beginPath(); g.ellipse(x, y, 7 * s, 3 * s, 0, 0, 7); g.fill();
   g.fillStyle = '#5aa04a'; for (let i = 0; i < 6; i++){ const a = i / 6 * 6.28; g.beginPath(); g.moveTo(x + Math.cos(a) * 6 * s, y + Math.sin(a) * 2.5 * s); g.lineTo(x + Math.cos(a) * 3 * s, y - 4 * s); g.lineTo(x + Math.cos(a + .5) * 6 * s, y + Math.sin(a + .5) * 2.5 * s); g.fill(); }
   g.fillStyle = '#ffd0e0'; g.beginPath(); g.ellipse(x, y - 4 * s, 3 * s, 2 * s, 0, 0, 7); g.fill();
@@ -129,7 +130,7 @@ function evKrathong(g, x, y, t, s){
         else { const a = ph * 6.28 + T * .08; x = w.x + Math.cos(a) * w.rx * .55; y = w.y + Math.sin(a) * w.ry * .55; }
         y += Math.sin(T * 1.6 + k) * 1.2; const sx0 = x - cam.x, sy0 = y - cam.y; if (sx0 < -30 || sx0 > VW + 30 || sy0 < -30 || sy0 > VH + 30) continue;
         list.push({y, f:() => evKrathong(g, x - cam.x, y - cam.y, T, .9 + (k % 3) * .1)}); } });
-    if (id === 'okpansa' && MAP_ID === 0) for (let k = 0; k < 7; k++){ const x = VX + 120 + k * 64, y = 700 + (k % 2) * 40;   // paper lamps strung over Aren
+    if ((id === 'okpansa' || id === 'loykrathong') && MAP_ID === 0) for (let k = 0; k < 7; k++){ const x = VX + 120 + k * 64, y = 700 + (k % 2) * 40;   // paper lamps strung over Aren
       list.push({y:y + 1, f:() => { const X = x - cam.x, Y = y - cam.y; if (X < -30 || X > VW + 30) return; g.strokeStyle = 'rgba(80,50,20,.8)'; g.lineWidth = 1; g.beginPath(); g.moveTo(X, Y); g.lineTo(X, Y - 40); g.stroke();
         const fl = .85 + Math.sin(T * 5 + k) * .15; g.globalAlpha = .45 * fl; g.drawImage(evGlow(), X - 16, Y - 62, 32, 32); g.globalAlpha = 1;
         g.fillStyle = k % 2 ? '#e8503a' : '#f0b030'; g.beginPath(); g.ellipse(X, Y - 46, 5, 7, 0, 0, 7); g.fill(); g.fillStyle = 'rgba(255,240,200,.8)'; g.fillRect(X - 5, Y - 47, 10, 1.2); } }); }
