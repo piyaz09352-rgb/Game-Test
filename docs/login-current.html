@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>VAYRATHEN · หน้าล็อกอินตอนนี้ (ไฟล์ตัวอย่าง)</title>
+<!--
+  VAYRATHEN · โค้ดหน้าล็อกอินที่ใช้อยู่ตอนนี้ (v232) รวมไว้ในไฟล์เดียว
+  - เปิดไฟล์นี้ในเบราว์เซอร์ได้เลย หน้าตาเหมือนในเกม (ยกเว้นฉากหลังแผนที่ ซึ่งในไฟล์นี้ใช้สีพื้นแทน)
+  - HTML ส่วน <div class="title" id="title"> คือสิ่งที่เกมสร้างจริง (js/sys/auth.js เป็นคนสร้าง) ห้ามเปลี่ยน id / class / data-*
+  - CSS ใน <style> คือกฎทุกข้อจาก 9 ไฟล์ของเกมที่มีผลกับหน้านี้ เรียงตามลำดับที่เกมโหลด:
+    hud.css (13), ornate.css (14), palace.css (6), systems.css (3), auth.css (132), pastel.css (19), royal.css (24), sunlit.css (19), <style> (7)
+  - สคริปต์ท้ายไฟล์มีไว้ให้กดสลับแท็บ "เข้าสู่ระบบ / สมัครสมาชิก" ในไฟล์ตัวอย่างนี้เท่านั้น (ในเกมใช้ js/sys/auth.js)
+  วิธีใช้กับ ChatGPT: ส่งไฟล์นี้ + ข้อความใน docs/LOGIN_DESIGN_PROMPT.md แล้วขอ CSS ใหม่ไฟล์เดียว
+-->
+<style>
+:root{
+  --ease:cubic-bezier(.2,.8,.2,1);
+  --thai:"Sarabun",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --gold-2:#9a5200;
+  --display:"Sarabun",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --muted:#3f3a35;
+  --fg:#141414;
+  --gold:#8a3f00;
+  --au-a:0deg;
+  --x:;
+  --y:;
+  --s:;
+  --t:;
+  --d:;
+  --body:"Sarabun",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --ink:#141414;
+  --sun:#ffd65c;
+  --sun2:#f5a623;
+  --sky1:#e9f6ff;
+  --sky2:#cfeaff;
+  --sky3:#9fd2f5;
+  --skyD:#155fa8;
+  --rn-cream:#141414;
+  --rn-gold:#8a3f00;
+  --rn-trim:0 0 0 1px rgba(232,194,106,.55),0 0 0 3px rgba(7,10,22,.9),0 0 0 4px rgba(232,194,106,.28);
+  --rn-drop:0 10px 28px rgba(0,0,0,.55);
+  --rn-gold-hi:#9a5200;
+  --rn-mute:#3f3a35;
+  --sl-ink:#141414;
+  --sl-line:#dcae55;
+  --sl-gold:#ffd65c;
+  --sl-gold-2:#f5a623;
+  --sl-gold-dk:#b86a00;
+  --sl-paper:#fffaf0;
+  --sl-paper-2:#f7ebd2;
+  --sl-drop:0 6px 18px rgba(80,50,10,.22),0 2px 4px rgba(80,50,10,.18);
+  --sl-sky-dk:#155fa8;
+  --sl-paper-3:#efdcb6;
+  --sl-mute:#3f3a35;
+  --sl-sky-2:#1f86dc;
+}
+html,body{margin:0;height:100%;font-family:Sarabun,"Noto Sans Thai",sans-serif}
+body{background:radial-gradient(circle at 30% 30%,#bfe8a8,#8fcf7a 45%,#d8c08a 100%)}   /* ไฟล์ตัวอย่าง: แทนภาพแผนที่เบลอที่อยู่หลังการ์ดในเกม */
+#title{position:fixed;inset:0;display:flex;align-items:center;justify-content:center}
+/* ===== กฎ CSS ของเกมที่มีผลกับหน้าล็อกอิน (242 ข้อ) ===== */
+.title { position: absolute; inset: 0px; z-index: 200; display: grid; place-items: center; padding: 16px; background: radial-gradient(at 50% 40%, rgba(40, 20, 14, 0.55), rgba(10, 6, 8, 0.86)); backdrop-filter: blur(3px); transition: opacity 0.35s; }
+.title.out { opacity: 0; }
+.title-card { position: relative; text-align: center; padding: 34px 40px 26px; min-width: min(380px, 100%); border-radius: 16px; background: linear-gradient(rgba(40, 24, 18, 0.94), rgba(18, 11, 9, 0.95)); border: 1px solid rgba(227, 176, 75, 0.45); box-shadow: rgba(0, 0, 0, 0.6) 0px 30px 80px; animation: winIn .5s var(--ease); }
+.t-eyebrow { margin: 0px; font: 700 20px var(--thai); color: var(--gold-2); opacity: 0.9; }
+.title h2 { margin: 4px 0px 2px; font: 600 clamp(34px,6vw,54px)/1 var(--display); letter-spacing: 0.28em; padding-left: 0.28em; background-image: ; background-position-x: ; background-position-y: ; background-repeat: ; background-attachment: ; background-origin: ; background-color: ; background-size: 220% 100%; background-clip: text; -webkit-text-fill-color: transparent; animation: 5s linear 0s infinite normal none running sheen; }
+.t-sub { margin: 0px 0px 22px; color: var(--muted); font-size: 13px; }
+.t-btns { display: flex; flex-direction: column; gap: 10px; align-items: stretch; }
+.tbtn { font: 500 16px var(--display); padding: 11px 18px; border-radius: 10px; cursor: pointer; color: var(--fg); background: linear-gradient(rgb(58, 34, 26), rgb(26, 15, 12)); border: 1px solid rgba(227, 176, 75, 0.3); transition: transform .15s var(--ease),border-color .2s,box-shadow .2s; }
+.tbtn:hover { transform: translateY(-2px); border-color: var(--gold); box-shadow: rgba(227, 176, 75, 0.25) 0px 0px 18px; }
+.tbtn.gold { background: linear-gradient(180deg,var(--gold-2),var(--gold)); color: rgb(36, 26, 5); border-color: var(--gold); }
+.t-save { margin: 16px 0px 0px; color: var(--muted); font-size: 12.5px; }
+@media (max-height: 560px){html:not(.rot) .title-card { zoom: 0.78; }}
+@media (max-width: 560px){html.rot .title-card { zoom: 0.78; }}
+.title-card { max-height: calc(100% - 8px); overflow: auto; }
+.tbtn.sm { font-size: 13.5px; padding: 7px 14px; border-radius: 9px; }
+.tbtn.del { padding: 7px 10px; color: rgb(255, 176, 160); }
+.tbtn.del:hover { border-color: rgb(255, 122, 106); box-shadow: rgba(255, 100, 80, 0.3) 0px 0px 12px; }
+@media (max-width: 560px){html:not(.rot) .title-card { padding: 20px 16px 16px; }}
+@media (max-height: 560px){html.rot .title-card { padding: 20px 16px 16px; }}
+@media (max-height: 520px){html:not(.rot) .title-card { padding: 12px 18px; }}
+@media (max-height: 520px){html:not(.rot) .title h2 { font-size: 28px; }}
+@media (max-height: 520px){html:not(.rot) .t-sub { margin-bottom: 8px; }}
+@media (max-width: 520px){html.rot .title-card { padding: 12px 18px; }}
+@media (max-width: 520px){html.rot .title h2 { font-size: 28px; }}
+@media (max-width: 520px){html.rot .t-sub { margin-bottom: 8px; }}
+.title-card.making .t-eyebrow, .title-card.making h2, .title-card.making .t-sub, .title-card.making .t-btns { display: none; }
+.title-card.making { padding-top: 20px; }
+.btn.gold, .tbtn.gold { background: linear-gradient(rgb(255, 242, 196), rgb(240, 195, 90) 48%, rgb(196, 138, 34)); border-color: rgb(255, 231, 168); color: rgb(42, 22, 4); box-shadow: rgba(240, 195, 90, 0.35) 0px 0px 14px, rgba(255, 255, 255, 0.6) 0px 1px 0px inset; }
+.btn.gold:hover, .tbtn.gold:hover { box-shadow: rgba(255, 214, 120, 0.6) 0px 0px 22px, rgba(255, 255, 255, 0.7) 0px 1px 0px inset; }
+.title { background: radial-gradient(at 50% 38%, rgba(90, 30, 24, 0.5), rgba(8, 3, 6, 0.9)); }
+.title-card { animation: winIn .5s var(--ease),paSpin 9s linear infinite,paBreath 4.8s ease-in-out infinite; }
+.title h2 { filter: drop-shadow(rgba(255, 200, 100, 0.45) 0px 0px 14px); }
+@media (prefers-reduced-motion: reduce){.card, .win, .dock, .dialog, .rail, .title-card, .portrait::after, .bar > i::after { animation: auto ease 0s 1 normal none running none; }}
+@media (max-height: 560px){html:not(.rot) .char, html:not(.rot) .goal, html:not(.rot) .mapc, html:not(.rot) .target, html:not(.rot) .rail, html:not(.rot) .chatbox, html:not(.rot) .win, html:not(.rot) .title-card, html:not(.rot) .ui.moba .dock, html:not(.rot) .ui.moba .mobautil { zoom: 1; }}
+@media (max-width: 560px){html.rot .char, html.rot .goal, html.rot .mapc, html.rot .target, html.rot .rail, html.rot .chatbox, html.rot .win, html.rot .title-card, html.rot .ui.moba .dock, html.rot .ui.moba .mobautil { zoom: 1; }}
+@media (max-width: 560px){.accbar .tbtn { white-space: nowrap; flex: 1 1 auto; }}
+.title-card.authing .t-eyebrow, .title-card.authing .t-btns, .title-card.authing .supbig, .title-card.authing .t-save { display: none; }
+.title-card.authing { padding: 24px 28px 20px; }
+.title-card.authing .t-sub { margin-bottom: 14px; }
+.au-box { position: relative; isolation: isolate; width: min(500px, -72px + 100vw); margin: 0px auto; padding: 16px 18px 12px; border-radius: 16px; text-align: left; background: radial-gradient(120% 70% at 50% 0%, rgba(140, 46, 26, 0.38), transparent 62%), radial-gradient(90% 60% at 50% 110%, rgba(227, 176, 75, 0.12), transparent 70%), linear-gradient(rgba(32, 15, 11, 0.95), rgba(13, 7, 7, 0.96)); box-shadow: rgba(0, 0, 0, 0.65) 0px 0px 0px 1px, rgba(0, 0, 0, 0.55) 0px 14px 34px, rgba(227, 176, 75, 0.12) 0px 0px 26px, rgba(227, 176, 75, 0.07) 0px 0px 34px inset; }
+.au-box::before { content: ""; position: absolute; inset: 0px; z-index: -1; border-radius: inherit; padding: 1.6px; pointer-events: none; background: conic-gradient(from var(--au-a),rgba(227,176,75,.4),#fff4c8 7%,rgba(227,176,75,.4) 16%,rgba(227,176,75,.4) 50%,#fff4c8 57%,rgba(227,176,75,.4) 66%); mask: linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px) content-box exclude, linear-gradient(rgb(0, 0, 0) 0px, rgb(0, 0, 0) 0px); animation: 7s linear 0s infinite normal none running auSpin; }
+.au-box::after { content: ""; position: absolute; inset: 5px; z-index: -1; border-radius: 12px; pointer-events: none; border: 1px solid rgba(227, 176, 75, 0.16); }
+.au-cn { position: absolute; width: 9px; height: 9px; transform: rotate(45deg); border-radius: 2px; pointer-events: none; background: radial-gradient(circle at 35% 35%, rgb(255, 251, 230), rgb(247, 220, 154) 40%, rgb(176, 122, 32)); box-shadow: rgba(255, 214, 120, 0.8) 0px 0px 10px; }
+.au-cn.tl { left: -4px; top: -4px; }
+.au-cn.tr { right: -4px; top: -4px; }
+.au-cn.bl { left: -4px; bottom: -4px; }
+.au-cn.br { right: -4px; bottom: -4px; }
+.au-fx { position: absolute; inset: 0px; z-index: -1; overflow: hidden; border-radius: inherit; pointer-events: none; }
+.au-fx i { position: absolute; left: var(--x); top: var(--y); width: var(--s); height: var(--s); margin: calc(var(--s) / -2) 0 0 calc(var(--s) / -2); opacity: 0; border-radius: 50%; background: radial-gradient(circle, rgb(255, 255, 255) 0px, rgb(255, 255, 255) 9%, rgba(255, 228, 150, 0.9) 18%, rgba(255, 200, 90, 0.25) 38%, transparent 62%); animation: auTwinkle var(--t) ease-in-out var(--d) infinite; }
+.au-fx i::before, .au-fx i::after { content: ""; position: absolute; left: 0px; top: 50%; width: 100%; height: 2px; margin-top: -1px; border-radius: 2px; background: linear-gradient(90deg, transparent, rgba(255, 236, 180, 0.9) 35%, rgb(255, 255, 255) 50%, rgba(255, 236, 180, 0.9) 65%, transparent); box-shadow: rgba(255, 210, 120, 0.8) 0px 0px 6px; }
+.au-fx i::after { transform: rotate(90deg); }
+.au-fx b { position: absolute; left: var(--x); bottom: -6px; width: 3px; height: 3px; border-radius: 50%; opacity: 0; background: rgb(255, 231, 160); box-shadow: rgba(255, 204, 100, 0.85) 0px 0px 6px 1px; animation: auRise var(--t) linear var(--d) infinite; }
+.au-lang { position: absolute; right: 10px; top: -13px; z-index: 2; padding: 2px 10px; border-radius: 999px; cursor: pointer; font: 700 11px var(--display); letter-spacing: 0.06em; color: rgb(255, 232, 168); background: linear-gradient(rgb(58, 29, 18), rgb(27, 13, 9)); border: 1px solid rgba(227, 176, 75, 0.6); box-shadow: rgba(0, 0, 0, 0.5) 0px 2px 8px; }
+.au-lang:hover { color: rgb(255, 255, 255); border-color: rgb(247, 220, 154); }
+.au-tabs { position: relative; display: grid; grid-template-columns: 1fr 1fr; padding: 3px; margin: 2px 0px 12px; border-radius: 999px; background: rgba(0, 0, 0, 0.5); box-shadow: rgba(227, 176, 75, 0.32) 0px 0px 0px 1px inset, rgba(0, 0, 0, 0.6) 0px 2px 6px inset; }
+.au-tabs button { position: relative; z-index: 1; padding: 7px 10px; border: 0px; border-radius: 999px; background: none; cursor: pointer; font: 600 14.5px var(--thai); color: rgb(205, 191, 159); transition: color 0.3s; }
+.au-tabs button:hover { color: rgb(255, 243, 214); }
+.au-tabs button[aria-selected="true"] { color: rgb(42, 22, 4); }
+.au-pill { position: absolute; top: 3px; bottom: 3px; left: 3px; width: calc(50% - 3px); border-radius: 999px; overflow: hidden; background: linear-gradient(rgb(255, 243, 198), rgb(247, 220, 154) 38%, rgb(227, 176, 75) 78%, rgb(195, 141, 44)); box-shadow: rgba(255, 210, 120, 0.55) 0px 0px 16px, rgb(255, 251, 232) 0px 1px 0px inset, rgba(120, 70, 10, 0.45) 0px -1px 0px inset; transition: transform .45s var(--ease); }
+.au-pill::after { content: ""; position: absolute; top: 0px; bottom: 0px; left: -40%; width: 30%; transform: skewX(-20deg); background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.8), transparent); animation: 4.2s ease-in-out 0s infinite normal none running auShine; }
+.au-box[data-m="reg"] .au-pill { transform: translateX(100%); }
+.au-head { display: flex; align-items: center; gap: 11px; margin: 2px 0px 12px; }
+.au-head div { display: flex; flex-direction: column; min-width: 0px; }
+.au-head b { font: 700 16px var(--thai); color: rgb(255, 232, 168); text-shadow: rgba(255, 200, 100, 0.4) 0px 0px 12px; }
+.au-head small { font: 500 12px var(--thai); color: var(--muted); }
+.au-gem { flex: 0 0 auto; width: 22px; height: 22px; transform: rotate(45deg); border-radius: 5px; background: radial-gradient(circle at 32% 30%, rgb(255, 251, 230), rgb(247, 220, 154) 38%, rgb(176, 122, 32)); box-shadow: rgba(255, 210, 120, 0.8) 0px 0px 14px; animation: 2.6s ease-in-out 0s infinite normal none running auPulse; }
+.au-pane { display: none; }
+.au-box[data-m="login"] .au-login, .au-box[data-m="reg"] .au-reg, .au-box[data-m="secure"] .au-reg { display: block; animation: auIn .4s var(--ease); }
+.au-t-login, .au-t-reg, .au-t-secure, .au-h-login, .au-h-reg, .au-h-secure { display: none; }
+.au-box[data-m="login"] .au-t-login, .au-box[data-m="reg"] .au-t-reg, .au-box[data-m="secure"] .au-t-secure { display: inline; }
+.au-box[data-m="login"] .au-h-login, .au-box[data-m="reg"] .au-h-reg, .au-box[data-m="secure"] .au-h-secure { display: block; }
+.au-box:not([data-m="login"]) .au-forgot { visibility: hidden; }
+.au-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 9px 12px; }
+.au-grid.one { grid-template-columns: 1fr; }
+.au-f { display: flex; flex-direction: column; gap: 4px; min-width: 0px; }
+.au-l { font: 600 12px var(--thai); color: var(--gold-2); letter-spacing: 0.02em; }
+.au-in { position: relative; display: flex; align-items: center; border-radius: 11px; background: linear-gradient(rgb(19, 10, 7), rgb(33, 18, 12)); box-shadow: rgba(227, 176, 75, 0.38) 0px 0px 0px 1px inset, rgba(0, 0, 0, 0.65) 0px 2px 7px inset; transition: box-shadow 0.25s; }
+.au-in:hover { box-shadow: rgba(247, 220, 154, 0.6) 0px 0px 0px 1px inset, rgba(0, 0, 0, 0.65) 0px 2px 7px inset; }
+.au-in:focus-within { box-shadow: rgb(247, 220, 154) 0px 0px 0px 1px inset, rgba(227, 176, 75, 0.2) 0px 0px 0px 3px, rgba(255, 200, 100, 0.4) 0px 0px 18px; animation: 2.4s ease-in-out 0s infinite normal none running auGlow; }
+.au-ic { flex: 0 0 auto; display: grid; place-items: center; width: 34px; color: rgb(217, 173, 85); }
+.au-ic svg, .au-eye svg { width: 17px; height: 17px; fill: none; stroke: currentcolor; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; }
+.au-in:focus-within .au-ic { color: rgb(255, 232, 168); filter: drop-shadow(rgba(255, 210, 120, 0.8) 0px 0px 4px); }
+.au-in input { flex: 1 1 0%; min-width: 0px; height: 40px; padding: 0px 10px 0px 0px; border: 0px; outline: none; background: none; color: rgb(255, 244, 220); font: 500 16px var(--body); letter-spacing: 0.01em; }
+.au-in input::placeholder { color: rgba(205, 191, 159, 0.45); }
+.au-in input:-webkit-autofill { -webkit-text-fill-color: rgb(255, 244, 220); transition: background-color 9999s; }
+.au-eye { flex: 0 0 auto; display: grid; place-items: center; width: 38px; height: 38px; border: 0px; background: none; cursor: pointer; color: rgb(191, 163, 106); border-radius: 9px; }
+.au-eye:hover { color: rgb(255, 232, 168); }
+.au-eye .au-slash { opacity: 0; }
+.au-eye[aria-pressed="true"] .au-slash { opacity: 1; }
+.au-eye[aria-pressed="true"] { color: rgb(255, 232, 168); }
+.au-f.bad .au-in { box-shadow: rgb(255, 138, 122) 0px 0px 0px 1px inset, rgba(255, 100, 80, 0.4) 0px 0px 14px; animation: auto ease 0s 1 normal none running none; }
+.au-f.bad .au-l { color: rgb(255, 179, 166); }
+.au-f.shake { animation: 0.38s ease 0s 1 normal none running auShake; }
+.au-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 11px 0px 2px; font: 500 13px var(--thai); color: rgb(217, 204, 176); }
+.au-keep { display: flex; align-items: center; gap: 8px; cursor: pointer; user-select: none; }
+.au-keep input { appearance: none; flex: 0 0 auto; width: 19px; height: 19px; margin: 0px; border-radius: 6px; cursor: pointer; background: rgb(21, 11, 8); box-shadow: rgba(227, 176, 75, 0.55) 0px 0px 0px 1px inset; transition: background 0.2s, box-shadow 0.2s; }
+.au-keep input:checked { background: linear-gradient(rgb(255, 240, 192), rgb(227, 176, 75)) center center / 100% auto no-repeat; box-shadow: rgba(255, 210, 120, 0.6) 0px 0px 10px; }
+.au-keep input:checked::after { content: ""; display: block; width: 5px; height: 10px; margin: 2px 0px 0px 6px; border-style: solid; border-color: rgb(42, 22, 4); border-image: none; border-width: 0px 2.2px 2.2px 0px; transform: rotate(45deg); }
+.au-keep input:focus-visible { outline: 2px solid var(--gold-2); outline-offset: 2px; }
+.au-link { padding: 2px 0px; border: 0px; background: none; cursor: pointer; font: 600 12.5px var(--thai); color: rgb(242, 201, 106); text-decoration: underline dotted rgba(242, 201, 106, 0.6); text-underline-offset: 3px; }
+.au-link:hover { color: rgb(255, 240, 192); }
+.au-err { min-height: 18px; margin: 4px 0px 6px; font: 600 13px/1.35 var(--thai); color: rgb(255, 159, 144); }
+.au-err.show { animation: auIn .3s var(--ease); }
+.au-go { position: relative; overflow: hidden; display: block; width: 100%; height: 46px; border: 1px solid rgb(247, 220, 154); border-radius: 12px; cursor: pointer; font: 700 17px var(--display); letter-spacing: 0.05em; color: rgb(42, 22, 4); text-shadow: rgba(255, 244, 210, 0.7) 0px 1px 0px; background: linear-gradient(rgb(255, 244, 200) 0%, rgb(247, 220, 154) 28%, rgb(227, 176, 75) 68%, rgb(180, 128, 31) 100%); box-shadow: rgba(0, 0, 0, 0.45) 0px 6px 18px, rgba(255, 200, 100, 0.35) 0px 0px 20px, rgb(255, 251, 234) 0px 1px 0px inset, rgba(120, 70, 10, 0.5) 0px -2px 0px inset; transition: transform .15s var(--ease),filter .2s,box-shadow .2s; }
+.au-go::after { content: ""; position: absolute; top: -30%; bottom: -30%; left: -40%; width: 28%; transform: skewX(-22deg); pointer-events: none; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent); animation: 3.4s ease-in-out 0s infinite normal none running auShine; }
+.au-go:hover { filter: brightness(1.07); transform: translateY(-1px); box-shadow: rgba(0, 0, 0, 0.5) 0px 8px 22px, rgba(255, 210, 120, 0.55) 0px 0px 30px, rgb(255, 251, 234) 0px 1px 0px inset, rgba(120, 70, 10, 0.5) 0px -2px 0px inset; }
+.au-go:active { transform: translateY(1px); }
+.au-go:focus-visible { outline: rgb(255, 240, 192) solid 2px; outline-offset: 3px; }
+.au-go:disabled { cursor: progress; filter: saturate(0.7) brightness(0.9); }
+.au-go.busy span::after { content: ""; display: inline-block; width: 13px; height: 13px; margin-left: 9px; vertical-align: -2px; border-radius: 50%; border-width: 2px; border-style: solid; border-color: rgb(42, 22, 4) rgba(42, 22, 4, 0.35) rgba(42, 22, 4, 0.35); border-image: none; animation: 0.8s linear 0s infinite normal none running auTurn; }
+.au-hint { margin: 9px 2px 0px; font: 500 11.5px/1.45 var(--thai); color: var(--muted); text-align: center; }
+@media (max-height: 520px){html:not(.rot) .title-card.authing { padding: 8px 16px 10px; }}
+@media (max-height: 520px){html:not(.rot) .title-card.authing h2 { font-size: 22px; }}
+@media (max-height: 520px){html:not(.rot) .title-card.authing .t-sub { margin: 2px 0px 8px; font-size: 11.5px; }}
+@media (max-height: 520px){html:not(.rot) .au-box { width: min(600px, -64px + 100vw); padding: 12px 14px 9px; }}
+@media (max-height: 520px){html:not(.rot) .au-tabs { margin-bottom: 8px; }}
+@media (max-height: 520px){html:not(.rot) .au-tabs button { padding: 5px 10px; font-size: 13.5px; }}
+@media (max-height: 520px){html:not(.rot) .au-grid { gap: 6px 10px; }}
+@media (max-height: 520px){html:not(.rot) .au-grid.one { grid-template-columns: 1fr 1fr; }}
+@media (max-height: 520px){html:not(.rot) .au-in input { height: 34px; }}
+@media (max-height: 520px){html:not(.rot) .au-eye { height: 32px; }}
+@media (max-height: 520px){html:not(.rot) .au-row { margin-top: 7px; }}
+@media (max-height: 520px){html:not(.rot) .au-err { min-height: 16px; margin: 2px 0px 4px; font-size: 12px; }}
+@media (max-height: 520px){html:not(.rot) .au-go { height: 38px; font-size: 15.5px; }}
+@media (max-height: 520px){html:not(.rot) .au-hint { margin-top: 6px; font-size: 11px; }}
+@media (max-height: 520px){html:not(.rot) .au-head { margin-bottom: 8px; }}
+@media (max-width: 520px){html.rot .title-card.authing { padding: 8px 16px 10px; }}
+@media (max-width: 520px){html.rot .title-card.authing h2 { font-size: 22px; }}
+@media (max-width: 520px){html.rot .title-card.authing .t-sub { margin: 2px 0px 8px; font-size: 11.5px; }}
+@media (max-width: 520px){html.rot .au-box { width: min(600px, -64px + 100vh); padding: 12px 14px 9px; }}
+@media (max-width: 520px){html.rot .au-tabs { margin-bottom: 8px; }}
+@media (max-width: 520px){html.rot .au-tabs button { padding: 5px 10px; font-size: 13.5px; }}
+@media (max-width: 520px){html.rot .au-grid { gap: 6px 10px; }}
+@media (max-width: 520px){html.rot .au-grid.one { grid-template-columns: 1fr 1fr; }}
+@media (max-width: 520px){html.rot .au-in input { height: 34px; }}
+@media (max-width: 520px){html.rot .au-eye { height: 32px; }}
+@media (max-width: 520px){html.rot .au-row { margin-top: 7px; }}
+@media (max-width: 520px){html.rot .au-err { min-height: 16px; margin: 2px 0px 4px; font-size: 12px; }}
+@media (max-width: 520px){html.rot .au-go { height: 38px; font-size: 15.5px; }}
+@media (max-width: 520px){html.rot .au-hint { margin-top: 6px; font-size: 11px; }}
+@media (max-width: 560px){html:not(.rot) .title-card.authing { padding: 18px 14px 14px; }}
+@media (max-width: 560px){html:not(.rot) .au-box { width: calc(-60px + 100vw); padding: 14px 12px 10px; }}
+@media (max-width: 560px){html:not(.rot) .au-grid { grid-template-columns: 1fr; }}
+@media (prefers-reduced-motion: reduce){.au-box::before, .au-fx i, .au-fx b, .au-pill::after, .au-go::after, .au-gem, .au-in:focus-within, .au-pane, .au-f.shake, .au-err.show { animation: auto ease 0s 1 normal none running none !important; }}
+@media (prefers-reduced-motion: reduce){.au-fx b { display: none; }}
+@media (prefers-reduced-motion: reduce){.au-fx i { opacity: 0.55; transform: scale(0.7); }}
+.au-meter { display: flex; align-items: center; gap: 4px; margin: 7px 2px 0px; }
+.au-meter i { flex: 1 1 0%; max-width: 46px; height: 4px; border-radius: 3px; background: rgba(227, 176, 75, 0.18); transition: background 0.25s; }
+.au-meter span { margin-left: 6px; font: 600 11.5px var(--thai); color: var(--muted); }
+.au-meter[data-k="1"] i:nth-child(-n+1) { background: rgb(255, 122, 102); }
+.au-meter[data-k="2"] i:nth-child(-n+2) { background: rgb(242, 180, 80); }
+.au-meter[data-k="3"] i:nth-child(-n+3) { background: rgb(191, 224, 106); }
+.au-meter[data-k="4"] i { background: rgb(111, 224, 160); }
+.au-meter[data-k="1"] span { color: rgb(255, 159, 144); }
+.au-meter[data-k="4"] span { color: rgb(159, 240, 192); }
+.secp .au-in input { color: rgb(255, 244, 220); }
+.secp .au-err.ok { color: rgb(159, 240, 192); }
+.au-box[data-m="reset"] .au-tabs, .au-box[data-m="bind"] .au-tabs, .au-box[data-m="reset"] .au-row, .au-box[data-m="bind"] .au-row { display: none; }
+.au-box[data-m="bind"] .au-reg, .au-box[data-m="reset"] .au-reset { display: block; animation: auIn .4s var(--ease); }
+.au-t-reset, .au-t-bind, .au-h-reset, .au-h-bind { display: none; }
+.au-box[data-m="reset"] .au-t-reset, .au-box[data-m="bind"] .au-t-bind { display: inline; }
+.au-box[data-m="reset"] .au-h-reset, .au-box[data-m="bind"] .au-h-bind, .au-back { display: block; }
+.au-mh { margin: 2px 0px 10px; font: 700 16px var(--thai); color: rgb(58, 36, 8); text-align: center; }
+.au-back .au-link { color: rgb(138, 90, 18); text-decoration-color: rgba(138, 90, 18, 0.5); }
+.au-guest { display: block; width: 100%; margin-top: 9px; height: 38px; border: 1.5px solid rgb(217, 164, 65); border-radius: 12px; cursor: pointer; background: rgb(255, 248, 230); font: 700 14px var(--thai); color: rgb(90, 54, 8); }
+.au-guest:hover { background: rgb(255, 239, 200); }
+.au-guest:focus-visible { outline: rgb(176, 122, 32) solid 2px; outline-offset: 3px; }
+.au-box:not([data-m="login"]):not([data-m="reg"]) .au-guest { display: none; }
+.btn, .tbtn, .ibtn, .seg button { font-weight: 700; background: linear-gradient(rgb(255, 255, 255), rgb(217, 239, 255)) !important; color: var(--ink) !important; border: 2px solid rgb(255, 255, 255) !important; border-radius: 12px !important; box-shadow: rgb(140, 187, 230) 0px 3px 0px, rgba(20, 60, 120, 0.25) 0px 4px 8px !important; text-shadow: none !important; }
+.btn:hover, .tbtn:hover, .ibtn:hover { filter: brightness(1.05); transform: translateY(-1px); }
+.btn:active, .tbtn:active, .ibtn:active { transform: translateY(2px); box-shadow: rgb(140, 187, 230) 0px 1px 0px !important; }
+.btn.gold, .tbtn.gold, .seg button.on, .btn.on { background: linear-gradient(180deg,#fff3a0,var(--sun) 50%,var(--sun2)) !important; color: rgb(106, 58, 0) !important; border-color: rgb(255, 255, 255) !important; box-shadow: rgb(208, 138, 16) 0px 3px 0px, rgba(240, 160, 20, 0.35) 0px 4px 10px !important; }
+.title { background: radial-gradient(at 50% 30%, rgba(255, 255, 255, 0.55), rgba(120, 200, 248, 0.85)) !important; }
+.title-card { border: 3px solid rgb(255, 255, 255) !important; border-radius: 22px !important; background: linear-gradient(180deg,var(--sky1),var(--sky2) 60%,var(--sky3)) !important; box-shadow: 0 6px 0 var(--skyD),0 16px 34px rgba(20,60,120,.4) !important; }
+.title-card h2 { -webkit-text-fill-color: rgb(255, 255, 255); background: none !important; color: rgb(255, 255, 255) !important; text-shadow: 0 3px 0 var(--sky3),0 0 18px rgba(255,255,255,.8) !important; }
+.title-card .t-eyebrow, .title-card .t-sub { text-shadow: 0 1px 0 var(--sky3); color: rgb(255, 255, 255) !important; }
+.au-box { background: linear-gradient(rgb(234, 247, 255), rgb(207, 234, 255)) !important; border: 3px solid rgb(255, 255, 255) !important; border-radius: 18px !important; box-shadow: rgb(140, 187, 230) 0px 4px 0px, rgba(20, 60, 120, 0.3) 0px 10px 22px !important; color: var(--ink) !important; }
+.au-box::before, .au-box::after, .au-cn, .au-fx { display: none !important; }
+.au-tabs { background: rgb(255, 255, 255) !important; border-radius: 999px !important; box-shadow: rgb(191, 224, 250) 0px 0px 0px 2px inset !important; }
+.au-tabs button { color: var(--ink) !important; }
+.au-pill { background: linear-gradient(180deg,#fff3a0,var(--sun) 50%,var(--sun2)) !important; box-shadow: rgb(208, 138, 16) 0px 2px 0px !important; }
+.au-l, .au-head b, .au-head small, .au-box label, .au-box p, .au-box small, .au-box span { color: var(--ink) !important; text-shadow: none !important; }
+.au-in { background: rgb(255, 255, 255) !important; border: 2px solid rgb(191, 224, 250) !important; border-radius: 12px !important; box-shadow: none !important; }
+.au-in input { background: transparent !important; color: var(--ink) !important; border: 0px !important; }
+.au-in svg { stroke: rgb(90, 140, 196) !important; color: rgb(90, 140, 196) !important; }
+.au-lang { background: var(--sky2) !important; color: rgb(255, 255, 255) !important; border: 2px solid rgb(255, 255, 255) !important; }
+.title-card h2 { text-shadow: rgb(13, 33, 65) 0px 3px 0px, rgba(120, 190, 255, 0.7) 0px 0px 14px !important; }
+.btn, .tbtn, .ibtn, .seg button, .chatbtn, .railtog, .mb { font-weight: 600; background: linear-gradient(rgb(42, 53, 99), rgb(23, 30, 61)) !important; color: var(--rn-cream) !important; border: 1px solid rgba(232, 194, 106, 0.55) !important; border-radius: 9px !important; box-shadow: rgba(255, 240, 194, 0.18) 0px 1px 0px inset, rgb(5, 7, 15) 0px 2px 0px, rgba(0, 0, 0, 0.4) 0px 3px 8px !important; text-shadow: rgb(0, 0, 0) 0px 1px 0px !important; }
+.btn:hover, .tbtn:hover, .ibtn:hover, .mb:hover, .chatbtn:hover { filter: brightness(1.18); border-color: var(--rn-gold) !important; }
+.btn:active, .tbtn:active, .ibtn:active { transform: translateY(1px); box-shadow: rgb(0, 0, 0) 0px 0px 0px !important; }
+.btn.gold, .tbtn.gold, .seg button.on, .btn.on, .au-pill { background: linear-gradient(rgb(255, 240, 194), rgb(232, 194, 106) 45%, rgb(184, 134, 47)) !important; color: rgb(42, 26, 0) !important; border: 1px solid rgb(255, 240, 194) !important; box-shadow: rgba(91, 63, 18, 0.45) 0px -2px 0px inset, rgb(91, 63, 18) 0px 2px 0px, rgba(232, 194, 106, 0.3) 0px 4px 14px !important; text-shadow: rgba(255, 255, 255, 0.4) 0px 1px 0px !important; }
+.btn.gold *, .tbtn.gold *, .seg button.on * { color: rgb(42, 26, 0) !important; }
+.title { background: radial-gradient(at 50% 40%, rgba(30, 26, 60, 0.55), rgba(5, 7, 15, 0.88)) !important; }
+.title-card { border: 1px solid var(--rn-gold) !important; border-radius: 14px !important; background: linear-gradient(rgb(29, 38, 72), rgb(13, 18, 38)) !important; box-shadow: var(--rn-trim),var(--rn-drop) !important; }
+.title-card h2 { filter: drop-shadow(rgb(0, 0, 0) 0px 2px 0px) drop-shadow(rgba(232, 194, 106, 0.4) 0px 0px 14px); font-family: Cinzel, serif !important; background: linear-gradient(rgb(255, 246, 216), rgb(232, 194, 106) 55%, rgb(156, 115, 48)) text !important; -webkit-text-fill-color: transparent !important; color: transparent !important; text-shadow: none !important; }
+.title-card .t-eyebrow, .title-card .t-sub { color: var(--rn-gold-hi) !important; text-shadow: rgb(0, 0, 0) 0px 1px 0px !important; }
+.au-box { background: linear-gradient(rgba(20, 27, 54, 0.96), rgba(9, 12, 27, 0.98)) !important; border: 1px solid rgba(232, 194, 106, 0.6) !important; border-radius: 12px !important; box-shadow: rgba(255, 240, 194, 0.12) 0px 1px 0px inset !important; color: var(--rn-cream) !important; }
+.au-tabs { background: rgb(7, 10, 22) !important; box-shadow: rgba(232, 194, 106, 0.45) 0px 0px 0px 1px inset !important; }
+.au-tabs button { color: var(--rn-mute) !important; }
+.au-l, .au-head b, .au-head small, .au-box label, .au-box p, .au-box small, .au-box span { color: var(--rn-cream) !important; text-shadow: none !important; }
+.au-box small, .au-box p { color: var(--rn-mute) !important; }
+.au-pill, .au-pill * { color: rgb(42, 26, 0) !important; }
+.au-in { background: rgb(7, 10, 22) !important; border: 1px solid rgba(232, 194, 106, 0.4) !important; border-radius: 9px !important; }
+.au-in:focus-within { border-color: var(--rn-gold) !important; box-shadow: rgba(232, 194, 106, 0.18) 0px 0px 0px 3px !important; }
+.au-in input { color: var(--rn-cream) !important; }
+.au-in input::placeholder { color: rgb(125, 117, 99) !important; }
+.au-in svg { stroke: var(--rn-gold) !important; color: var(--rn-gold) !important; }
+.au-lang { background: rgb(7, 10, 22) !important; color: var(--rn-gold) !important; border: 1px solid rgba(232, 194, 106, 0.6) !important; }
+.au-tabs button[aria-selected="true"] { color: rgb(42, 26, 0) !important; }
+.au-go { background: linear-gradient(rgb(255, 240, 194), rgb(232, 194, 106) 45%, rgb(184, 134, 47)) !important; border: 1px solid rgb(255, 240, 194) !important; }
+.au-go, .au-go span { color: rgb(42, 26, 0) !important; text-shadow: rgba(255, 255, 255, 0.4) 0px 1px 0px !important; }
+html body .btn, html body .tbtn, html body .ibtn, html body .seg button, html body .chatbtn, html body .railtog, html body .mb { font-weight: 700; background: linear-gradient(rgb(255, 255, 255), rgb(243, 230, 200)) !important; color: var(--sl-ink) !important; border: 1.5px solid var(--sl-line) !important; border-radius: 11px !important; box-shadow: rgb(255, 255, 255) 0px 1px 0px inset, rgb(201, 160, 87) 0px 3px 0px, rgba(80, 50, 10, 0.18) 0px 4px 8px !important; text-shadow: none !important; }
+html body .btn:hover, html body .tbtn:hover, html body .ibtn:hover, html body .mb:hover, html body .chatbtn:hover { filter: brightness(1.04) saturate(1.1); }
+html body .btn:active, html body .tbtn:active, html body .ibtn:active, html body .mb:active { transform: translateY(2px); box-shadow: rgb(255, 255, 255) 0px 1px 0px inset, rgb(201, 160, 87) 0px 1px 0px !important; }
+html body .btn.gold, html body .tbtn.gold, html body .seg button.on, html body .btn.on, html body .au-pill, html body .au-go { background: linear-gradient(180deg,#fff2a8 0%,var(--sl-gold) 40%,var(--sl-gold-2) 100%) !important; color: rgb(74, 38, 0) !important; border: 1.5px solid rgb(255, 243, 192) !important; box-shadow: inset 0 1px 0 rgba(255,255,255,.8),0 3px 0 var(--sl-gold-dk),0 5px 12px rgba(245,166,35,.35) !important; text-shadow: rgba(255, 255, 255, 0.5) 0px 1px 0px !important; }
+html body .btn.gold *, html body .tbtn.gold *, html body .seg button.on *, html body .au-go span { color: rgb(74, 38, 0) !important; }
+html body .title { background: radial-gradient(at 50% 40%, rgba(255, 250, 235, 0.35), rgba(120, 190, 240, 0.55)) !important; }
+html body .title-card, html body .au-box { background: linear-gradient(180deg,var(--sl-paper),var(--sl-paper-2)) !important; border: 2px solid var(--sl-line) !important; box-shadow: var(--sl-drop) !important; color: var(--sl-ink) !important; }
+html body .title-card h2 { filter: drop-shadow(rgb(138, 74, 0) 0px 2px 0px) !important; }
+html body .title-card .t-eyebrow, html body .title-card .t-sub { color: var(--sl-sky-dk) !important; text-shadow: none !important; }
+html body .au-tabs { background: var(--sl-paper-3) !important; box-shadow: inset 0 0 0 1.5px var(--sl-line) !important; }
+html body .au-tabs button { color: var(--sl-mute) !important; }
+html body .au-l, html body .au-head b, html body .au-box label, html body .au-box span { color: var(--sl-ink) !important; }
+html body .au-box small, html body .au-box p, html body .au-head small { color: var(--sl-mute) !important; }
+html body .au-in { background: rgb(255, 255, 255) !important; border: 1.5px solid var(--sl-line) !important; }
+html body .au-in input { color: var(--sl-ink) !important; }
+html body .au-in input::placeholder { color: rgb(179, 154, 120) !important; }
+html body .au-in svg { stroke: var(--sl-sky-2) !important; color: var(--sl-sky-2) !important; }
+html body .au-lang { background: rgb(255, 255, 255) !important; color: var(--sl-sky-2) !important; border: 1.5px solid var(--sl-line) !important; }
+html body .au-tabs button[aria-selected="true"] { color: rgb(74, 38, 0) !important; }
+.supdc, .supdcbig { display: block; text-align: center; text-decoration: none; box-sizing: border-box; background: rgb(88, 101, 242); color: rgb(255, 255, 255); border: 2px solid rgb(60, 69, 184); }
+.supdcbig { width: 100%; margin-top: 8px; padding: 11px 16px; border-radius: 14px; font: 700 16px var(--display); box-shadow: rgba(0, 0, 0, 0.4) 0px 4px 14px; }
+.supdc:hover, .supdcbig:hover { filter: brightness(1.1); }
+.supbig { display: block; width: 100%; margin-top: 12px; padding: 14px 16px; border-radius: 14px; border: 2px solid rgb(242, 196, 90); cursor: pointer; background: linear-gradient(rgb(138, 74, 26), rgb(90, 42, 14)); color: rgb(255, 243, 214); font: 700 18px var(--display); box-shadow: rgba(0, 0, 0, 0.45) 0px 4px 16px, rgba(255, 230, 170, 0.35) 0px 1px 0px inset; }
+.supbig:hover { filter: brightness(1.12); }
+.title h2 { animation: auto ease 0s 1 normal none running none !important; }
+.au-box::before { animation: auto ease 0s 1 normal none running none !important; }
+.au-pill::after { animation: auto ease 0s 1 normal none running none !important; }
+.au-gem { animation: auto ease 0s 1 normal none running none !important; }
+.au-in:focus-within { animation: auto ease 0s 1 normal none running none !important; }
+.au-go::after { animation: auto ease 0s 1 normal none running none !important; }
+.au-go.busy span::after { animation: auto ease 0s 1 normal none running none !important; }
+</style></head>
+<body>
+<div class="title" id="title">
+        <div class="title-card authing">
+          <p class="t-eyebrow"><span data-en="Realm of Vayra" data-th="อาณาจักรวายรา">อาณาจักรวายรา</span></p>
+          <h2>VAYRATHEN</h2>
+          <p class="t-sub"><span data-en="Legend of the Sealed God" data-th="ตำนานแห่งเทพผู้ถูกผนึก">ตำนานแห่งเทพผู้ถูกผนึก</span></p>
+          <div id="titleBody"><div class="au-box" id="auBox" data-m="reg"><div class="au-fx" aria-hidden="true"><i style="--x:65.0%;--y:90.4%;--s:13px;--d:-0.62s;--t:3.24s"></i><i style="--x:75.9%;--y:19.5%;--s:14px;--d:-4.81s;--t:3.55s"></i><i style="--x:61.9%;--y:84.3%;--s:23px;--d:-3.11s;--t:3.43s"></i><i style="--x:45.3%;--y:44.5%;--s:18px;--d:-1.54s;--t:4.87s"></i><i style="--x:11.8%;--y:78.1%;--s:10px;--d:-1.89s;--t:3.83s"></i><i style="--x:54.1%;--y:59.5%;--s:19px;--d:-4.41s;--t:3.64s"></i><i style="--x:83.8%;--y:3.8%;--s:10px;--d:-2.44s;--t:5.03s"></i><i style="--x:8.4%;--y:78.1%;--s:19px;--d:-5.13s;--t:3.65s"></i><i style="--x:76.6%;--y:78.8%;--s:18px;--d:-4.03s;--t:3.45s"></i><i style="--x:88.6%;--y:76.8%;--s:21px;--d:-3.83s;--t:3.93s"></i><i style="--x:74.3%;--y:27.8%;--s:12px;--d:-3.01s;--t:3.22s"></i><i style="--x:37.8%;--y:50.8%;--s:22px;--d:-2.46s;--t:3.10s"></i><i style="--x:68.3%;--y:71.8%;--s:23px;--d:-0.21s;--t:4.61s"></i><i style="--x:17.8%;--y:35.7%;--s:21px;--d:-2.05s;--t:2.78s"></i><i style="--x:46.0%;--y:83.6%;--s:18px;--d:-0.22s;--t:2.82s"></i><i style="--x:31.0%;--y:97.1%;--s:16px;--d:-4.07s;--t:4.51s"></i><i style="--x:47.1%;--y:10.0%;--s:18px;--d:-2.74s;--t:5.38s"></i><i style="--x:9.5%;--y:85.6%;--s:21px;--d:-3.79s;--t:2.84s"></i><i style="--x:85.2%;--y:61.1%;--s:17px;--d:-3.92s;--t:3.86s"></i><i style="--x:70.7%;--y:59.1%;--s:17px;--d:-5.58s;--t:2.83s"></i><i style="--x:36.7%;--y:65.1%;--s:17px;--d:-1.69s;--t:3.40s"></i><i style="--x:39.1%;--y:72.0%;--s:13px;--d:-0.25s;--t:2.89s"></i><i style="--x:96.7%;--y:91.3%;--s:22px;--d:-5.08s;--t:3.78s"></i><i style="--x:35.8%;--y:30.6%;--s:24px;--d:-0.40s;--t:4.74s"></i><b style="--x:1.2%;--d:-3.83s;--t:9.81s;--w:13px"></b><b style="--x:72.6%;--d:-3.37s;--t:6.89s;--w:0px"></b><b style="--x:28.7%;--d:-0.89s;--t:6.92s;--w:12px"></b><b style="--x:16.6%;--d:-0.72s;--t:9.59s;--w:9px"></b><b style="--x:68.3%;--d:-7.91s;--t:8.38s;--w:-3px"></b><b style="--x:89.9%;--d:-3.83s;--t:9.88s;--w:-5px"></b><b style="--x:17.3%;--d:-8.35s;--t:9.14s;--w:-10px"></b><b style="--x:38.1%;--d:-8.75s;--t:10.97s;--w:6px"></b><b style="--x:80.7%;--d:-5.28s;--t:7.29s;--w:7px"></b><b style="--x:69.8%;--d:-3.38s;--t:6.48s;--w:8px"></b><b style="--x:48.6%;--d:-2.55s;--t:6.68s;--w:-13px"></b><b style="--x:67.7%;--d:-1.92s;--t:9.15s;--w:8px"></b><b style="--x:40.8%;--d:-2.49s;--t:11.59s;--w:-10px"></b><b style="--x:66.5%;--d:-5.98s;--t:11.50s;--w:-9px"></b><b style="--x:17.8%;--d:-0.41s;--t:7.45s;--w:-12px"></b><b style="--x:97.0%;--d:-2.34s;--t:10.48s;--w:-11px"></b><b style="--x:58.5%;--d:-5.70s;--t:11.42s;--w:6px"></b><b style="--x:97.4%;--d:-7.42s;--t:6.19s;--w:-4px"></b></div><i class="au-cn tl"></i><i class="au-cn tr"></i><i class="au-cn bl"></i><i class="au-cn br"></i>
+    <button type="button" class="au-lang" data-aulang="1" aria-label="Switch to English">EN</button>
+    <div class="au-tabs" role="tablist"><span class="au-pill"></span>
+      <button type="button" role="tab" data-autab="login" aria-selected="false">เข้าสู่ระบบ</button>
+      <button type="button" role="tab" data-autab="reg" aria-selected="true">สมัครสมาชิก</button></div>
+    
+    <div class="au-pane au-login" role="tabpanel"><div class="au-grid one"><label class="au-f" data-f="auLId"><span class="au-l">ไอดี</span>
+      <span class="au-in"><span class="au-ic"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="7" r="3.4"></circle><path d="M3.5 17c.8-3.4 3.3-5 6.5-5s5.7 1.6 6.5 5"></path></svg></span><input id="auLId" type="text" value="" placeholder="เช่น maprang_09" maxlength="16" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false"></span></label><label class="au-f" data-f="auLPw"><span class="au-l">รหัสผ่าน</span>
+      <span class="au-in"><span class="au-ic"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="9" width="12" height="8.5" rx="2"></rect><path d="M7 9V6.6a3 3 0 0 1 6 0V9"></path><circle cx="10" cy="13.2" r="1.1"></circle></svg></span><input id="auLPw" type="password" value="" placeholder="รหัสผ่านของคุณ" maxlength="64" autocomplete="current-password"><button type="button" class="au-eye" data-aueye="auLPw" aria-pressed="false" aria-label="แสดงรหัสผ่าน" title="แสดง/ซ่อนรหัสผ่าน"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M1.8 10S5 4.6 10 4.6 18.2 10 18.2 10 15 15.4 10 15.4 1.8 10 1.8 10z"></path><circle cx="10" cy="10" r="2.6"></circle><path class="au-slash" d="M3.5 16.5 16.5 3.5"></path></svg></button></span></label></div></div>
+    <div class="au-pane au-reg" role="tabpanel"><div class="au-grid"><label class="au-f" data-f="auId"><span class="au-l">ไอดี</span>
+      <span class="au-in"><span class="au-ic"><svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="7" r="3.4"></circle><path d="M3.5 17c.8-3.4 3.3-5 6.5-5s5.7 1.6 6.5 5"></path></svg></span><input id="auId" type="text" value="" placeholder="เช่น maprang_09" maxlength="16" autocomplete="username" autocapitalize="off" autocorrect="off" spellcheck="false"></span></label><label class="au-f" data-f="auPw"><span class="au-l">รหัสผ่าน</span>
+      <span class="au-in"><span class="au-ic"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="9" width="12" height="8.5" rx="2"></rect><path d="M7 9V6.6a3 3 0 0 1 6 0V9"></path><circle cx="10" cy="13.2" r="1.1"></circle></svg></span><input id="auPw" type="password" value="" placeholder="อย่างน้อย 6 ตัว" maxlength="64" autocomplete="new-password"><button type="button" class="au-eye" data-aueye="auPw" aria-pressed="false" aria-label="แสดงรหัสผ่าน" title="แสดง/ซ่อนรหัสผ่าน"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M1.8 10S5 4.6 10 4.6 18.2 10 18.2 10 15 15.4 10 15.4 1.8 10 1.8 10z"></path><circle cx="10" cy="10" r="2.6"></circle><path class="au-slash" d="M3.5 16.5 16.5 3.5"></path></svg></button></span></label><label class="au-f" data-f="auPw2"><span class="au-l">ยืนยันรหัสผ่าน</span>
+      <span class="au-in"><span class="au-ic"><svg viewBox="0 0 20 20" aria-hidden="true"><rect x="4" y="9" width="12" height="8.5" rx="2"></rect><path d="M7 9V6.6a3 3 0 0 1 6 0V9"></path><circle cx="10" cy="13.2" r="1.1"></circle></svg></span><input id="auPw2" type="password" value="" placeholder="อย่างน้อย 6 ตัว" maxlength="64" autocomplete="new-password"><button type="button" class="au-eye" data-aueye="auPw2" aria-pressed="false" aria-label="แสดงรหัสผ่าน" title="แสดง/ซ่อนรหัสผ่าน"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M1.8 10S5 4.6 10 4.6 18.2 10 18.2 10 15 15.4 10 15.4 1.8 10 1.8 10z"></path><circle cx="10" cy="10" r="2.6"></circle><path class="au-slash" d="M3.5 16.5 16.5 3.5"></path></svg></button></span></label></div>
+      <div class="au-meter" id="auMeter" data-k="0"><i></i><i></i><i></i><i></i><span>ความแข็งแรงของรหัสผ่าน</span></div></div>
+    
+    <div class="au-row"><label class="au-keep"><input type="checkbox" id="auKeep" checked=""><span>จดจำฉันในเครื่องนี้</span></label>
+      <button type="button" class="au-link au-forgot" data-auforgot="1">ลืมรหัสผ่าน?</button></div>
+    <p class="au-err" id="auErr" role="alert" aria-live="assertive"></p>
+    <button type="button" class="au-go" data-auth="go"><span class="au-t-login">เข้าสู่ระบบ</span><span class="au-t-reg">สมัครสมาชิก</span><span class="au-t-reset">ตั้งรหัสใหม่และเข้าเกม</span><span class="au-t-bind">ผูกไอดี</span></button>
+    <p class="au-hint au-h-login">ลืมรหัสผ่าน? กด "ลืมรหัสผ่าน" แล้วตั้งรหัสใหม่ได้ ตัวละครไม่หาย (ยืนยันตัวตนด้วยบัญชี Claude)</p><p class="au-hint au-h-reg">รหัสผ่านอย่างน้อย 6 ตัว ห้ามซ้ำกับไอดี · รหัสผ่านถูกเข้ารหัสก่อนเก็บ · สมัครรับ 10 เหรียญวายรา</p><p class="au-hint au-h-reset">ยืนยันตัวตนด้วยบัญชี Claude ที่ล็อกอินอยู่แล้ว · ตัวละคร เหรียญ และชุดแฟชั่นอยู่ครบ · รหัสเดิมใช้ไม่ได้อีก</p><p class="au-hint au-h-bind">ผูกไอดีจริงให้บัญชีแขก @ · ของทั้งหมดอยู่ครบ · ใช้ไอดีเดิมก็ได้</p>
+    <button type="button" class="au-guest" data-auguest="1">▶ เล่นแบบแขก · ไม่ต้องสมัคร</button>
+    </div></div>
+          <div class="t-btns">
+            <button class="tbtn" id="btnTitleSettings"><span data-en="Settings" data-th="ตั้งค่า">ตั้งค่า</span></button>
+          </div>
+          <p class="t-save" id="saveInfo"></p>
+        <button class="supbig" data-supopen="1">☕ สนับสนุนกาแฟ</button><a class="supdcbig wout" href="https://discord.gg/6smpHGME4" target="_blank" rel="noopener">ติดต่อเรา · Discord</a></div>
+      </div>
+<script>
+/* ไฟล์ตัวอย่างเท่านั้น: สลับแท็บ และปุ่มดูรหัสผ่าน */
+document.addEventListener('click', e => { const t = e.target.closest('[data-autab][role="tab"]'); if (t){ const box = document.getElementById('auBox'); box.dataset.m = t.dataset.autab;
+  box.querySelectorAll('[data-autab][role="tab"]').forEach(b => b.setAttribute('aria-selected', String(b === t))); }
+  const eye = e.target.closest('[data-aueye]'); if (eye){ const i = eye.parentElement.querySelector('input'); if (i) i.type = i.type === 'password' ? 'text' : 'password'; } });
+</script>
+</body></html>
