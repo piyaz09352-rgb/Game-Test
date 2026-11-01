@@ -17,7 +17,7 @@ const NPCS = [
   {id:'job',name:'ครูวายรา',en:'Master Vayra',role:'เปลี่ยน Job',roleEn:'Job Master',x:300,y:712,robe:'#f0e6cf',hair:'#d9d4c8'},
   {id:'shop',name:'ป้าบัวคำ',en:'Auntie Buakham',role:'Shop · ตีบวก',roleEn:'Shop · Refine',x:420,y:905,robe:'#b0503f',hair:'#2b211a'},
   // ตลาดกลาง (central market) south of the village
-  {id:'trader',name:'เถ้าแก่ฮง',en:'Taokae Hong',role:'ตลาดกลาง · รับซื้อของ',roleEn:'Central Market · Buyer',x:200,y:1238},
+  {id:'trader',name:'เถ้าแก่ฮง',en:'Taokae Hong',role:'ตลาดกลาง · รับซื้อของและอุปกรณ์',roleEn:'Central Market · Loot & gear buyer',x:200,y:1238},
   {id:'boatman',name:'ตาพุ่ม',en:'Grandpa Phum',role:'คนพายเรือ · วาร์ป',roleEn:'Boatman · Warp',x:520,y:1150}
 ];
 for (const n of NPCS) n.x += VX;
