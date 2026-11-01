@@ -51,12 +51,14 @@ function tlPoints(id){
 function tlSetup(id){
   TL.map = id; TL.folk = []; TL.say = []; const pi = tlPlace(id); if (pi < 0) return;
   const pl = TL_PLACES[pi], r = tlRng(id * 977 + 3); TL.pts = tlPoints(id); if (TL.pts.length < 4) return;
-  const n = id === 0 ? 9 : 11;
+  // (v222) a lighter crowd: fewer people sharing fewer looks (every look is a sprite sheet to paint and keep), none at the Low preset
+  if (typeof GFX !== 'undefined' && GFX.preset === 'low') return;
+  const n = id === 0 ? 6 : 7;
   // four looks per place, shared (each look is one sprite sheet to build: a crowd of unique faces would stall the frame)
-  const looks = [0, 1, 2, 3].map(j => ({job:'tl_folk', look:{sex:j % 2 ? 'm' : 'f', hair:[5, 3, 17, 6][j], color:pl.hair[j]}, gear:{armor:pl.tops[j], head:pl.heads[j]}}));
+  const looks = [0, 1, 2].map(j => ({job:'tl_folk', look:{sex:j % 2 ? 'm' : 'f', hair:[5, 3, 17, 6][j], color:pl.hair[j]}, gear:{armor:pl.tops[j], head:pl.heads[j]}}));
   for (let i = 0; i < n; i++){ const p = TL.pts[(r() * TL.pts.length) | 0];
     TL.folk.push({x:p.x, y:p.y, tx:null, ty:null, wait:r() * 4, spd:30 + r() * 16, dir:(r() * 8) | 0, animT:r() * 5, moving:false, sayCd:4 + r() * 10, home:r() < .65, lamp:r() < .5, i,
-      tw:looks[i % 4]}); }
+      tw:looks[i % 3]}); }
 }
 function tlSay(w, line){ TL.say = TL.say.filter(s => s.w !== w); TL.say.push({w, s:L(line[0], line[1]), t:3.2}); }
 function tlUpd(dt){

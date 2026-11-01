@@ -172,7 +172,7 @@ function hud(){
   setW('bxI', bm ? 1 : S.exp / nb); setW('jxI', jm ? 1 : S.jexp / nj);
   setT('bxT', bm ? 'Base MAX' : `Base ${(Math.min(S.exp / nb, .999) * 100).toFixed(1)}%`); setT('jxT', jm ? 'Job MAX' : `Job ${(S.jexp / nj * 100).toFixed(1)}%`);
   { const a = el('ammoT'), on = usesArrows(); if (a.hidden === on) a.hidden = !on; if (on){ const n = arrowCount(); setT('ammoT', `${ammoWant() === 'star' ? '✦' : '➶'} ${n}`); a.classList.toggle('low', n < 50); } }
-  setT('cJob', S.name || nm(JOBS[S.job])); setT('cLv', S.name ? `${nm(JOBS[S.job])} · Job ${S.jlvl}` : `Job ${S.jlvl}`);   // (v221) your name, and the class as a small tag setT('lvBadge', String(S.lvl));
+  setT('cJob', nm(JOBS[S.job])); setT('cLv', `Base ${S.lvl} · Job ${S.jlvl}`); setT('lvBadge', String(S.lvl));
   document.querySelectorAll('.cdv').forEach(c => {
     const id = c.dataset.cd, sk = SKILLS[id], full = sk ? skCd(sk, skl(id) || 1) : MOVES[id].cd;
     let v = clamp((P.cds[id] || 0) / (full || 1), 0, 1); if (sk && P.acd > 0 && P.acdMax && !c.closest('.mo')) v = Math.max(v, clamp(P.acd / P.acdMax, 0, 1)); const prev = +(c.dataset.p || 0);   // (v112) touch buttons: the short pause after every cast no longer darkens every skill button (it made them blink under Auto); a tap in that pause still waits as before

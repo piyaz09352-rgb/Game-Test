@@ -2058,7 +2058,7 @@ async function buildAll(onProgress, prewarm = []){
   for (const k of Object.keys(CHARS)) out[k] = sheet('char', k);
   for (const k of Object.keys(MOBS)) out[k] = sheet('mob', k);
   for (let i = 0; i < prewarm.length; i++){
-    const [key, act, dirs] = prewarm[i]; if (out[key]) for (const d of dirs || [0, 1, 2, 3, 4, 5, 6, 7]) ensureFrames(out[key], act, d);
+    const [key, act, dirs] = prewarm[i]; if (out[key]) for (const d of dirs || [0, 1, 2, 3, 4, 5, 6, 7]){ ensureFrames(out[key], act, d); await new Promise(r => setTimeout(r, 0)); }   // (v221) a breath after every direction, not every sheet
     if (onProgress) onProgress((i + 1) / prewarm.length, key);
     await new Promise(r => setTimeout(r, 0));
   }
