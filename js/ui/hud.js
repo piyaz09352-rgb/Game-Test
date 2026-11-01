@@ -117,8 +117,18 @@ function drawMini(){
     g.save(); g.translate(alive ? boss.x * kx : lx, alive ? boss.y * ky : ly); g.scale(u * pz, u * pz);
     g.fillStyle = alive ? '#ff5a4a' : 'rgba(40,20,20,.75)'; g.beginPath(); g.arc(0, 0, 6, 0, 7); g.fill();
     g.fillStyle = alive ? '#fff0a0' : '#e3b04b'; g.beginPath(); g.moveTo(-4, 2); g.lineTo(-4, -2); g.lineTo(-2, 0); g.lineTo(0, -3.5); g.lineTo(2, 0); g.lineTo(4, -2); g.lineTo(4, 2); g.closePath(); g.fill(); g.restore(); }
-  for (const gt of GATES){ g.save(); g.translate(gt.x * kx, gt.y * ky); g.scale(u, u); g.fillStyle = '#e3b04b'; g.strokeStyle = 'rgba(60,20,10,.9)'; g.lineWidth = 1;
-    g.beginPath(); const d = gt.side === 'w' ? -1 : 1; g.moveTo(d * 6, 0); g.lineTo(-d * 2, -5); g.lineTo(-d * 2, 5); g.closePath(); g.fill(); g.stroke(); g.restore(); }
+  // (v221) each gateway points its own way and says the monster levels of the map behind it, coloured by your level:
+  // green = your level or below, gold = a little above you, red = too strong for now; a town shows «เมือง»
+  for (const gt of GATES){ const mp = MAPS[gt.to], ang = {e:0, s:Math.PI / 2, w:Math.PI, n:-Math.PI / 2}[gt.side] || 0, gx = gt.x * kx, gy = gt.y * ky;
+    g.save(); g.translate(gx, gy); g.rotate(ang); g.scale(u, u); g.fillStyle = '#e3b04b'; g.strokeStyle = 'rgba(60,20,10,.9)'; g.lineWidth = 1;
+    g.beginPath(); g.moveTo(6, 0); g.lineTo(-2, -5); g.lineTo(-2, 5); g.closePath(); g.fill(); g.stroke(); g.restore();
+    if (!mp) continue; const town = !!mp.town || mp.id === 0, lv0 = mp.lv[0], gap = lv0 - S.lvl;
+    const txt = town ? L('เมือง', 'Town') : `Lv ${lv0}–${mp.lv[1]}`, col = town ? ['#e8f6ff', '#2a5a8a'] : gap <= 0 ? ['#eaffe8', '#2a7a3a'] : gap <= 8 ? ['#fff4c8', '#9a6a0a'] : ['#ffe2dc', '#b02a1a'];
+    g.font = `800 ${Math.round(8.5 * u)}px Sarabun,"Noto Sans Thai",sans-serif`; g.textBaseline = 'middle'; const tw = g.measureText(txt).width + 6 * u, th = 11 * u;
+    let tx = gt.side === 'e' ? gx - 9 * u - tw : gt.side === 'w' ? gx + 9 * u : gx - tw / 2, ty = gt.side === 's' ? gy - 9 * u - th : gt.side === 'n' ? gy + 9 * u : gy - th / 2;
+    tx = clamp(tx, 1, w - tw - 1); ty = clamp(ty, 1, h - th - 1);
+    g.fillStyle = col[1]; g.beginPath(); g.roundRect ? g.roundRect(tx, ty, tw, th, 4 * u) : g.rect(tx, ty, tw, th); g.fill(); g.strokeStyle = 'rgba(255,255,255,.75)'; g.lineWidth = .8 * u; g.stroke();
+    g.fillStyle = col[0]; g.textAlign = 'left'; g.fillText(txt, tx + 3 * u, ty + th / 2 + .5 * u); }
   g.fillStyle = '#7ff0c4'; for (const n of NPCS) g.fillRect(n.x * kx - 2 * u, n.y * ky - 2 * u, 4 * u, 4 * u);
   if (MMGO && P.tx != null && Math.hypot(P.tx - MMGO.x, P.ty - MMGO.y) < 1){ const fx = MMGO.x * kx, fy = MMGO.y * ky, b = Math.sin(T * 6) * .8 * u;
     g.strokeStyle = 'rgba(255,240,180,.55)'; g.setLineDash([2 * u, 2 * u]); g.lineWidth = u; g.beginPath(); g.moveTo(P.x * kx, P.y * ky); g.lineTo(fx, fy); g.stroke(); g.setLineDash([]);
@@ -154,13 +164,15 @@ function hud(){
   const setW = (id, v) => { const s = (clamp(v, 0, 1) * 100).toFixed(1) + '%'; const n = el(id); if (n.style.width !== s) n.style.width = s; };
   const setT = (id, s) => { const n = el(id); if (n.textContent !== s) n.textContent = s; };
   setW('hpI', S.hp / DER.maxhp); setW('hpG', S.hp / DER.maxhp); setW('spI', S.sp / DER.maxsp); setW('spG', S.sp / DER.maxsp);
-  setT('hpT', `HP ${Math.max(0, Math.round(S.hp))} / ${DER.maxhp}`); setT('spT', `SP ${Math.round(S.sp)} / ${DER.maxsp}`);
+  // (v221) the bars read «HP» on the left and the numbers on the right
+  const setH = (id, h) => { const n = el(id); if (n.dataset.h !== h){ n.dataset.h = h; n.innerHTML = h; } };
+  setH('hpT', `<b>HP</b><em>${Math.max(0, Math.round(S.hp)).toLocaleString()} / ${DER.maxhp.toLocaleString()}</em>`); setH('spT', `<b>SP</b><em>${Math.round(S.sp).toLocaleString()} / ${DER.maxsp.toLocaleString()}</em>`);
   el('hpBar').classList.toggle('low', S.hp / DER.maxhp < .25 && !P.dead);
   const nb = nextBase(S.lvl), nj = nextJob(S.jlvl), jm = S.jlvl >= JOBS[S.job].jobMax, bm = S.lvl >= LV_MAX;
   setW('bxI', bm ? 1 : S.exp / nb); setW('jxI', jm ? 1 : S.jexp / nj);
   setT('bxT', bm ? 'Base MAX' : `Base ${(Math.min(S.exp / nb, .999) * 100).toFixed(1)}%`); setT('jxT', jm ? 'Job MAX' : `Job ${(S.jexp / nj * 100).toFixed(1)}%`);
   { const a = el('ammoT'), on = usesArrows(); if (a.hidden === on) a.hidden = !on; if (on){ const n = arrowCount(); setT('ammoT', `${ammoWant() === 'star' ? '✦' : '➶'} ${n}`); a.classList.toggle('low', n < 50); } }
-  setT('cJob', nm(JOBS[S.job])); setT('cLv', `Base ${S.lvl} · Job ${S.jlvl}`); setT('lvBadge', String(S.lvl));
+  setT('cJob', S.name || nm(JOBS[S.job])); setT('cLv', S.name ? `${nm(JOBS[S.job])} · Job ${S.jlvl}` : `Job ${S.jlvl}`);   // (v221) your name, and the class as a small tag setT('lvBadge', String(S.lvl));
   document.querySelectorAll('.cdv').forEach(c => {
     const id = c.dataset.cd, sk = SKILLS[id], full = sk ? skCd(sk, skl(id) || 1) : MOVES[id].cd;
     let v = clamp((P.cds[id] || 0) / (full || 1), 0, 1); if (sk && P.acd > 0 && P.acdMax && !c.closest('.mo')) v = Math.max(v, clamp(P.acd / P.acdMax, 0, 1)); const prev = +(c.dataset.p || 0);   // (v112) touch buttons: the short pause after every cast no longer darkens every skill button (it made them blink under Auto); a tap in that pause still waits as before

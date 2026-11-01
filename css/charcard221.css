@@ -1,0 +1,23 @@
+/* VAYRATHEN — css/charcard221.css — (v221) a clearer character card
+   The owner found the card hard to read: an outlined gilded class name, tiny numbers squeezed into thin bars and
+   faint EXP lines. Now: your name in plain bold brown with the class as a small sky tag, HP / SP bars twice as tall
+   with «HP» on the left and the numbers on the right in white with a dark edge, and EXP lines with bold coloured
+   labels. Loaded last, so it wins over the older theme layers. */
+html body #ui.ui #charCard .cname{display:flex !important;align-items:center !important;gap:6px !important;flex-wrap:nowrap !important;margin:0 0 4px !important;line-height:1.15 !important;overflow:hidden !important}
+html body #ui.ui #charCard .cname #cJob,html body #ui.ui #charCard .cname #cJob span{font:800 15.5px/1.15 Sarabun,"Noto Sans Thai",sans-serif !important;color:#4a2608 !important;-webkit-text-fill-color:#4a2608 !important;
+  background:none !important;filter:none !important;text-shadow:0 1px 0 #fff !important;white-space:nowrap !important;overflow:hidden !important;text-overflow:ellipsis !important;min-width:0 !important;max-width:100% !important}
+html body #ui.ui #charCard .cname #cLv{display:inline-block !important;flex:none !important;font:700 10.5px/16px Sarabun,"Noto Sans Thai",sans-serif !important;color:#fff !important;padding:0 7px !important;border-radius:999px !important;
+  background:linear-gradient(180deg,#3fa2f0,#1d68c0) !important;border:0 !important;box-shadow:0 1px 0 rgba(20,70,140,.35) !important;white-space:nowrap !important;max-width:58% !important;overflow:hidden !important;text-overflow:ellipsis !important}
+html body #ui.ui #charCard .bar{height:16px !important;border-radius:8px !important;margin:0 0 4px !important;background:#e9dcc0 !important;box-shadow:0 0 0 1.5px #b88a3e,inset 0 2px 3px rgba(80,50,10,.28) !important}
+html body #ui.ui #charCard .bar > i{border-radius:8px !important}
+html body #ui.ui #charCard .bar span{position:absolute !important;inset:0 !important;display:flex !important;align-items:center !important;justify-content:space-between !important;padding:0 8px !important;
+  font:800 11.5px/16px Sarabun,"Noto Sans Thai",sans-serif !important;color:#fff !important;letter-spacing:.2px !important;font-variant-numeric:tabular-nums !important;
+  text-shadow:1px 0 0 #3a1404,-1px 0 0 #3a1404,0 1px 0 #3a1404,0 -1px 0 #3a1404,0 1px 2px rgba(0,0,0,.4) !important;z-index:2 !important}
+html body #ui.ui #charCard .bar.sp span{text-shadow:1px 0 0 #0a2a5a,-1px 0 0 #0a2a5a,0 1px 0 #0a2a5a,0 -1px 0 #0a2a5a,0 1px 2px rgba(0,0,0,.4) !important}
+html body #ui.ui #charCard .bar span b{font-weight:900 !important;opacity:.95}
+html body #ui.ui #charCard .bar span em{font-style:normal !important}
+html body #ui.ui #charCard .thin{height:6px !important;border-radius:3px !important;margin:2px 0 0 !important;background:#e9dcc0 !important;box-shadow:0 0 0 1px #c9a25a !important}
+html body #ui.ui #charCard .xpt{display:flex !important;justify-content:space-between !important;margin:2px 0 0 !important;font:800 11px/14px Sarabun,"Noto Sans Thai",sans-serif !important}
+html body #ui.ui #charCard .xpt #bxT{color:#b06a00 !important}
+html body #ui.ui #charCard .xpt #jxT{color:#12865e !important}
+html body #ui.ui #charCard .xpt .ammo{color:#8a3f00 !important}
