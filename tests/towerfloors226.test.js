@@ -1,6 +1,6 @@
 /* VAYRATHEN — tests/towerfloors226.test.js — (v226) tower floors of different kinds: a strong hero climbs floors
    1–12 on Auto and meets a curse (3), a survive floor that lasts its 40 s (4), a leader hunt that ends when the
-   leader falls (9) and a treasure room whose chests Auto opens (11); a drought curse refuses potions. */
+   leader falls (9) and a treasure room whose chests Auto opens (11); a drought curse halves what potions heal (v235). */
 'use strict';
 const test = require('node:test'), assert = require('node:assert');
 const { chromium, openGame, enterWorld } = require('./browser');
@@ -17,7 +17,7 @@ test('tower floor kinds: curse, survive, leader, treasure', { skip, timeout: 240
       let t = 0, cur = 0, t0 = 0;
       while (t < 900 && TW.active && TW.f <= 12){ step(); t += .05;
         if (TW.phase === 'fight' && TWF.f === TW.f && cur !== TW.f){ cur = TW.f; t0 = t; o.kinds[cur] = TWF.kind;
-          if (TWF.kind === 'curse' && TWF.curse === 'drought'){ const hp = S.hp = Math.round(DER.maxhp / 2); useItem('redpot'); o.drought = S.hp === hp; S.hp = DER.maxhp; } }
+          if (TWF.kind === 'curse' && TWF.curse === 'drought'){ const hp = S.hp = Math.round(DER.maxhp / 2); P.itemCd = 0; useItem('redpot'); const got = S.hp - hp; o.drought = got > 0 && got <= Math.ceil(ITEMS.redpot.heal * (1 + (DER.pas.potionPct || 0)) / 2) + 1; S.hp = DER.maxhp; } }
         if (TW.phase === 'rest' && cur && o.dur[cur] == null){ o.dur[cur] = Math.round(t - t0); if (o.kinds[cur] === 'treasure') o.chests = TW.gain.z; } }
       o.reached = TW.f; return o;
     });
@@ -25,7 +25,7 @@ test('tower floor kinds: curse, survive, leader, treasure', { skip, timeout: 240
     assert.strictEqual(r.kinds[3], 'curse'); assert.strictEqual(r.kinds[4], 'survive'); assert.strictEqual(r.kinds[9], 'elite'); assert.strictEqual(r.kinds[11], 'treasure');
     assert.ok(r.dur[4] >= 38, `the survive floor lasts its 40 s (${r.dur[4]} s)`);
     assert.ok(r.dur[11] < 26, `the treasure room ends when the chests are open or time is up (${r.dur[11]} s)`);
-    assert.ok(r.drought === undefined || r.drought === true, 'a drought curse refuses potions');
+    assert.ok(r.drought === undefined || r.drought === true, 'a drought curse halves what potions heal');
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no runtime errors');
 });

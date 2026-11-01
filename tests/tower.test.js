@@ -1,5 +1,5 @@
 /* VAYRATHEN — tests/tower.test.js — the endless tower: a run starts, floors clear and climb, a guardian floor,
-   a blessing, first-clear rewards, leaving ends the run with a summary, the best floor is kept, checkpoints. */
+   no blessing (v235), first-clear rewards, leaving ends the run with a summary, the best floor is kept, checkpoints. */
 'use strict';
 const test = require('node:test'), assert = require('node:assert');
 const { chromium, openGame, enterWorld } = require('./browser');
@@ -27,11 +27,11 @@ test('tower: climb floors, guardian on floor 5, leave, best floor and checkpoint
     const g = await page.evaluate(() => ({boss:mobs.some(m => m.tw && !m.dead && m.def.boss), lab:questTracker().includes('หอคอย') || questTracker().includes('Tower')}));
     assert.ok(g.boss, 'floor 5 brings a guardian'); assert.ok(g.lab, 'the quest card shows the climb');
     await killAll();
-    await page.waitForFunction(() => DG3.boonOpen, null, { timeout: 15000 });
-    await page.click('#dgBoon [data-boon]');
+    await page.waitForFunction(() => TW.f === 6 && TW.phase === 'rest', null, { timeout: 15000 });
+    await page.evaluate(() => { TW.restT = Math.min(TW.restT, .2); });   // (v235) no blessing: the stairs open, skip the wait
     await page.waitForFunction(() => TW.f === 6 && TW.phase === 'fight', null, { timeout: 20000 });
     const mid = await page.evaluate(() => ({best:S.tower.best, boons:Object.keys(P.buffs).filter(k => k.startsWith('dgb_')).length}));
-    assert.strictEqual(mid.best, 5, 'the best floor is kept'); assert.strictEqual(mid.boons, 1, 'one blessing for the run');
+    assert.strictEqual(mid.best, 5, 'the best floor is kept'); assert.strictEqual(mid.boons, 0, 'no blessing in the tower (v235)');
     await page.evaluate(() => twQuit('leave'));
     await page.waitForSelector('#twSum', { timeout: 10000 });
     const end = await page.evaluate(() => ({dg:DG.active, tw:TW.active, map:MAP_ID, reached:TW.end.reached, boons:Object.keys(P.buffs).filter(k => k.startsWith('dgb_')).length}));

@@ -2,7 +2,7 @@
    The owner: the tower must have its own maps made for it, not other maps dropped in. Until now every floor loaded a
    hunting region whole (its camp fire, shrine keeper, cook, log seats, trees, gates). Now a floor is a round stone
    hall high up in the tower, built for the climb:
-   · a stone floor of rings and spokes, a carpet from the entrance (front) over the floor's seal (middle, the floor
+   · a stone floor of rings and spokes with gold inlays in golden steps round the floor's seal (middle, the floor
      number carved in it) to the staircase (back), the back wall with arched niches and banners, the tower's outer
      wall falling away below the front rim, and the sky (or the dark) all round;
    · eight pillars with braziers round the rim, braziers by the stairs and the entrance; nothing else stands in it;
@@ -87,9 +87,23 @@ function twmPaint(){
       g.strokeStyle = 'rgba(255,255,255,.22)'; g.lineWidth = 1.2; g.beginPath(); g.ellipse(c.x, c.y, TWM_RX * r0 + 1.5, TWM_RY * r0 + 1, 0, a0 + .01, a1 - .01); g.stroke();   // lit upper edge
       g.strokeStyle = 'rgba(40,24,10,.3)'; g.lineWidth = 1.6; g.beginPath(); g.ellipse(c.x, c.y, TWM_RX * r1, TWM_RY * r1, 0, a0, a1); g.ellipse(c.x, c.y, TWM_RX * r0, TWM_RY * r0, 0, a1, a0, true); g.closePath(); g.stroke();
       if (r() < .18){ const am = (a0 + a1) / 2, rm = (r0 + r1) / 2, x = c.x + Math.cos(am) * TWM_RX * rm, y = c.y + Math.sin(am) * TWM_RY * rm; g.strokeStyle = 'rgba(40,24,10,.25)'; g.lineWidth = 1; g.beginPath(); g.moveTo(x - 6, y - 2); g.lineTo(x, y + 1); g.lineTo(x + 5, y - 3); g.stroke(); } } }
-  // the carpet: entrance → seal → stairs
-  const st = twmStairs(), en = twmEntry(); g.fillStyle = T0.carpet; g.fillRect(c.x - 38, st.y, 76, en.y - st.y + 60); g.fillStyle = T0.acc; g.fillRect(c.x - 38, st.y, 5, en.y - st.y + 60); g.fillRect(c.x + 33, st.y, 5, en.y - st.y + 60);
-  for (let y = st.y + 30; y < en.y + 50; y += 46){ g.fillStyle = 'rgba(255,255,255,.12)'; g.beginPath(); g.moveTo(c.x, y - 9); g.lineTo(c.x + 12, y); g.lineTo(c.x, y + 9); g.lineTo(c.x - 12, y); g.closePath(); g.fill(); }
+  // (v235) no carpet: inlays laid out in golden steps from the seal (150 · 150φ · 150φ²), a light pool in the middle
+  const st = twmStairs(), en = twmEntry(), PHI = 1.618, R1 = 150, R2 = R1 * PHI, R3 = R2 * PHI, oy = 2 / 3;
+  { const lp = g.createRadialGradient(c.x, c.y, 10, c.x, c.y, R3); lp.addColorStop(0, 'rgba(255,255,255,.28)'); lp.addColorStop(.6, 'rgba(255,255,255,.06)'); lp.addColorStop(1, 'rgba(255,255,255,0)'); g.fillStyle = lp; g.beginPath(); g.ellipse(c.x, c.y, R3, R3 * oy, 0, 0, 7); g.fill(); }
+  // the mosaic band (R2): tiles of the hall's gold and its dark stone, alternating
+  { const n = 36, w = 15; for (let j = 0; j < n; j++){ const a0 = j / n * 6.283, a1 = (j + 1) / n * 6.283; g.fillStyle = j % 2 ? T0.acc : T0.rim; g.globalAlpha = j % 2 ? .85 : .55;
+      g.beginPath(); g.ellipse(c.x, c.y, R2 + w, (R2 + w) * oy, 0, a0, a1); g.ellipse(c.x, c.y, R2 - w, (R2 - w) * oy, 0, a1, a0, true); g.closePath(); g.fill(); }
+    g.globalAlpha = 1; g.strokeStyle = T0.rim; g.lineWidth = 2; for (const k of [R2 + w, R2 - w]){ g.beginPath(); g.ellipse(c.x, c.y, k, k * oy, 0, 0, 7); g.stroke(); } }
+  // gold spokes from the seal to the band, thin ones on to the outer ring
+  g.lineCap = 'round';
+  for (let j = 0; j < 16; j++){ const a = j / 16 * 6.283 + Math.PI / 16, big = j % 2 === 0; g.strokeStyle = big ? T0.acc : 'rgba(255,255,255,.35)'; g.lineWidth = big ? 3.2 : 1.6;
+    const r0 = R1 + 6, r1 = big ? R2 - 18 : R3 - 10; g.beginPath(); g.moveTo(c.x + Math.cos(a) * r0, c.y + Math.sin(a) * r0 * oy); g.lineTo(c.x + Math.cos(a) * r1, c.y + Math.sin(a) * r1 * oy); g.stroke(); }
+  // the outer ring (R3): gold diamonds
+  g.strokeStyle = 'rgba(40,24,10,.35)'; g.lineWidth = 1.5; g.beginPath(); g.ellipse(c.x, c.y, R3, R3 * oy, 0, 0, 7); g.stroke();
+  for (let j = 0; j < 28; j++){ const a = j / 28 * 6.283, x = c.x + Math.cos(a) * R3, y = c.y + Math.sin(a) * R3 * oy, s = j % 2 ? 6 : 9;
+    g.fillStyle = T0.acc; g.beginPath(); g.moveTo(x, y - s * .75); g.lineTo(x + s, y); g.lineTo(x, y + s * .75); g.lineTo(x - s, y); g.closePath(); g.fill(); g.strokeStyle = T0.rim; g.lineWidth = 1.2; g.stroke(); }
+  // a soft shadow toward the rim
+  { const sh = g.createRadialGradient(c.x, c.y, TWM_RX * .7, c.x, c.y, TWM_RX * 1.02); sh.addColorStop(0, 'rgba(0,0,0,0)'); sh.addColorStop(1, 'rgba(40,20,0,.28)'); g.save(); g.scale(1, oy); g.fillStyle = sh; g.beginPath(); g.arc(c.x, c.y / oy, TWM_RX, 0, 7); g.fill(); g.restore(); }
   // the seal in the middle (the floor number is carved into it as you climb, see twmUnder)
   for (const [k, col, w0] of [[1, T0.rim, 10], [.86, T0.acc, 4], [.62, T0.rim, 3]]){ g.strokeStyle = col; g.lineWidth = w0; g.beginPath(); g.ellipse(c.x, c.y, 150 * k, 100 * k, 0, 0, 7); g.stroke(); }
   g.fillStyle = T0.floor[2]; g.beginPath(); g.ellipse(c.x, c.y, 140, 93, 0, 0, 7); g.fill(); g.strokeStyle = T0.rim; g.lineWidth = 3; g.stroke();

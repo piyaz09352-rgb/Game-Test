@@ -25,3 +25,10 @@ window.addEventListener('resize', () => setTimeout(lg234Zoom, 60)); setInterval(
 { const run = () => { try { lg234Zoom(); lg234(); } catch (e) {} };
   const mo = new MutationObserver(run); const start = () => { const t = document.getElementById('titleBody') || document.getElementById('title'); if (t) mo.observe(t, {childList:true, subtree:true}); run(); };
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start); else start(); }
+
+/* (v235) «ตั้งค่า» on the title screen: open the settings window above the title, game still paused. It used to call
+   hideTitle(), which dropped you into the world as a blank Lv 1 hero without choosing a character. */
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#btnTitleSettings'); const t = document.getElementById('title');
+  if (!b || !t || t.hidden || e.defaultPrevented) return;
+  e.preventDefault(); e.stopImmediatePropagation();
+  if (typeof openWin === 'function') openWin('settings'); const w = document.getElementById('win-settings'); if (w) w.style.zIndex = 400; }, true);

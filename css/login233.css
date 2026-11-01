@@ -126,3 +126,8 @@ html body #title .title-card.authing > .supdcbig,html body #title .title-card.au
 html body #title .title-card:not(.authing):has(.slots):not(:has(.maker)){justify-self:end;margin-right:4vw !important;width:min(640px,49vw) !important}
 html body #title .title-card:not(.authing):has(.slots):not(:has(.maker)) > :is(.t-eyebrow,h2,.t-sub){display:none !important}
 @media (max-height:440px){html body #title .title-card:not(.authing):has(.slots):not(:has(.maker)){width:min(460px,54vw) !important;margin-right:2vw !important}}
+
+/* (v235) the settings window opened from the title screen shows above it (other windows stay hidden there) */
+html body .ui.on-title > #win-settings:not([hidden]){opacity:1 !important;pointer-events:auto !important;z-index:400 !important}
+/* (v235) the character card's lines under the name (class · levels · map) were dark brown on the dark card */
+html body #title .slots small{color:#e8d6b0 !important;opacity:1 !important;text-shadow:0 1px 1px rgba(0,0,0,.5) !important}
