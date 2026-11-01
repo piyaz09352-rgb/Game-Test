@@ -233,3 +233,8 @@ const MS_CH = {
       done:['อำพันละลาย… ตาเทียนลืมตาขึ้นแล้วยิ้ม «ข้าวหอมของตาโตแล้วนะ» เขม่าคุกเข่าขอโทษ ตาให้อภัยและพาทุกคนกลับอาเรน นี่ ชุดช่างโคมรุ่งอรุณ ข้ากับตาตัดให้เจ้า ขอบคุณที่เดินทางมากับข้านะ!', "The amber melts… Ta Thian opens his eyes and smiles. «My little Khao Hom, all grown up.» Khamao kneels and begs forgiveness; Grandpa forgives him and takes everyone home to Aren. Here — a Dawn Lantern-maker's outfit Grandpa and I made for you. Thank you for walking this road with me!"]}
   ]}
 };
+// (v214) who walks this road with you, what she wears at the end, who joins her at home, and the road's title
+Object.assign(MS_ARCS[0], {comp:MS_KHAOHOM, compArmor:'ms_t_dawn', extra:MS_TATHIAN,
+  extraSay:['ข้าติดค้างบุญคุณเจ้ามากนัก… โคมรุ่งอรุณจะส่องแสงให้ผนึกวายราไปอีกนาน ไปไหนก็ระวังตัวนะหลาน', 'I owe you more than I can say… the Dawn Lantern will keep the Seal of Vayra lit for a long time yet. Take care on the road, child.'],
+  doneSay:['ตากลับบ้านแล้ว ข้ามีความสุขที่สุดเลย! ขอบคุณที่เดินทางมาด้วยกันนะ', 'Grandpa is home and I could not be happier! Thank you for walking the road with me.'],
+  titleName:['ผู้จุดโคมรุ่งอรุณ', 'Dawn Lantern Bearer']});

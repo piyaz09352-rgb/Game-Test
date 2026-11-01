@@ -45,6 +45,51 @@ SPR.CHARS.ms_npc = {...SPR.CHARS.novice, name:'NPC', en:'Story NPC'}; delete SPR
 }
 // Grandpa Thian's own head: a white head wrap and a white beard (not a wardrobe piece)
 SPR.GEAR_LOOK.ms_x_tathian = {hat:'headwrap', bandMat:SPR.M.ivory != null ? 'ivory' : 'white', beard:'hairWhite', bodyScale:.92};
+/* (v214) the south road's pieces */
+{ const M = SPR.M, mm = (n, f = 'white') => (M[n] != null ? n : f), m = n => M[mm(n)];
+  const tops = {
+    ms_t_oasis:['ชุดนักบวชโอเอซิส', 'Oasis Priest Robe', fSet('robe', mm('emerald', 'jade'), mm('sand', 'cream'), mm('gold'), FT.combo(FT.waves(m('goldLight')), FT.hem(m('gold'))))],
+    ms_t_tani:['ชุดใบตองนางตานี', 'Nang Tani Banana-leaf Gown', fSet('dress', mm('mint', 'jade'), mm('ivory'), mm('jade', 'green'), FT.combo(FT.kanok(m('goldLight')), FT.hem(m('jade'))))],
+    ms_t_caravan:['ชุดกองคาราวาน', 'Caravan Robe', fSet('robe', mm('sand', 'cream'), mm('sunset', 'scarlet'), mm('gold'), FT.combo(FT.stripes(m('sunset')), FT.hem(m('gold'))))],
+    ms_t_ember:['ชุดผู้เฝ้าไฟ', 'Fire-keeper Suit', fSet('ninja', mm('scarlet'), mm('charcoal', 'onyx'), mm('ember', 'gold'), FT.combo(FT.chev(m('ember')), FT.hem(m('lavaGlow', 'ember'))))],
+    ms_t_hermit:['ชุดฤๅษีหินดำ', 'Black-stone Hermit Robe', fSet('robe', mm('ochre', 'sand'), mm('charcoal', 'onyx'), mm('gold'), FT.combo(FT.kanok(m('gold')), FT.hem(m('charcoal'))), {cape:mm('tigerFur', 'ochre')})],
+    ms_t_cinder:['ชุดนักพายทะเลถ่าน', 'Cinder-sea Paddler', fSet('battle', mm('charcoal', 'onyx'), mm('ember', 'scarlet'), mm('lavaGlow', 'ember'), FT.combo(FT.waves(m('lavaGlow')), FT.hem(m('ember'))), {cape:null})],
+    ms_t_yama:['ชุดเสมียนยมโลก', 'Underworld Clerk Robe', fSet('court', mm('midnight', 'navy'), mm('scarlet'), mm('gold'), FT.combo(FT.stars(m('gold')), FT.hem(m('scarlet'))))],
+    ms_t_rain:['ชุดผู้นำฝน', 'Rainbringer', fSet('sky', mm('sky'), mm('pearl', 'white'), mm('cyanGlow', 'aqua'), FT.combo(FT.waves(m('cyanGlow')), FT.hem(m('aqua', 'sky'))), {cape:mm('aqua', 'sky'), capeTex:'gold'})]
+  };
+  const parts = {
+    ms_h_rocket:['head', 'ผ้าโพกช่างบั้งไฟ', "Rocket Maker's Head Wrap", {hat:'headwrap', bandMat:mm('ember', 'scarlet')}],
+    ms_h_explorer:['head', 'หมวกนักล่าสมบัติ', "Treasure Hunter's Hat", {hat:'cap', capMat:mm('sand', 'cream')}],
+    ms_h_wind:['head', 'คาดผมสายลม', 'Wind Headband', {hat:'band', bandMat:mm('sky')}],
+    ms_h_cactus:['head', 'กิ๊บดอกกระบองเพชร', 'Cactus Flower Pin', {hat:null, hairClip:'flower', clipMat:mm('rose')}],
+    ms_h_miner:['head', 'หมวกคนงานเหมือง', "Miner's Cap", {hat:'cap', capMat:mm('sun', 'gold')}],
+    ms_h_agni:['head', 'มงกุฎเปลวอัคนี', 'Agni Flame Crown', {hat:'crest', bandMat:mm('ember', 'scarlet'), crestMat:mm('lavaGlow', 'ember'), crestN:5}],
+    ms_h_horns:['head', 'เขามังกรน้อย', 'Little Dragon Horns', {hat:null, horns:mm('jade', 'green'), hornLen:2.4, hornSpread:1}],
+    ms_k_dust:['mask', 'ผ้าปิดจมูกช่างแกะหิน', "Stone Carver's Dust Mask", {ninjaMask:mm('sand', 'cream')}],
+    ms_k_bandana:['mask', 'ผ้าปิดหน้าเสือน้อย', "Suea Noi's Face Cloth", {ninjaMask:mm('wine', 'scarlet')}],
+    ms_k_goggle:['mask', 'แว่นกันความร้อน', 'Heat Goggles', {faceMask:mm('bronze', 'gold'), fmStyle:'round', fmTrim:mm('bronze', 'gold')}]
+  };
+  for (const id in tops){ const [th, en, look] = tops[id]; COSTUME[id] = {slot:'top', th, en, src:'story', grand:true, sw:[look.top, look.forearm], look}; SPR.GEAR_LOOK[id] = look; }
+  for (const id in parts){ const [slot, th, en, look] = parts[id]; COSTUME[id] = {slot, th, en, src:'story', grand:false, sw:[look.bandMat || look.capMat || look.clipMat || look.horns || look.ninjaMask || look.faceMask, look.crestMat || look.fmTrim || look.bandMat || look.capMat || look.clipMat || look.horns || look.ninjaMask], look}; SPR.GEAR_LOOK[id] = look; }
+  WINGS.ms_b_phoenix = {set:null, th:'ประกายขนหงส์เพลิง', en:'Phoenix Feather Sparks', kind:'aFly', c:['#ffffff', '#ffc05a', '#ff5a2a'], edge:'#ff5a2a', glow:'255,150,60', fx:'none', span:1, cute:true, story:true};
+  WINGS.ms_b_pearl = {set:null, th:'ไข่มุกมังกรลอยวน', en:'Orbiting Dragon Pearls', kind:'aBubble', c:['#ffffff', '#fff2d0', '#e8c070'], edge:'#e8c070', glow:'255,230,170', fx:'none', span:1, cute:true, story:true};
+  const rk = {slot:'mount', th:'บั้งไฟพญานาค', en:'Naga Rocket', kind:'rocket', lift:10, c:['#c8281e', '#ffd040'], story:true};
+  XMOUNT.ms_m_rocket = rk; XCOS.ms_m_rocket = rk;
+}
+// the naga rocket: a bamboo rocket bound in red and gold, a carved naga head at the front, streamers and a smoke trail behind
+MOUNT_X.rocket = function(g, M, x, by, dir, t, moving){
+  const [red, gold] = M.c, fl = dir === 2 || dir === 1 || dir === 3 ? -1 : 1, side = dir === 2 || dir === 6, bob = Math.sin(t * 3) * 1;
+  g.save(); g.translate(x, by + 4 + bob); g.scale(fl * (side ? 1 : .78), 1);
+  for (let i = 0; i < 6; i++){ const ph = (t * (moving ? 2.4 : 1.2) + i / 6) % 1; g.fillStyle = `rgba(220,220,225,${(1 - ph) * .5})`; ov(g, -22 - ph * 18, Math.sin(i * 2 + t) * 1.5 + 1, 2 + ph * 4, 1.6 + ph * 3); g.fill(); }
+  fxGlow(g, -21, 1, 7, 4, '255,160,60', .8); g.fillStyle = '#fff0a0'; ov(g, -20.5, 1, 2.6 + Math.sin(t * 20), 1.4); g.fill(); g.fillStyle = '#ff7a2a'; ov(g, -23, 1, 2, 1); g.fill();
+  g.fillStyle = vsLin(g, 0, -3, 0, 4, [[0, '#e8d890'], [.5, '#c8b060'], [1, '#8a7030']]); g.beginPath(); g.moveTo(-20, -2.6); g.lineTo(14, -2.6); g.lineTo(14, 3.6); g.lineTo(-20, 3.6); g.closePath(); g.fill();
+  for (const bx of [-16, -9, -2, 5, 11]){ g.fillStyle = red; g.fillRect(bx, -2.8, 2.2, 6.6); g.fillStyle = gold; g.fillRect(bx + .6, -2.8, .6, 6.6); }
+  for (let i = 0; i < 3; i++){ const w = Math.sin(t * 6 + i) * 1.6; g.strokeStyle = [red, gold, '#4ab8ff'][i]; g.lineWidth = .9; g.beginPath(); g.moveTo(-19, 2 + i * .6); g.quadraticCurveTo(-26, 5 + w, -31, 6 + i * 1.4 - w); g.stroke(); }
+  g.fillStyle = vsLin(g, 0, -6, 0, 5, [[0, '#4ad88a'], [1, '#1a7a4a']]); g.beginPath(); g.moveTo(14, -3.4); g.quadraticCurveTo(22, -7, 25, -2); g.lineTo(23, 1.6); g.quadraticCurveTo(20, 4.6, 14, 4); g.closePath(); g.fill();
+  g.fillStyle = gold; g.beginPath(); g.moveTo(16, -4.6); g.lineTo(18, -9); g.lineTo(19.6, -4.4); g.lineTo(21.4, -8); g.lineTo(22.2, -3.2); g.closePath(); g.fill();
+  g.fillStyle = '#ff3a2a'; ov(g, 21, -2.4, 1, 1); g.fill(); g.fillStyle = '#fff'; g.fillRect(23.4, 0, 1.6, .6); g.strokeStyle = '#1a4a2a'; g.lineWidth = .4; g.beginPath(); g.moveTo(25, -.6); g.lineTo(22, .8); g.stroke();
+  g.restore();
+};
 const MS_STORY_IDS = new Set([...Object.keys(COSTUME).filter(k => /^ms_/.test(k)), 'ms_b_rainbow', 'ms_b_firefly', 'ms_m_krathong']);
 // the sky krathong: a banana-leaf krathong with marigolds, a candle and three incense sticks, floating on a soft glow
 MOUNT_X.krathong = function(g, M, x, by, dir, t){
@@ -85,7 +130,8 @@ const msS = () => { const o = S.ms = S.ms && typeof S.ms === 'object' ? S.ms : {
 const msArcOf = map => MS_ARCS.find(a => a.maps.includes(+map));
 const msPrev = map => { const a = msArcOf(map); if (!a) return null; const i = a.maps.indexOf(+map); return i > 0 ? a.maps[i - 1] : null; };
 const msLv = map => (MAPS[map] && MAPS[map].lv ? MAPS[map].lv[0] : 1);
-const msJoined = () => !!msS().done[0];
+const msJoined = (arc = MS_ARCS[0]) => !!msS().done[arc.maps[0]];   // the road's companion has joined once its first chapter is done
+const msCompArc = id => MS_ARCS.find(a => (a.comp && a.comp.id === id) || (a.extra && a.extra.id === id));
 const msArcDone = arc => arc.maps.every(m => msS().done[m]);
 function msOpen(map){ const s = msS(), p = msPrev(map); return !s.done[map] && (p == null || !!s.done[p]); }
 const msLvOk = map => S.lvl >= Math.max(1, msLv(map) - 5);
@@ -165,8 +211,8 @@ function msPlace(mapId){
 }
 function msNpcObj(d, x, y){ return {id:d.id, name:d.name, en:d.en, role:d.role[0], roleEn:d.role[1], x, y, ms:true}; }
 function msLookOf(d){
-  const done = d.id === MS_KHAOHOM.id && MS_ARCS[0] && msArcDone(MS_ARCS[0]);
-  return {job:'ms_npc', look:{sex:d.sex, hair:d.hair, color:d.color, eye:d.eye}, gear:{...d.gear, ...(done ? {armor:'ms_t_dawn'} : {})}};
+  const arc = MS_ARCS.find(a => a.comp && a.comp.id === d.id), done = arc && arc.compArmor && msArcDone(arc);
+  return {job:'ms_npc', look:{sex:d.sex, hair:d.hair, color:d.color, eye:d.eye}, gear:{...d.gear, ...(done ? {armor:arc.compArmor} : {})}};
 }
 function msAddNpc(d, near, gap = 96){
   if (NPCS.some(n => n.id === d.id)) return null;
@@ -178,10 +224,11 @@ function msRefreshNpcs(){
   // drop the story NPCs and place them again (who stands where depends on how far the story has got)
   for (let i = NPCS.length - 1; i >= 0; i--) if (NPCS[i].ms) NPCS.splice(i, 1);
   const s = msS(), id = MAP_ID, ch = MS_CH[id];
-  if (id === 0){ const t = NPCS.find(n => n.id === 'teller') || {x:W / 2, y:H / 2}, arc = MS_ARCS[0];
-    if (!msJoined() || msArcDone(arc)){ const kh = msAddNpc(MS_KHAOHOM, t); if (kh && msArcDone(arc)) msAddNpc(MS_TATHIAN, kh, 70); }
-  } else if (ch){ const c = CAMP || {x:W / 2, y:H / 2}, local = msAddNpc(ch.npc, {x:c.x + 30, y:c.y + 60});
-    if (local && !ch.finale && msJoined() && ch.npc.id !== MS_KHAOHOM.id && !s.done[id]) msAddNpc(MS_KHAOHOM, local, 70); }
+  const arc = msArcOf(id);
+  if (ch && arc){ const c = CAMP || {x:W / 2, y:H / 2}, base = id === 0 ? (NPCS.find(n => n.id === 'teller') || {x:W / 2, y:H / 2}) : {x:c.x + 30, y:c.y + 60};
+    if (id === arc.maps[0]){ // the road's first map: the companion waits here before she joins, and comes home here at the end
+      if (!msJoined(arc) || msArcDone(arc)){ const n = msAddNpc(arc.comp, base); if (n && msArcDone(arc) && arc.extra) msAddNpc(arc.extra, n, 70); } }
+    else { const local = msAddNpc(ch.npc, base); if (local && ch.npc.id !== arc.comp.id && msJoined(arc) && !s.done[id]) msAddNpc(arc.comp, local, 70); } }
   // the NPC sheets are made for the figure they wear now
   for (const n of NPCS) if (n.ms && typeof npcSheet === 'function') npcSheet(n.id);
 }
@@ -189,7 +236,7 @@ function msRefreshNpcs(){
 
 /* ---------- talking ---------- */
 function msOpenNpc(n){
-  const s = msS(), c = s.cur, id = MAP_ID, ch = MS_CH[id], st = msStep(), arc = msArcOf(id) || MS_ARCS[0];
+  const s = msS(), c = s.cur, id = MAP_ID, ch = MS_CH[id], st = msStep(), arc = msArcOf(id) || MS_ARCS[0], comp = arc.comp;
   let say = MS.say || '', body = ''; MS.say = '';
   const pages = arc.maps.filter(m => s.done[m]).length, prog = `<p class="hint">📖 ${L(arc.title[0], arc.title[1])} · ${L('บทที่จบแล้ว', 'chapters done')} ${pages}/${arc.maps.length}</p>`;
   const stepBox = (stp, i) => { const h = msHave(stp), need = msNeed(stp), r = msReward(c.map, i, i >= MS_CH[c.map].steps.length - 1);
@@ -197,10 +244,11 @@ function msOpenNpc(n){
       <small>${L('รางวัล', 'Reward')}: ${msRewardTxt(r)}</small>
       <button class="btn gold wide" data-msturn="1" ${h >= need ? '' : 'disabled'}>${h >= need ? L('เล่าให้ฟัง · ส่งขั้นนี้', 'Tell them · hand in') : L('ยังไม่ครบ', 'Not finished yet')}</button></div>`; };
   const localHere = ch && ch.npc.id === n.id;
-  if (n.id === MS_TATHIAN.id){ say = L('ข้าติดค้างบุญคุณเจ้ามากนัก… โคมรุ่งอรุณจะส่องแสงให้ผนึกวายราไปอีกนาน ไปไหนก็ระวังตัวนะหลาน', 'I owe you more than I can say… the Dawn Lantern will keep the Seal of Vayra lit for a long time yet. Take care on the road, child.'); }
-  else if (c && c.map === id && (localHere || (n.id === MS_KHAOHOM.id && ch && ch.npc.id === MS_KHAOHOM.id))){
+  if (arc.extra && n.id === arc.extra.id){ say = L(...arc.extraSay); }
+  else if (n.id === comp.id && msArcDone(arc) && arc.doneSay){ say = say || L(...arc.doneSay); body = prog; }
+  else if (c && c.map === id && (localHere || (n.id === comp.id && ch && ch.npc.id === comp.id))){
     if (!say) say = L(...st.say); body = stepBox(st, c.step) + prog; }
-  else if (n.id === MS_KHAOHOM.id && !localHere){
+  else if (n.id === comp.id && !localHere){
     // the companion: her own line here, and where the story stands
     say = say || (ch && ch.kh ? L(...ch.kh) : L('ข้าอยู่นี่นะ ไปด้วยกัน!', "I'm right here — let's go together!"));
     if (c) body = `<div class="qbox"><b>${L(MS_CH[c.map].title[0], MS_CH[c.map].title[1])}</b><div class="qg${msReady() ? ' ok' : ''}"><span>${msGoalTxt(st)}</span><b>${msHave(st)}/${msNeed(st)}</b></div><p class="hint">${msReady() ? L(`กลับไปหา${MS_CH[c.map].npc.name}`, `Go back to ${MS_CH[c.map].npc.en}`) : L(`ที่${MAPS[c.map].name}`, `in ${MAPS[c.map].en}`)}</p></div>`;
@@ -272,15 +320,15 @@ EV.on('tick', () => { const s = msS(), c = s.cur, st = msStep(); if (!c || !st |
 
 /* ---------- story NPCs wear their back pieces too ---------- */
 { const _n = drawNpcW;
-  drawNpcW = function(g, n){ const d = n && n.ms ? [MS_KHAOHOM, MS_TATHIAN, ...Object.values(MS_CH).map(c => c.npc)].find(x => x.id === n.id) : null, wg = d && d.wing && WINGS[d.wing] ? d.wing : null;
+  drawNpcW = function(g, n){ const d = n && n.ms ? [...MS_ARCS.flatMap(a => [a.comp, a.extra].filter(Boolean)), ...Object.values(MS_CH).map(c => c.npc)].find(x => x.id === n.id) : null, wg = d && d.wing && WINGS[d.wing] ? d.wing : null;
     if (!wg) return _n.apply(this, arguments);
     const x = n.x - cam.x, y = n.y - cam.y, near = Math.hypot(P.x - n.x, P.y - n.y) < 110, dir = near ? SPR.dirFromVec(P.x - n.x, P.y - n.y) : 0;
     drawWings(g, wg, x, y, dir, T + n.x * .01, {part:'back'}); const r = _n.apply(this, arguments); drawWings(g, wg, x, y, dir, T + n.x * .01, {part:'front'}); return r; }; }
 
 /* ---------- the road's title ---------- */
 if (typeof ACH !== 'undefined' && typeof ACH_BY !== 'undefined') for (const arc of MS_ARCS){ if (!arc.title_id || ACH_BY[arc.title_id]) continue;
-  const a = {id:arc.title_id, cat:'story', tier:3, th:`ผู้จุดโคมรุ่งอรุณ`, en:'Dawn Lantern Bearer', dth:`จบเนื้อเรื่องเสริม «${arc.title[0]}» ทั้ง ${arc.maps.length} บท`, den:`Finish all ${arc.maps.length} chapters of «${arc.title[1]}»`,
-    prog:() => [arc.maps.filter(m => msS().done[m]).length, arc.maps.length], coin:20, title:['ผู้จุดโคมรุ่งอรุณ', 'Dawn Lantern Bearer']};
+  const a = {id:arc.title_id, cat:'story', tier:3, th:arc.titleName[0], en:arc.titleName[1], dth:`จบเนื้อเรื่องเสริม «${arc.title[0]}» ทั้ง ${arc.maps.length} บท`, den:`Finish all ${arc.maps.length} chapters of «${arc.title[1]}»`,
+    prog:() => [arc.maps.filter(m => msS().done[m]).length, arc.maps.length], coin:20, title:arc.titleName};
   ACH.push(a); ACH_BY[a.id] = a; }
 
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'mapstory', t:['เนื้อเรื่องเสริมตามแผนที่', 'Map stories'], b:() => `<p>${L('แต่ละแผนที่มี NPC ที่มีเรื่องราวของตัวเอง (ป้าย ✦ เหนือหัว) เรื่องต่อกันเป็นสาย ทำทีละบทตามลำดับ บทละ 3 ขั้น: ล่า · ตามหาจุดเรืองแสง ✦ หรือเก็บของ · ปราบมอนสเตอร์มีชื่อ ส่งแต่ละขั้นกับ NPC เพื่อฟังเรื่องต่อ จบบทได้ชิ้นแฟชั่นที่ NPC คนนั้นใส่ จบทั้งสายได้ฉายาและสัตว์ขี่', 'Every map has an NPC with a tale of their own (a ✦ tag over the head). The tales run on as a road, one chapter after another, three steps each: hunt · find glowing ✦ spots or gather · defeat a named monster. Hand each step back to hear what happens next; a chapter ends with the wardrobe piece that NPC wears, and a whole road with a title and a mount.')}</p>

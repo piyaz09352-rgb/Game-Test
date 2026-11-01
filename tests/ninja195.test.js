@@ -19,6 +19,9 @@ test('ninja: reworked skills, ricochet, clones, smoke, four elements', { skip, t
       derive(); out.refund = S.skPts; out.gone = !('iai' in S.skills) && !('ninjadash' in S.skills);
       out.counts = ['ninja', 'shinobi', 'kage'].map(j => JOBS[j].skills.length);
       out.mask = !SPR.CHARS.ninja.ninjaMask && !!SPR.GEAR_LOOK.f_njmask;
+      // (v213) festivals are on again: keep the festival spirit out of this test (it would take a ricochet target)
+      if (typeof EVB !== 'undefined' && typeof thaiClock === 'function'){ const c = thaiClock(); EVB.slot = Math.floor((c.h * 60 + c.m) / 15); }
+      mobs.forEach(m => { if (m.evb || m.elite) m.dead = true; });
       const ms = mobs.filter(m => !m.dead && !m.def.boss).slice(0, 5);
       ms.forEach((m, i) => { m.maxhp = m.hp = 1e7; m.x = P.x + 60 + i * 40; m.y = P.y; m.aggro = false; m.st = {stop:999}; });
       const m = ms[0], dmg = () => ms.map(x => 1e7 - x.hp);

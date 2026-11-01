@@ -15,7 +15,7 @@ test('map stories: east road chapters, NPCs, rewards', { skip, timeout: 180000 }
       o.bad = [];
       for (const [m, ch] of Object.entries(MS_CH)){ for (const st of ch.steps){ if ((st.k === 'kill' || st.k === 'elite') && !(MOB[st.t] && MAPS[m].mobs.includes(st.t))) o.bad.push(m + ':' + st.t); if (st.k === 'item' && !ITEMS[st.t]) o.bad.push(m + ':' + st.t); }
         if (!(COSTUME[ch.cos] || WINGS[ch.cos] || XCOS[ch.cos])) o.bad.push('cos ' + ch.cos); }
-      o.chapters = MS_ARCS[0].maps.every(m => MS_CH[m]);
+      o.chapters = MS_ARCS.length >= 2 && MS_ARCS.every(a => a.maps.every(m => MS_CH[m]) && a.comp && (XCOS[a.mount] || XMOUNT[a.mount]) && ACH_BY[a.title_id]);
       S.lvl = 20; S.tut = {done:true, i:99}; loadMap(0); adv(4);
       const kh = NPCS.find(n => n.id === 'ms_khaohom'); o.kh = !!kh && npcMark(kh) === '!';
       msAccept(0); const lan = spawnMob('lantern', P.x + 300, P.y); for (let i = 0; i < 6; i++) EV.emit('kill', lan); o.r1 = msReady(); msHandIn();
@@ -28,10 +28,12 @@ test('map stories: east road chapters, NPCs, rewards', { skip, timeout: 180000 }
       if (e) EV.emit('kill', e); o.r6 = msReady(); msHandIn(); o.wrap = cosHave('ms_h_bamboo');
       o.tracker = !questTracker().includes('📖');
       const t = NPCS_HOME.find(n => n.id === 'tailor'); if (t){ loadMap(0); adv(2); openNpc(NPCS.find(n => n.id === 'tailor')); o.tailor = !el('dialog').innerHTML.includes('ms_b_'); el('dialog').hidden = true; } else o.tailor = true;
+      S.lvl = 80; loadMap(9); adv(3); const ph = NPCS.find(n => n.id === 'ms_phirun'); o.south = !!ph && npcMark(ph) === '!';
       return o;
     });
     assert.deepStrictEqual(r.bad, [], 'every chapter names real monsters of its map, real items and pieces');
-    assert.ok(r.chapters, 'all 16 east-road maps have a chapter');
+    assert.ok(r.chapters, 'every map of the east and south roads has a chapter; each road has a companion, a mount and a title');
+    assert.ok(r.south, 'Phirun waits on the Weeping Plains to start the south road');
     assert.ok(r.kh, 'Khao Hom waits in Aren with a quest mark');
     assert.ok(r.r1 && r.r2 && r.r3 && r.paid && r.done && r.bow, 'hunt → find → gather, paid, chapter done, her bow given');
     assert.ok(r.npcs, 'the bamboo map has its own NPC and Khao Hom beside it');

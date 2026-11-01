@@ -294,28 +294,36 @@ const S3_DRAW = {
     vgCrate(g, 50, 0, 10, 8); vgCrate(g, 52, -8, 8, 7); g.fillStyle = PAL.barkM; g.fillRect(-56, -22, 1.6, 22); g.fillRect(-62, -22, 13, 1.4); g.strokeStyle = '#8a8a92'; g.lineWidth = .5; for (const x of [-60, -51]){ g.beginPath(); g.moveTo(x, -21); g.lineTo(x, -15); g.stroke(); g.fillStyle = '#b8a060'; ov(g, x, -14.6, 2.6, .9); g.fill(); }
   },
   beast(g, rng){
+    S3.plinth(g, -48, 96, 3, rng);
     // a low red-brown barn, stable half-doors, a hay loft
     S3.boards(g, -46, -46, 92, 46, rng, ['#8a3a24', '#7a3220', '#9a442c'], 4); S3.shade(g, -46, -46, 92, 46, .3);
     g.fillStyle = '#e8dcc0'; g.fillRect(-46, -46, 92, 1.6); g.fillRect(-46, -2, 92, 2);
     for (const x of [-38, -10, 18]){ g.fillStyle = '#2a140a'; g.fillRect(x, -36, 20, 34); g.fillStyle = '#6a2a18'; g.fillRect(x, -18, 20, 16); g.strokeStyle = '#e8dcc0'; g.lineWidth = 1; g.strokeRect(x, -18, 20, 16); g.beginPath(); g.moveTo(x, -18); g.lineTo(x + 20, -2); g.moveTo(x + 20, -18); g.lineTo(x, -2); g.stroke(); g.strokeRect(x, -36, 20, 34); }
     g.fillStyle = '#d8b860'; for (let i = 0; i < 7; i++){ g.strokeStyle = i % 2 ? '#e8c870' : '#c8a050'; g.lineWidth = .7; g.beginPath(); g.moveTo(-34 + i * 2, -18); g.lineTo(-33 + i * 2.2, -24 - (i % 3)); g.stroke(); }
     // the straw roof and the loft opening
-    S3.thatch(g, [-56, -42, -30, -78, 30, -78, 56, -42, 50, -38, -50, -38], rng, '#b88a40');
-    g.fillStyle = '#2a140a'; g.fillRect(-8, -70, 16, 14); g.fillStyle = '#e8c870'; pv(g, [-8, -56, 8, -56, 6, -62, 2, -60, -2, -63, -6, -60]); g.fill();
-    g.strokeStyle = '#e8dcc0'; g.lineWidth = .8; g.strokeRect(-8, -70, 16, 14);
+    S3.thatch(g, [-56, -42, -26, -90, 26, -90, 56, -42, 50, -38, -50, -38], rng, '#b88a40');
+    g.fillStyle = '#2a140a'; g.fillRect(-8, -78, 16, 16); g.fillStyle = '#e8c870'; pv(g, [-8, -62, 8, -62, 6, -68, 2, -66, -2, -69, -6, -66]); g.fill();
+    g.strokeStyle = '#e8dcc0'; g.lineWidth = .8; g.strokeRect(-8, -78, 16, 16);
     S3.board(g, 0, -50, S3_NAME('beast'), {bg:['#e8d8a8', '#c8b078'], fg:'#5a2a10', frame:'#6a3a18', w:34, h:7.4, font:5.6});
     // a horseshoe, hay bales, a trough and a bit of fence
-    g.strokeStyle = '#8a8a92'; g.lineWidth = 1.2; g.beginPath(); g.arc(0, -82, 2.6, .2, Math.PI - .2, true); g.stroke();
+    g.strokeStyle = '#8a8a92'; g.lineWidth = 1.2; g.beginPath(); g.arc(0, -84, 2.6, .2, Math.PI - .2, true); g.stroke();
     for (const [x, y] of [[-56, 0], [-50, -7]]){ g.fillStyle = '#d8b860'; g.fillRect(x - 6, y - 7, 12, 7); g.fillStyle = 'rgba(120,80,20,.4)'; g.fillRect(x - 6, y - 4, 12, .7); g.fillStyle = '#8a6a2a'; g.fillRect(x - 3, y - 7, .7, 7); g.fillRect(x + 3, y - 7, .7, 7); }
     g.fillStyle = '#6a4a2a'; pv(g, [44, -8, 60, -8, 58, -2, 46, -2]); g.fill(); g.fillStyle = '#4a8aa8'; g.fillRect(45, -8, 14, 1.4);
     g.fillStyle = PAL.teakM; for (const x of [48, 60]) g.fillRect(x, -16, 1.6, 8); g.fillRect(46, -14, 16, 1.2);
   }
 };
 
-PROP_TYPES.vshop = (seed, v = 0) => makeProp({w:124, h:110, ax:62, ay:100, seed, shadow:[52, 12, 3], collide:30, glow:[0, -40, 62], paint(g, rng){
+/* (v214) one standard for all twelve: each house's main body (from the ground to its roof ridge, eave to eave — not
+   smoke, chimneys, flags or spires) is scaled to the same height on the same ground line, within the same width */
+const S3_STD = {h:92, w:120, base:2};
+const S3_MAIN = {smith:[-86, -54, 54], forger:[-96, -50, 50], driller:[-88, -56, 56], shop:[-98, -48, 46], herbal:[-98, -54, 54], cook:[-82, -54, 56],
+  tailor:[-88, -52, 52], banker:[-98, -50, 50], registrar:[-92, -54, 54], festival:[-96, -50, 50], trader:[-94, -54, 54], beast:[-90, -56, 56]};
+PROP_TYPES.vshop = (seed, v = 0) => makeProp({w:128, h:124, ax:64, ay:112,   // (v214) taller canvas: chimneys and spires are no longer cut off
+  seed, shadow:[52, 12, 3], collide:30, glow:[0, -40, 62], paint(g, rng){
   const V = VSHOP[v] || VSHOP[0], f = S3_DRAW[V.k];
   if (!f) return;
-  f(g, rng);
+  const [top, x0, x1] = S3_MAIN[V.k] || [-92, -50, 50], k = Math.min(S3_STD.h / -top, S3_STD.w / (x1 - x0)), cx = (x0 + x1) / 2;
+  g.save(); g.translate(0, S3_STD.base); g.scale(k, k); g.translate(-cx, 0); f(g, rng); g.restore();
   // every house gets its pots by the door and, where it fits, a lantern at the eave
   const pk = VSHOP_PLANT[V.k] || 'fern';
   if (!['herbal', 'beast', 'cook', 'festival'].includes(V.k)) for (const px of [-30, 30]){ g.save(); g.translate(px, 1); g.scale(.62, .62); vsPlant(g, 0, 0, pk, rng); g.restore(); }
