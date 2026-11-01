@@ -35,7 +35,10 @@ const dlgTall = b => { const H = b.h * (b.k || 1);   // real screen pixels (the 
   return H >= 560 ? DLG_SHARE : H <= 400 ? .88 : DLG_SHARE + (.88 - DLG_SHARE) * (560 - H) / 160; };
 function dlgSize(b){
   const fw = DLGM.size ? DLGM.size[0] : null, fh = DLGM.size ? DLGM.size[1] : null;
-  const w = clamp(fw ? fw * b.w : b.w * DLG_SHARE, Math.min(320, b.w - 16), b.w - 16);
+  if (!fw){   // (v238) the default shape is a golden rectangle: height = the screen's dialog share, width = height × φ
+    const h0 = clamp(Math.round(b.h * dlgTall(b)), 160, b.h - 16), w0 = Math.min(Math.round(h0 * 1.618), b.w - 16);
+    return {w:w0, h:Math.round(Math.min(h0, w0 / 1.618 * 1.0001 + .5) > h0 ? h0 : Math.round(w0 / 1.618))}; }
+  const w = clamp(fw * b.w, Math.min(320, b.w - 16), b.w - 16);
   const h = fh ? clamp(fh * b.h, 160, b.h - 16) : null;
   return {w, h};
 }

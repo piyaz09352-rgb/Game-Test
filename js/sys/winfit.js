@@ -17,9 +17,9 @@ function winFit(id){
   let X = parseFloat(w.style.left) || 0, Y = parseFloat(w.style.top) || 0;
   for (let i = 0; i < 4; i++){
     const u = brect(ui), b = brect(w), k = (b.width / (w.offsetWidth || 1)) || 1;
-    const full = WF_FULL.includes(id), big = WF_BIG.includes(id), tw = big ? u.width * .8 / k : Math.min((u.width - WF_M * 2) / k, u.width > u.height && !full ? WF_WIDE : 1e9);
+    const full = WF_FULL.includes(id), big = WF_BIG.includes(id), gold = !full && !big && u.width > u.height, tw = big ? u.width * .8 / k : gold ? Math.min((u.width - WF_M * 2) / k, (u.height - WF_M * 2) / k * 1.618) : Math.min((u.width - WF_M * 2) / k, u.width > u.height && !full ? WF_WIDE : 1e9);   // (v238) a phone window lying down is a golden rectangle: width = height × φ
     put('width', tw + 'px'); put('height', 'auto');                 // v31: as tall as what it holds, up to the screen
-    const th = full ? (u.height - WF_M * 2) / k : big ? u.height * .8 / k : Math.min((u.height - WF_M * 2) / k, w.offsetHeight), b2 = brect(w);
+    const th = full || gold ? (u.height - WF_M * 2) / k : big ? u.height * .8 / k : Math.min((u.height - WF_M * 2) / k, w.offsetHeight), b2 = brect(w);
     const dx = (u.left + (u.width - tw * k) / 2 - b2.left) / k, dy = (u.top + (u.height - th * k) / 2 - b2.top) / k;
     put('height', th + 'px');
     if (Math.abs(dx) < .75 && Math.abs(dy) < .75) break;

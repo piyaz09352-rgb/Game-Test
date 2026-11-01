@@ -12,3 +12,26 @@ html body #ui.ui #goalCard{aspect-ratio:2.618 / 1 !important;height:auto !import
 html body #ui.ui #target{aspect-ratio:2.618 / 1 !important;height:auto !important;box-sizing:border-box !important;align-content:center}
 html body #ui.ui > .chatbox{width:38.2% !important;left:30.9% !important;right:auto !important;box-sizing:border-box !important}
 html body #ui.ui #dock{min-width:61.8% !important;left:19.1% !important;right:auto !important;box-sizing:border-box !important;display:flex !important;justify-content:center !important;transform:none !important}
+
+/* ---------- (v238) group 2: windows are golden rectangles ----------
+   Tall screens: a single-column window (status, quest, settings, social, log, wiki, tower, auto…) is height = width × φ,
+   its height taken from the screen (so it never runs off) and its width = height ÷ φ. Short screens (phones held
+   sideways): the same windows lie down, width = height × φ. The skill tree (wide by nature) is width = height × φ
+   everywhere. The inventory / equipment screen stays full-screen. The window body scrolls inside. Sizes are divided by
+   the game's UI zoom (--uiz) so a big screen is not scaled twice. */
+html body #ui.ui > .win.phiw:not([hidden]):not(#win-equip):not(#win-skill){
+  --ph:calc(min(680px, 100vh - 150px) / var(--uiz, 1));
+  height:var(--ph) !important;width:calc(var(--ph) / 1.618) !important;max-height:none !important;max-width:calc(100% - 16px) !important;box-sizing:border-box !important;display:flex !important;flex-direction:column !important}
+html body #ui.ui > #win-skill.phiw:not([hidden]){--ph:calc(min(600px, 100vh - 150px) / var(--uiz, 1));height:var(--ph) !important;width:min(calc(var(--ph) * 1.618), calc(100% - 16px)) !important;max-width:none !important;max-height:none !important;box-sizing:border-box !important;display:flex !important;flex-direction:column !important}
+html body #ui.ui > .win.phiw:not([hidden]) > :not(header){flex:1 1 auto;min-height:0;overflow-y:auto}
+@media (max-height:560px){
+  html body #ui.ui > .win.phiw:not([hidden]):not(#win-equip):not(#win-skill){--ph:calc((100vh - 24px) / var(--uiz, 1));width:min(calc(var(--ph) * 1.618), calc(100% - 16px)) !important}
+  html body #ui.ui > #win-skill.phiw:not([hidden]){--ph:calc((100vh - 24px) / var(--uiz, 1))}
+}
+
+/* ---------- (v238) group 3: NPC and shop dialogs are golden rectangles ----------
+   Every NPC dialog (shops, job master, market, warp, story NPCs…) used to be its own shape (0.9 : 1 to 2.3 : 1).
+   Now all of them share one: width = height × φ (js/sys/dlgmove.js), the height taken from the screen, the list
+   inside scrolls. A size the player sets by dragging the corner is still kept. */
+html body #ui.ui #dialog:not([hidden]){display:flex !important;flex-direction:column !important;box-sizing:border-box !important}   /* the size itself: js/sys/dlgmove.js dlgSize (width = height × φ) */
+html body #ui.ui #dialog:not([hidden]) > .db{flex:1 1 auto;min-height:0;overflow-y:auto}
