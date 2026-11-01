@@ -99,5 +99,5 @@ window.addEventListener('unhandledrejection', e => { if (!window.__vay) showFata
 cv.addEventListener('contextlost', e => e.preventDefault());
 cv.addEventListener('contextrestored', () => { try { repaintMap(); } catch (err) {} });
 const boot = () => window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
-{ let booted = false; const go = () => { if (!booted){ booted = true; boot(); } };
+{ let booted = false; const go = () => { if (booted) return; if (document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', go, {once:true}); return; } booted = true; boot(); };   // (v236) never before every script has run (job lines register late)
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(go); setTimeout(go, 2500); }   // never wait more than 2.5 s for fonts

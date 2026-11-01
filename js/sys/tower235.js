@@ -56,3 +56,15 @@ if (typeof TWF_CURSE !== 'undefined') TWF_CURSE.drought = ['แห้งแล�
 if (typeof BGM_TRACKS !== 'undefined') BGM_TRACKS.tower = {src:'audio/tower_loop.mp3', th:'หอคอยร้อยชั้น', en:'The Hundred-floor Tower'};
 if (typeof SFX !== 'undefined' && SFX.music){ const _m = SFX.music; SFX.music = function(name){ if (typeof TW !== 'undefined' && TW.active && name) name = 'tower'; return _m.call(this, name); }; }
 EV.on('tick', () => { if (typeof TW !== 'undefined' && TW.active && typeof BGM !== 'undefined' && BGM.key !== 'tower' && typeof SFX !== 'undefined' && SFX.music) SFX.music('tower'); });
+
+/* ---------- (v236) from floor 100 the guardian floors bring more guardians ----------
+   Floors 100–149: two guardians · 150 and up: three, of different regions round the level when possible (the floor's
+   own guardian, plus guardians of the regions just below and above). Each extra one is a full tower guardian. */
+const tw236Bosses = f => (f % 5 !== 0 || f < 100) ? 1 : f < 150 ? 2 : 3;
+{ const _sp = twSpawn; twSpawn = function(){ const r = _sp.apply(this, arguments); const f = TW.f, n = tw236Bosses(f); if (n < 2 || !TW.active || TW.phase !== 'fight') return r;
+    const th = typeof twThemes === 'function' ? twThemes() : [], i = th.findIndex(o => o.i === TW.theme), pool = [th[i - 1], th[i + 1], th[i - 2], th[i]].filter(o => o && MAPS[o.i].boss && MOB[MAPS[o.i].boss]).map(o => MAPS[o.i].boss);
+    const c = twmC(); let have = mobs.filter(m => m.tw === f && !m.dead && m.def.boss).length;
+    for (let k = 0; have < n && k < 6; k++){ const t = pool[k % Math.max(1, pool.length)] || MAPS[TW.theme].boss, a = (have / n) * 6.283 + .6, x = c.x + Math.cos(a) * 170, y = c.y + Math.sin(a) * 110;
+      const g = twMob(t, x, y, f); g.bcd = 3 + k; g.roamT = 99; VFX.play('bossArrive', {x, y}); have++; }
+    banner(L(`ชั้น ${f} · ♛ ผู้พิทักษ์ ${n} ตน!`, `Floor ${f} · ♛ ${n} guardians!`)); TW.t = Math.max(TW.t, TW_TB + 30 * (n - 1));
+    return r; }; }
