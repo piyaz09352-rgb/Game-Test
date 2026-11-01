@@ -1,0 +1,14 @@
+/* VAYRATHEN — css/phi237.css — (v237) the golden ratio on the HUD (φ = 1.618)
+   The owner asked for golden proportions in every element on every screen. First group: the HUD.
+   · character card: width : height = φ : 1 (it grows taller if its content needs more) — was 2.06 : 1
+   · quest card: same width, width : height = φ² : 1 at least, placed under the character card at a gap of
+     (edge margin ÷ φ) — js/sys/phi237.js keeps it there as the card above grows
+   · target card: width : height = φ² : 1 at least
+   · hotbar: 61.8% of the screen width, centred (was 57–60%) · chat: 38.2% of the screen width, centred (was 32%):
+     hotbar : chat = φ : 1, and both together span the screen 1 : φ
+   Sizes are proportions of the card or of the screen, so every screen keeps the same ratios. */
+html body #ui.ui #charCard{aspect-ratio:1.618 / 1 !important;height:auto !important;box-sizing:border-box !important;align-content:center !important}
+html body #ui.ui #goalCard{aspect-ratio:2.618 / 1 !important;height:auto !important;box-sizing:border-box !important}
+html body #ui.ui #target{aspect-ratio:2.618 / 1 !important;height:auto !important;box-sizing:border-box !important;align-content:center}
+html body #ui.ui > .chatbox{width:38.2% !important;left:30.9% !important;right:auto !important;box-sizing:border-box !important}
+html body #ui.ui #dock{min-width:61.8% !important;left:19.1% !important;right:auto !important;box-sizing:border-box !important;display:flex !important;justify-content:center !important;transform:none !important}
