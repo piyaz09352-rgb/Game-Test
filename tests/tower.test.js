@@ -17,7 +17,7 @@ test('tower: climb floors, guardian on floor 5, leave, best floor and checkpoint
     const lv1 = await page.evaluate(() => mobs.find(m => m.tw && !m.dead).def.lvl);
     assert.strictEqual(lv1, 6, 'floor 1 monsters are Lv 6');
     // clear floors 1..4 by hand
-    const killAll = () => page.evaluate(() => { for (const m of mobs) if (m.dg && !m.dead){ m.hp = 0; m.dead = true; } S.hp = DER.maxhp; });
+    const killAll = () => page.evaluate(() => { for (const m of mobs) if (m.dg && !m.dead){ m.hp = 0; m.dead = true; } S.hp = DER.maxhp; if (typeof TWF !== 'undefined' && TWF.kind === 'survive' && TWF.f === TW.f) TW.t = .5; });   // (v226) a survive floor ends when its time is up
     for (let f = 1; f <= 4; f++){
       await page.waitForFunction(n => TW.f === n && TW.phase === 'fight', f, { timeout: 15000 });
       await killAll();
