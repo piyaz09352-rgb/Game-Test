@@ -16,6 +16,8 @@ test('tower halls: own map, stairs, Auto, tiers, leaving', { skip, timeout: 1200
       S.tut = {done:true, i:99}; S.lvl = 200; derive(); loadMap(0); twSt().best = 30; twStart(1); adv(70);
       o.hall = W === TWM_W && H === TWM_H && !NPCS.length && !GATES.length && !CAMP && PROPS.length > 0 && PROPS.every(p => p.type === 'twpillar' || p.type === 'twbrazier');
       o.inside = mobs.filter(m => m.dg && !m.dead).every(m => twmIn(m.x, m.y)) && mobs.some(m => m.dg && !m.dead);
+      { const mp = MAPS[TW.theme], kind = mp.mobs.find(t => MOB[t] && !MOB[t].boss && !MOB[t].night), g = twMob(mp.boss, P.x, P.y - 200, 5), n = twMob(kind, P.x, P.y - 220, 5);
+        o.guard = g.maxhp >= n.maxhp * 4 && g.maxhp <= n.maxhp * 8; o.guardTxt = `${g.maxhp} vs ${n.maxhp}`; g.dead = n.dead = true; }   // (v224) a guardian is a fight, not a wall
       for (const m of mobs) if (m.dg) m.dead = true; adv(4); o.open = TWM.open && TW.phase === 'rest' && TW.f === 2;
       const st = twmStairs(); P.x = st.x; P.y = st.y + 10; adv(3); adv(20); const e = twmEntry();
       o.climbed = TW.f === 2 && TW.phase === 'fight' && Math.hypot(P.x - e.x, P.y - e.y) < 30;
@@ -28,6 +30,7 @@ test('tower halls: own map, stairs, Auto, tiers, leaving', { skip, timeout: 1200
     });
     assert.ok(r.hall, 'a floor is the tower hall: no NPCs, gates or camp, only its pillars and braziers');
     assert.ok(r.inside, 'the monsters stand inside the hall');
+    assert.ok(r.guard, `a guardian has 4–8× an ordinary monster's HP (${r.guardTxt})`);
     assert.ok(r.open, 'a cleared floor opens the stairs');
     assert.ok(r.climbed, 'walking onto the stairs climbs to the next floor, arriving at the entrance');
     assert.ok(r.auto, 'Auto takes the stairs');
