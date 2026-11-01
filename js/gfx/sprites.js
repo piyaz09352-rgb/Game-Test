@@ -901,7 +901,7 @@ function drawHuman(cx, cfg, P){
     G(); ell(cx, add(hc, [5.5, 8.5, 7]), 2.8, 2.4, M[cfg.bandMat || 'cloth']);
   } else if (cfg.hat === 'ngob'){
     // งอบ: the wide palm-leaf farmer's hat
-    G(); frustum(cx, add(hc, [0, 0, -.5]), hc[1] + 15, hc[1] + 6.6, 3, 17.5, M.straw, {tex:(n, k) => (Math.sin(Math.atan2(n[0], n[2]) * 14) > .7 ? {dt:1} : k > .92 ? {m:M.wood} : undefined)});
+    G(); frustum(cx, add(hc, [0, 0, -.5]), hc[1] + 15, hc[1] + 6.6, 3, 17.5, M[cfg.hatMat] ?? M.straw, {tex:(n, k) => (Math.sin(Math.atan2(n[0], n[2]) * 14) > .7 ? {dt:1} : k > .92 ? {m:M[cfg.ngobBand] ?? M.wood} : undefined)});   // (v212) a wardrobe ngob may be dyed
     G(); ell(cx, add(hc, [0, 15.6, -.5]), 2, 1.6, M.wood);
   } else if (cfg.hat === 'lomphok' || cfg.hat === 'hermit'){
     // ลอมพอก: tall cone hat of Ayutthaya envoys and astrologers (tiger-striped for the hermit)
