@@ -17,7 +17,7 @@ test('crossroads towns: roads, safety, people, services, shops', { skip, timeout
         return !!mp && A.links[d] === T0.id && mp.links[OPP[d]] === A.id && (!B || B.links[OPP[d]] === T0.id) && ROADS[d].includes(T0.id); });
       o.visit = [];
       for (const T0 of TOWNS){ loadMap(T0.id); adv(10);
-        const ids = NPCS.map(n => n.id); o.visit.push({k:T0.k, mobs:mobs.filter(m => !m.dead).length, boss:!!boss, camp:CAMP, blds:PROPS.filter(p => p.type === 'tbld').length, land:PROPS.some(p => p.type === 'tland'),
+        const ids = NPCS.map(n => n.id); o.visit.push({k:T0.k, mobs:mobs.filter(m => !m.dead).length, boss:!!boss, camp:CAMP, blds:PROPS.filter(p => p.type === 'tbld').length, svc:Object.keys(TW_LAY.pos).length, land:PROPS.some(p => p.type === 'tland'),
           npcs:['warp', 'shop', 'smith', 'banker', 'healer_oon', `tw_${T0.k}_food`, `tw_${T0.k}_cos`].every(id => ids.includes(id))}); }
       // the services open in a town, the kitchen and the costume shop sell
       const T0 = TOWNS[0]; loadMap(T0.id); adv(4); o.dlg = [];
@@ -37,7 +37,7 @@ test('crossroads towns: roads, safety, people, services, shops', { skip, timeout
       return o;
     });
     assert.deepStrictEqual(r.towns, [true, true, true, true], 'each town sits in its road, gates wired both ways');
-    for (const v of r.visit){ assert.strictEqual(v.mobs, 0, `${v.k}: no monsters`); assert.ok(!v.boss && !v.camp, `${v.k}: no boss, no camp`); assert.ok(v.blds >= 16 && v.land, `${v.k}: buildings and a landmark`); assert.ok(v.npcs, `${v.k}: services, kitchen and costume shop`); }
+    for (const v of r.visit){ assert.strictEqual(v.mobs, 0, `${v.k}: no monsters`); assert.ok(!v.boss && !v.camp, `${v.k}: no boss, no camp`); assert.ok(v.blds >= 12 && v.svc === 8 && v.land, `${v.k}: all eight service buildings, houses and a landmark`); assert.ok(v.npcs, `${v.k}: services, kitchen and costume shop`); }
     assert.deepStrictEqual(r.dlg, [true, true, true, true, true], 'potions, smith, bank, healer and warp open in a town');
     assert.ok(r.food && r.foodUse, 'the kitchen sells local food');
     assert.ok(r.cos, 'the costume shop sells its town pieces');

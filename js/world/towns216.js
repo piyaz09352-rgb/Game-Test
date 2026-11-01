@@ -187,32 +187,61 @@ const TW_OUTER = [-145, -115, -65, -35, 35, 65, 115, 145];
 const twSlot = (deg, k) => { const a = deg * Math.PI / 180; return [Math.round(W * .5 + Math.cos(a) * 430 * k), Math.round(H * .5 + Math.sin(a) * 290 * k)]; };
 const TW_DECOR = [[['lamp', 1], ['jar', 1], ['bougain', 1], ['frangipani', 1]], [['palm', 1], ['jar', 1], ['stall', 1], ['rock', 1]], [['pine', 1], ['rock', 1], ['stupa', 1], ['lamp', 1]], [['himtree', 1], ['lotusbowl', 1], ['stupa', 1], ['lamp', 1]]];
 const TW_PAVE = [['#b8a890', '#a89878', '#c8baa0'], ['#d8b880', '#c8a46a', '#e4c890'], ['#9a9aa2', '#8a8a92', '#aaaab2'], ['#f4f0fa', '#e6e0f0', '#ffffff']];
+/* (v219) the town is laid out like a town, not a ring: an irregular square that fades into the ground, cobbled streets
+   with soft ragged edges where grass creeps in, the services round the square at uneven distances, houses along the
+   streets, lamps beside them, trees, flower beds and hedges between the houses. (v216 painted a hard-edged ellipse of
+   brick tiles: the owner found it did not belong to the land at all.) */
+const TW_GROUND = [   // dirt (soft base) · stones · grass at the edges
+  {dirt:['rgba(150,124,86,', 'rgba(172,146,104,'], stone:['#a8a090', '#b8b0a0', '#968e80', '#c4bcac', '#8a8476'], grass:['#4a7a3a', '#5e9048', '#6aa050']},
+  {dirt:['rgba(176,134,80,', 'rgba(196,154,98,'], stone:['#d8b888', '#e4c898', '#c8a474', '#ecd4a8', '#bc9866'], grass:['#9a8a4a', '#b0a058', '#8a7a3e']},
+  {dirt:['rgba(186,198,214,', 'rgba(204,214,228,'], stone:['#9aa0ac', '#aeb4c0', '#8a909c', '#c0c6d0', '#7e848e'], grass:['#ffffff', '#eef4fa', '#dce8f4']},
+  {dirt:['rgba(232,226,240,', 'rgba(246,242,250,'], stone:['#f4f0fa', '#e6e0f0', '#ffffff', '#ded6ec', '#f0e6c8'], grass:['#7ac8a0', '#9ad8b0', '#e8d080']}
+];
+const TW_LAY = {map:-1, pos:{}};
+function twPaveR(a, k){ return 250 + 46 * Math.sin(a * 3 + k) + 28 * Math.sin(a * 5 + k * 2.3) + 14 * Math.sin(a * 9 + k * .7); }
+function twInPave(x, y, cx, cy, k){ const dx = x - cx, dy = (y - cy) * 1.32, a = Math.atan2(dy, dx); if (Math.hypot(dx, dy) < twPaveR(a, k)) return 1 - Math.hypot(dx, dy) / twPaveR(a, k);
+  const d = trailD(x, y), w = 30 + 9 * Math.sin(x * .021 + y * .013); return d < w && Math.hypot(x - cx, y - cy) < 1150 ? 1 - d / w : 0; }
 function twLayout(mapId){
-  const T0 = TOWN_OF[mapId], st = T0.style, cx = W * .5, cy = H * .5; let sd = mapId * 977 + 7; const r = () => (sd = (sd * 9301 + 49297) % 233280) / 233280;
-  // paving: the square and the streets into it, painted into the ground
-  const g = terr.getContext('2d'), P0 = TW_PAVE[st]; g.save(); g.setTransform(TS, 0, 0, TS, 0, 0);
-  for (const tr of TRAIL.lines){ g.strokeStyle = P0[1]; g.lineWidth = 64; g.lineCap = 'round'; g.beginPath(); tr.forEach(([x, y], i) => { if (Math.hypot(x - cx, y - cy) > 1000) return; i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); }
-  for (const tr of TRAIL.lines){ g.strokeStyle = P0[2]; g.lineWidth = 40; g.beginPath(); tr.forEach(([x, y], i) => { if (Math.hypot(x - cx, y - cy) > 1000) return; i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); }
-  // the square: laid stone tiles in staggered rows inside a kerb, each tile its own shade
-  const RX = 250, RY = 185; g.save(); g.beginPath(); g.ellipse(cx, cy, RX, RY, 0, 0, 7); g.clip(); g.fillStyle = 'rgba(40,30,20,.45)'; g.fillRect(cx - RX, cy - RY, RX * 2, RY * 2);
-  for (let y = cy - RY, row = 0; y < cy + RY; y += 15, row++) for (let x = cx - RX - (row % 2) * 13; x < cx + RX; x += 26){ g.fillStyle = P0[(r() * 3) | 0]; g.fillRect(x + 1, y + 1, 24, 13); g.fillStyle = 'rgba(255,255,255,.18)'; g.fillRect(x + 1, y + 1, 24, 1.2); }
-  g.fillStyle = P0[2]; g.beginPath(); g.ellipse(cx, cy, 46, 34, 0, 0, 7); g.fill(); g.strokeStyle = 'rgba(80,60,40,.4)'; g.lineWidth = 3; g.stroke(); g.restore();
-  g.strokeStyle = 'rgba(70,55,40,.55)'; g.lineWidth = 7; g.beginPath(); g.ellipse(cx, cy, RX, RY, 0, 0, 7); g.stroke(); g.strokeStyle = 'rgba(255,255,255,.25)'; g.lineWidth = 2; g.beginPath(); g.ellipse(cx, cy, RX - 3, RY - 3, 0, 0, 7); g.stroke();
+  const T0 = TOWN_OF[mapId], st = T0.style, cx = W * .5, cy = H * .5, G0 = TW_GROUND[st], k = mapId * .37; let sd = mapId * 977 + 7; const r = () => (sd = (sd * 9301 + 49297) % 233280) / 233280;
+  const g = terr.getContext('2d'); g.save(); g.setTransform(TS, 0, 0, TS, 0, 0);
+  // 1) worn ground: many soft overlapping patches along the streets and over the square, feathered at the edge
+  const blob = (x, y, rr, a) => { const gr = g.createRadialGradient(x, y, 0, x, y, rr); gr.addColorStop(0, G0.dirt[(r() * 2) | 0] + a + ')'); gr.addColorStop(1, G0.dirt[0] + '0)'); g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, rr, rr * .8, 0, 0, 7); g.fill(); };
+  for (const tr of TRAIL.lines) tr.forEach(([x, y], i) => { if (i % 2 || Math.hypot(x - cx, y - cy) > 1180) return; blob(x + (r() - .5) * 20, y + (r() - .5) * 14, 46 + r() * 22, .55); });
+  for (let i = 0; i < 260; i++){ const a = r() * 6.283, d = Math.sqrt(r()) * twPaveR(a, k) * 1.05, x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d / 1.32; blob(x, y, 50 + r() * 40, .5); }
+  // 2) cobbles: rounded stones of uneven size and shade, thick in the middle, thinning out toward the edges
+  for (let i = 0; i < 34000; i++){ const x = cx + (r() - .5) * 2400, y = cy + (r() - .5) * 1700, m = twInPave(x, y, cx, cy, k); if (m <= 0 || r() > Math.min(1, m * 2.6)) continue;
+    const rw = 4.5 + r() * 3.5, rh = rw * (.55 + r() * .25), c = G0.stone[(r() * G0.stone.length) | 0];
+    g.fillStyle = 'rgba(30,20,10,.28)'; g.beginPath(); g.ellipse(x + .6, y + 1, rw, rh, 0, 0, 7); g.fill();
+    g.fillStyle = c; g.beginPath(); g.ellipse(x, y, rw, rh, r() * .6 - .3, 0, 7); g.fill(); g.fillStyle = 'rgba(255,255,255,.28)'; g.beginPath(); g.ellipse(x - rw * .25, y - rh * .35, rw * .5, rh * .35, 0, 0, 7); g.fill(); }
+  // 3) grass (snow, sand) creeping back over the ragged edges
+  for (let i = 0; i < 7000; i++){ const x = cx + (r() - .5) * 2400, y = cy + (r() - .5) * 1700, m = twInPave(x, y, cx, cy, k); if (m <= 0 || m > .28) continue;
+    g.strokeStyle = G0.grass[(r() * G0.grass.length) | 0]; g.lineWidth = st === 2 ? 3 : 1; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (r() - .5) * 3, y - 3 - r() * 4); g.stroke(); }
   g.restore();
-  // the landmark, the buildings round the square, decorations
-  addProp('tland', cx, cy - 200, st);
-  for (const [deg, type] of TW_SLOTS){ const [x, y] = twSlot(deg, 1); addProp('tbld', x, y, st * 10 + TW_TYPES.indexOf(type)); }
-  TW_OUTER.forEach((deg, i) => { const [x, y] = twSlot(deg, 1.62); addProp('tbld', x, y, st * 10 + (i % 2 ? 7 : 6)); });
-  for (let i = 0; i < 12; i++){ const a = (i + .5) / 12 * 6.283, x = cx + Math.cos(a) * 268, y = cy + Math.sin(a) * 200; if (Math.abs(Math.cos(a)) > .95 || Math.abs(Math.sin(a)) > .97) continue; addProp(st === 3 ? 'lotusbowl' : 'lamp', x, y, 0); }
-  const dec = TW_DECOR[st]; let n = 0;
-  for (let t = 0; t < 600 && n < 46; t++){ const a = r() * 6.283, d = 700 + r() * 700, x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d * .7; if (x < 80 || y < 100 || x > W - 80 || y > H - 80 || trailD(x, y) < 60 || GATES.some(gt => Math.hypot(gt.x - x, gt.y - y) < 160)) continue;
-    if (PROPS.some(p => Math.hypot(p.x - x, p.y - y) < 90)) continue; const [type] = dec[(r() * dec.length) | 0]; addProp(type, x, y, Math.floor(r() * 3)); n++; }
+  // the landmark at the head of the square
+  TW_LAY.map = mapId; TW_LAY.pos = {};
+  addProp('tland', cx, cy - 175, st);
+  const taken = [{x:cx, y:cy - 175}], free = (x, y, gap = 165) => x > 120 && x < W - 120 && y > 140 && y < H - 100 && trailD(x, y) > 92 && twInPave(x, y + 10, cx, cy, k) <= 0 && !taken.some(p => Math.hypot(p.x - x, (p.y - y) * 1.15) < gap) && !GATES.some(gt => Math.hypot(gt.x - x, gt.y - y) < 180);
+  const place = (x0, y0, v, key) => { for (let t = 0; t < 60; t++){ const a = r() * 6.283, d = t * 9, x = Math.round(x0 + Math.cos(a) * d), y = Math.round(y0 + Math.sin(a) * d * .8); if (!free(x, y)) continue; addProp('tbld', x, y, v); taken.push({x, y}); if (key) TW_LAY.pos[key] = [x, y]; return [x, y]; } return null; };
+  // the services round the square, each at its own distance from it
+  TW_SLOTS.forEach(([deg, type], i) => { const a = deg * Math.PI / 180, R = 1 + .12 * Math.sin(i * 2.1 + k), x = cx + Math.cos(a) * (twPaveR(Math.atan2(Math.sin(a), Math.cos(a)), k) + 150) * R, y = cy + Math.sin(a) * (twPaveR(a, k) / 1.32 + 120) * R;
+    place(x, y, st * 10 + TW_TYPES.indexOf(type), type); });
+  // houses along the streets, either side, with lamps beside the road
+  for (const tr of TRAIL.lines){ let last = -999, side = 1;
+    tr.forEach(([x, y], i) => { const d = Math.hypot(x - cx, y - cy); if (d < 470 || d > 1150 || i - last < 22) return; const nx = tr[Math.min(i + 1, tr.length - 1)], dx = nx[0] - x, dy = nx[1] - y, L0 = Math.hypot(dx, dy) || 1;
+      side = -side; if (place(x - dy / L0 * 150 * side, y + dx / L0 * 120 * side, st * 10 + (r() < .5 ? 6 : 7))) last = i;
+      if (i % 3 === 0){ const lx = x + dy / L0 * 48 * side, ly = y - dx / L0 * 40 * side; if (!taken.some(p => Math.hypot(p.x - lx, p.y - ly) < 70)) addProp(st === 3 ? 'lotusbowl' : 'lamp', lx, ly, 0); } }); }
+  // lamps round the square's edge, then trees, beds and hedges in the gaps
+  for (let i = 0; i < 9; i++){ const a = (i + .3) / 9 * 6.283, R0 = twPaveR(a, k) + 18, x = cx + Math.cos(a) * R0, y = cy + Math.sin(a) * R0 / 1.32; if (trailD(x, y) < 50 || taken.some(p => Math.hypot(p.x - x, p.y - y) < 80)) continue; addProp(st === 3 ? 'lotusbowl' : 'lamp', x, y, 0); }
+  const green = [['tree', 'bush', 'flowerbed', 'hedge', 'frangipani'], ['palm', 'jar', 'flowerbed', 'rock', 'palm'], ['pine', 'pine', 'rock', 'bush', 'stupa'], ['himtree', 'lotusbowl', 'flowerbed', 'hedge', 'himtree']][st];
+  let n = 0; for (let t = 0; t < 1400 && n < 70; t++){ const a = r() * 6.283, d = 280 + Math.sqrt(r()) * 1100, x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d * .72;
+    if (x < 80 || y < 110 || x > W - 80 || y > H - 80 || twInPave(x, y, cx, cy, k) > 0 || trailD(x, y) < 50 || GATES.some(gt => Math.hypot(gt.x - x, gt.y - y) < 150) || taken.some(p => Math.hypot(p.x - x, (p.y - y) * 1.2) < 95) || PROPS.some(p => Math.hypot(p.x - x, p.y - y) < 55)) continue;
+    const type = green[(r() * green.length) | 0]; if (!PROP_TYPES[type]) continue; addProp(type, x, y, Math.floor(r() * 3)); n++; }
 }
 /* the ground: the region's own biome, without ponds, rivers or waterfalls, and the town instead of wild props */
 { const _pm = paintMap;
   paintMap = function(mapId){ if (!isTown(mapId)) return _pm.apply(this, arguments);
     const k = MAPS[mapId].biome, keep = BIOME[k], wf = WATERFALL_BIOMES[k];
-    BIOME[k] = {...keep, ponds:0, band:null, band2:null, floor:null, propN:0, props:keep.props};   // no flagstone ruins either delete WATERFALL_BIOMES[k];
+    BIOME[k] = {...keep, ponds:0, band:null, band2:null, floor:null, propN:0, props:keep.props}; /* no flagstone ruins either */ delete WATERFALL_BIOMES[k];
     try { return _pm.apply(this, arguments); } finally { BIOME[k] = keep; if (wf) WATERFALL_BIOMES[k] = wf; } }; }
 { const _cp = campPlace; campPlace = function(){ if (isTown(MAP_ID)){ twLayout(MAP_ID); CAMP = null; return; } return _cp.apply(this, arguments); }; }   // a town has its square, not a travellers' camp (no fire, no camp cook)
 /* no little ground decorations (flowers, pebbles, tufts) on the square or the streets */
@@ -265,7 +294,7 @@ const twSheet = n => (n.tw && typeof heroSheet === 'function' ? heroSheet(n.tw.j
   setupNpcs = function(id){ const r = _s.apply(this, arguments); const T0 = TOWN_OF[id]; if (!T0) return r;
     for (let i = NPCS.length - 1; i >= 0; i--) if (NPCS[i].id === 'quarter' || NPCS[i].id === 'campcook') NPCS.splice(i, 1);   // no camp quartermaster in a town
     const ti = TOWNS.indexOf(T0), cx = W * .5, cy = H * .5;
-    TW_FOLK[ti].forEach((f, i) => { const [deg] = TW_SLOTS[[0, 1, 2, 3, 4, 6][i]], [x, y0] = twSlot(deg, 1), y = y0 + 46; void cx; void cy;
+    TW_FOLK[ti].forEach((f, i) => { const type = TW_SLOTS[[0, 1, 2, 3, 4, 6][i]][1], at = TW_LAY.map === id && TW_LAY.pos[type] ? TW_LAY.pos[type] : twSlot(TW_SLOTS[[0, 1, 2, 3, 4, 6][i]][0], 1), x = at[0], y = at[1] + 46; void cx; void cy;
       const id2 = TW_AS[i] || `tw_${T0.k}_${i === 4 ? 'food' : 'cos'}`; NPCS.push({id:id2, name:f[0], en:f[1], role:TW_ROLE[i][0], roleEn:TW_ROLE[i][1], x, y, tw:twLook(f), twTown:T0.k, twKind:i}); });
     return r; }; }
 /* town folk use their own figure (the services keep their usual dialogs) */
