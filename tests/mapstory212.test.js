@@ -15,7 +15,7 @@ test('map stories: east road chapters, NPCs, rewards', { skip, timeout: 180000 }
       o.bad = [];
       for (const [m, ch] of Object.entries(MS_CH)){ for (const st of ch.steps){ if ((st.k === 'kill' || st.k === 'elite') && !(MOB[st.t] && MAPS[m].mobs.includes(st.t))) o.bad.push(m + ':' + st.t); if (st.k === 'item' && !ITEMS[st.t]) o.bad.push(m + ':' + st.t); }
         if (!(COSTUME[ch.cos] || WINGS[ch.cos] || XCOS[ch.cos])) o.bad.push('cos ' + ch.cos); }
-      o.chapters = MS_ARCS.length >= 3 && MS_ARCS.every(a => a.maps.every(m => MS_CH[m]) && a.comp && (XCOS[a.mount] || XMOUNT[a.mount]) && ACH_BY[a.title_id]);
+      o.chapters = MS_ARCS.length >= 4 && MS_ARCS.every(a => a.maps.every(m => MS_CH[m]) && a.comp && (XCOS[a.mount] || XMOUNT[a.mount]) && ACH_BY[a.title_id]);
       S.lvl = 20; S.tut = {done:true, i:99}; loadMap(0); adv(4);
       const kh = NPCS.find(n => n.id === 'ms_khaohom'); o.kh = !!kh && npcMark(kh) === '!';
       msAccept(0); const lan = spawnMob('lantern', P.x + 300, P.y); for (let i = 0; i < 6; i++) EV.emit('kill', lan); o.r1 = msReady(); msHandIn();
@@ -32,7 +32,7 @@ test('map stories: east road chapters, NPCs, rewards', { skip, timeout: 180000 }
       return o;
     });
     assert.deepStrictEqual(r.bad, [], 'every chapter names real monsters of its map, real items and pieces');
-    assert.ok(r.chapters, 'every map of the east, south and west roads has a chapter; each road has a companion, a mount and a title');
+    assert.ok(r.chapters, 'every map of all four roads has a chapter; each road has a companion, a mount and a title');
     assert.ok(r.south, 'Phirun waits on the Weeping Plains to start the south road');
     assert.ok(r.kh, 'Khao Hom waits in Aren with a quest mark');
     assert.ok(r.r1 && r.r2 && r.r3 && r.paid && r.done && r.bow, 'hunt → find → gather, paid, chapter done, her bow given');

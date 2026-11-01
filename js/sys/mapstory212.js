@@ -124,6 +124,52 @@ MOUNT_X.suncloth = function(g, M, x, by, dir, t){
   g.fillStyle = 'rgba(255,255,255,.18)'; g.fillRect(x - w / 2, cy - h / 2 - 3, w, 3.4); g.restore();
   for (const s of [-1, 1]) for (let k = 0; k < 5; k++){ const u = s < 0 ? 0 : 1, yy = cy - h / 2 + 1.5 + k * (h - 3) / 4 + Math.sin(u * 7 + t * 5) * 1.8, sw = Math.sin(t * 6 + k) * 1; g.strokeStyle = k % 2 ? gold : '#ffe8a0'; g.lineWidth = .7; g.beginPath(); g.moveTo(x + s * w / 2, yy); g.lineTo(x + s * (w / 2 + 3.4), yy + sw); g.stroke(); }
 };
+/* (v217) the north road's pieces */
+{ const M = SPR.M, mm = (n, f = 'white') => (M[n] != null ? n : f), m = n => M[mm(n)];
+  const tops = {
+    ms_t_whiterobe:['ชุดขาวถือศีล', 'White Robe of the Precepts', fSet('robe', mm('white'), mm('ivory'), mm('gold'), FT.combo(FT.hem(m('ivory'))), {cape:mm('white'), capeTex:null})],
+    ms_t_laplae:['ชุดชาวลับแล', 'Laplae Dress', fSet('dress', mm('jade', 'green'), mm('ivory'), mm('gold'), FT.combo(FT.stripes(m('ivory')), FT.hem(m('gold'))))],
+    ms_t_naga:['ชุดนาคีน้อย', 'Little Nakee Dress', fSet('battle', mm('teal', 'jade'), mm('gold'), mm('emerald', 'jade'), FT.combo(FT.scales(m('emerald', 'jade')), FT.hem(m('gold'))), {cape:null})],
+    ms_t_hunter:['ชุดพรานบุญ', 'Phran Boon Hunter', fSet('ninja', mm('forest', 'green'), mm('brownCl', 'leather'), mm('gold'), FT.combo(FT.zip(m('leather')), FT.hem(m('brownCl', 'leather'))))],
+    ms_t_manohra:['ชุดมโนห์รา', 'Manohra Gown', fSet('dress', mm('roseGold', 'rose'), mm('pearl', 'white'), mm('goldLight', 'gold'), FT.combo(FT.kanok(m('goldLight', 'gold')), FT.hem(m('goldLight', 'gold'))))],
+    ms_t_crystal:['ชุดนางแก้ว', 'Crystal Lady Gown', fSet('sky', mm('frost', 'sky'), mm('pearl', 'white'), mm('iceGlow', 'sky'), FT.combo(FT.stars(m('iceGlow', 'sky')), FT.hem(m('iceGlow', 'sky'))))],
+    ms_t_sun:['ชุดผู้จุดประทีปพันดวง', "Lamplighter's Raiment", fSet('court', mm('sun', 'gold'), mm('ivory'), mm('auraGold', 'gold'), FT.combo(FT.kanok(m('auraGold', 'gold')), FT.dots(m('goldLight', 'gold')), FT.hem(m('goldLight', 'gold'))), {cape:mm('sunset', 'scarlet'), capeTex:'gold'})]
+  };
+  const parts = {
+    ms_h_lamp:['head', 'ปิ่นประทีป', 'Lamp Hairpin', {hat:null, hairClip:'flower', clipMat:mm('sun', 'gold')}],
+    ms_h_minerwrap:['head', 'ผ้าโพกคนขุดแร่', "Miner's Head Wrap", {hat:'headwrap', bandMat:mm('ochre', 'sand')}],
+    ms_h_prince:['head', 'ชฎาเจ้าชายน้อย', "Little Prince's Crown", {hat:'crest', bandMat:mm('gold'), crestMat:mm('goldLight', 'gold'), crestN:3, crestGem:true}],
+    ms_h_asurahorn:['head', 'เขายักษ์น้อย', 'Little Yaksha Horns', {hat:null, horns:mm('crimsonV', 'scarlet'), hornLen:2.2, hornSpread:1.1}],
+    ms_h_flowercrown:['head', 'มาลัยสวนลอยฟ้า', 'Floating-garden Wreath', {hat:'wreath', hatMat:mm('sakuraGlow', 'sakura'), crestMat:mm('goldLight', 'gold')}],
+    ms_h_gate:['head', 'มงกุฎทวารสวรรค์', 'Heavenly-gate Crown', {hat:'crest', bandMat:mm('pearl', 'white'), crestMat:mm('auraGold', 'gold'), crestN:7, crestGem:true}],
+    ms_k_shadow:['mask', 'ผ้าคลุมหน้าบึงเงา', 'Mire Veil', {faceMask:mm('midnight', 'navy'), fmStyle:'veil', fmTrim:mm('silver', 'white'), fmEye:null}],
+    ms_k_witch:['mask', 'ลายดาวแม่มด', 'Witch-star Marks', {faceMask:mm('lavender', 'plum'), fmStyle:'sticker', fmTrim:mm('goldLight', 'gold')}],
+    ms_k_deva:['mask', 'ลายทองเทวดา', 'Golden Deva Marks', {faceMask:mm('goldLight', 'gold'), fmStyle:'blush', fmTrim:mm('auraGold', 'gold')}]
+  };
+  for (const id in tops){ const [th, en, look] = tops[id]; COSTUME[id] = {slot:'top', th, en, src:'story', grand:true, sw:[look.top, look.forearm], look}; SPR.GEAR_LOOK[id] = look; }
+  for (const id in parts){ const [slot, th, en, look] = parts[id]; COSTUME[id] = {slot, th, en, src:'story', grand:false, sw:[look.clipMat || look.bandMat || look.horns || look.hatMat || look.faceMask, look.crestMat || look.fmTrim || look.clipMat || look.bandMat || look.horns], look}; SPR.GEAR_LOOK[id] = look; }
+  WINGS.ms_b_spores = {set:null, th:'สปอร์เห็ดเรืองแสง', en:'Glowcap Spores', kind:'aFly', c:['#ffffff', '#9affe8', '#3ab8c8'], edge:'#3ab8c8', glow:'140,255,230', fx:'none', span:1, cute:true, story:true};
+  WINGS.ms_b_redlotus = {set:null, th:'ปีกบัวแดง', en:'Red Lotus Wings', kind:'lotus', c:['#fff0f0', '#ff8a9a', '#c8203a'], edge:'#ffd0d8', glow:'255,120,140', fx:'sparkle', span:1.05, story:true};
+  WINGS.ms_b_chicks = {set:null, th:'ดาวลูกไก่วนรอบตัว', en:'Pleiades Chicks', kind:'aStar', c:['#ffffff', '#fff2a0', '#ffc840'], edge:'#ffc840', glow:'255,230,140', fx:'none', span:1, cute:true, story:true};
+  const bg = {slot:'mount', th:'เรือสุพรรณหงส์ลอยฟ้า', en:'Flying Golden Swan Barge', kind:'barge', lift:9, c:['#e8b030', '#c8281e'], story:true};
+  XMOUNT.ms_m_barge = bg; XCOS.ms_m_barge = bg;
+}
+// the golden swan barge: a small royal barge with a swan's head and tail, red hull band, gold kanok, oars dipping into clouds
+MOUNT_X.barge = function(g, M, x, by, dir, t, moving){
+  const [gold, red] = M.c, fl = dir === 2 || dir === 1 || dir === 3 ? -1 : 1, side = dir === 2 || dir === 6, bob = Math.sin(t * 2) * 1.2;
+  for (let i = 0; i < 5; i++){ g.fillStyle = 'rgba(255,255,255,.75)'; ov(g, x - 18 + i * 9, by + 9 + Math.sin(t * 1.5 + i) * .8, 7 + (i % 2) * 2, 3); g.fill(); }
+  g.save(); g.translate(x, by + 2 + bob); g.scale(fl * (side ? 1 : .8), 1);
+  g.fillStyle = vsLin(g, 0, -2, 0, 6, [[0, '#ffe08a'], [.5, gold], [1, '#8a5a10']]); g.beginPath(); g.moveTo(-22, -2); g.quadraticCurveTo(-24, 5, -12, 6); g.lineTo(14, 6); g.quadraticCurveTo(24, 5, 22, -2); g.closePath(); g.fill();
+  g.fillStyle = red; g.fillRect(-20, 1.6, 40, 2); g.fillStyle = '#ffe08a'; for (let k = -18; k < 18; k += 4){ pv(g, [k, 1.6, k + 2, -.6, k + 4, 1.6]); g.fill(); }
+  // swan head and neck at the bow, tail plumes at the stern
+  g.strokeStyle = gold; g.lineWidth = 2.4; g.beginPath(); g.moveTo(20, -1); g.quadraticCurveTo(28, -6, 25, -14); g.stroke(); g.fillStyle = gold; ov(g, 25.4, -15, 2.6, 2); g.fill();
+  g.fillStyle = red; pv(g, [27.6, -15.4, 30.6, -14.6, 27.6, -13.8]); g.fill(); g.fillStyle = '#1a1a1a'; ov(g, 25.8, -15.6, .5, .5); g.fill();
+  for (let k = 0; k < 3; k++){ g.strokeStyle = k === 1 ? red : gold; g.lineWidth = 1.2; g.beginPath(); g.moveTo(-20, -1); g.quadraticCurveTo(-27 - k, -6 - k * 2, -24 + k * 2, -12 - k * 2); g.stroke(); }
+  // oars sweeping into the clouds
+  for (const k of [-10, 0, 10]){ const a = Math.sin(t * 3 + k * .1) * .4; g.strokeStyle = '#8a5a20'; g.lineWidth = .8; g.beginPath(); g.moveTo(k, 3); g.lineTo(k - 3 + Math.sin(a) * 3, 11); g.stroke(); g.fillStyle = red; ov(g, k - 3 + Math.sin(a) * 3, 11.5, 1.4, .8); g.fill(); }
+  fxGlow(g, 0, 2, 20, 8, '255,220,140', .3);
+  g.restore(); void moving;
+};
 const MS_STORY_IDS = new Set([...Object.keys(COSTUME).filter(k => /^ms_/.test(k)), 'ms_b_rainbow', 'ms_b_firefly', 'ms_m_krathong']);
 // the sky krathong: a banana-leaf krathong with marigolds, a candle and three incense sticks, floating on a soft glow
 MOUNT_X.krathong = function(g, M, x, by, dir, t){
