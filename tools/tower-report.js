@@ -46,6 +46,7 @@ function towerHero(line, lv){
 }
 
 function climbOne({ line, lv, max, noAvoid }){
+  if (P.dead && typeof dthTown === 'function') dthTown(); P.dead = false;   // (v241) a fall waits on the death sign: get up first
   const job = towerHero(line, lv);
   if (TW.active) twQuit('leave');
   loadMap(0); twSt().best = 400;
@@ -57,6 +58,7 @@ function climbOne({ line, lv, max, noAvoid }){
   while (t < max){
     advance(.05, false); t += .05;
     if (!BOT.on) setBot(true);
+    if (P.dead && typeof dthTown === 'function') dthTown();   // (v241) the player presses «leave the Tower» on the death sign
     if (DG3.boonOpen){ const b = document.querySelector('[data-boon]'); if (b) b.click(); else DG3.boonOpen = false; }
     if (end()){ why = TW.end ? TW.end.why : 'end'; break; }
   }
