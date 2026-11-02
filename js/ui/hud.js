@@ -104,6 +104,7 @@ el('minimap').addEventListener('pointerdown', e => {
   if (typeof SFX !== 'undefined' && SFX.play) SFX.play('click');
 });
 const MM_TAGS = [];   // (v229) the gate tags placed this frame
+const MM_SPOT = new Map();   // (v239) where each gate tag sits, fixed per map
 function drawMini(){
   if (el('mapCard').classList.contains('folded')) return;
   const mm = el('minimap'), g = mm.getContext('2d'), w = mm.width, h = mm.height;
@@ -120,7 +121,7 @@ function drawMini(){
     g.fillStyle = alive ? '#fff0a0' : '#e3b04b'; g.beginPath(); g.moveTo(-4, 2); g.lineTo(-4, -2); g.lineTo(-2, 0); g.lineTo(0, -3.5); g.lineTo(2, 0); g.lineTo(4, -2); g.lineTo(4, 2); g.closePath(); g.fill(); g.restore(); }
   // (v221) each gateway points its own way and says the monster levels of the map behind it, coloured by your level:
   // green = your level or below, gold = a little above you, red = too strong for now; a town shows «เมือง»
-  MM_TAGS.length = 0;
+  MM_TAGS.length = 0; const sig = w + 'x' + h + ':' + GATES.map(q => q.to + '@' + q.x + ',' + q.y).join(';');
   for (const gt of GATES){ const mp = MAPS[gt.to], ang = {e:0, s:Math.PI / 2, w:Math.PI, n:-Math.PI / 2}[gt.side] || 0, gx = gt.x * kx, gy = gt.y * ky;
     g.save(); g.translate(gx, gy); g.rotate(ang); g.scale(u, u); g.fillStyle = '#e3b04b'; g.strokeStyle = 'rgba(60,20,10,.9)'; g.lineWidth = 1;
     g.beginPath(); g.moveTo(6, 0); g.lineTo(-2, -5); g.lineTo(-2, 5); g.closePath(); g.fill(); g.stroke(); g.restore();
@@ -131,9 +132,14 @@ function drawMini(){
     const bx = gt.side === 'e' ? gx - 9 * u - tw : gt.side === 'w' ? gx + 9 * u : gx - tw / 2, by = gt.side === 's' ? gy - 9 * u - th : gt.side === 'n' ? gy + 9 * u : gy - th / 2;
     const vert = gt.side === 'e' || gt.side === 'w', ox = gt.side === 'e' ? gx + 9 * u : gt.side === 'w' ? gx - 9 * u - tw : bx, oy = gt.side === 's' ? gy + 9 * u : gt.side === 'n' ? gy - 9 * u - th : by;   // outward: the far side of the gate
     const cands = [[bx, by], [ox, oy], ...[1, -1, 2, -2].flatMap(k => vert ? [[bx, by + k * (th + 2 * u)], [ox, oy + k * (th + 2 * u)]] : [[bx + k * (tw * .55 + 2 * u), by], [ox + k * (tw * .55 + 2 * u), oy]])];
-    const hit = (x, y) => (MM_TAGS.some(q => x < q[0] + q[2] && x + tw > q[0] && y < q[1] + q[3] && y + th > q[1])) || (x < P.x * kx + 17 * u && x + tw > P.x * kx - 17 * u && y < P.y * ky + 17 * u && y + th > P.y * ky - 17 * u);
-    let tx = clamp(bx, 1, w - tw - 1), ty = clamp(by, 1, h - th - 1);
-    for (const [cx0, cy0] of cands){ const cx1 = clamp(cx0, 1, w - tw - 1), cy1 = clamp(cy0, 1, h - th - 1); if (!hit(cx1, cy1)){ tx = cx1; ty = cy1; break; } }
+    // (v239) the spot is chosen once per map and minimap size and then stays put: dodging your arrow every frame made the tags jump about
+    const key = `${sig}|${gt.x}|${gt.y}|${txt}`;
+    let spot = MM_SPOT.get(key);
+    if (!spot){ const hit = (x, y) => MM_TAGS.some(q => x < q[0] + q[2] && x + tw > q[0] && y < q[1] + q[3] && y + th > q[1]);
+      spot = [clamp(bx, 1, w - tw - 1), clamp(by, 1, h - th - 1)];
+      for (const [cx0, cy0] of cands){ const cx1 = clamp(cx0, 1, w - tw - 1), cy1 = clamp(cy0, 1, h - th - 1); if (!hit(cx1, cy1)){ spot = [cx1, cy1]; break; } }
+      if (MM_SPOT.size > 400) MM_SPOT.clear(); MM_SPOT.set(key, spot); }
+    const tx = spot[0], ty = spot[1];
     MM_TAGS.push([tx, ty, tw, th]);
     g.fillStyle = col[1]; g.beginPath(); g.roundRect ? g.roundRect(tx, ty, tw, th, 4 * u) : g.rect(tx, ty, tw, th); g.fill(); g.strokeStyle = 'rgba(255,255,255,.75)'; g.lineWidth = .8 * u; g.stroke();
     g.fillStyle = col[0]; g.textAlign = 'left'; g.fillText(txt, tx + 3 * u, ty + th / 2 + .5 * u); }
