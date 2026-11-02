@@ -155,7 +155,7 @@ function basicAttack(t){
   if (JOBS[S.job].caster){ SFX.play('orb', {elem:DER.welem}); projs.push({k:'orb', elem:DER.welem, x:P.x, y:P.y - 34, t, delay:.12, speed:520, hit:() => { applyDamage(t, magicDamage(t, .7, DER.welem)); VFX.play('orbHit', {x:t.x, y:t.y - MOB_H[t.type] * .5, elem:DER.welem}); }}); return; }
   { const wt = JOBS[S.job].weapon.type; if (wt === 'dagger' || wt === 'sword') later(wt === 'dagger' ? .06 : .1, () => VFX.play('swingArc', {x:P.x, y:P.y, ang:Math.atan2(t.y - P.y, t.x - P.x), flip:typeof DAGGER_LEFT !== 'undefined' && DAGGER_LEFT.includes(P.dir | 0), kind:wt})); }
   const strike = () => { if (JOBS[S.job].weapon.type === 'shuriken'){ projs.push(shurShot(t, mul)); return; }   // (v184) a thrown star: magic damage
-    if (JOBS[S.job].ranged) projs.push({k:'arrow', elem:DER.welem, x:P.x, y:P.y - 20, t, delay:0, speed:720, hit:() => { applyDamage(t, physDamage(t, mul)); VFX.play('arrowHit', {x:t.x, y:t.y - MOB_H[t.type] * .5, elem:DER.welem}); }}); else applyDamage(t, physDamage(t, mul)); };
+    if (JOBS[S.job].ranged) projs.push({k:'arrow', elem:DER.welem, x:P.x, y:P.y - 20, t, delay:0, speed:720, hit:() => { applyDamage(t, physDamage(t, mul)); VFX.play('arrowHit', {x:t.x, y:t.y - MOB_H[t.type] * .5, elem:DER.welem}); }}); else { applyDamage(t, physDamage(t, mul)); if (typeof meleeCleave === 'function') meleeCleave(t, mul); } };
   strike();
   if (DER.pas.dbl && Math.random() < DER.pas.dbl){ later(.14, () => { if (!t.dead){ strike(); VFX.play('slashHit', {x:t.x, y:t.y - MOB_H[t.type] * .5, gold:true}); } }); }
 }
