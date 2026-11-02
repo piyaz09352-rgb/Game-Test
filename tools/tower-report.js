@@ -4,7 +4,7 @@
    checkpoint about 20 levels below its own and climbs on Auto (blessings: the first one offered) until it falls, runs
    out of time on a floor, or MAX_SEC of game time passes. Reports the floor reached, the monster level there and why
    the run ended → docs/TOWER.md (Thai).
-   Run:  CHROMIUM_PATH=/opt/pw-browsers/chromium node tools/tower-report.js [maxSec=1500]   (LINES=blade,rune · LEVELS=45,80) */
+   Run:  CHROMIUM_PATH=/opt/pw-browsers/chromium node tools/tower-report.js [maxSec=1500]   (LINES=blade,rune · LEVELS=45,80 · NOCLEAVE=1 turns the close-range sweep off) */
 'use strict';
 const fs = require('fs'), path = require('path');
 const { openGame, enterWorld } = require('../tests/browser');
@@ -68,6 +68,7 @@ async function main(){
   const { page, errors, close } = await openGame({ width: 1280, height: 720 }); const rows = [];
   try {
     await enterWorld(page, 'Tower', 'towerbal'); await page.evaluate(`window.towerHero = ${towerHero.toString()}`);
+    if (process.env.NOCLEAVE) await page.evaluate(() => { meleeCleave = () => {}; });   // (v242) compare without the close-range sweep
     let lines = await page.evaluate(() => Object.keys(JOBS).filter(k => JOBS[k].parent === 'novice'));
     if (process.env.LINES) lines = lines.filter(l => process.env.LINES.split(',').includes(l));
     for (const line of lines) for (const lv of LEVELS){ const r = await page.evaluate(climbOne, {line, lv, max:MAX_SEC, noAvoid:!!process.env.NOAVOID}); rows.push(r); console.log(JSON.stringify(r)); }
