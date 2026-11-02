@@ -102,7 +102,7 @@ html body #ui.ui #win-equip .eqstat{background:linear-gradient(100deg,color-mix(
 html body #ui.ui #win-equip .bagtab svg{box-sizing:content-box;padding:3px;flex:none;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#f3dfb2);box-shadow:0 0 0 1.5px #e3c486,0 2px 4px rgba(120,70,20,.2)}
 html body #ui.ui #win-equip .bagtab.on svg{background:radial-gradient(circle at 35% 30%,#fff,#ffd56a);box-shadow:0 0 0 1.5px #a8620e,0 0 8px rgba(255,200,80,.8)}
 html body #ui.ui #win-equip .bslot:not(:has(svg)){background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 9c3 4 4 8 0 14-4-6-3-10 0-14zM20 23c-5-1-9-4-11-9 5 0 9 3 11 9zM20 23c5-1 9-4 11-9-5 0-9 3-11 9zM12 27c3-2 13-2 16 0-3 2-13 2-16 0z' fill='%23d8b878' opacity='.22'/%3E%3C/svg%3E") center/62% no-repeat,radial-gradient(circle at 50% 35%,#fffdf8,#f6ead0 70%) !important}
-html body #ui.ui #win-equip .bslot:has(svg){position:relative;overflow:hidden}
+html body #ui.ui #win-equip .bslot:has(svg){position:relative;clip-path:inset(0 round 11px)}   /* clip-path, not overflow:hidden: in the bag grid overflow:hidden let the rows shrink to 8 px and the cells piled up */
 html body #ui.ui #win-equip .bslot:has(svg)::after{content:"";position:absolute;top:-30%;bottom:-30%;width:35%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);transform:skewX(-18deg);animation:eqGlint 4.5s ease-in-out 9999;pointer-events:none}
 html body #ui.ui #win-equip .bagh,html body #ui.ui #win-equip .bagtool{position:relative}
 
