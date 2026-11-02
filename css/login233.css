@@ -131,3 +131,8 @@ html body #title .title-card:not(.authing):has(.slots):not(:has(.maker)) > :is(.
 html body .ui.on-title > #win-settings:not([hidden]){opacity:1 !important;pointer-events:auto !important;z-index:400 !important}
 /* (v235) the character card's lines under the name (class · levels · map) were dark brown on the dark card */
 html body #title .slots small{color:#e8d6b0 !important;opacity:1 !important;text-shadow:0 1px 1px rgba(0,0,0,.5) !important}
+
+/* (v240) Settings opened from the title screen: only what makes sense before entering the world
+   (no «back to title», «rest screen now», «arrange buttons» or the look inspector: they need a hero in the world) */
+.ui.on-title #pane-settings .row:has(#setTitle),.ui.on-title #pane-settings .row:has(#restNow),
+.ui.on-title #pane-settings #heOpenRow,.ui.on-title #pane-settings .set:has([data-insopen]){display:none!important}
