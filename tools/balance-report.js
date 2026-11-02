@@ -5,7 +5,8 @@
    (the real game loop, stepped without drawing). The report counts kills per minute, EXP per minute, deaths and
    potions, and says whether the class has an area skill to hunt groups with.
    Run:  CHROMIUM_PATH=/opt/pw-browsers/chromium node tools/balance-report.js [seconds]   → docs/BALANCE.md (Thai)
-         BOSS=1 … → each line alone against the map's boss → docs/BALANCE_BOSS.md · LINES=rune,occult limits the lines */
+         BOSS=1 … → each line alone against the map's boss → docs/BALANCE_BOSS.md · LINES=rune,occult limits the lines
+         · BOSSTYPE=agnilord fights that boss instead · LV=65,120 picks the levels */
 'use strict';
 const fs = require('fs'), path = require('path');
 const { openGame, enterWorld } = require('../tests/browser');
@@ -20,8 +21,8 @@ async function main(){
     await enterWorld(page, 'Balance', 'balance');
     let lines = await page.evaluate(() => Object.keys(JOBS).filter(k => JOBS[k].parent === 'novice'));
     if (process.env.LINES) lines = lines.filter(l => process.env.LINES.split(',').includes(l));   // e.g. LINES=rune,occult
-    for (const line of lines) for (const lv of (process.env.BOSS ? [45, 80, 115] : LEVELS)){
-      const r = await page.evaluate(simOne, { line, lv, sec: SIM_SEC, boss: !!process.env.BOSS });
+    for (const line of lines) for (const lv of (process.env.LV ? process.env.LV.split(',').map(Number) : process.env.BOSS ? [45, 80, 115] : LEVELS)){
+      const r = await page.evaluate(simOne, { line, lv, sec: SIM_SEC, boss: !!process.env.BOSS, bossType: process.env.BOSSTYPE || '' });
       rows.push(r); console.log(JSON.stringify(r));
     }
   } finally { await close(); }
@@ -42,7 +43,7 @@ function writeOut(rows, errors){
 }
 
 /* runs inside the game page */
-async function simOne({ line, lv, sec, boss: bossMode }){
+async function simOne({ line, lv, sec, boss: bossMode, bossType }){
   const kids = j => Object.keys(JOBS).filter(k => JOBS[k].parent === j);
   let job = line; const tier = lv < 40 ? 1 : lv < 70 ? 2 : lv < 100 ? 3 : 4;
   for (let t = 1; t < tier; t++){ const k = kids(job)[0]; if (!k) break; job = k; }
@@ -80,7 +81,7 @@ async function simOne({ line, lv, sec, boss: bossMode }){
   // boss mode: the map's boss next to you, nothing else around
   let bossM = null;
   if (typeof BOTG !== 'undefined') BOTG.r = bossMode ? 0 : 190;   // (v206) Auto keeps off monsters near warp gates; a test boss may stand by one
-  if (bossMode){ const bt = MAPS[mapId].boss;
+  if (bossMode){ const bt = bossType && MOB[bossType] ? bossType : MAPS[mapId].boss;   // BOSSTYPE=agnilord: that boss instead of the map's own
     // away from the camp (a boss hit from a safe zone teleports away with full HP: sys/bosssafe.js)
     const safe = typeof CAMP !== 'undefined' && CAMP ? CAMP : {x: P.x, y: P.y};
     const far = mobs.filter(m => !m.def.boss).sort((a, b) => Math.hypot(b.x - safe.x, b.y - safe.y) - Math.hypot(a.x - safe.x, a.y - safe.y))[0];
