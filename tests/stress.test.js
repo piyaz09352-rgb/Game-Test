@@ -112,6 +112,8 @@ test('hero falls in battle and wakes up in town', { skip, timeout: 120000 }, asy
   try {
     await enterWorld(page);
     await page.evaluate(() => { loadMap(1); P.x = VSPAWN.x; P.y = VSPAWN.y; S.exp = 50; playerDie(); });
+    await page.waitForFunction(() => P.dead && el('dth') && !el('dth').hidden, null, { timeout: 15000 });   // (v241) the death sign: the player gets up
+    await page.click('[data-dth="town"]');
     await page.waitForFunction(() => !P.dead, null, { timeout: 15000 });
     const st = await page.evaluate(() => ({ map: MAP_ID, hp: S.hp, exp: S.exp }));
     assert.strictEqual(st.map, 0, 'respawned in town');

@@ -47,6 +47,10 @@ test('tower: climb floors, guardian on floor 5, leave, best floor and checkpoint
     await page.evaluate(() => { closeWin('tower'); const b = document.getElementById('twSum'); if (b) b.remove(); twStart(21); });
     await page.waitForFunction(() => TW.phase === 'fight', null, { timeout: 15000 });
     await page.evaluate(() => playerDie());
+    // (v241) the death sign: no feather in the Tower, «leave the Tower» ends the climb
+    await page.waitForFunction(() => el('dth') && !el('dth').hidden, null, { timeout: 10000 });
+    assert.ok(await page.evaluate(() => document.querySelector('[data-dth="here"]').disabled), 'no feather revive in the Tower');
+    await page.click('[data-dth="town"]');
     await page.waitForFunction(() => !TW.active && TW.end && TW.end.why === 'fell', null, { timeout: 20000 });
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no runtime errors');
