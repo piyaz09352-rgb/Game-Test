@@ -45,3 +45,18 @@ html body #ui.ui.moba .mobapot .mo{width:var(--phpot,40px)!important;height:var(
 html body #ui.ui.moba .mobautil .mu{width:40px!important;height:40px!important}
 html body #ui.ui.moba .joy{width:var(--phjoy,168px)!important;height:var(--phjoy,168px)!important}
 html body #ui.ui.moba .joy .knob{width:calc(var(--phjoy,168px) * .382)!important;height:calc(var(--phjoy,168px) * .382)!important;margin:calc(var(--phjoy,168px) * -.191) 0 0 calc(var(--phjoy,168px) * -.191)!important}
+
+/* (v244) the wardrobe on a phone: the hero preview stays in sight while trying things on. The left column is a
+   flex column that scrolls; with the try/buy buttons and the dye palette under it, the preview box (overflow hidden)
+   was squeezed to 0 px high and the player could not see the outfit they were trying */
+html body #ui.ui #win-equip .eqstage > .eqaura{flex-shrink:0 !important}
+/* the preview fills the left column at its own shape, and the hero stands on the pedestal (on a phone the box shrank
+   to 91×111 with the hero floating small in its middle) */
+html body #ui.ui #win-equip .eqaura{width:min(100%,184px) !important;height:auto !important;aspect-ratio:160/196;place-items:end center !important}
+html body #ui.ui #win-equip .eqaura #eqPrev{width:86% !important;height:auto !important;aspect-ratio:108/140;margin-bottom:9%}
+/* (v244) bag · equipment on a landscape phone: the doll and the bag side by side, as on a PC. A rule meant for narrow
+   (portrait) screens stacked them under 820 px wide, so on a landscape phone the doll ring was squashed into a strip
+   about 100 px high (slot pictures gone, labels on top of each other) and the bag's footer sat on its grid */
+@media (orientation:landscape){
+  html body #ui.ui #win-equip.invwin:not(.cosmode) .invcombo{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) !important;overflow-y:hidden !important}
+}
