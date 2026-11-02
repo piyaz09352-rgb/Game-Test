@@ -1,0 +1,128 @@
+/* VAYRATHEN — css/eqstyle245.css — (v245) the bag · equipment window dressed up (the owner: "too plain")
+   Looks only: the same tabs, slots, numbers and buttons. Gold tabs that show where you are, the doll on a golden
+   mandala with round gilded slots and a small ✕ in the corner (it was a big oval over the picture), a coloured
+   stripe per stat, a gilded category list, bag cells with a gold rim and depth, the footer as a ribbon. */
+
+/* tabs: the one you are on is gold */
+html body #ui.ui #win-equip .eqtabs{gap:8px !important}
+html body #ui.ui #win-equip .eqtabs button{border-radius:999px !important;border:2px solid #e3c486 !important;background:linear-gradient(#fffaf0,#f3e3c0) !important;
+  color:#7a4a1c !important;font-weight:800 !important;letter-spacing:.3px;box-shadow:inset 0 2px 0 #fff,0 3px 0 #d9b878 !important;transition:transform .08s}
+html body #ui.ui #win-equip:not(.cosmode) .eqtabs [data-eqtab="gear"],html body #ui.ui #win-equip.cosmode .eqtabs [data-eqtab="cos"]{
+  background:linear-gradient(#ffe9a0,#f2b93a 55%,#d8901a) !important;border-color:#a8620e !important;color:#4a2406 !important;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.7),0 3px 0 #8a4a0a,0 0 14px rgba(255,190,60,.55) !important;text-shadow:0 1px 0 rgba(255,255,255,.6)}
+
+/* the doll: a golden mandala behind the hero */
+html body #ui.ui #win-equip .eqdoll2.e6{position:relative;border-radius:22px;isolation:isolate;
+  background:radial-gradient(ellipse at 50% 50%,rgba(255,236,170,.95) 0,rgba(255,214,130,.55) 26%,rgba(255,240,210,0) 62%),
+    repeating-conic-gradient(from 0deg at 50% 50%,rgba(214,160,60,.10) 0 6deg,rgba(214,160,60,0) 6deg 12deg),
+    linear-gradient(#fffaf0,#fbefd6) !important;
+  box-shadow:inset 0 0 0 2px #edd39a,inset 0 0 0 6px rgba(255,255,255,.6),inset 0 0 40px rgba(214,150,40,.18) !important}
+html body #ui.ui #win-equip .eqdoll2.e6::after{content:"";position:absolute;inset:7px;border-radius:17px;border:1.5px dashed rgba(190,130,50,.35);pointer-events:none;z-index:-1}
+html body #ui.ui #win-equip:not(.cosmode) .eqdoll2.e6 .eqaura{transform:scale(1.35);transform-origin:50% 60%}
+html body #ui.ui #win-equip .eqplate b{color:#5a2a08 !important;text-shadow:0 1px 0 #fff}
+html body #ui.ui #win-equip .eqplate{background:linear-gradient(90deg,rgba(255,250,235,0),rgba(255,250,235,.95) 20%,rgba(255,250,235,.95) 80%,rgba(255,250,235,0)) !important;border-radius:10px}
+
+/* the slots: round, gilded, glowing; the ✕ is a small button on the rim */
+html body #ui.ui #win-equip .eqdoll2.e6 .eqbox{border-radius:50% !important;background:radial-gradient(circle at 38% 30%,#ffffff,#fdf4e0 55%,#ecd6a8) !important;
+  box-shadow:0 0 0 2px #e3b04b,0 0 0 4px rgba(255,255,255,.85),0 4px 10px rgba(120,70,20,.3) !important}
+html body #ui.ui #win-equip .eqdoll2.e6 .eqsl.full .eqbox{box-shadow:0 0 0 2px #e3b04b,0 0 0 4px rgba(255,255,255,.85),0 0 14px rgba(255,190,60,.7),0 4px 10px rgba(120,70,20,.3) !important}
+html body #ui.ui #win-equip .eqdoll2.e6 .eqsl:not(.full) .eqbox{opacity:.75;background:radial-gradient(circle at 38% 30%,#fffdf6,#f2e6cc) !important;box-shadow:0 0 0 2px #e6d2a8,0 2px 6px rgba(120,70,20,.18) !important}
+html body #ui.ui #win-equip .eqdoll2.e6 .eqx{width:18px !important;height:18px !important;min-width:0 !important;padding:0 !important;border-radius:50% !important;
+  background:linear-gradient(#ff7a6a,#d8303a) !important;border:1.5px solid #fff !important;box-shadow:0 1px 3px rgba(90,10,16,.5) !important;color:#fff !important;display:grid !important;place-items:center !important}
+html body #ui.ui #win-equip .eqdoll2.e6 .eqx svg{width:10px !important;height:10px !important;stroke:#fff !important;color:#fff !important}
+
+/* stats: a coloured stripe and label for each */
+html body #ui.ui #win-equip .eqstats{gap:6px !important}
+html body #ui.ui #win-equip .eqstat{position:relative;overflow:hidden;border-radius:10px !important;border:1.5px solid #ead6aa !important;
+  background:linear-gradient(#fffdf8,#f8ecd2) !important;box-shadow:inset 0 1px 0 #fff,0 2px 0 #e2c992 !important;padding-left:12px !important}
+html body #ui.ui #win-equip .eqstat::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--sc,#e3b04b)}
+html body #ui.ui #win-equip .eqstat small{color:var(--sc,#8a5a2a) !important;font-weight:800 !important;filter:brightness(.8)}
+html body #ui.ui #win-equip .eqstat b{color:#3a2208 !important}
+html body #ui.ui #win-equip .eqstat:nth-child(1){--sc:#e04a3a}html body #ui.ui #win-equip .eqstat:nth-child(2){--sc:#9a4ae0}
+html body #ui.ui #win-equip .eqstat:nth-child(3){--sc:#3a7ad8}html body #ui.ui #win-equip .eqstat:nth-child(4){--sc:#1fa8a0}
+html body #ui.ui #win-equip .eqstat:nth-child(5){--sc:#3aa84a}html body #ui.ui #win-equip .eqstat:nth-child(6){--sc:#2ab0e0}
+html body #ui.ui #win-equip .eqstat:nth-child(7){--sc:#f07a1a}html body #ui.ui #win-equip .eqstat:nth-child(8){--sc:#d8a20a}
+
+/* the bag: gilded category list and cells with a rim */
+html body #ui.ui #win-equip .bagtabs{background:linear-gradient(#fffaf0,#f6e8c8) !important;border-right:1.5px solid #ead6aa !important}
+html body #ui.ui #win-equip .bagtab{border-radius:12px !important;margin:2px 4px !important;transition:background .15s}
+html body #ui.ui #win-equip .bagtab.on{background:linear-gradient(#ffe9a0,#f2b93a 60%,#e09a22) !important;color:#4a2406 !important;
+  box-shadow:inset 0 2px 0 rgba(255,255,255,.65),0 2px 0 #a8620e,0 0 10px rgba(255,190,60,.45) !important}
+html body #ui.ui #win-equip .bagtab.on b,html body #ui.ui #win-equip .bagtab.on small,html body #ui.ui #win-equip .bagtab.on svg{color:#4a2406 !important;stroke:#4a2406 !important;text-shadow:none !important}
+html body #ui.ui #win-equip .bslot{border-radius:11px !important;border:1.5px solid #e8d2a0 !important;
+  background:radial-gradient(circle at 50% 35%,#fffdf8,#f6ead0 70%) !important;box-shadow:inset 0 2px 4px rgba(150,100,40,.12),inset 0 -2px 0 rgba(255,255,255,.8) !important}
+html body #ui.ui #win-equip .bslot:has(svg){border-color:#e3b04b !important;background:radial-gradient(circle at 50% 35%,#ffffff,#fdf0d4 70%) !important;box-shadow:0 2px 6px rgba(150,100,40,.22),inset 0 1px 0 #fff !important}
+
+/* the footer as a ribbon */
+html body #ui.ui #win-equip .bagf{background:linear-gradient(90deg,rgba(255,240,200,0),rgba(255,236,190,.9) 25%,rgba(255,236,190,.9) 75%,rgba(255,240,200,0)) !important;border-top:1.5px solid #ead6aa !important}
+html body #ui.ui #win-equip .bagf .bcap{font-weight:800;color:#6a3a10}
+html body #ui.ui #win-equip .bagf .bagx{background:linear-gradient(#fff2c0,#f2c24a) !important;border:1.5px solid #b8780e !important;color:#4a2406 !important;border-radius:999px !important;box-shadow:0 2px 0 #8a4a0a !important}
+/* the ✕ stays round on a phone (the touch rule gives every button 35 px of height, which stretched it into an oval) */
+html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 .eqsl .eqx{min-height:0 !important;min-width:0 !important;width:20px !important;height:20px !important;aspect-ratio:1 !important;
+  background:linear-gradient(#ff7a6a,#d8303a) !important;border:1.5px solid #fff !important;box-shadow:0 1px 3px rgba(90,10,16,.5) !important}
+html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 .eqsl .eqx svg{width:10px !important;height:10px !important;stroke:#fff !important}
+
+/* ---------- (v245, more) the owner: still too plain ---------- */
+/* the window: gilded corners and a parchment body */
+html body #ui.ui #win-equip .wb{background:radial-gradient(ellipse at 50% 0%,rgba(255,236,190,.55),transparent 60%),
+  repeating-linear-gradient(45deg,rgba(214,170,90,.05) 0 2px,transparent 2px 9px),linear-gradient(#fffaf0,#f8ecd4) !important}
+html body #ui.ui #win-equip .wb::before,html body #ui.ui #win-equip .wb::after{content:"";position:absolute;width:54px;height:54px;pointer-events:none;z-index:5;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 60'%3E%3Cpath d='M4 56V22C4 12 12 4 22 4h34' fill='none' stroke='%23e3b04b' stroke-width='3'/%3E%3Cpath d='M11 56V26c0-8 7-15 15-15h30' fill='none' stroke='%23fff0b8' stroke-width='1.4'/%3E%3Cpath d='M18 18c6-7 15-6 17 1-6-2-11 0-13 6-3-1-4-4-4-7z' fill='%23e3b04b'/%3E%3Ccircle cx='12' cy='12' r='4.5' fill='%23ffd56a' stroke='%237a3a14' stroke-width='1.4'/%3E%3C/svg%3E") no-repeat center/contain}
+html body #ui.ui #win-equip .wb{position:relative}
+html body #ui.ui #win-equip .wb::before{left:2px;bottom:2px;transform:scaleY(-1)}
+html body #ui.ui #win-equip .wb::after{right:2px;bottom:2px;transform:scale(-1)}
+
+/* the doll: kranok corners, slow golden rays, drifting sparkles, a glowing pedestal under the hero */
+html body #ui.ui #win-equip .eqdoll2.e6{overflow:visible !important}
+html body #ui.ui #win-equip .eqdoll2.e6 .eqstage::before{content:"";position:absolute;left:50%;top:50%;width:150%;height:150%;transform:translate(-50%,-50%);z-index:-1;pointer-events:none;border-radius:50%;
+  background:repeating-conic-gradient(from 0deg,rgba(255,206,90,.28) 0 5deg,rgba(255,206,90,0) 5deg 15deg);
+  -webkit-mask:radial-gradient(circle,#000 18%,transparent 66%);mask:radial-gradient(circle,#000 18%,transparent 66%);animation:eqRays 40s linear 9999}
+html body #ui.ui #win-equip .eqdoll2.e6 .eqstage::after{content:"";position:absolute;left:50%;bottom:16%;width:62%;height:13%;transform:translateX(-50%);z-index:0;pointer-events:none;border-radius:50%;
+  background:radial-gradient(ellipse,rgba(255,250,220,.95) 0,rgba(255,206,90,.85) 40%,rgba(214,140,30,.55) 62%,rgba(214,140,30,0) 72%);box-shadow:0 0 18px rgba(255,190,60,.55);animation:eqGlow 2.6s ease-in-out 9999}
+html body #ui.ui #win-equip .eqdoll2.e6 .eqaura{z-index:1}
+html body #ui.ui #win-equip .eqdoll2.e6 > .eqstage{background:radial-gradient(circle at 50% 46%,rgba(255,255,255,.9),rgba(255,236,180,.5) 40%,transparent 66%) !important}
+html body #ui.ui #win-equip .eqdoll2.e6 .e6c{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff6c8;box-shadow:0 0 8px 2px rgba(255,210,90,.9);animation:eqSpark 3.4s ease-in-out 9999;pointer-events:none}
+html body #ui.ui #win-equip .eqdoll2.e6 .e6c.a{left:18%;top:28%;animation-delay:-.4s}html body #ui.ui #win-equip .eqdoll2.e6 .e6c.b{right:16%;top:22%;animation-delay:-1.6s}
+html body #ui.ui #win-equip .eqdoll2.e6 .e6c.c{left:22%;bottom:24%;animation-delay:-2.4s}html body #ui.ui #win-equip .eqdoll2.e6 .e6c.d{right:20%;bottom:30%;animation-delay:-.9s}
+html body #ui.ui #win-equip .eqdoll2.e6 > .eqstage .eqplate{position:relative;z-index:2;background:linear-gradient(#fffaf0,#f6e2b6) !important;border:1.5px solid #e3b04b !important;border-radius:999px !important;padding:2px 14px !important;box-shadow:0 2px 6px rgba(120,70,20,.25) !important}
+/* slot names as little ribbons; worn slots breathe gold */
+html body #ui.ui #win-equip .eqdoll2.e6 .eqsl::after{text-shadow:0 1px 0 rgba(0,0,0,.25);box-shadow:0 2px 4px rgba(90,50,10,.3),inset 0 1px 0 rgba(255,255,255,.5) !important;border:1px solid rgba(255,255,255,.75) !important}
+html body #ui.ui #win-equip .eqdoll2.e6 .eqsl.full{animation:eqBreath 3s ease-in-out 9999}
+
+/* stats: a small emblem for each */
+html body #ui.ui #win-equip .eqstat small::before{display:inline-grid;place-items:center;width:1.45em;height:1.45em;margin-right:4px;border-radius:50%;font-size:.95em;color:#fff;
+  background:radial-gradient(circle at 35% 30%,color-mix(in srgb,var(--sc) 45%,#fff),var(--sc));box-shadow:0 1px 2px rgba(0,0,0,.25);vertical-align:-.25em}
+html body #ui.ui #win-equip .eqstat:nth-child(1) small::before{content:"⚔"}html body #ui.ui #win-equip .eqstat:nth-child(2) small::before{content:"✦"}
+html body #ui.ui #win-equip .eqstat:nth-child(3) small::before{content:"⛨"}html body #ui.ui #win-equip .eqstat:nth-child(4) small::before{content:"✧"}
+html body #ui.ui #win-equip .eqstat:nth-child(5) small::before{content:"◎"}html body #ui.ui #win-equip .eqstat:nth-child(6) small::before{content:"➶"}
+html body #ui.ui #win-equip .eqstat:nth-child(7) small::before{content:"✸"}html body #ui.ui #win-equip .eqstat:nth-child(8) small::before{content:"ϟ"}
+html body #ui.ui #win-equip .eqstat{background:linear-gradient(100deg,color-mix(in srgb,var(--sc) 10%,#fff),#fffaf0 45%,#f8ecd2) !important}
+
+/* the bag: icons in coloured discs, lotus watermark in empty cells, a gold glint on filled ones */
+html body #ui.ui #win-equip .bagtab svg{box-sizing:content-box;padding:3px;flex:none;border-radius:50%;background:radial-gradient(circle at 35% 30%,#fff,#f3dfb2);box-shadow:0 0 0 1.5px #e3c486,0 2px 4px rgba(120,70,20,.2)}
+html body #ui.ui #win-equip .bagtab.on svg{background:radial-gradient(circle at 35% 30%,#fff,#ffd56a);box-shadow:0 0 0 1.5px #a8620e,0 0 8px rgba(255,200,80,.8)}
+html body #ui.ui #win-equip .bslot:not(:has(svg)){background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 40 40'%3E%3Cpath d='M20 9c3 4 4 8 0 14-4-6-3-10 0-14zM20 23c-5-1-9-4-11-9 5 0 9 3 11 9zM20 23c5-1 9-4 11-9-5 0-9 3-11 9zM12 27c3-2 13-2 16 0-3 2-13 2-16 0z' fill='%23d8b878' opacity='.22'/%3E%3C/svg%3E") center/62% no-repeat,radial-gradient(circle at 50% 35%,#fffdf8,#f6ead0 70%) !important}
+html body #ui.ui #win-equip .bslot:has(svg){position:relative;overflow:hidden}
+html body #ui.ui #win-equip .bslot:has(svg)::after{content:"";position:absolute;top:-30%;bottom:-30%;width:35%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);transform:skewX(-18deg);animation:eqGlint 4.5s ease-in-out 9999;pointer-events:none}
+html body #ui.ui #win-equip .bagh,html body #ui.ui #win-equip .bagtool{position:relative}
+
+/* the coin chips and the footer ornaments */
+html body #ui.ui #win-equip .bagh .chip,html body #ui.ui #win-equip .bagh b,html body #ui.ui #win-equip .bagh .btn{border-radius:999px !important}
+
+@keyframes eqRays{to{transform:translate(-50%,-50%) rotate(360deg)}}
+@keyframes eqGlow{0%,100%{opacity:.8;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.06)}}
+@keyframes eqSpark{0%,100%{opacity:0;transform:translateY(6px) scale(.5)}40%{opacity:1}60%{opacity:1;transform:translateY(-10px) scale(1.1)}}
+@keyframes eqBreath{0%,100%{filter:brightness(1)}50%{filter:brightness(1.12) drop-shadow(0 0 6px rgba(255,200,80,.7))}}
+@keyframes eqGlint{0%,70%{left:-60%}100%{left:130%}}
+@media (prefers-reduced-motion:reduce){html body #ui.ui #win-equip *{animation:none !important}}
+
+/* the old ring hid its own decorations (display:none): shown again here, under the hero */
+html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 > .eqstage::before,html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 > .eqstage::after{display:block !important}
+html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 .eqaura .e6c{display:block !important;opacity:1}
+html body #ui.ui #win-equip .bagtab span{white-space:nowrap;min-width:0}
+html body #ui.ui #win-equip .bagtab b{white-space:nowrap}
+html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 > .eqstage::after{animation:eqGlow 2.6s ease-in-out 9999 !important}
+html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 .eqaura .e6c{animation:eqSpark 3.4s ease-in-out 9999 !important}
+html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 .eqaura .e6c.a{animation-delay:-.4s !important}html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 .eqaura .e6c.b{animation-delay:-1.6s !important}
+html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 .eqaura .e6c.c{animation-delay:-2.4s !important}html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 .eqaura .e6c.d{animation-delay:-.9s !important}
+html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 .eqsl.full{animation:eqBreath 3s ease-in-out 9999 !important}

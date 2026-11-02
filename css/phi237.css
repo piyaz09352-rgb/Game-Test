@@ -52,8 +52,8 @@ html body #ui.ui.moba .joy .knob{width:calc(var(--phjoy,168px) * .382)!important
 html body #ui.ui #win-equip .eqstage > .eqaura{flex-shrink:0 !important}
 /* the preview fills the left column at its own shape, and the hero stands on the pedestal (on a phone the box shrank
    to 91×111 with the hero floating small in its middle) */
-html body #ui.ui #win-equip .eqaura{width:min(100%,184px) !important;height:auto !important;aspect-ratio:160/196;place-items:end center !important}
-html body #ui.ui #win-equip .eqaura #eqPrev{width:86% !important;height:auto !important;aspect-ratio:108/140;margin-bottom:9%}
+html body #ui.ui #win-equip.cosmode .eqaura{width:min(100%,184px) !important;height:auto !important;aspect-ratio:160/196;place-items:end center !important}
+html body #ui.ui #win-equip.cosmode .eqaura #eqPrev{width:86% !important;height:auto !important;aspect-ratio:108/140;margin-bottom:9%}
 /* (v244) bag · equipment on a landscape phone: the doll and the bag side by side, as on a PC. A rule meant for narrow
    (portrait) screens stacked them under 820 px wide, so on a landscape phone the doll ring was squashed into a strip
    about 100 px high (slot pictures gone, labels on top of each other) and the bag's footer sat on its grid */
