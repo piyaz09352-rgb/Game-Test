@@ -24,10 +24,13 @@ for (const k in BRG){ const d = MOB[k]; if (!d || !d.boss) continue; Object.assi
     d.bossSkills = out; } }
 /* no leap onto a hero who stands back: a ranged boss walks until you are in range (mobs.js does the shooting) */
 { const _h = bossHunt; bossHunt = function(m){ if (m && m.def && m.def.bossRanged) m.leapCd = 99; return _h.apply(this, arguments); }; }
-/* a caster's bolt: lands on MDEF, Flee does not sidestep it (a roll still does) */
+/* a caster's bolt: lands on MDEF, Flee does not sidestep it (a roll still does). Every hero has far less MDEF than DEF
+   and cannot dodge it, so a bolt hits for 55% of the boss's blow: measured solo, the Sea Ogress killed heroes three
+   times as often as a melee boss of her level at full strength (tools/balance-report.js BOSS=1 BOSSTYPE=seaogress) */
+const BRG_BOLT = .55;
 { const _a = mobAttack; mobAttack = function(m, mult = 1, noDodge = false){
     if (!m || !m.def || !m.def.bossCaster || !DER || P.roll) return _a.apply(this, arguments);
-    const keep = DER.def; DER.def = DER.mdef || 0; try { return _a.call(this, m, mult, true); } finally { DER.def = keep; } }; }
+    const keep = DER.def; DER.def = DER.mdef || 0; try { return _a.call(this, m, mult * BRG_BOLT, true); } finally { DER.def = keep; } }; }
 /* stand next to one and it blinks back out of reach */
 EV.on('tick', dt => { if (!S || P.dead) return;
   for (const m of mobs){ const d = m.def; if (m.dead || m.vanish || !d || !d.bossRanged || !m.aggro || m.charge || m.leapT > 0) continue;
