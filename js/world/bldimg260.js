@@ -4,7 +4,7 @@
      apothecary.png → ร้านยา · smithy.png → โรงตีเหล็ก · smelter.png → โรงหลอมแร่ · driller.png → ร้านเจาะมณี ·
      herbal.png → สมุนไพร · cook.png → โรงครัว · tailor.png → ร้านตัดชุด · bank.png → คลังเบี้ย · registrar.png → ทะเบียน ·
      festival.png → เทศกาล · trader.png → รับซื้อของ · beast.png → เลี้ยงสัตว์ · tower.png → อนุสรณ์หอคอย 100 ชั้น
-   A white (or near-white) background round the picture is cut away by itself, so a picture with a plain white
+   A white (or near-white) background round the picture is cut away by itself (v262: a black one too), so a picture with a plain white
    background works as well as a transparent PNG. A missing file just leaves the painted building. */
 'use strict';
 const BIMG = {files:{shop:'apothecary', smith:'smithy', forger:'smelter', driller:'driller', herbal:'herbal', cook:'cook', tailor:'tailor', banker:'bank', registrar:'registrar',
@@ -13,8 +13,11 @@ const BIMG = {files:{shop:'apothecary', smith:'smithy', forger:'smelter', drille
 function bimgCut(img){
   const w = img.naturalWidth, h = img.naturalHeight, c = document.createElement('canvas'); c.width = w; c.height = h; const g = c.getContext('2d'); g.drawImage(img, 0, 0);
   let d; try { d = g.getImageData(0, 0, w, h); } catch (e) { return c; }
-  const px = d.data, seen = new Uint8Array(w * h), white = i => px[i * 4 + 3] > 0 && px[i * 4] > 232 && px[i * 4 + 1] > 232 && px[i * 4 + 2] > 232, st = [];
+  const px = d.data, seen = new Uint8Array(w * h), st = [];
   if (px[3] < 10 && px[(w * h - 1) * 4 + 3] < 10) return c;   // already transparent
+  // (v262) the background is the corner's colour: near-white or near-black (the owner's stable came on black)
+  const blackBg = Math.max(px[0], px[1], px[2]) < 30, white = blackBg ? i => px[i * 4 + 3] > 0 && Math.max(px[i * 4], px[i * 4 + 1], px[i * 4 + 2]) < 14
+    : i => px[i * 4 + 3] > 0 && px[i * 4] > 232 && px[i * 4 + 1] > 232 && px[i * 4 + 2] > 232;
   for (let x = 0; x < w; x++){ st.push(x, (h - 1) * w + x); } for (let y = 0; y < h; y++){ st.push(y * w, y * w + w - 1); }
   while (st.length){ const i = st.pop(); if (seen[i] || !white(i)) continue; seen[i] = 1; px[i * 4 + 3] = 0; const x = i % w, y = (i / w) | 0;
     if (x > 0) st.push(i - 1); if (x < w - 1) st.push(i + 1); if (y > 0) st.push(i - w); if (y < h - 1) st.push(i + w); }
