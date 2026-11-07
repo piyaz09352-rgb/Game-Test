@@ -26,6 +26,7 @@ function t269Garden(){
   // nobody stands on a bed or in the fountain
   const free = e => { if (walkable(e.x, e.y, 10)) return; for (let t = 1; t < 60; t++){ const a = t * 2.4, d = 6 + t * 3, x = e.x + Math.cos(a) * d, y = e.y + Math.sin(a) * d * .8; if (walkable(x, y, 10)){ e.x = x; e.y = y; return; } } };
   for (const n of NPCS) free(n);
+  if (typeof MS !== 'undefined' && MS.map === 0 && Array.isArray(MS.spots)) for (const q of MS.spots) free(q);   // a story chapter's glowing spots, set down before the beds were
   free(P);
   if (typeof TL !== 'undefined') TL.map = null;   // the townsfolk pick their spots again, round the beds
   if (typeof ARN_L !== 'undefined') ARN_L.clear();
