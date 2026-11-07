@@ -51,7 +51,7 @@ function netTick(dt){
     // up to 20 heroes share a map room: send less often as it fills so the room stays light (8/s alone → ~4/s full)
     NET.presT = NET.mapRoom ? (NET.mapRoom.peers().length > 10 ? .33 : NET.mapRoom.peers().length > 4 ? .25 : NET.mapRoom.peers().length > 1 ? .2 : .5) : .5;   // (v185) 5/s with company, 2/s alone on the map (no one downloads it), 3–4/s in a crowd
     if (typeof NM !== 'undefined' && (NM.host || NM.holding)) NET.presT = Math.max(NET.presT, .2);   // the monster host's presence carries the snapshot: keep it at 5/s
-    const p = {n:netName(), j:S.job, l:S.lvl, x:Math.round(P.x), y:Math.round(P.y), d:P.dir || 0, a:P.act || 'idle', r:P.ride ? 1 : 0, h:Math.round(S.hp / DER.maxhp * 100), sp:Math.round(S.sp / DER.maxsp * 100), pt:NET.party || null, s:P.sit ? 1 : 0, dead:P.dead ? 1 : 0, g:(vg => { const a = GHOST_SLOTS.map(k => vg[k] || ''); while (a.length > 4 && !a[a.length - 1]) a.pop(); return a.join(','); })(typeof visGear === 'function' ? visGear(S.gear) : S.gear || {}), ti:S.title || '', gn:(S.guild && S.guild.name) || '', lk:SPR.lookKey(S.look), ...(typeof wbPres === 'function' ? wbPres() : {}), ...(typeof nmPres === 'function' ? nmPres() : {}), ...(typeof dgPres === 'function' ? dgPres() : {}), ...(typeof pvpPres === 'function' ? pvpPres() : {}), ...(typeof afPres === 'function' ? afPres() : {}), ...(typeof cosPres === 'function' ? cosPres() : {}), ...(typeof emoPres === 'function' ? emoPres() : {}), ...(typeof siegePres === 'function' ? siegePres() : {}), ...(typeof rfPres === 'function' ? rfPres() : {}), ...(typeof gmPres === 'function' ? gmPres() : {}), ...(typeof sumPres === 'function' ? sumPres() : {}), ...(typeof gfxPres === 'function' ? gfxPres() : {})};
+    const p = {...(typeof GAMEV !== 'undefined' && GAMEV ? {gv:GAMEV} : {}), n:netName(), j:S.job, l:S.lvl, x:Math.round(P.x), y:Math.round(P.y), d:P.dir || 0, a:P.act || 'idle', r:P.ride ? 1 : 0, h:Math.round(S.hp / DER.maxhp * 100), sp:Math.round(S.sp / DER.maxsp * 100), pt:NET.party || null, s:P.sit ? 1 : 0, dead:P.dead ? 1 : 0, g:(vg => { const a = GHOST_SLOTS.map(k => vg[k] || ''); while (a.length > 4 && !a[a.length - 1]) a.pop(); return a.join(','); })(typeof visGear === 'function' ? visGear(S.gear) : S.gear || {}), ti:S.title || '', gn:(S.guild && S.guild.name) || '', lk:SPR.lookKey(S.look), ...(typeof wbPres === 'function' ? wbPres() : {}), ...(typeof nmPres === 'function' ? nmPres() : {}), ...(typeof dgPres === 'function' ? dgPres() : {}), ...(typeof pvpPres === 'function' ? pvpPres() : {}), ...(typeof afPres === 'function' ? afPres() : {}), ...(typeof cosPres === 'function' ? cosPres() : {}), ...(typeof emoPres === 'function' ? emoPres() : {}), ...(typeof siegePres === 'function' ? siegePres() : {}), ...(typeof rfPres === 'function' ? rfPres() : {}), ...(typeof gmPres === 'function' ? gmPres() : {}), ...(typeof sumPres === 'function' ? sumPres() : {}), ...(typeof gfxPres === 'function' ? gfxPres() : {})};
     let ch = false; for (const k in p) if (p[k] !== NET.lastPres[k]){ ch = true; break; }
     NET.hbT = (NET.hbT || 0) - dt; if (!ch && NET.hbT <= 0) ch = true;   // heartbeat: other clients drop a hero who has been silent for 45 s (see firebase-shim.js)
     if (ch) NET.hbT = 10;
@@ -85,8 +85,15 @@ function netTick(dt){
    changed for 5 minutes (the AFK kick removes a live player before that) is no longer drawn or counted for the
    monsters and the world clock; the moment it moves again it is back. */
 const NET_IDLE = {ms:5 * 60e3, seen:new Map()};
+/* (v254) heroes stuck on the map, take two: the owner still saw strangers standing for good. Those were old versions
+   left running in forgotten tabs: they keep moving a little (HP/SP ticking, an idle pose) so the 5-minute check never
+   fires, they have no AFK kick, and some never stamp the time the 45-second drop needs. The map presence now carries the
+   game version (gv); a hero with no version (every game before v254) or an older version than mine is not drawn and not
+   counted. A real player on an old version sees the "new version" banner (newver.js), reloads, and is back. */
+function netOldGhost(q){ if (typeof GAMEV === 'undefined' || !GAMEV) return false; const v = +q.gv; return !(v > 0) || v < GAMEV; }
 function netIdleGhost(pe){
   const q = pe && pe.presence; if (!q) return false;
+  if (!pe.isMe && netOldGhost(q)) return true;
   const sig = `${q.x}|${q.y}|${q.a}|${q.d}|${q.h}|${q.s}|${q.r}|${q.dead}|${q.sp}`, now = Date.now();
   let e = NET_IDLE.seen.get(pe.peer); if (!e || e.sig !== sig){ e = {sig, t:now}; NET_IDLE.seen.set(pe.peer, e); }
   if (NET_IDLE.seen.size > 400) for (const k of NET_IDLE.seen.keys()){ NET_IDLE.seen.delete(k); if (NET_IDLE.seen.size < 300) break; }

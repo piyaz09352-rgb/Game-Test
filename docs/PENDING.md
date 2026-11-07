@@ -12,3 +12,4 @@
 - (v248) ไม่ให้ผู้เล่นเห็นเพดานหรือสูตรตัวเลข · (v253) วิกิ 5 หน้าที่เหลือ (balance30 boss192 bosshard world2 petevo) เขียนใหม่เป็นคำพูดแล้ว
 - Firebase บน itch.io: อาจต้องเพิ่มโดเมน `html-classic.itch.zone` ใน Authorized domains (เจ้าของเกมต้องทำเองใน Firebase Console)
 - (v253) เทสต์ hudedit แก้ให้วัดปุ่มแต่ละปุ่มแล้ว · townlife221 และ potsteady ผ่าน · test:fast ผ่าน 55/55
+- (v254) ตัวคนอื่นยืนค้างบนแมพ: ซ่อนตัวที่ไม่มีเลขเวอร์ชัน/เวอร์ชันเก่ากว่า (online.js netOldGhost) · เทสต์ netsummon ไม่ผ่านอยู่ก่อนแล้ว (ไม่ใช่จาก v254)
