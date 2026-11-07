@@ -6,7 +6,7 @@
 | ไฟล์ | อาคาร |
 |---|---|
 | apothecary.png | ร้านยา |
-| smithy.png | โรงตีเหล็ก |
+| smithy.png | โรงตีเหล็ก / ร้านตีบวก (ช่างตีบวก) |
 | smelter.png | โรงหลอมแร่ |
 | driller.png | ร้านเจาะมณี |
 | herbal.png | สมุนไพร |
