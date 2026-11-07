@@ -446,6 +446,9 @@ function render(){
     cam.x = GFX.smooth ? CAMS.x + shx : Math.round(CAMS.x + shx); cam.y = GFX.smooth ? CAMS.y + shy : Math.round(CAMS.y + shy); }
   // painted ground (2 px per world unit) straight to the screen
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = GFX.preset === 'ultra' ? 'high' : 'medium';   // (v105) 'high' only at the sharpest preset
+  // (v260) a view wider or taller than the map (far zoom in a small map, the tower's halls): fill the rest first, or the
+  // last frame (the town you came from) shows through at the edges
+  if (VW > W || VH > H){ ctx.fillStyle = typeof twmOn === 'function' && twmOn() && typeof twmT === 'function' ? twmT().sky[1] : '#0b0d12'; ctx.fillRect(0, 0, cv.width, cv.height); }
   ctx.drawImage(terr, cam.x * TS, cam.y * TS, VW * TS, VH * TS, 0, 0, VW * PX * DPR, VH * PX * DPR);
   let g = ctx; g.setTransform(PX * DPR, 0, 0, PX * DPR, 0, 0);
   g.translate(-.5, -.5);
