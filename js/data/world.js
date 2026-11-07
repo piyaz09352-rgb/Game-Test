@@ -1,5 +1,5 @@
 /* VAYRATHEN — js/data/world.js
-   The realm: the capital Aren + 30 regions on four roads (monsters Lv 1–350), 130 monster
+   The realm: the capital Aren + 30 regions on four roads (monsters Lv 1–300), 130 monster
    species built from the archetypes in gfx/beasts.js, one boss per map with its own skill set, the loot each
    species drops, boss cards, armour/headgear sold at the central market, and the market's daily prices.
    Monster stats come from one level curve (statsFor) so every map scales evenly. */
@@ -365,18 +365,18 @@ MAPS.push(
 /* ---------- the realm's layout ----------
    The capital Aren (map 0) sits in the middle. Four roads leave it: east through the fertile lands (Lv 5–75),
    south through the arid lands into the volcano (Lv 70–163), west into the frozen lands (Lv 150–235) and north
-   through the lands of darkness up to the lands of light (Lv 230–350). Each map links back toward the capital and
+   through the lands of darkness up to the lands of light (Lv 210–300). Each map links back toward the capital and
    on to the next one; levels rise the farther you go. */
 const LANDS = {
   capital:['นครหลวง', 'Capital', '#e3b04b'], fertile:['ดินแดนอุดมสมบูรณ์', 'Fertile Lands', '#5aa84a'], arid:['ดินแดนแห้งแล้ง', 'Arid Lands', '#d0a050'],
   volcanic:['ดินแดนภูเขาไฟ', 'Volcanic Lands', '#e0502a'], frozen:['ดินแดนเหน็บหนาว', 'Frozen Lands', '#6ab0e0'], dark:['ดินแดนแห่งความมืด', 'Lands of Darkness', '#8a5ab0'], light:['ดินแดนแห่งแสงสว่าง', 'Lands of Light', '#f0d070']};
 const ROADS = {e:[1, 2, 3, 4, 11, 12, 15], s:[9, 10, 13, 21, 22, 23, 24, 25], w:[7, 26, 27, 28, 19, 29], n:[5, 6, 8, 16, 17, 18, 14, 20, 30]};
-/* east road 5–74, south 70–163, west 150–235, north 230–350 (LVMAP) */
-/* monsters reach Lv 350 (heroes stop at 300): the first half of the world keeps its levels, the later roads are
-   stretched so the last region is 335–350 and its boss ~358. EXP is NOT changed by this: every monster still gives
-   the EXP of the level its map had before (LVINV), so levelling speed stays exactly as it was. */
-const LVMAP = L => (L <= 150 ? L : Math.round(150 + (L - 150) * 200 / 150));
-const LVINV = L => (L <= 150 ? L : 150 + (L - 150) * 150 / 200);
+/* (v253) maps end at Lv 300, the hero's top level (they were stretched to 350: seven maps sat above anything a hero
+   could reach). Levels are the raw ones again: east 5–74, south 70–160, west 150–214, north 210–300. EXP was always
+   the raw level's (LVINV), so levelling speed is exactly as before; monsters past Lv 150 are now their own level's
+   strength instead of the stretched one. Bosses stay a few levels above their map. */
+const LVMAP = L => L;
+const LVINV = L => L;
 const ROAD_LV_RAW = {e:[[5, 15], [14, 24], [23, 33], [32, 42], [41, 52], [50, 62], [60, 74]],
   s:[[70, 82], [80, 92], [90, 102], [100, 112], [110, 122], [120, 134], [132, 146], [144, 160]],
   w:[[150, 162], [160, 172], [170, 182], [180, 192], [190, 202], [200, 214]],

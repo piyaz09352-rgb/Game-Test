@@ -139,11 +139,11 @@ if (typeof sdHTML === 'function'){ const _sd = sdHTML;
     const i = h.lastIndexOf('</div>'); return i < 0 ? h + sec : h.slice(0, i) + sec + h.slice(i); }; }
 
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'bosshard', t:['บอสโหด คริ เจาะเกราะ', 'Hard bosses, crits, penetration'], b:() => `<ul>
-  <li>${L('บอสตัวใหญ่ขึ้น เสกลูกสมุนครั้งละ 4+ ตัว (มีผู้เล่นอื่นใกล้ ๆ ยิ่งเยอะ) และเสกเองทุก 10–20 วินาที', 'Bosses are bigger, call 4+ minions at a time (more with other players near) and call again every 10–20 s')}</li>
+  <li>${L('บอสตัวใหญ่ขึ้น เสกลูกสมุนออกมาเป็นฝูง (มีผู้เล่นอื่นใกล้ ๆ ยิ่งเยอะ) และเสกซ้ำเป็นระยะ', 'Bosses are bigger, call a pack of minions (more with other players near) and call again from time to time')}</li>
   <li>${L('สกิลบอสแรงพอฆ่าอาชีพสายบางที่ไม่มีของป้องกันได้ในทีเดียว · DEF MDEF และลดดาเมจช่วยได้', 'Boss skills can one-shot frail classes without defence · DEF, MDEF and damage reduction help')}</li>
-  <li>${L('มอนทุกตัวมีค่าต้านคริ (Lv × 0.1 บอส +5) · โอกาสคริไม่มีเพดาน', 'Every monster has a crit shield (Lv × 0.1, bosses +5) · crit chance has no cap')}</li>
+  <li>${L('มอนทุกตัวมีค่าต้านคริ ยิ่งเลเวลสูงยิ่งต้านมาก บอสต้านมากกว่ามอนทั่วไป', 'Every monster has a crit shield: more at higher levels, more on bosses')}</li>
   <li>${L('เจาะเกราะ: Ignore DEF/MDEF % (ทั้งหมด บอส มอนธรรมดา ตามเผ่า) และ Armor Pierce · ดูได้ในรายละเอียดสถานะ', 'Penetration: Ignore DEF/MDEF % (all, boss, normal, by race) and Armor Pierce · see the Status details')}</li>
-  <li>${L('สัตว์ที่จับได้ตีแรงตามตัวละคร · ตายแล้วเกิดใหม่ใน 3 นาที ระหว่างนั้นบัพและสกิลของมันหยุด', 'Caught pets scale with you · when one falls it returns in 3 minutes and its bonuses stop until then')}</li></ul>`});
+  <li>${L('สัตว์ที่จับได้ตีแรงตามตัวละคร · ตายแล้วเกิดใหม่ในไม่กี่นาที ระหว่างนั้นบัพและสกิลของมันหยุด', 'Caught pets scale with you · when one falls it returns a few minutes later and its bonuses stop until then')}</li></ul>`});
 
 /* ---------- (v55) ASPD: stats alone stop at ASPD_STAT (180); flat ASPD from gear options and Swift cards takes it up to ASPD_CAP (190) ---------- */
 function aspdFlat(){ let v = 0;

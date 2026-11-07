@@ -78,7 +78,7 @@ html body #ui.ui #win-equip .eqdoll2.e6 .eqstage::before{content:"";position:abs
   background:repeating-conic-gradient(from 0deg,rgba(255,206,90,.28) 0 5deg,rgba(255,206,90,0) 5deg 15deg);
   -webkit-mask:radial-gradient(circle,#000 18%,transparent 66%);mask:radial-gradient(circle,#000 18%,transparent 66%);animation:eqRays 40s linear 9999}
 html body #ui.ui #win-equip .eqdoll2.e6 .eqstage::after{content:"";position:absolute;left:50%;bottom:16%;width:62%;height:13%;transform:translateX(-50%);z-index:0;pointer-events:none;border-radius:50%;
-  background:radial-gradient(ellipse,rgba(255,250,220,.95) 0,rgba(255,206,90,.85) 40%,rgba(214,140,30,.55) 62%,rgba(214,140,30,0) 72%);box-shadow:0 0 18px rgba(255,190,60,.55);animation:eqGlow 2.6s ease-in-out 9999}
+  background:radial-gradient(ellipse,rgba(255,250,220,.95) 0,rgba(255,206,90,.85) 40%,rgba(214,140,30,.55) 62%,rgba(214,140,30,0) 72%);box-shadow:0 0 18px rgba(255,190,60,.55);animation:eqPedestal 2.6s ease-in-out 9999}
 html body #ui.ui #win-equip .eqdoll2.e6 .eqaura{z-index:1}
 html body #ui.ui #win-equip .eqdoll2.e6 > .eqstage{background:radial-gradient(circle at 50% 46%,rgba(255,255,255,.9),rgba(255,236,180,.5) 40%,transparent 66%) !important}
 html body #ui.ui #win-equip .eqdoll2.e6 .e6c{position:absolute;width:6px;height:6px;border-radius:50%;background:#fff6c8;box-shadow:0 0 8px 2px rgba(255,210,90,.9);animation:eqSpark 3.4s ease-in-out 9999;pointer-events:none}
@@ -110,7 +110,7 @@ html body #ui.ui #win-equip .bagh,html body #ui.ui #win-equip .bagtool{position:
 html body #ui.ui #win-equip .bagh .chip,html body #ui.ui #win-equip .bagh b,html body #ui.ui #win-equip .bagh .btn{border-radius:999px !important}
 
 @keyframes eqRays{to{transform:translate(-50%,-50%) rotate(360deg)}}
-@keyframes eqGlow{0%,100%{opacity:.8;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.06)}}
+@keyframes eqPedestal{0%,100%{opacity:.8;transform:translateX(-50%) scale(1)}50%{opacity:1;transform:translateX(-50%) scale(1.06)}}
 @keyframes eqSpark{0%,100%{opacity:0;transform:translateY(6px) scale(.5)}40%{opacity:1}60%{opacity:1;transform:translateY(-10px) scale(1.1)}}
 @keyframes eqBreath{0%,100%{filter:brightness(1)}50%{filter:brightness(1.12) drop-shadow(0 0 6px rgba(255,200,80,.7))}}
 @keyframes eqGlint{0%,70%{left:-60%}100%{left:130%}}
@@ -121,7 +121,7 @@ html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 > .eqstage::before,html body
 html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 .eqaura .e6c{display:block !important;opacity:1}
 html body #ui.ui #win-equip .bagtab span{white-space:nowrap;min-width:0}
 html body #ui.ui #win-equip .bagtab b{white-space:nowrap}
-html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 > .eqstage::after{animation:eqGlow 2.6s ease-in-out 9999 !important}
+html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 > .eqstage::after{animation:eqPedestal 2.6s ease-in-out 9999 !important}
 html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 .eqaura .e6c{animation:eqSpark 3.4s ease-in-out 9999 !important}
 html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 .eqaura .e6c.a{animation-delay:-.4s !important}html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 .eqaura .e6c.b{animation-delay:-1.6s !important}
 html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 .eqaura .e6c.c{animation-delay:-2.4s !important}html body #ui.ui #win-equip #pane-equip .eqdoll2.e6 .eqaura .e6c.d{animation-delay:-.9s !important}

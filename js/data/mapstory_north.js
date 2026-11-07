@@ -1,5 +1,5 @@
 /* VAYRATHEN — js/data/mapstory_north.js — (v217) map stories, the north road: «ประทีปพันดวง» (The Thousand Lamps)
-   19 maps, Lv 230–350, from the lands of darkness up to the lands of light: the forest temple ruins, the mire, the
+   19 maps, Lv 210–300, from the lands of darkness up to the lands of light: the forest temple ruins, the mire, the
    caves and the glowcap forest, the cemetery and the tomb of kings, Laplae, the cursed spire, the naga underworld, the
    crimson lake and the asura labyrinth, then Himmapan, the floating gardens, the Milky Way, Mount Meru, the crystal
    palace, the gate of Tavatimsa and the Throne of the Sun. (The Floating Deva City is a town, not a chapter.)
