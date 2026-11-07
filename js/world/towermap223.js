@@ -29,7 +29,7 @@ const twmOn = () => typeof TW !== 'undefined' && TW.active && typeof DG !== 'und
 const twmTierOf = f => (f >= 100 ? 5 : f > 80 ? 4 : f > 60 ? 3 : f > 40 ? 2 : f > 20 ? 1 : 0);   // (v259) the owner's zones
 const twmT = () => TWM_TIERS[twmTierOf(TW.f)];
 const twmC = () => ({x:W / 2, y:H * .615});   // (v264) the centre of the picture's floor
-const twmStairs = () => { const c = twmC(); return {x:c.x, y:c.y - TWM_RY + 5}; };   // (v263) at the foot of the gate's steps in the picture
+const twmStairs = () => { const c = twmC(); return {x:c.x, y:c.y - TWM_RY - 70}; };   // (v268) on the gate's steps in the picture, right under the glowing door
 const twmEntry = () => { const c = twmC(); return {x:c.x, y:c.y + TWM_RY - 90}; };
 const twmIn = (x, y, m = 0) => { if (typeof twzInOct === 'function') return twzInOct(x, y, m); const c = twmC(); return Math.hypot((x - c.x) / (TWM_RX - m), (y - c.y) / (TWM_RY - m * .66)) < 1; };
 

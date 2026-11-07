@@ -10,9 +10,10 @@
 { const _k = twfKind; twfKind = function(f){ const k = _k.apply(this, arguments); return k === 'treasure' ? 'hunt' : k; }; }
 const T267 = {pool:null};
 const t267Pool = () => T267.pool || (T267.pool = [...new Set(MAPS.map(m => m && m.boss).filter(b => b && MOB[b] && MOB[b].boss && b !== 'asuraking'))]);
+function t267Pick(){ const pool = t267Pool(); return pool[(Math.random() * pool.length) | 0]; }   // (v268) tower268.js pre-rolls these
 const t267Hp = f => 1 + Math.max(0, f - 20) / 20, t267Atk = f => 1 + f / 80, t267Punch = f => 1 + f / 50;
 { const _m = twMob; twMob = function(type, x, y, f){
-    if (typeof TW !== 'undefined' && TW.active && MOB[type] && MOB[type].boss && type !== 'asuraking' && !(typeof TWSQ !== 'undefined' && TWSQ.raw)){ const pool = t267Pool(); if (pool.length) type = pool[(Math.random() * pool.length) | 0]; }
+    if (typeof TW !== 'undefined' && TW.active && MOB[type] && MOB[type].boss && type !== 'asuraking' && !(typeof TWSQ !== 'undefined' && TWSQ.raw)){ type = t267Pick(); }
     const m = _m.call(this, type, x, y, f), fl = f || (typeof TW !== 'undefined' ? TW.f : 1);
     if (m && m.def && m.def.boss && typeof TW !== 'undefined' && TW.active && !m.t267){ m.t267 = true;
       m.def = {...m.def, hp:Math.round(m.def.hp * t267Hp(fl)), atk:m.def.atk.map(v => Math.max(1, Math.round(v * t267Atk(fl)))), ...(fl >= 50 ? {speed:(m.def.speed || 60) * 1.2, delay:(m.def.delay || 1.5) * .85} : {})};

@@ -210,6 +210,7 @@ const TWZ_K = .3;   // how much the corners are cut
 function twzOct(c, a = TWM_RX, b = TWM_RY){ const k = TWZ_K;
   return [[c.x - a * (1 - k), c.y - b], [c.x + a * (1 - k), c.y - b], [c.x + a, c.y - b * (1 - k)], [c.x + a, c.y + b * (1 - k)], [c.x + a * (1 - k), c.y + b], [c.x - a * (1 - k), c.y + b], [c.x - a, c.y + b * (1 - k)], [c.x - a, c.y - b * (1 - k)]]; }
 function twzInOct(x, y, m = 0){ const c = twmC(), a = TWM_RX - m, b = TWM_RY - m * .66, dx = Math.abs(x - c.x), dy = Math.abs(y - c.y);
+  if (dx < 95 - m && y > c.y - TWM_RY - 95 + m * .5 && y <= c.y) return true;   // (v268) the steps up to the gate
   return dx <= a && dy <= b && dx / a + dy / b <= 2 - TWZ_K; }
 const twzPath = (g, pts) => { g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); };
 function twzHall(){

@@ -32,7 +32,7 @@ if (typeof twzBuild === 'function'){ const _b = twzBuild; twzBuild = function(){
     const edge = twzOct(c, TWM_RX + 26, TWM_RY + 18);
     for (let i = 0; i < 8; i++){ const p = edge[i], q = edge[(i + 1) % 8], n = Math.ceil(Math.hypot(q[0] - p[0], q[1] - p[1]) / 26);
       for (let k = 0; k < n; k++) obstacles.push({x:p[0] + (q[0] - p[0]) * k / n, y:p[1] + (q[1] - p[1]) * k / n, r:30, twEdge:true}); }
-    for (let k = -3; k <= 3; k++) obstacles.push({x:st.x + k * 34, y:st.y - 60, r:24, twEdge:true}); }; }
+    for (let k = -3; k <= 3; k++) obstacles.push({x:st.x + k * 34, y:st.y - 48, r:22, twEdge:true}); }; }
 // the picture is lit already: no zone dimming, and the painted gate's shimmer stands aside
 if (typeof twlLight === 'function'){ const _l = twlLight; twlLight = function(){ if (TIMG.floor) return; return _l.apply(this, arguments); }; }
 if (typeof twlGate === 'function'){ const _gt = twlGate; twlGate = function(){ if (TIMG.floor) return; return _gt.apply(this, arguments); }; }
@@ -82,6 +82,7 @@ const TIMG_FIRE = [[.084, .488, 2.6], [.917, .488, 2.6], [.272, .851, 3.2], [.73
 const TIMG_CRYS = [[.196, .79, 1.2], [.81, .78, 1.2], [.368, .18, .8], [.633, .18, .8], [.092, .36, 1], [.906, .36, 1]];
 const TIMG_GATE = [.498, .2], TIMG_ROSE = [.5, .545];
 const timgAt = ([fx, fy]) => { const c = twmC(), h = H, w = h * TIMG.floor.naturalWidth / TIMG.floor.naturalHeight; return [c.x + (fx - TIMG_FLOOR.cx) * w, c.y + (fy - TIMG_FLOOR.cy) * h]; };
+const timgZC = () => (typeof TWZ268 !== 'undefined' ? TWZ268.z().crys : '150,230,255'), timgZL = () => (typeof TWZ268 !== 'undefined' ? TWZ268.z().lights : [['170,110,255', .17, 0], ['80,170,255', .13, 2.1], ['255,190,90', .11, 4.2]]);
 const timgOn = () => !!TIMG.floor && typeof twmOn === 'function' && twmOn();
 const TIMG_FX = {sparks:[], dust:[]};
 const timgPh = (x, y) => { const s = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453; return (s - Math.floor(s)) * 20; };
@@ -105,13 +106,13 @@ EV.on('tick', dt => {
     g.save(); g.globalCompositeOperation = 'lighter';
     const pool = (x, y, rx, ry, col, a0) => { const gr = g.createRadialGradient(x, y, 2, x, y, rx); gr.addColorStop(0, `rgba(${col},${a0})`); gr.addColorStop(1, `rgba(${col},0)`); g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, rx, ry, 0, 0, 7); g.fill(); };
     for (const f of TIMG_FIRE){ const [x, y] = timgAt(f), ph = timgPh(f[0], f[1]), fl = .78 + Math.sin((T + ph) * 9.1) * .12 + Math.sin((T + ph) * 13.7) * .08; pool(x - cam.x, y - cam.y + 20, 150 * f[2] / 2.4 * fl, 80 * f[2] / 2.4 * fl, '255,150,60', .3 * fl); }
-    for (const f of TIMG_CRYS){ const [x, y] = timgAt(f), pu = .7 + Math.sin(T * 2.1 + f[0] * 9) * .3; pool(x - cam.x, y - cam.y + 10, 130 * f[2], 66 * f[2], '90,200,255', .26 * pu); }
+    for (const f of TIMG_CRYS){ const [x, y] = timgAt(f), pu = .7 + Math.sin(T * 2.1 + f[0] * 9) * .3; pool(x - cam.x, y - cam.y + 10, 130 * f[2], 66 * f[2], timgZC(), .26 * pu); }
     // the compass: a breathing glow and slowly turning rays
     { const [x0, y0] = timgAt(TIMG_ROSE), x = x0 - cam.x, y = y0 - cam.y, pu = .65 + Math.sin(T * 1.6) * .35; pool(x, y, 340, 190, '255,200,90', .16 * pu); pool(x, y, 120, 66, '120,210,255', .35 * pu);
       g.save(); g.translate(x, y); g.scale(1, .56); for (let k = 0; k < 8; k++){ const a = T * .25 + k * Math.PI / 4, gr = g.createLinearGradient(0, 0, Math.cos(a) * 330, Math.sin(a) * 330); gr.addColorStop(0, `rgba(255,220,130,${.22 * pu})`); gr.addColorStop(1, 'rgba(255,220,130,0)');
         g.fillStyle = gr; g.beginPath(); g.moveTo(0, 0); g.arc(0, 0, 330, a - .07, a + .07); g.closePath(); g.fill(); } g.restore(); }
     // three coloured lights drifting slowly over the floor
-    { const c = twmC(); for (const [col, sp, ph] of [['170,110,255', .17, 0], ['80,170,255', .13, 2.1], ['255,190,90', .11, 4.2]]){ const x = c.x + Math.cos(T * sp + ph) * TWM_RX * .65 - cam.x, y = c.y + Math.sin(T * sp * 1.3 + ph) * TWM_RY * .6 - cam.y; pool(x, y, 320, 180, col, .14); } }
+    { const c = twmC(); for (const [col, sp, ph] of timgZL()){ const x = c.x + Math.cos(T * sp + ph) * TWM_RX * .65 - cam.x, y = c.y + Math.sin(T * sp * 1.3 + ph) * TWM_RY * .6 - cam.y; pool(x, y, 320, 180, col, .14); } }
     g.restore(); return r; }; }
 // over everything: the gate's shimmer, the crystals' pulse, sparks and dust
 { const _o = LIVE.drawOver; LIVE.drawOver = function(g, ...a){ const r = _o.call(this, g, ...a); if (!timgOn()) return r;
@@ -120,7 +121,7 @@ EV.on('tick', dt => {
       g.save(); g.beginPath(); g.rect(x - w / 2, y - h, w, h); g.clip();
       for (let k = 0; k < 5; k++){ const yy = y - ((T * 40 + k * 40) % h), gr = g.createLinearGradient(0, yy - 18, 0, yy + 18); gr.addColorStop(0, 'rgba(120,190,255,0)'); gr.addColorStop(.5, `rgba(150,210,255,${.35 * pu})`); gr.addColorStop(1, 'rgba(120,190,255,0)'); g.fillStyle = gr; g.fillRect(x - w / 2, yy - 18, w, 36); }
       g.restore(); const gg = g.createRadialGradient(x, y - h * .45, 4, x, y - h * .45, 160); gg.addColorStop(0, `rgba(110,180,255,${.4 * pu})`); gg.addColorStop(1, 'rgba(110,180,255,0)'); g.fillStyle = gg; g.fillRect(x - 160, y - h * .45 - 160, 320, 320); }
-    for (const f of TIMG_CRYS){ const [x0, y0] = timgAt(f), pu = .5 + Math.sin(T * 2.1 + f[0] * 9) * .5, x = x0 - cam.x, y = y0 - cam.y - 45 * f[2]; const cg = g.createRadialGradient(x, y, 2, x, y, 60 * f[2]); cg.addColorStop(0, `rgba(150,230,255,${.45 * pu})`); cg.addColorStop(1, 'rgba(150,230,255,0)'); g.fillStyle = cg; g.beginPath(); g.arc(x, y, 60 * f[2], 0, 7); g.fill(); }
+    for (const f of TIMG_CRYS){ const [x0, y0] = timgAt(f), pu = .5 + Math.sin(T * 2.1 + f[0] * 9) * .5, x = x0 - cam.x, y = y0 - cam.y - 45 * f[2]; const cg = g.createRadialGradient(x, y, 2, x, y, 60 * f[2]); cg.addColorStop(0, `rgba(${timgZC()},${.45 * pu})`); cg.addColorStop(1, `rgba(${timgZC()},0)`); g.fillStyle = cg; g.beginPath(); g.arc(x, y, 60 * f[2], 0, 7); g.fill(); }
     for (const s of TIMG_FX.sparks){ const x = s.x - cam.x, y = s.y - cam.y; if (x < -20 || y < -20 || x > VW + 20 || y > VH + 20) continue; g.fillStyle = `rgba(${s.c},${Math.max(0, Math.min(1, s.life)) * .9})`;
       if (s.star){ g.fillRect(x - .7, y - 3, 1.4, 6); g.fillRect(x - 3, y - .7, 6, 1.4); } else { g.beginPath(); g.arc(x, y, s.r || 1.3, 0, 7); g.fill(); } }
     for (const d of TIMG_FX.dust){ const x = d.x - cam.x, y = d.y - cam.y; if (x < -5 || y < -5 || x > VW + 5 || y > VH + 5) continue; g.fillStyle = `rgba(255,235,170,${.25 + Math.sin(T * 2 + d.ph) * .2})`; g.beginPath(); g.arc(x, y, 1.1, 0, 7); g.fill(); }
