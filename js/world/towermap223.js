@@ -173,11 +173,10 @@ EV.on('tick', dt => {
   if (TW.restT <= .05){ TWM.open = false; const e = twmEntry(); P.x = e.x; P.y = e.y; return; }   // the stairs carried you up anyway
   if (typeof BOT !== 'undefined' && BOT.on && !(BOT.pause > 0) && !P.dead){ P.tx = s.x; P.ty = s.y + 20; if (!P.ride){ P.ride = true; if (typeof renderHotbar === 'function') renderHotbar(); } }   // Auto takes the stairs
 });
-// the floor number carved in the seal, and the open stairs glowing
+// the open stairs glowing
 { const _u = LIVE.drawUnder; LIVE.drawUnder = function(g, ...a){ const r = _u.call(this, g, ...a); if (!twmOn()) return r;
     const T0 = twmT(), c = twmC(), x = c.x - cam.x, y = c.y - cam.y;
-    g.save(); g.font = `900 64px Georgia,"Times New Roman",serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillStyle = 'rgba(0,0,0,.22)'; g.fillText(String(TW.f), x + 2, y + 4); g.fillStyle = T0.rim; g.globalAlpha = .85; g.fillText(String(TW.f), x, y + 2); g.restore();
+    // (v269) the floor number is shown big on the minimap only (js/sys/mobspace269.js), not on the floor
     if (TWM.open && TW.phase === 'rest'){ const s = twmStairs(), sx = s.x - cam.x, sy = s.y - cam.y, p = .6 + Math.sin(T * 4) * .25;
       g.save(); const gr = g.createRadialGradient(sx, sy - 60, 4, sx, sy - 60, 120); gr.addColorStop(0, `rgba(${T0.glow},${.75 * p})`); gr.addColorStop(1, `rgba(${T0.glow},0)`); g.fillStyle = gr; g.fillRect(sx - 130, sy - 190, 260, 260);
       g.globalAlpha = p; g.fillStyle = '#fff6c8'; g.beginPath(); g.ellipse(sx, sy, 48, 16, 0, 0, 7); g.fill(); g.restore(); }

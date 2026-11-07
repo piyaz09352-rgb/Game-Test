@@ -80,7 +80,7 @@ function killMob(m){
   questKill(m.type); partyShareExp(be, je, m.x, m.y); SFX.play(d.boss ? 'boom' : 'mobDie');
   for (const [id, ch] of d.drops){ if (!m.minion && Math.random() < ch * nmul) dropLoot(id, m.x, m.y); }
   // equipment drops: GEAR_DROP (2%) from monsters, every boss drops one piece (and often a second)
-  if (!m.minion){ const n = d.boss ? 1 + (Math.random() < .6 ? 1 : 0) + (Math.random() < .2 ? 1 : 0) : Math.random() < GEAR_DROP * nmul ? 1 : 0;
+  if (!m.minion){ const n = d.boss ? (Math.random() < .5 ? 1 : 0) + (Math.random() < .3 ? 1 : 0) + (Math.random() < .1 ? 1 : 0) : Math.random() < GEAR_DROP * nmul ? 1 : 0;
     for (let i = 0; i < n; i++){ const g0 = gearDrop(m), g = g0 && rollGear(g0, d.boss ? 'boss' : 'mob', m.x, m.y - MOB_H[m.type]); if (g){ dropLoot(g, m.x + rand(-10, 10), m.y + rand(-6, 6)); if (!d.boss) addText(m.x, m.y - MOB_H[m.type] - 32, 'Gear!', '#ffd56a', 14); } } }
   if (!m.minion && Math.random() < d.cardRate * nmul){
     S.cards[d.card] = (S.cards[d.card] || 0) + 1; bump('cards'); EV.emit('card', d.card);

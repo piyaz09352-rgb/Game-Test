@@ -159,7 +159,7 @@ EV.on('kill', m => {
     const rp = m.fz.berserk > 0, n = m.fz.rampages || 0, bonus = Math.round(d.exp * RATE * (.7 + n * .15) * (rp ? 1.3 : 1));
     gainExp(bonus, Math.round(d.jexp * JRATE * (.7 + n * .15)));
     for (let i = 0; i < (rp ? 2 : 1); i++){ const g0 = gearDrop(m), g = g0 && rollGear(g0, rp ? 'rampage' : 'fury', m.x, m.y - MOB_H[m.type]); if (g) dropLoot(g, m.x + rand(-16, 16), m.y + rand(-8, 8)); }
-    if (rp && d.card && Math.random() < .05){ S.cards[d.card] = (S.cards[d.card] || 0) + 1; if (typeof cardPop === 'function') cardPop(d.card); }
+    if (rp && d.card && Math.random() < (d.cardRate || 0) * 2){ S.cards[d.card] = (S.cards[d.card] || 0) + 1; if (typeof cardPop === 'function') cardPop(d.card); }
     banner(L(`โบนัสความโหด · EXP +${bonus.toLocaleString()}${rp ? ' · ปราบขณะอาละวาด!' : ''}`, `Ferocity bonus · EXP +${bonus.toLocaleString()}${rp ? ' · slain mid-rampage!' : ''}`));
     NPCMEM('boss', nm(d));
   }

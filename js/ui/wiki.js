@@ -23,7 +23,7 @@ function wikiIndex(){
   return (WIKI_IX = {where, droppers, skillOf});
 }
 const wkLink = (tab, id, label, cls = '') => `<a class="wkl ${cls}" data-wk="${tab}:${id}">${label}</a>`;
-const wkPct = v => (v >= .1 ? Math.round(v * 100) : +(v * 100).toFixed(2)) + '%';
+const wkPct = v => (v >= .1 ? Math.round(v * 100) : +(v * 100).toFixed(v < .0001 ? 3 : 2)) + "%";
 
 /* (v57) a card's effects, one per line, each with what it means in plain words */
 const WK_FX = [
