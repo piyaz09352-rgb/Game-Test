@@ -28,12 +28,12 @@ if (typeof TWB !== 'undefined'){ TWB.hp = 6; TWB.atk = 1.3; }   // guardians as 
     if (m && m.def){ m.def = {...m.def, hp:Math.round(m.def.hp * TW235.hp * tw256Hp(arguments[3] | 0)), atk:m.def.atk.map(v => Math.max(1, Math.round(v * TW235.atk * tw255Atk(arguments[3] | 0))))}; m.maxhp = m.hp = m.def.hp; }
     return m; }; }
 // more of them
-const tw235Count = f => Math.min(13, 7 + Math.floor(f / 10));   // (v256) 100 floors: 7 → 13 by floor 60 (it reached 16 at floor 54, and a hall of 16 Lv 200+ monsters killed every hero in shop gear)
+const tw235Count = f => Math.min(24, 14 + Math.floor(f / 7));   // (v266) the owner: too few, too quick — 14 → 24 by floor 70 (the hall is wider now)   // (v256) 100 floors: 7 → 13 by floor 60 (it reached 16 at floor 54, and a hall of 16 Lv 200+ monsters killed every hero in shop gear)
 { const _sp = twSpawn; twSpawn = function(){ const r = _sp.apply(this, arguments); if (!TW.active || TW.phase !== 'fight') return r;
     const f = TW.f, kind = typeof twfKind === 'function' ? twfKind(f) : (f % 5 ? 'hunt' : 'guard'), mp = MAPS[TW.theme] || {}, kinds = (mp.mobs || []).filter(t => MOB[t] && !MOB[t].night && !MOB[t].boss); if (!kinds.length) return r;
     const alive = () => mobs.filter(m => m.tw === f && !m.dead && !m.def.boss).length;
     if (kind === 'curse' && typeof TWF !== 'undefined' && TWF.curse === 'drought')return r;   // drought: no extra monsters   // no potions already: no extra monsters (melee lines could not survive both)
-    const want = kind === 'guard' ? 3 : kind === 'elite' ? 6 : kind === 'survive' ? 9 : kind === 'treasure' ? 0 : tw235Count(f);
+    const want = kind === 'guard' ? 6 : kind === 'elite' ? 11 : kind === 'survive' ? 15 : kind === 'treasure' ? 0 : tw235Count(f);
     const c = typeof twmC === 'function' ? twmC() : {x:P.x, y:P.y}, rx = typeof TWM_RX !== 'undefined' ? TWM_RX : 300, ry = typeof TWM_RY !== 'undefined' ? TWM_RY : 200;
     for (let i = alive(), k = 0; i < want && k < 40; k++){ const a = Math.random() * 6.283, d = .25 + Math.random() * .45, x = c.x + Math.cos(a) * rx * d, y = c.y + Math.sin(a) * ry * d;
       if (!walkable(x, y, 14)) continue; const m = twMob(kinds[(i + f) % kinds.length], x, y, f);

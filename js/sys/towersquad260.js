@@ -55,7 +55,7 @@ function twsqAffix(m, id){
   if (id === 'leader') m.def = {...m.def, hp:Math.round(m.def.hp * 1.4)}, m.maxhp = m.hp = m.def.hp;
   if (typeof VFX !== 'undefined') VFX.play('enrage', {m});
 }
-const twsqAfxCount = f => (f < 5 ? 0 : Math.min(5, 1 + Math.floor(f / 20)));
+const twsqAfxCount = f => (f < 3 ? 0 : Math.min(7, 2 + Math.floor(f / 15)));   // (v266) more affixed monsters
 function twsqDealAffixes(f, list){
   const ids = Object.keys(TWSQ_AFX), n = twsqAfxCount(f), pool = list.filter(m => !m.twAfx);
   for (let i = 0; i < n && pool.length; i++){ const m = pool.splice((Math.random() * pool.length) | 0, 1)[0]; twsqAffix(m, ids[(Math.random() * ids.length) | 0]); } }
