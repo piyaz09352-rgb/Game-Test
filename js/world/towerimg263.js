@@ -41,7 +41,7 @@ if (typeof twlGate === 'function'){ const _gt = twlGate; twlGate = function(){ i
 const TIMG_TIDY = new Set(['flowerbed', 'hedge', 'lotusbowl', 'bush', 'flowers', 'fern', 'grass', 'tuft', 'flower']);
 function timgPlaza(){
   if (!TIMG.plaza || typeof MAP_ID === 'undefined' || MAP_ID !== 0 || typeof ARC === 'undefined' || (typeof DG !== 'undefined' && DG.active)) return;
-  const im = TIMG.plaza, cx = ARC.x, cy = ARC.y, w = ARC.r * 2.3, h = w * im.naturalHeight / im.naturalWidth, rx = w * .44, ry = h * .46;
+  const im = TIMG.plaza, cx = ARC.x, cy = ARC.y, w = (typeof SHOPR !== 'undefined' ? SHOPR.rx - 100 : ARC.r) / .44, h = w * im.naturalHeight / im.naturalWidth, rx = w * .44, ry = h * .46;   // (v264) inside the oval of shops
   // the picture, faded out at its edge so it melts into the town's ground
   const k = 1, cv2 = document.createElement('canvas'); cv2.width = Math.round(w * k); cv2.height = Math.round(h * k); const c2 = cv2.getContext('2d');
   c2.drawImage(im, 0, 0, cv2.width, cv2.height); c2.globalCompositeOperation = 'destination-in';
@@ -50,6 +50,10 @@ function timgPlaza(){
   const g = terr.getContext('2d'); g.save(); g.setTransform(TS, 0, 0, TS, 0, 0); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(cv2, cx - w / 2, cy - h / 2, w, h); g.restore();
   // small decorations inside it give way (buildings, lamps, NPCs and the shrine stay)
   for (let i = PROPS.length - 1; i >= 0; i--){ const p = PROPS[i]; if (!TIMG_TIDY.has(p.type) || ((p.x - cx) / rx) ** 2 + ((p.y - cy) / ry) ** 2 > 1) continue;
+    PROPS.splice(i, 1); for (let j = obstacles.length - 1; j >= 0; j--) if (obstacles[j].prop === p) obstacles.splice(j, 1); }
+  // (v264) the old trees, bushes and rocks inside the town's oval give way too: only the buildings, lamps, fence and NPCs stand in it
+  const T = typeof TOWNR !== 'undefined' ? TOWNR : {rx:rx, ry:ry}, NATURE = new Set(['tree', 'palm', 'bush', 'bamboo', 'banana', 'rock', 'pine', 'himtree', 'reed', 'deadtree', 'stump', 'log', 'mushroom', 'flowerbed', 'hedge', 'lotusbowl', 'fern', 'flowers']);
+  for (let i = PROPS.length - 1; i >= 0; i--){ const p = PROPS[i]; if (!NATURE.has(p.type) || ((p.x - cx) / (T.rx - 10)) ** 2 + ((p.y - cy) / (T.ry - 10)) ** 2 > 1) continue;
     PROPS.splice(i, 1); for (let j = obstacles.length - 1; j >= 0; j--) if (obstacles[j].prop === p) obstacles.splice(j, 1); }
   if (typeof CUTE !== 'undefined' && CUTE && Array.isArray(CUTE.decor)) CUTE.decor = CUTE.decor.filter(d => !d || d.x == null || ((d.x - cx) / rx) ** 2 + ((d.y - cy) / ry) ** 2 > 1);
   if (typeof tcMini === 'function') try { tcMini(); } catch (e) {}

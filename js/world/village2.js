@@ -204,23 +204,29 @@ Object.assign(PROP_TYPES, {
    · the storyteller's mat and shade tree sit in the court beside the crossing; the army tent and the dungeon gate
      stand just outside the north gate, where adventures start */
 const ARC = {x:1200, y:800, r:460, ring:290, lane:422};
+/* (v264) the owner: the shops did not sit evenly with the town. They now stand on an oval round the central garden
+   (plaza.jpg), at equal steps, mirrored left and right: one at the bottom centre, six on each side, the top centre left
+   open for the temple. The packed-earth ground, the low fence and the lamps follow the same oval. */
+const SHOPR = {rx:500, ry:330}, TOWNR = {rx:610, ry:440};
+const ellAt = (deg, rx = SHOPR.rx, ry = SHOPR.ry) => [Math.round(ARC.x + Math.cos(deg * Math.PI / 180) * rx), Math.round(ARC.y + Math.sin(deg * Math.PI / 180) * ry)];
+const SHOP_SLOT = k => 90 + k * 360 / 14;   // k = 0 bottom centre … 7 top centre (the temple's gap)
 const arcAt = (deg, r) => [Math.round(ARC.x + Math.cos(deg * Math.PI / 180) * r), Math.round(ARC.y + Math.sin(deg * Math.PI / 180) * r)];
 /* the plan: [npc id, building (prop type, variant), x, y]; the NPC stands at y + 32. The angles keep every house and
    its keeper clear of its neighbours and of the four roads coming in */
 const VPLAN = [
-  ['shop',       'vshop', VSHOP_I.shop,      ...arcAt(180, 380)],
-  ['banker',     'vshop', VSHOP_I.banker,    ...arcAt(204, 380)],
-  ['healer_oon', 'sala', 0,                  ...arcAt(232, 380)],
-  ['tailor',     'vshop', VSHOP_I.tailor,    ...arcAt(252, 380)],
-  ['festival',   'vshop', VSHOP_I.festival,  ...arcAt(286, 380)],
-  ['registrar',  'vshop', VSHOP_I.registrar, ...arcAt(306, 380)],
-  ['smith',      'vshop', VSHOP_I.smith,     ...arcAt(334, 380)],
-  ['forger',     'vshop', VSHOP_I.forger,    ...arcAt(23, 380)],
-  ['driller',    'vshop', VSHOP_I.driller,   ...arcAt(52, 380)],
-  ['herbal',     'vshop', VSHOP_I.herbal,    ...arcAt(72, 380)],
-  ['cook',       'vshop', VSHOP_I.cook,      ...arcAt(101, 380)],
-  ['trader',     'vshop', VSHOP_I.trader,    ...arcAt(120, 380)],
-  ['beastkeeper','vshop', VSHOP_I.beast,     ...arcAt(144, 380)],
+  ['registrar',  'vshop', VSHOP_I.registrar, ...ellAt(SHOP_SLOT(0))],
+  ['cook',       'vshop', VSHOP_I.cook,      ...ellAt(SHOP_SLOT(1))],
+  ['trader',     'vshop', VSHOP_I.trader,    ...ellAt(SHOP_SLOT(2))],
+  ['beastkeeper','vshop', VSHOP_I.beast,     ...ellAt(SHOP_SLOT(3))],
+  ['shop',       'vshop', VSHOP_I.shop,      ...ellAt(SHOP_SLOT(4))],
+  ['banker',     'vshop', VSHOP_I.banker,    ...ellAt(SHOP_SLOT(5))],
+  ['healer_oon', 'sala', 0,                  ...ellAt(SHOP_SLOT(6))],
+  ['tailor',     'vshop', VSHOP_I.tailor,    ...ellAt(SHOP_SLOT(8))],
+  ['festival',   'vshop', VSHOP_I.festival,  ...ellAt(SHOP_SLOT(9))],
+  ['smith',      'vshop', VSHOP_I.smith,     ...ellAt(SHOP_SLOT(10))],
+  ['forger',     'vshop', VSHOP_I.forger,    ...ellAt(SHOP_SLOT(11))],
+  ['driller',    'vshop', VSHOP_I.driller,   ...ellAt(SHOP_SLOT(12))],
+  ['herbal',     'vshop', VSHOP_I.herbal,    ...ellAt(SHOP_SLOT(13))],
   ['teller',     'storymat', 0,              1090, 880],
   ['general',    'armytent', 0,              1050, 290],
   ['gatekeeper', 'portal', 0,                1360, 300],
@@ -242,7 +248,6 @@ function villageNpcs(){
 /* the props of the round town, called from placeProps() */
 function villageProps(){
   for (const [, type, v, x, y] of VPLAN) addProp(type, x, y, v);
-  addProp('tree', 1040, 862, 1);   // the storyteller's shade tree
   // the boatman's old landing south of town: a pond that blocks the way like water does, a plank stage and his boat
   for (const [dx, r] of [[-62, 40], [0, 50], [62, 40]]) obstacles.push({x:VPOND.x + dx, y:VPOND.y, r, water:true});
   if (typeof WATERS !== 'undefined') WATERS.push({k:'pond', x:VPOND.x, y:VPOND.y, rx:VPOND.rx - 6, ry:VPOND.ry - 6, kind:'water', seed:31});
@@ -250,27 +255,27 @@ function villageProps(){
   // (v82) the crossing signpost was removed at the owner's request
   // the low fence round the town, open at the four gates
   const gap = d => ARC_GATES.some(g => Math.abs(((d - g + 540) % 360) - 180) < 7);
-  for (let d = 0; d < 360; d += 3.6){ if (gap(d)) continue; const [x, y] = arcAt(d, ARC.r - 6); addProp('lowfence', x, y, Math.abs(Math.sin(d * Math.PI / 180)) > .7 ? 0 : 1); }
+  for (let d = 0; d < 360; d += 2.6){ if (gap(d)) continue; const [x, y] = ellAt(d, TOWNR.rx - 6, TOWNR.ry - 6); addProp('lowfence', x, y, Math.abs(Math.sin(d * Math.PI / 180)) > .7 ? 0 : 1); }
   // lamps round the ring road, and one each side of every gate
-  for (let d = 9; d < 360; d += 30){ const [x, y] = arcAt(d, ARC.ring + 38); if (VPLAN.some(p => Math.hypot(p[3] - x, p[4] - y) < 70)) continue; addProp('lamp', x, y); }
-  for (const g of ARC_GATES) for (const s of [-9, 9]){ const [x, y] = arcAt(g + s, ARC.r - 20); addProp('lamp', x, y); }
-  addProp('spirit', 1262, 650);
+  // a lamp midway between every two shops, on the same oval (mirrored like the shops)
+  for (let k = 0; k < 14; k++){ const [x, y] = ellAt(SHOP_SLOT(k) + 180 / 14, SHOPR.rx + 30, SHOPR.ry + 30); addProp('lamp', x, y); }
+  for (const g of ARC_GATES) for (const s of [-6, 6]){ const [x, y] = ellAt(g + s, TOWNR.rx - 20, TOWNR.ry - 20); addProp('lamp', x, y); }
 }
 
 /* the ground under the round town: a disc of packed earth, the ring road, the market lane, the four gate roads and
    a swept patch in front of every shop */
 function villageGround(g){   // called inside buildTerrain() with the village transform (x − VX)
   const X = x => x - VX, cx = X(ARC.x), cy = ARC.y;
-  const disc = (r, col) => { g.fillStyle = col; g.beginPath(); g.arc(cx, cy, r, 0, 7); g.fill(); };
+  const disc = (r, col) => { g.fillStyle = col; g.beginPath(); g.ellipse(cx, cy, TOWNR.rx * r / ARC.r, TOWNR.ry * r / ARC.r, 0, 0, 7); g.fill(); };   // (v264) the town's oval
   disc(ARC.r + 22, 'rgba(184,149,95,.35)'); disc(ARC.r + 8, 'rgba(184,149,95,.7)'); disc(ARC.r, '#b8955f');
-  for (let i = 0; i < 2600; i++){ const a = R() * 6.283, d = Math.sqrt(R()) * ARC.r, x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d;
+  for (let i = 0; i < 2600; i++){ const a = R() * 6.283, d = Math.sqrt(R()), x = cx + Math.cos(a) * d * TOWNR.rx, y = cy + Math.sin(a) * d * TOWNR.ry;
     g.fillStyle = R() < .5 ? 'rgba(110,78,42,.3)' : 'rgba(225,195,145,.26)'; g.beginPath(); g.ellipse(x, y, .8 + R() * 2, .6 + R(), R() * 3, 0, 7); g.fill(); }
   const lane = (r, w) => { for (const [lw, col] of [[w, '#a8804c'], [w - 6, '#bf9a62']]){ g.strokeStyle = col; g.lineWidth = lw; g.beginPath(); g.arc(cx, cy, r, 0, 7); g.stroke(); } };
   const spoke = d => { const a = d * Math.PI / 180; for (const [lw, col] of [[52, '#a8804c'], [46, '#bf9a62']]){ g.strokeStyle = col; g.lineWidth = lw; g.lineCap = 'butt'; g.beginPath(); g.moveTo(cx + Math.cos(a) * (ARC.ring - 20), cy + Math.sin(a) * (ARC.ring - 20)); g.lineTo(cx + Math.cos(a) * (ARC.r + 24), cy + Math.sin(a) * (ARC.r + 24)); g.stroke(); } };
   if (false) for (const d of ARC_GATES) spoke(d);   // (v263) the owner: no dirt roads (the four gate roads)
-  lane(ARC.ring, 56);
+  if (false) lane(ARC.ring, 56);   // (v264) the garden picture lies here
   // the market lane: the south half, in front of the stalls
-  for (const [lw, col] of [[46, '#a8804c'], [40, '#bf9a62']]){ g.strokeStyle = col; g.lineWidth = lw; g.beginPath(); g.arc(cx, cy, ARC.lane, 15 * Math.PI / 180, 165 * Math.PI / 180); g.stroke(); }
+  if (false) for (const [lw, col] of [[46, '#a8804c'], [40, '#bf9a62']]){ g.strokeStyle = col; g.lineWidth = lw; g.beginPath(); g.arc(cx, cy, ARC.lane, 15 * Math.PI / 180, 165 * Math.PI / 180); g.stroke(); }
   for (let i = 0; i < 1600; i++){ const a = R() * 6.283, d = ARC.ring + (R() - .5) * 44, x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d;
     g.fillStyle = R() < .5 ? 'rgba(100,70,40,.4)' : 'rgba(240,210,160,.3)'; g.beginPath(); g.ellipse(x, y, .8 + R() * 1.4, .6 + R(), R() * 3, 0, 7); g.fill(); }
   // swept patches in front of the shops
