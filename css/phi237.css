@@ -20,9 +20,9 @@ html body #ui.ui #dock{min-width:61.8% !important;left:19.1% !important;right:au
    everywhere. The inventory / equipment screen stays full-screen. The window body scrolls inside. Sizes are divided by
    the game's UI zoom (--uiz) so a big screen is not scaled twice. */
 html body #ui.ui > .win.phiw:not([hidden]):not(#win-equip):not(#win-skill){
-  --ph:calc(min(680px, 100vh - 150px) / var(--uiz, 1));
+  --ph:min(680px, calc(100vh / var(--uiz, 1) - 150px));
   height:var(--ph) !important;width:calc(var(--ph) / 1.618) !important;max-height:none !important;max-width:calc(100% - 16px) !important;box-sizing:border-box !important;display:flex !important;flex-direction:column !important}
-html body #ui.ui > #win-skill.phiw:not([hidden]){--ph:calc(min(600px, 100vh - 150px) / var(--uiz, 1));height:var(--ph) !important;width:min(calc(var(--ph) * 1.618), calc(100% - 16px)) !important;max-width:none !important;max-height:none !important;box-sizing:border-box !important;display:flex !important;flex-direction:column !important}
+html body #ui.ui > #win-skill.phiw:not([hidden]){--ph:min(600px, calc(100vh / var(--uiz, 1) - 150px));height:var(--ph) !important;width:min(calc(var(--ph) * 1.618), calc(100% - 16px)) !important;max-width:none !important;max-height:none !important;box-sizing:border-box !important;display:flex !important;flex-direction:column !important}
 html body #ui.ui > .win.phiw:not([hidden]) > :not(header){flex:1 1 auto;min-height:0;overflow-y:auto}
 @media (max-height:560px){
   html body #ui.ui > .win.phiw:not([hidden]):not(#win-equip):not(#win-skill){--ph:calc((100vh - 24px) / var(--uiz, 1));width:min(calc(var(--ph) * 1.618), calc(100% - 16px)) !important}
@@ -60,3 +60,44 @@ html body #ui.ui #win-equip.cosmode .eqaura #eqPrev{width:86% !important;height:
 @media (orientation:landscape){
   html body #ui.ui #win-equip.invwin:not(.cosmode) .invcombo{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) !important;overflow-y:hidden !important}
 }
+
+/* ---------- (v247) group 5: wide windows lie down, tab bars never hide a tab ----------
+   v238 stood every window up (height = width × φ). Windows whose content is wide by nature (a long tab bar, a list
+   beside a detail pane: wiki, adventurer's book, achievements, forge…) were too narrow for it, so tabs ran off the
+   right edge. Now such a window lies down on PC and tablet: width = height × φ, the same golden rectangle turned on
+   its side, and when the screen is too narrow for that the height shrinks with the width so the ratio holds.
+   js/sys/phi237.js phiDecide() picks the windows (a fixed list + any window whose content is wider than it). Phones
+   held sideways already lie every window down (the max-height:560px rules above).
+   Sizes are now in the UI's own units (the screen's height ÷ the UI zoom): v238 capped windows at 680 screen pixels,
+   so on a big screen, where the UI is drawn 1.4× larger, a window held only about 480 px of content — tabs and
+   lists were squeezed there more than on a laptop. Now a window holds the same amount of content on every screen. */
+@media (min-height:561px){
+  html body #ui.ui > .win.phiw.phiwide:not([hidden]):not(#win-equip):not(#win-skill){
+    --ph:min(600px, calc(100vh / var(--uiz, 1) - 150px));
+    --pw:calc(100vw / var(--uiz, 1) - 16px);
+    width:min(calc(var(--ph) * 1.618), var(--pw)) !important;
+    height:min(var(--ph), calc(var(--pw) / 1.618)) !important}
+  html body #ui.ui > #win-skill.phiw:not([hidden]){
+    --pw:calc(100vw / var(--uiz, 1) - 16px);
+    height:min(var(--ph), calc(var(--pw) / 1.618)) !important;width:min(calc(var(--ph) * 1.618), var(--pw)) !important}
+}
+/* a tab bar that is still wider than its window wraps onto a second row instead of hiding tabs off the edge
+   (it used to scroll sideways with its scrollbar hidden, so players never knew the last tabs were there) */
+html body #ui.ui > .win.phiw .wktabs,html body #ui.ui > .win.phiw .sktabs,html body #ui.ui #dialog .wktabs{
+  flex-wrap:wrap !important;overflow-x:visible !important;row-gap:4px !important}
+html body #ui.ui > .win.phiw .wktabs > *,html body #ui.ui > .win.phiw .sktabs > *,html body #ui.ui #dialog .wktabs > *{flex-shrink:0 !important}
+/* (v247) the Status window's «Details ▶» tab moves into the window's own header (it stuck out past the right edge,
+   outside the golden frame, and could be cut by the screen edge); the drawer still opens beside the window */
+html body #ui.ui #win-stat > .sdtab{top:9px;right:54px;width:auto;height:auto;padding:5px 12px;writing-mode:horizontal-tb;
+  border:2px solid #fff;border-radius:999px;box-shadow:0 2px 0 #d08a10;line-height:1.1;white-space:nowrap}
+@media (min-width:701px) and (min-height:521px){ html body #ui.ui #win-stat > .sdpanel:not(.left){left:calc(100% + 8px)} }
+/* (v247) the skill window: «Next ›» once, then the next jobs as one-line tabs; tree beside its detail card in golden
+   shares (tree : card = φ : 1) on every screen — on a phone the card sat under the tree and covered the hint line */
+html body #ui.ui #win-skill .sktabs{align-items:stretch}
+html body #ui.ui #win-skill .sktabs .sknx{align-self:center;flex-shrink:0;padding:0 2px 0 6px;font:700 12px var(--display);color:#8a5a1c;white-space:nowrap}
+html body #ui.ui #win-skill .sktabs .skt.pv{display:flex;align-items:center;justify-content:center}
+html body #ui.ui #win-skill.phiw .skmain{display:grid !important;grid-template-columns:minmax(0,1.618fr) minmax(0,1fr) !important;gap:10px !important;align-items:stretch !important}
+html body #ui.ui #win-skill.phiw .skmain > .sktree{margin:0 !important}
+html body #ui.ui #win-skill.phiw .skmain > .skdetail{position:static !important;flex-wrap:wrap !important;align-items:flex-start !important;align-content:flex-start !important;margin:0 !important}
+html body #ui.ui #win-skill.phiw .skmain > .skdetail .nm{flex:1 1 120px !important;min-width:0 !important}
+html body #ui.ui #win-skill.phiw .skmain > .skdetail .ska{flex:1 0 100% !important;display:flex !important;flex-direction:row !important;justify-content:flex-end !important;align-items:center;gap:6px;margin-top:6px}

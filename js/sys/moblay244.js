@@ -86,7 +86,11 @@ setInterval(() => { try { mlyLayout(); } catch (e) {} }, 700);
   html body #ui.ui.moba.ml244 .joy{width:var(--mlJ)!important;height:var(--mlJ)!important}
   html body #ui.ui.moba.ml244 .joy:not(.live){left:var(--mlJx)!important;bottom:var(--mlJb)!important;top:auto!important;transform:translate(-50%,0)!important}
   html body #ui.ui.moba.ml244 .joy .knob{width:calc(var(--mlJ) * .382)!important;height:calc(var(--mlJ) * .382)!important;margin:calc(var(--mlJ) * -.191) 0 0 calc(var(--mlJ) * -.191)!important}
-  html body #ui.ui.moba.ml244 #mobaAct .mo,html body #ui.ui.moba.ml244 #mobaPot .mo,html body #ui.ui.moba.ml244 #mobaUtil .mu{position:absolute!important}`; document.head.appendChild(st); }
+  html body #ui.ui.moba.ml244 #mobaAct .mo,html body #ui.ui.moba.ml244 #mobaPot .mo,html body #ui.ui.moba.ml244 #mobaUtil .mu{position:absolute!important}
+  /* (v249) this layout stretches the small-button group (#mobaUtil, class "row") over the whole screen and places each
+     button inside it; the bright theme paints every .row white at 62% (css/sunlit.css), so the whole game behind it
+     went pale — a white veil on every touch screen. The group's frame is invisible again (its buttons keep their look). */
+  html body #ui.ui.moba:not(.hedit) #mobaUtil,html body #ui.ui.moba:not(.hedit) #mobaAct,html body #ui.ui.moba:not(.hedit) #mobaPot{background:none!important;background-color:transparent!important;border-color:transparent!important;box-shadow:none!important}`; document.head.appendChild(st); }
 /* a group redrawn on its own (the potion counts, the small buttons) is placed again at once */
 { let q = 0; const mo = new MutationObserver(() => { if (q) return; q = requestAnimationFrame(() => { q = 0; try { mlyLayout(); } catch (e) {} }); });
   const watch = () => { for (const id of ['mobaAct', 'mobaPot', 'mobaUtil']){ const c = el(id); if (c && !c._mly){ c._mly = 1; mo.observe(c, {childList:true}); } } };

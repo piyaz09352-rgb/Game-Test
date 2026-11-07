@@ -26,3 +26,22 @@ function phiJoy(){
 }
 if (typeof heApply === 'function'){ const _ha = heApply; heApply = function(){ try { phiJoy(); } catch (e) {} return _ha.apply(this, arguments); }; }
 setInterval(() => { try { phiJoy(); } catch (e) {} }, 1000);
+
+/* (v247) wide windows lie down (css/phi237.css .phiwide). A window joins once and stays (no jumping between shapes):
+   the ones whose content is a list beside a detail pane or a long tab bar, and any other window that turns out wider
+   than its upright shape — measured right after it opens, while it is still upright. */
+const PHI_WIDE = ['wiki', 'book', 'ach', 'craft', 'market', 'guild', 'siege', 'arena', 'house', 'gm'];
+function phiTooWide(w){
+  const bars = w.querySelectorAll('.wktabs, .sktabs, .tabs');
+  for (const b of bars){ if (!b.offsetWidth) continue; let sum = 0; const gap = parseFloat(getComputedStyle(b).columnGap) || 4;
+    for (const c of b.children) if (c.offsetWidth) sum += c.offsetWidth + gap; if (sum - gap > b.clientWidth + 4) return true; }
+  for (const e of w.querySelectorAll('div, ul, section')){ if (!e.clientWidth || e.scrollWidth <= e.clientWidth + 4) continue;
+    if (/auto|scroll|hidden/.test(getComputedStyle(e).overflowX) && !e.closest('.wktabs, .sktabs, .tabs')) return true; }
+  return false;
+}
+function phiDecide(id){
+  const w = winEl(id); if (!w || w.hidden || !w.classList.contains('phiw') || w.classList.contains('phiwide') || id === 'skill') return;
+  if (PHI_WIDE.includes(id) || phiTooWide(w)){ w.classList.add('phiwide'); if (typeof fitWin === 'function') try { fitWin(id); } catch (e) {} }
+}
+if (typeof openWin === 'function'){ const _ow = openWin; openWin = function(id){ const r = _ow.apply(this, arguments);
+  try { phiWins(); phiDecide(id); } catch (e) {} setTimeout(() => { try { phiDecide(id); } catch (e) {} }, 350); return r; }; }

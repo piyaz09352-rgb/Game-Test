@@ -63,7 +63,8 @@ function renderSkills(){
   const preview = skTab.startsWith('>'), jid = preview ? skTab.slice(1) : skTab, jb = JOBS[jid];
   const left = S.skPts - skPending();
   let h = `<div class="sktop"><div class="pts${left > 0 ? ' has' : ''}"><span>Skill Point</span><b>${left}</b></div>
-    <div class="sktabs" role="tablist">${tabs.map(t => { const id = t.replace('>', ''), pv = t.startsWith('>'); return `<button role="tab" class="skt${t === skTab ? ' on' : ''}${pv ? ' pv' : ''}" data-sktab="${t}" aria-selected="${t === skTab}"><small>${pv ? L('ถัดไป', 'Next') : 'Tier ' + JOBS[id].tier}</small>${nm(JOBS[id])}</button>`; }).join('')}</div></div>`;
+    <div class="sktabs" role="tablist">${tabs.map((t, i) => { const id = t.replace('>', ''), pv = t.startsWith('>'), first = pv && !(tabs[i - 1] || '').startsWith('>');   // (v247) one «Next ›» label before the next jobs, each next tab one line (12 of them for a villager ran off the window)
+      return `${first ? `<span class="sknx" aria-hidden="true">${L('ถัดไป', 'Next')} ›</span>` : ''}<button role="tab" class="skt${t === skTab ? ' on' : ''}${pv ? ' pv' : ''}" data-sktab="${t}" aria-selected="${t === skTab}"${pv ? ` aria-label="${L('ถัดไป', 'Next')}: ${nm(JOBS[id])}"` : ''}>${pv ? '' : `<small>Tier ${JOBS[id].tier}</small>`}${nm(JOBS[id])}</button>`; }).join('')}</div></div>`;
   if (preview) h += `<p class="empty">${L(`ดูล่วงหน้า: สกิลของ${nm(jb)} (เปลี่ยน Job ที่ครูวายรา)`, `Preview: ${nm(jb)} skills (change Job with Master Vayra)`)}</p>`;
   // ---- skill tree: rows by prerequisite depth, each skill under the one it needs, lines drawn between them ----
   const ids = jb.skills, inJob = new Set(ids), depth = {};

@@ -34,9 +34,4 @@ const roResisted = k => { if (!(Math.random() < roResOf(k))) return false;
 
 /* (v115) the status window no longer lists the dodge & resist breakdown (the player asked for it to go); the rules still apply */
 
-if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'combatrules', t:['หลบและต้านสถานะ', 'Dodge & status resist'], b:() => `<ul>
-  <li>${L('โดนรุม: มอนตัวที่ 3 ขึ้นไปที่สู้กับเราอยู่ ลด Flee ตัวละ 10%', 'Mobbed: each monster past the 2nd fighting you takes 10% off your Flee')}</li>
-  <li>${L('Perfect Dodge: LUK ทุก 10 แต้ม หลบได้แน่นอน 1% แม้ Flee ไม่พอ', 'Perfect Dodge: 1% per 10 LUK, works even when Flee fails')}</li>
-  <li>${L('ต้านสถานะจากสเตตัส (สเตตัส ÷ 250 สูงสุด 40%): VIT ต้านมึน พิษ เลือดไหล ไฟลวก · INT ต้านใบ้ แช่แข็ง ตาพร่า · LUK ต้านคำสาป · AGI ต้านช้าและตรึง · ซ้อนกับออปชัน Status Resist บนของ', 'Status resist from stats (stat ÷ 250, up to 40%): VIT stun, poison, bleed, burn · INT silence, freeze, blind · LUK curse · AGI slow and root · stacks with the Status Resist gear option')}</li>
-  <li>${L('EXP ตามช่วงเลเวล (มอน − เรา): สูงกว่า 10+ ได้ 120% · 5+ ได้ 110% · ต่ำกว่า 6–10 ได้ 90% · 11–15 ได้ 75% · 16–20 ได้ 60% · 21–30 ได้ 40% · เกิน 30 ได้ 20%', 'EXP by level gap (monster − you): 10+ higher 120% · 5+ higher 110% · 6–10 lower 90% · 11–15 lower 75% · 16–20 lower 60% · 21–30 lower 40% · over 30 lower 20%')}</li>
-  <li>${L('ฟื้นตัวทุก 6 วิ HP = Max HP ÷ 200 + VIT ÷ 5 · ทุก 8 วิ SP = 1 + Max SP ÷ 100 + INT ÷ 6 (สาย INT ทุก 4 วิ) · นั่งหรืออยู่ในเมืองเร็วขึ้น 2 เท่า', 'Recovery: every 6 s HP = Max HP ÷ 200 + VIT ÷ 5 · every 8 s SP = 1 + Max SP ÷ 100 + INT ÷ 6 (INT classes every 4 s) · sitting or in town doubles it')}</li></ul>`});
+/* (v248) the wiki page «Dodge & status resist» (its numbers and formulas) is gone at the owner's request; the rules still apply */
