@@ -40,7 +40,7 @@ function mlyLayout(){
   const pad = A * .08, ax = W - m - pad - A / 2, ay = H - m - pad - A / 2;
   const rects = [];
   const put = (e, cx, cy, d) => { mlSet(e, {position:'absolute', left:cx - d / 2, top:cy - d / 2, width:d, height:d, right:'auto', bottom:'auto', margin:'0px'}); rects.push({x:cx - d / 2, y:cy - d / 2, w:d, h:d, cx, cy, r:d / 2}); };
-  for (const c of [act, pot, util]) if (c) mlSet(c, {left:'0px', top:'0px', right:'auto', bottom:'auto', width:W + 'px', height:H + 'px', transform:'none', display:'block', 'pointer-events':'none', padding:'0px'});
+  for (const c of [act, pot, util]) if (c) mlSet(c, {left:'0px', top:'0px', right:'auto', bottom:'auto', width:W + 'px', height:H + 'px', transform:'none', display:'block', 'pointer-events':'none', padding:'0px', background:'transparent', 'background-image':'none', border:'0px', 'box-shadow':'none', 'backdrop-filter':'none', '-webkit-backdrop-filter':'none'});   // (v247) the boxes now cover the whole screen: their own panel look (the small-button bar was 62% white) must go, or it veils the game
   for (const e of [atk, ...big, ...small, roll, ...pots, ...mus]) if (e) e.style.setProperty('pointer-events', 'auto', 'important');
   if (atk) put(atk, ax, ay, A);
   // rings: from just below the left (165°) round to just past straight up (285°)
@@ -73,7 +73,7 @@ function mlyLayout(){
 }
 function mlyOff(){ if (!MLY.on) return; MLY.on = false; const ui = el('ui'); if (ui) ui.classList.remove('ml244');
   for (const id of ['mobaAct', 'mobaPot', 'mobaUtil', 'joyZone', 'chatBtn']){ const c = el(id); if (!c) continue;
-    for (const p of ['left', 'top', 'right', 'bottom', 'width', 'height', 'transform', 'display', 'pointer-events', 'padding', 'position']) if (c.style.getPropertyPriority(p) === 'important') c.style.removeProperty(p);
+    for (const p of ['left', 'top', 'right', 'bottom', 'width', 'height', 'transform', 'display', 'pointer-events', 'padding', 'position', 'background', 'background-image', 'border', 'box-shadow', 'backdrop-filter', '-webkit-backdrop-filter']) if (c.style.getPropertyPriority(p) === 'important') c.style.removeProperty(p);
     for (const e of c.querySelectorAll('.mo,.mu')) for (const p of ['left', 'top', 'right', 'bottom', 'width', 'height', 'position', 'margin', 'pointer-events']) e.style.removeProperty(p); }
   if (typeof heApply === 'function') try { heApply(); } catch (e) {} }
 /* after every other placer */
