@@ -16,7 +16,8 @@ test('tower halls: own map, stairs, Auto, tiers, leaving', { skip, timeout: 1200
       S.tut = {done:true, i:99}; S.lvl = 200; derive(); loadMap(0); twSt().best = 30; twStart(1); adv(70);
       o.hall = W === TWM_W && H === TWM_H && !NPCS.length && !GATES.length && !CAMP && PROPS.length > 0 && PROPS.every(p => ['twpillar', 'twbrazier', 'twcrystal', 'twbarrel', 'twcrate', 'twyaksha', 'twdeadtree'].includes(p.type));   // (v259) the zone's own pieces
       o.inside = mobs.filter(m => m.dg && !m.dead).every(m => twmIn(m.x, m.y)) && mobs.some(m => m.dg && !m.dead);
-      { const mp = MAPS[TW.theme], kind = mp.mobs.find(t => MOB[t] && !MOB[t].boss && !MOB[t].night), g = twMob(mp.boss, P.x, P.y - 200, 5), n = twMob(kind, P.x, P.y - 220, 5);
+      { if (typeof TWSQ !== 'undefined') TWSQ.raw = true;   // (v260) compare with the region's own monster, not a squad pick
+        const mp = MAPS[TW.theme], kind = mp.mobs.find(t => MOB[t] && !MOB[t].boss && !MOB[t].night), g = twMob(mp.boss, P.x, P.y - 200, 5), n = twMob(kind, P.x, P.y - 220, 5); if (typeof TWSQ !== 'undefined') TWSQ.raw = false;
         o.guard = g.maxhp >= n.maxhp * 4 && g.maxhp <= n.maxhp * 8; o.guardTxt = `${g.maxhp} vs ${n.maxhp}`; g.dead = n.dead = true; }   // (v224) a guardian is a fight, not a wall
       for (const m of mobs) if (m.dg) m.dead = true; adv(4); o.open = TWM.open && TW.phase === 'rest' && TW.f === 2;
       const st = twmStairs(); P.x = st.x; P.y = st.y + 10; adv(3); adv(20); const e = twmEntry();

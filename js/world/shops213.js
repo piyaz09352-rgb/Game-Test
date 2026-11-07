@@ -6,7 +6,8 @@
      โรงหลอมแร่   (v259, the owner's picture) a banded brick bottle kiln with a wide glowing mouth beside an open shed of
                   gold, silver and copper ingots under a striped tin roof, a crucible pouring into moulds, an ore cart on rails
      ร้านเจาะมณี  a white Thai-Chinese plaster shop, blue glazed roof with curled ridge ends, an arched display window
-     ร้านยา       a two-storey wooden shophouse: folding plank doors, a wall of medicine drawers, a balcony, a red vertical sign
+     ร้านยา       (v260, the owner's picture) a two-storey wooden apothecary: red tile gable with a mortar emblem, a
+                  white balcony with flowers, green louvres, a drawer wall, shelves of bottles, a counter, lanterns, a banner
      สมุนไพร      a bamboo hut on stilts with woven walls and a steep straw roof, herbs drying underneath
      โรงครัว      an open-air kitchen under a striped tarp on bamboo poles, woks steaming, string lights, tables
      ร้านตัดชุด   a pastel wooden boutique with fretwork eaves, a bay window with a dress on a stand, flower boxes
@@ -176,27 +177,57 @@ const S3_DRAW = {
     // the gem-cutting wheel outside
     g.fillStyle = PAL.teakD; g.fillRect(48, -14, 10, 2); g.fillRect(49, -12, 1.4, 12); g.fillRect(56, -12, 1.4, 12); g.fillStyle = '#9aa4b0'; g.beginPath(); g.arc(53, -18, 4.6, 0, 7); g.fill(); g.fillStyle = '#5a6470'; g.beginPath(); g.arc(53, -18, 1.4, 0, 7); g.fill();
   },
-  shop(g, rng){
-    S3.plinth(g, -40, 80, 5, rng);
-    S3.side(g, 38, -76, -5, 8, '#6a4428');
-    // ground floor: folding plank doors, the middle ones open on a wall of medicine drawers
-    S3.boards(g, -36, -40, 74, 35, rng, ['#8a5a34', '#7a4e2c', '#9a6a40']); S3.shade(g, -36, -40, 74, 35);
-    g.fillStyle = '#2a160a'; g.fillRect(-20, -38, 40, 33);
-    for (let r = 0; r < 5; r++) for (let c = 0; c < 6; c++){ const x = -18 + c * 6.2, y = -36 + r * 5.6; g.fillStyle = (r + c) % 2 ? '#8a4a24' : '#7a3e1c'; g.fillRect(x, y, 5.6, 5); g.fillStyle = PAL.goldL; g.fillRect(x + 2.3, y + 2.2, 1, .8); }
-    for (let i = 0; i < 4; i++){ g.fillStyle = ['#e0d8c0', '#c8b890', '#d8cca8', '#b8a880'][i]; ov(g, -14 + i * 9, -8.6, 3, 3.4); g.fill(); g.fillStyle = '#8a2a20'; g.fillRect(-15.6 + i * 9, -12.6, 3.2, 1.2); }
-    for (const [x, open] of [[-36, 0], [-28, 0], [20, 0], [28, 0]]){ void open; g.fillStyle = '#6a3e20'; g.fillRect(x, -40, 8, 35); g.strokeStyle = 'rgba(30,14,4,.5)'; g.lineWidth = .6; g.strokeRect(x + 1, -38, 6, 14); g.strokeRect(x + 1, -21, 6, 14); }
-    // upper floor: a balcony with a railing and louvred windows
-    S3.boards(g, -36, -72, 74, 32, rng, ['#9a6a40', '#8a5a34']); S3.shade(g, -36, -72, 74, 32);
-    for (const x of [-30, -6, 18]){ g.fillStyle = '#3a6a4a'; g.fillRect(x, -68, 14, 18); g.fillStyle = 'rgba(0,0,0,.35)'; for (let y = -66; y < -51; y += 2.2) g.fillRect(x + 1, y, 12, .8); g.strokeStyle = '#e8dcc0'; g.lineWidth = .8; g.strokeRect(x, -68, 14, 18); }
-    g.fillStyle = '#5a3a20'; g.fillRect(-40, -42, 80, 3); g.fillStyle = '#e8dcc0'; for (let x = -38; x < 40; x += 3.4) g.fillRect(x, -50, 1.2, 8); g.fillRect(-40, -51, 80, 1.6);
-    for (const x of [-34, 30]){ g.fillStyle = '#b8603a'; ov(g, x, -52.5, 3, 1.6); g.fill(); g.fillStyle = '#4a9a44'; ov(g, x, -55, 3.4, 2.6); g.fill(); }
-    // a front gable with red tiles
-    tileQuad(g, [-46, -72, 46, -72, 36, -80, -36, -80], 3, 12, [PAL.roofM, PAL.roofL, PAL.roofD]);
-    g.fillStyle = PAL.teakD; pv(g, [-36, -80, 0, -98, 36, -80]); g.fill(); g.fillStyle = PAL.roofD; for (const s of [-1, 1]){ g.save(); g.lineWidth = 5; g.strokeStyle = PAL.roofM; g.beginPath(); g.moveTo(s * 40, -79); g.lineTo(0, -99); g.stroke(); g.restore(); }
-    g.fillStyle = '#fff6dc'; g.beginPath(); g.arc(0, -86, 4, 0, 7); g.fill(); g.strokeStyle = PAL.gold; g.lineWidth = .8; g.stroke(); g.font = '5.6px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('🧪', 0, -85.6); g.textBaseline = 'alphabetic';
-    // the vertical red sign and a gourd charm
-    S3.vboard(g, -48, -66, S3_NAME('shop')); g.strokeStyle = '#3a2010'; g.lineWidth = .6; g.beginPath(); g.moveTo(-43.5, -70); g.lineTo(-43.5, -66); g.stroke();
-    g.fillStyle = '#c8a040'; ov(g, 44, -30, 3, 3.6); g.fill(); ov(g, 44, -35.6, 2, 2.2); g.fill(); g.fillStyle = '#8a2a20'; g.fillRect(43.2, -39, 1.6, 2);
+  shop(g, rng){   // (v260) the owner's picture: a two-storey wooden apothecary under red tiles, a balcony, a drawer wall, lanterns
+    const NAME = 'ร้านขายยา';
+    S3.plinth(g, -46, 92, 5, rng);
+    g.fillStyle = '#d8d0bc'; g.fillRect(-14, -1, 28, 3.4); g.fillStyle = 'rgba(0,0,0,.2)'; g.fillRect(-14, 2, 28, .6);
+    // ground floor: the back wall of medicine drawers under four cloth banners, shelves either side
+    S3.boards(g, -40, -44, 80, 39, rng, ['#8a5a34', '#7a4e2c', '#9a6a40']); S3.shade(g, -40, -44, 80, 39, .3);
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 5; c++){ const x = -15 + c * 6.2, y = -30 + r * 5; g.fillStyle = (r + c) % 2 ? '#8a4a24' : '#7a3e1c'; g.fillRect(x, y, 5.6, 4.4); g.fillStyle = '#e3b04b'; g.fillRect(x + 2.2, y + 1.8, 1.4, 1); }
+    const ic = ['#4a9a44', '#9a6ad8', '#d8a050', '#d83a3a']; for (let k = 0; k < 4; k++){ const x = -15 + k * 7.8; g.fillStyle = '#f2ead6'; g.fillRect(x, -40, 6.6, 8); g.fillStyle = ic[k]; g.beginPath(); g.arc(x + 3.3, -36, 1.8, 0, 7); g.fill(); }
+    // left shelves: coloured bottles, jars, a mortar; herbs and a lantern hanging
+    for (const y of [-30, -20]){ g.fillStyle = '#5a3418'; g.fillRect(-36, y, 18, 1.4); }
+    const bc = ['#3a8ad8', '#d83a5a', '#9a5ad8', '#e8a030', '#3ab08a']; for (let k = 0; k < 5; k++){ g.fillStyle = bc[k]; g.fillRect(-35 + k * 3.4, -34, 2.4, 4); g.fillStyle = '#e8e4dc'; g.fillRect(-34.6 + k * 3.4, -35, 1.6, 1); }
+    for (let k = 0; k < 3; k++){ g.fillStyle = '#e8dcc0'; ov(g, -33 + k * 5.2, -22.4, 2.2, 2.4); g.fill(); g.fillStyle = '#5a9a4a'; g.fillRect(-33.6 + k * 5.2, -23, 1.2, 1.2); }
+    g.fillStyle = '#c8c4bc'; ov(g, -21, -12.6, 3, 1.8); g.fill(); g.fillStyle = '#a8a49c'; g.fillRect(-21, -17, 1.2, 4);
+    for (const x of [-34, -30]){ g.fillStyle = '#6a8a3a'; pv(g, [x - 1.6, -42, x + 1.6, -42, x + 1, -35, x - 1, -35]); g.fill(); }
+    g.fillStyle = '#2a1a0a'; g.fillRect(-26.6, -42, 4.6, 1.2); g.fillStyle = '#ffd068'; g.fillRect(-26, -41, 3.4, 4.6); g.fillStyle = 'rgba(255,220,120,.35)'; g.beginPath(); g.arc(-24.3, -38.6, 6, 0, 7); g.fill();
+    // right shelves: jars and a gold scale
+    for (const y of [-30, -20]){ g.fillStyle = '#5a3418'; g.fillRect(18, y, 18, 1.4); }
+    for (let k = 0; k < 3; k++){ g.fillStyle = 'rgba(230,240,240,.85)'; g.fillRect(20 + k * 5.4, -35, 3.6, 5); g.fillStyle = ['#9a6ad8', '#6aaa5a', '#d8a050'][k]; g.fillRect(20.4 + k * 5.4, -33, 2.8, 2.6); }
+    g.strokeStyle = '#e3b04b'; g.lineWidth = .9; g.beginPath(); g.moveTo(27, -27); g.lineTo(27, -21); g.moveTo(22, -26); g.lineTo(32, -26); g.stroke(); for (const x of [22, 32]){ g.beginPath(); g.arc(x, -24, 2, 0, Math.PI); g.stroke(); }
+    // the counter with a red runner, sacks and a basket of greens, jars of herbs
+    g.fillStyle = '#7a4a26'; g.fillRect(-30, -16, 60, 3); g.fillStyle = '#5a3418'; g.fillRect(-30, -13, 60, 8);
+    g.fillStyle = '#b02a2a'; g.fillRect(-8, -16, 16, 11); g.fillStyle = '#e3b04b'; g.fillRect(-8, -16, 16, 1); g.beginPath(); g.moveTo(0, -12.6); g.lineTo(2.4, -10.4); g.lineTo(0, -8.2); g.lineTo(-2.4, -10.4); g.closePath(); g.fill();
+    g.fillStyle = '#c8b088'; ov(g, -36, -5, 5, 5); g.fill(); g.fillStyle = '#d8a050'; ov(g, -36, -9.6, 3.6, 1.6); g.fill();
+    g.fillStyle = '#8a6030'; pv(g, [-30, -8, -22, -8, -23, -2, -29, -2]); g.fill(); g.fillStyle = '#5aaa4a'; ov(g, -26, -9, 4, 2.4); g.fill();
+    for (const [x, c] of [[22, '#e8dcc0'], [28, '#e8dcc0'], [34, '#b8603a']]){ g.fillStyle = c; ov(g, x, -5.4, 2.8, 3.4); g.fill(); g.fillStyle = c === '#b8603a' ? '#c02a2a' : '#7a5ad8'; ov(g, x, -9, 2.6, .9); g.fill(); }
+    // posts with braces
+    for (const x of [-44, 40]){ g.fillStyle = vsLin(g, x, 0, x + 4, 0, [[0, '#3a2412'], [.5, '#8a5a30'], [1, '#3a2412']]); g.fillRect(x, -46, 4, 41); }
+    g.strokeStyle = '#5a3a1e'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(-40, -36); g.lineTo(-32, -45); g.moveTo(40, -36); g.lineTo(32, -45); g.stroke();
+    // the red tile awning over the ground floor and the big sign on it
+    tileQuad(g, [-54, -42, 54, -42, 48, -50, -48, -50], 2, 14, [PAL.roofM, PAL.roofL, PAL.roofD]);
+    { const w = 50, y = -55; g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(-w / 2 + .8, y + .8, w, 11); g.fillStyle = vsLin(g, 0, y, 0, y + 11, [[0, '#8a1e18'], [1, '#5a0e0a']]); g.fillRect(-w / 2, y, w, 11);
+      g.strokeStyle = PAL.gold; g.lineWidth = 1; g.strokeRect(-w / 2 + .6, y + .6, w - 1.2, 9.8); g.fillStyle = '#ffe08a'; g.font = '700 7px Sarabun,"Noto Sans Thai",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(NAME, 0, y + 6, w - 12); g.textBaseline = 'alphabetic';
+      g.fillStyle = '#5aaa4a'; for (const d of [-1, 1]){ ov(g, d * 21.5, y + 5.5, 2, 1.2); g.fill(); } }
+    // upper floor: planks, three green louvred windows, a white balcony with flower pots
+    S3.boards(g, -42, -78, 84, 26, rng, ['#9a6a40', '#8a5a34']); S3.shade(g, -42, -78, 84, 26);
+    for (const x of [-32, -7, 18]){ g.fillStyle = '#e8e0cc'; g.fillRect(x - 1, -75, 16, 18); g.fillStyle = '#2a6a4a'; g.fillRect(x, -74, 14, 16); g.fillStyle = 'rgba(0,0,0,.3)'; for (let y = -72; y < -58; y += 2) g.fillRect(x, y, 14, .7); g.fillStyle = '#1a4a32'; g.fillRect(x + 6.6, -74, .8, 16); }
+    g.fillStyle = '#f2ede2'; g.fillRect(-44, -60, 88, 1.6); g.fillRect(-44, -53, 88, 1.6); for (let x = -43; x < 44; x += 3) g.fillRect(x, -59, 1.1, 6);
+    for (const x of [-36, 36]){ g.fillStyle = '#b8603a'; pv(g, [x - 3.6, -60, x + 3.6, -60, x + 2.6, -65, x - 2.6, -65]); g.fill(); g.fillStyle = '#4a9a44'; ov(g, x, -67, 4.6, 3); g.fill(); g.fillStyle = '#ffd8e8'; for (const dx of [-2, 0, 2]) { g.beginPath(); g.arc(x + dx, -68.4 + Math.abs(dx) * .4, .9, 0, 7); g.fill(); } }
+    // the gable roof with the round mortar-and-pestle emblem
+    tileQuad(g, [-56, -76, 56, -76, 10, -104, -10, -104], 6, 14, [PAL.roofM, PAL.roofL, PAL.roofD]);
+    g.fillStyle = '#8a5a34'; pv(g, [-30, -78, 0, -98, 30, -78]); g.fill(); g.fillStyle = 'rgba(0,0,0,.2)'; for (let x = -28; x < 30; x += 4) g.fillRect(x, -96 + Math.abs(x) * .62, .6, 20 - Math.abs(x) * .62);
+    g.fillStyle = PAL.gold; g.beginPath(); g.arc(0, -85, 7, 0, 7); g.fill(); g.fillStyle = '#8a1e18'; g.beginPath(); g.arc(0, -85, 5.8, 0, 7); g.fill();
+    g.fillStyle = '#f2ede2'; g.beginPath(); g.moveTo(-3.4, -85); g.lineTo(3.4, -85); g.lineTo(2, -82); g.lineTo(-2, -82); g.closePath(); g.fill(); g.fillStyle = '#d8d0c0'; g.save(); g.translate(1.6, -87); g.rotate(.6); g.fillRect(-.8, -3, 1.6, 4); g.restore();
+    g.fillStyle = '#5aaa4a'; for (const [x, y] of [[-3, -88], [3.4, -87]]){ ov(g, x, y, 1.6, 1); g.fill(); }
+    // the vertical red banner (left) and two red lanterns (right)
+    g.strokeStyle = '#3a2010'; g.lineWidth = .8; g.beginPath(); g.moveTo(-54, -72); g.lineTo(-48, -72); g.stroke(); S3.vboard(g, -58, -70, NAME, {w:10});
+    for (const y of [-70, -42]){ g.strokeStyle = '#2a1a0a'; g.lineWidth = .6; g.beginPath(); g.moveTo(52, y - 4); g.lineTo(52, y); g.stroke();
+      g.fillStyle = '#d8281e'; ov(g, 52, y + 5, 4.4, 5.6); g.fill(); g.fillStyle = '#e3b04b'; g.fillRect(49.6, y, 4.8, 1.2); g.fillRect(49.6, y + 9.8, 4.8, 1.2); g.fillStyle = 'rgba(255,200,120,.4)'; ov(g, 51, y + 4, 2, 3); g.fill(); g.fillStyle = '#c8281e'; g.fillRect(51.4, y + 11, 1.2, 3); }
+    // stone planters with pink flowers at the front corners
+    for (const x of [-50, 50]){ g.fillStyle = '#c8c4bc'; g.fillRect(x - 5, -8, 10, 8); g.fillStyle = '#a8a49c'; g.fillRect(x - 5, -8, 10, 1.2); g.fillStyle = '#4a9a44'; ov(g, x, -10, 6, 3.4); g.fill();
+      g.fillStyle = '#ffb8d0'; for (const dx of [-3.6, -1, 1.8, 4]){ g.beginPath(); g.arc(x + dx, -11.6 + (dx > 0 ? .6 : 0), 1.1, 0, 7); g.fill(); } }
   },
   herbal(g, rng){
     // stilts and a raised floor, herbs drying underneath
@@ -368,7 +399,7 @@ const S3_DRAW = {
 /* (v214) one standard for all twelve: each house's main body (from the ground to its roof ridge, eave to eave — not
    smoke, chimneys, flags or spires) is scaled to the same height on the same ground line, within the same width */
 const S3_STD = {h:92, w:120, base:2};
-const S3_MAIN = {smith:[-90, -60, 60], forger:[-100, -60, 60], driller:[-88, -56, 56], shop:[-98, -48, 46], herbal:[-98, -54, 54], cook:[-82, -54, 56],
+const S3_MAIN = {smith:[-90, -60, 60], forger:[-100, -60, 60], driller:[-88, -56, 56], shop:[-104, -58, 58], herbal:[-98, -54, 54], cook:[-82, -54, 56],
   tailor:[-88, -52, 52], banker:[-98, -50, 50], registrar:[-92, -54, 54], festival:[-96, -50, 50], trader:[-94, -54, 54], beast:[-90, -56, 56]};
 PROP_TYPES.vshop = (seed, v = 0) => makeProp({w:128, h:124, ax:64, ay:112,   // (v214) taller canvas: chimneys and spires are no longer cut off
   seed, shadow:[52, 12, 3], collide:30, glow:[0, -40, 62], paint(g, rng){
@@ -379,5 +410,5 @@ PROP_TYPES.vshop = (seed, v = 0) => makeProp({w:128, h:124, ax:64, ay:112,   // 
   // every house gets its pots by the door and, where it fits, a lantern at the eave
   const pk = VSHOP_PLANT[V.k] || 'fern';
   if (!['herbal', 'beast', 'cook', 'festival'].includes(V.k)) for (const px of [-30, 30]){ g.save(); g.translate(px, 1); g.scale(.62, .62); vsPlant(g, 0, 0, pk, rng); g.restore(); }
-  if (['shop', 'festival', 'cook', 'tailor'].includes(V.k)) { vsLantern(g, V.k === 'shop' ? 40 : -44, V.k === 'tailor' ? -58 : -60, 3); }
+  if (['festival', 'cook', 'tailor'].includes(V.k)) { vsLantern(g, -44, V.k === 'tailor' ? -58 : -60, 3); }
 }});
