@@ -18,13 +18,17 @@ const TW235 = {hp:1.1, atk:1.05};
 /* (v255) high floors: tools/tower-report.js showed Lv 250–300 heroes falling within 10–20 s on ordinary floors 30 levels
    under their own (a full hall of Lv 270+ monsters hits much harder than a map's spread-out ones). From floor 60 the
    tower's monsters hit softer, down to ×TW255_TOP at floor 100. */
-const TW255_TOP = .6, tw255Atk = f => f <= 60 ? 1 : 1 - (1 - TW255_TOP) * Math.min(1, (f - 60) / 40);
+const TW255_TOP = .6, tw255Atk = f => f <= 50 ? 1 : 1 - (1 - TW255_TOP) * Math.min(1, (f - 50) / 30);   // full by floor 80
+/* (v256) the real wall: on maps a Lv 300 hero kills 9–21 monsters a minute against 30–40 at low levels, so a hall that
+   fights all at once takes far longer to clear up high and buries the hero. Tower monsters lose HP from floor 40, down
+   to ×TW256_HP at floor 100, so a high hall takes about as long as a low one (guardians too: towerbal224 eases less). */
+const TW256_HP = .45, tw256Hp = f => f <= 40 ? 1 : 1 - (1 - TW256_HP) * Math.min(1, (f - 40) / 35);   // full by floor 75
 if (typeof TWB !== 'undefined'){ TWB.hp = 6; TWB.atk = 1.3; }   // guardians as in v224 (on top of the +10% / +5% every tower monster has): 7× / 1.35× stopped the melee lines at the first guardian
 { const _m = twMob; twMob = function(){ const m = _m.apply(this, arguments);
-    if (m && m.def){ m.def = {...m.def, hp:Math.round(m.def.hp * TW235.hp), atk:m.def.atk.map(v => Math.max(1, Math.round(v * TW235.atk * tw255Atk(arguments[3] | 0))))}; m.maxhp = m.hp = m.def.hp; }
+    if (m && m.def){ m.def = {...m.def, hp:Math.round(m.def.hp * TW235.hp * tw256Hp(arguments[3] | 0)), atk:m.def.atk.map(v => Math.max(1, Math.round(v * TW235.atk * tw255Atk(arguments[3] | 0))))}; m.maxhp = m.hp = m.def.hp; }
     return m; }; }
 // more of them
-const tw235Count = f => Math.min(16, 7 + Math.floor(f / 6));
+const tw235Count = f => Math.min(13, 7 + Math.floor(f / 10));   // (v256) 100 floors: 7 → 13 by floor 60 (it reached 16 at floor 54, and a hall of 16 Lv 200+ monsters killed every hero in shop gear)
 { const _sp = twSpawn; twSpawn = function(){ const r = _sp.apply(this, arguments); if (!TW.active || TW.phase !== 'fight') return r;
     const f = TW.f, kind = typeof twfKind === 'function' ? twfKind(f) : (f % 5 ? 'hunt' : 'guard'), mp = MAPS[TW.theme] || {}, kinds = (mp.mobs || []).filter(t => MOB[t] && !MOB[t].night && !MOB[t].boss); if (!kinds.length) return r;
     const alive = () => mobs.filter(m => m.tw === f && !m.dead && !m.def.boss).length;
@@ -62,10 +66,10 @@ if (typeof SFX !== 'undefined' && SFX.music){ const _m = SFX.music; SFX.music = 
 EV.on('tick', () => { if (typeof TW !== 'undefined' && TW.active && typeof BGM !== 'undefined' && BGM.key !== 'tower' && typeof SFX !== 'undefined' && SFX.music) SFX.music('tower'); });
 
 /* ---------- (v236) from floor 100 the guardian floors bring more guardians ----------
-   (v255, the tower ends at 100) floors 80–95: two guardians · floor 100: the Shadow of Vaira and one guardian at
-   its side (three guardians stopped every Lv 300 hero at floor 95). Of different regions round the level when possible (the floor's own guardian, plus guardians
+   (v255, the tower ends at 100) floor 90: two guardians · floor 100: the Shadow of Vaira and one guardian at its side
+   (v256: two on every floor 80–95 stopped every Lv 300 hero in shop gear at floor 95). Of different regions round the level when possible (the floor's own guardian, plus guardians
    of the regions just below and above). Each extra one is a full tower guardian. */
-const tw236Bosses = f => (f % 5 !== 0 || f < 80) ? 1 : 2;
+const tw236Bosses = f => (f === 90 || f === 100) ? 2 : 1;   // (v256) two guardians only on floor 90, and the Shadow with one at its side on 100
 { const _sp = twSpawn; twSpawn = function(){ const r = _sp.apply(this, arguments); const f = TW.f, n = tw236Bosses(f); if (n < 2 || !TW.active || TW.phase !== 'fight') return r;
     const th = typeof twThemes === 'function' ? twThemes() : [], i = th.findIndex(o => o.i === TW.theme), pool = [th[i - 1], th[i + 1], th[i - 2], th[i]].filter(o => o && MAPS[o.i].boss && MOB[MAPS[o.i].boss]).map(o => MAPS[o.i].boss);
     const c = twmC(); let have = mobs.filter(m => m.tw === f && !m.dead && m.def.boss).length;

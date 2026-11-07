@@ -11,7 +11,7 @@ const TWB = {hp:6, atk:1.3, def:1.2};
 /* (v255) the 100-floor tower: tools/tower-report.js showed heroes of Lv 200–300 stopped by guardians 20–27 levels
    under their own (low floors were fine, about their own level). A guardian's HP and hits ease off from floor 30 to
    the top (×1 → ×TWB_TOP), so the last floors stay hard but a strong Lv 300 can reach the top. */
-const TWB_TOP = {hp:.4, atk:.7};
+const TWB_TOP = {hp:.75, atk:.7};   // (v256) HP: on top of tower235's ease for every tower monster
 const twbEase = (f, k) => f <= 30 ? 1 : 1 - (1 - TWB_TOP[k]) * Math.min(1, (f - 30) / 70);
 { const _m = twMob; twMob = function(type, x, y, f){ const m = _m.apply(this, arguments);
     if (m && MOB[type] && MOB[type].boss){
@@ -27,3 +27,9 @@ EV.on('tick', () => {
   if (on){ if (typeof botSet === 'function' && !S.bot) botSet(); if (S.bot && S.bot.avoidBoss !== false){ S.bot.avoidBoss = false; S.bot._twAvoid = true; } }
   else if (S && S.bot && S.bot._twAvoid){ S.bot.avoidBoss = true; delete S.bot._twAvoid; }
 });
+/* (v256) a guardian's real blows go through bossPunch (bosshard.js: a share of a reference HP for its level), which the
+   eased hits above never touched: at floor 60 one blow took 35% of a Lv 200 swordsman and 75% of a healer. In the
+   tower the blows ease from floor 30 down to ×TWB_PUNCH at the top. */
+const TWB_PUNCH = .35, twbPunch = f => f <= 30 ? 1 : 1 - (1 - TWB_PUNCH) * Math.min(1, (f - 30) / 55);   // full by floor 85
+if (typeof bossPunch === 'function'){ const _bp = bossPunch; bossPunch = function(m){ const r = _bp.apply(this, arguments);
+    return m && m.twGuard && typeof TW !== 'undefined' && TW.active ? Math.max(1, Math.round(r * twbPunch(TW.f))) : r; }; }

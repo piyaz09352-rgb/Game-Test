@@ -157,7 +157,7 @@ EV.on('tick', dt => {
     if (!TW.mine){ if (alive) TW.mine = true; else { const t = TW.t; twSpawn(); TW.t = Math.max(15, t); return; } }
     else if (!alive){ twClear(); return; } }   // the guardian's guards count too
   if ((TW.t -= dt) <= 0){ banner(L(`หมดเวลาที่ชั้น ${TW.f}!`, `Time ran out on floor ${TW.f}!`)); twQuit('time'); return; }
-  if (TW.f >= 10 && typeof dg3Hazard === 'function' && (TW.hazT -= dt) <= 0){ TW.hazT = Math.max(4, 9 - TW.f / 20); dg3Hazard(); }
+  if (TW.f >= 10 && typeof dg3Hazard === 'function' && (TW.hazT -= dt) <= 0){ TW.hazT = Math.max(6, 9 - TW.f / 30); dg3Hazard(.08); }   // (v256) every 6–9 s, 8% HP a hit (was every 4 s, 12%: half of what killed casters near the top)
 });
 EV.on('die', () => { if (TW.active) TW.fellAt = TW.f; });
 EV.on('map', () => { if (TW.active && !TW.entering) twFinish(TW.fellAt === TW.f ? 'fell' : 'leave'); });

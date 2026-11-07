@@ -53,14 +53,14 @@ function dg3Take(id){
 document.addEventListener('click', e => { const t = e.target.closest && e.target.closest('[data-boon]'); if (t) dg3Take(t.dataset.boon); });
 
 /* ---------- danger zones ---------- */
-function dg3Hazard(){
+function dg3Hazard(pct = .12){   // (v256) the tower passes a smaller share
   const n = DG.wave >= 4 ? 3 : 2;
   for (let i = 0; i < n; i++){ const x = P.x + (i ? rand(-110, 110) : rand(-20, 20)), y = P.y + (i ? rand(-70, 70) : rand(-12, 12)), r = 48, tt = 1.2;
     VFX.play('warnCircle', {x, y, r, t:tt});
     later(tt, () => { if (!DG.active) return; VFX.play('boom', {x, y, r}); VFX.shake(3); SFX.play('fire');
       if (typeof skfxRing === 'function'){ skfxRing(x, y, r * 1.5, '#ff8a1f', .35, 6); skfxScorch(x, y, r, '#c7261a', 1.6); }
       if (P.dead || P.roll || Object.values(P.buffs).some(b => b.invuln)) return;
-      if (Math.hypot(P.x - x, (P.y - y) * 1.6) < r + 6){ const d = Math.round(DER.maxhp * .12 * (1 - Math.min(.6, buffSum('dmgRed'))));
+      if (Math.hypot(P.x - x, (P.y - y) * 1.6) < r + 6){ const d = Math.round(DER.maxhp * pct * (1 - Math.min(.6, buffSum('dmgRed'))));
         S.hp -= d; addText(P.x, P.y - 48, String(d), '#ff8a80'); P.hurt = .25; SFX.play('hurt'); if (S.hp <= 0) playerDie(); } }); }
 }
 
