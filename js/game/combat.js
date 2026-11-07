@@ -99,7 +99,8 @@ function killMob(m){
 function gainExp(b, j){
   const lv0 = S.lvl, jl0 = S.jlvl;
   S.exp += b;
-  while (S.lvl < LV_MAX && S.exp >= nextBase(S.lvl)){
+  const cap = typeof patchCap === 'function' ? patchCap() : LV_MAX;   // (v257) the server's patch cap (patch257.js): EXP past it is stored
+  while (S.lvl < cap && S.exp >= nextBase(S.lvl)){
     S.exp -= nextBase(S.lvl); S.lvl++; S.statPts += statGain(S.lvl);
     derive(); S.hp = DER.maxhp; S.sp = DER.maxsp;
     pulseChar();

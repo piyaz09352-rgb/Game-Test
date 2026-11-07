@@ -182,9 +182,9 @@ function hud(){
   const setH = (id, h) => { const n = el(id); if (n.dataset.h !== h){ n.dataset.h = h; n.innerHTML = h; } };
   setH('hpT', `<b>HP</b><em>${Math.max(0, Math.round(S.hp)).toLocaleString()} / ${DER.maxhp.toLocaleString()}</em>`); setH('spT', `<b>SP</b><em>${Math.round(S.sp).toLocaleString()} / ${DER.maxsp.toLocaleString()}</em>`);
   el('hpBar').classList.toggle('low', S.hp / DER.maxhp < .25 && !P.dead);
-  const nb = nextBase(S.lvl), nj = nextJob(S.jlvl), jm = S.jlvl >= JOBS[S.job].jobMax, bm = S.lvl >= LV_MAX;
+  const nb = nextBase(S.lvl), nj = nextJob(S.jlvl), jm = S.jlvl >= JOBS[S.job].jobMax, pc = typeof patchCap === 'function' ? patchCap() : LV_MAX, bm = S.lvl >= pc;
   setW('bxI', bm ? 1 : S.exp / nb); setW('jxI', jm ? 1 : S.jexp / nj);
-  setT('bxT', bm ? 'Base MAX' : `Base ${(Math.min(S.exp / nb, .999) * 100).toFixed(1)}%`); setT('jxT', jm ? 'Job MAX' : `Job ${(S.jexp / nj * 100).toFixed(1)}%`);
+  setT('bxT', bm ? (S.lvl < LV_MAX ? L(`เพดาน Lv ${pc} · สะสม EXP`, `Cap Lv ${pc} · EXP stored`) : 'Base MAX') : `Base ${(Math.min(S.exp / nb, .999) * 100).toFixed(1)}%`); setT('jxT', jm ? 'Job MAX' : `Job ${(S.jexp / nj * 100).toFixed(1)}%`);
   { const a = el('ammoT'), on = usesArrows(); if (a.hidden === on) a.hidden = !on; if (on){ const n = arrowCount(); setT('ammoT', `${ammoWant() === 'star' ? '✦' : '➶'} ${n}`); a.classList.toggle('low', n < 50); } }
   setT('cJob', nm(JOBS[S.job])); setT('cLv', `Base ${S.lvl} · Job ${S.jlvl}`); setT('lvBadge', String(S.lvl));
   document.querySelectorAll('.cdv').forEach(c => {
