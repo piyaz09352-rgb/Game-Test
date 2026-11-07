@@ -1,8 +1,10 @@
 /* VAYRATHEN — js/world/shops213.js — (v213) every shop in Aren is its own building
    The owner did not want twelve copies of one shop (v212 gave them depth and light but kept one template). Each trade
    now has the house that trade would really have, in a Thai town:
-     โรงตีเหล็ก   a sooty open forge shed under a dark hip roof, smoke vent on the ridge, glowing hearth, tall chimney
-     โรงหลอมแร่   a brick bottle kiln with a fire mouth beside a lean-to shed with a rusty tin roof and stacked ingots
+     โรงตีเหล็ก   (v259, the owner's picture) an open forge under a dark slate roof with a lit vent house, a brick chimney,
+                  an arched furnace, an anvil, benches of ingots, tongs, swords and a shield, lanterns, barrels and flowers
+     โรงหลอมแร่   (v259, the owner's picture) a banded brick bottle kiln with a wide glowing mouth beside an open shed of
+                  gold, silver and copper ingots under a striped tin roof, a crucible pouring into moulds, an ore cart on rails
      ร้านเจาะมณี  a white Thai-Chinese plaster shop, blue glazed roof with curled ridge ends, an arched display window
      ร้านยา       a two-storey wooden shophouse: folding plank doors, a wall of medicine drawers, a balcony, a red vertical sign
      สมุนไพร      a bamboo hut on stilts with woven walls and a steep straw roof, herbs drying underneath
@@ -54,51 +56,101 @@ const S3 = {
 const S3_NAME = k => (VSHOP_NAME[k] || ['ร้านค้า'])[0];
 
 const S3_DRAW = {
-  smith(g, rng){
-    S3.plinth(g, -46, 86, 6, rng);
-    S3.side(g, 40, -56, -6, 8, '#3a3434');
-    // back wall: sooty brick; posts; the hearth glowing at the back
-    blocks(g, -40, -56, 80, 50, 6, 3, ['#6a3a2a', '#5a3022', '#7a4430', '#4a2a20'], '#2a1a14', rng, 6); S3.shade(g, -40, -56, 80, 50, .5);
-    g.fillStyle = 'rgba(20,10,6,.45)'; g.fillRect(-40, -56, 80, 12);
-    { const gr = g.createRadialGradient(-12, -14, 2, -12, -14, 34); gr.addColorStop(0, 'rgba(255,150,60,.75)'); gr.addColorStop(1, 'rgba(255,90,20,0)'); g.fillStyle = gr; g.fillRect(-46, -50, 70, 46); }
-    blocks(g, -26, -22, 26, 16, 5, 3, ['#7a4a34', '#6a3a28'], '#2a1a12', rng); g.fillStyle = '#1a0a04'; g.fillRect(-21, -19, 16, 6); vgFire(g, -13, -13, 1.1);
-    g.fillStyle = '#ffb040'; for (let i = 0; i < 6; i++){ g.fillRect(-20 + rng() * 14, -16 - rng() * 12, .8, .8); }
-    // tools on the wall, anvil on a stump, quench barrel
-    for (let i = 0; i < 4; i++){ const x = 8 + i * 6; g.fillStyle = PAL.barkM; g.fillRect(x, -48, 1.2, 14); g.fillStyle = '#5a5e68'; g.fillRect(x - 2, -48, 5.2, 3); }
-    g.fillStyle = PAL.barkD; g.fillRect(12, -14, 10, 8); g.fillStyle = '#4a4e58'; pv(g, [8, -20, 26, -20, 24, -16, 20, -15, 20, -14, 14, -14, 14, -15, 10, -16]); g.fill(); g.fillStyle = 'rgba(255,255,255,.35)'; g.fillRect(9, -20, 16, .7);
-    g.fillStyle = vsLin(g, 28, 0, 38, 0, [[0, '#5a3a20'], [.5, '#8a5a30'], [1, '#4a2e18']]); g.fillRect(28, -16, 10, 10); g.fillStyle = '#2a3a4a'; ov(g, 33, -16, 5, 1.6); g.fill();
-    for (const x of [-44, -2, 38]){ g.fillStyle = vsLin(g, x, 0, x + 5, 0, [[0, '#2a1a10'], [.5, '#5a3a24'], [1, '#2a1a10']]); g.fillRect(x, -60, 5, 54); }
-    // a dark hip roof with a smoke vent on the ridge
-    tileQuad(g, [-54, -56, 54, -56, 26, -84, -26, -84], 7, 9, ['#3a3e46', '#5a606a', '#1e2026']);
-    g.fillStyle = vsLin(g, -40, -84, 40, -56, [[0, 'rgba(255,255,255,.18)'], [1, 'rgba(0,0,0,.25)']]); pv(g, [-54, -56, 54, -56, 26, -84, -26, -84]); g.fill();
-    g.fillStyle = '#1a1c20'; g.fillRect(-54, -57, 108, 2.4);
-    g.fillStyle = '#2a2c32'; g.fillRect(-8, -92, 16, 8); tileQuad(g, [-12, -91, 12, -91, 6, -97, -6, -97], 2, 4, ['#3a3e46', '#5a606a', '#1e2026']); S3.smoke(g, 0, -99, 4);
-    // a tall brick chimney on the right
-    blocks(g, 44, -96, 9, 90, 4.5, 3, ['#7a3a28', '#8a4430', '#6a3022'], '#3a1a12', rng); g.fillStyle = '#2a1a14'; g.fillRect(43, -98, 11, 3); S3.smoke(g, 49, -101, 3);
-    S3.board(g, 0, -55, S3_NAME('smith'), {bg:['#3a3e46', '#1e2026'], fg:'#ffb060', frame:'#a0a4ac', w:40});
+  smith(g, rng){   // (v259) the owner's picture: an open forge under a dark slate roof, a vent house on the ridge, a brick chimney
+    // stone plinth, front steps, flower boxes at the corners
+    S3.plinth(g, -50, 100, 6, rng);
+    for (let k = 0; k < 2; k++){ g.fillStyle = k ? '#d8d0bc' : '#e6dfcc'; g.fillRect(-16 + k * 2, -2 - k * 3, 32 - k * 4, 3.4); g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(-16 + k * 2, 1 - k * 3, 32 - k * 4, .6); }
+    // the brick back wall, lit warm by the furnace
+    blocks(g, -42, -52, 84, 46, 6, 3, ['#9a4a2c', '#8a3e24', '#aa5634', '#7a3420'], '#3a1a10', rng, 6); S3.shade(g, -42, -52, 84, 46, .45);
+    { const gr = g.createRadialGradient(-16, -18, 2, -16, -18, 44); gr.addColorStop(0, 'rgba(255,160,70,.55)'); gr.addColorStop(1, 'rgba(255,100,30,0)'); g.fillStyle = gr; g.fillRect(-42, -52, 84, 46); }
+    // the stone floor inside
+    g.fillStyle = '#8a7a6a'; g.fillRect(-42, -10, 84, 4); for (let x = -42; x < 42; x += 6){ g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(x, -10, .5, 4); }
+    // the arched brick furnace with its fire
+    blocks(g, -34, -40, 30, 34, 5, 3, ['#7a3a24', '#8a4430', '#6a3020'], '#2a140c', rng); g.fillStyle = 'rgba(0,0,0,.2)'; g.fillRect(-34, -40, 30, 3);
+    g.fillStyle = '#1a0804'; g.beginPath(); g.moveTo(-28, -8); g.lineTo(-28, -22); g.arc(-19, -22, 9, Math.PI, 0); g.lineTo(-10, -8); g.closePath(); g.fill();
+    { const gr = g.createRadialGradient(-19, -14, 1, -19, -14, 12); gr.addColorStop(0, '#fff4b0'); gr.addColorStop(.45, '#ffa030'); gr.addColorStop(1, 'rgba(200,60,10,.4)'); g.fillStyle = gr; g.beginPath(); g.moveTo(-27, -8); g.lineTo(-27, -21); g.arc(-19, -21, 8, Math.PI, 0); g.lineTo(-11, -8); g.closePath(); g.fill(); }
+    vgFire(g, -19, -9, .9); g.strokeStyle = '#c8603a'; g.lineWidth = 1.4; g.beginPath(); g.arc(-19, -22, 10, Math.PI, 0); g.stroke();
+    // tongs hanging, a rack of swords, a shield on the wall
+    for (let i = 0; i < 3; i++){ const x = 2 + i * 4.5; g.strokeStyle = '#3a3a40'; g.lineWidth = 1; g.beginPath(); g.moveTo(x, -46); g.lineTo(x - 1.4, -34); g.moveTo(x, -46); g.lineTo(x + 1.4, -34); g.stroke(); g.fillStyle = '#2a2a30'; g.beginPath(); g.arc(x, -46, 1.2, 0, 7); g.fill(); }
+    g.fillStyle = '#5a3a1e'; g.fillRect(16, -47, 18, 2); for (let i = 0; i < 4; i++){ const x = 18 + i * 4.4; g.fillStyle = '#d8dce4'; g.fillRect(x - .8, -45, 1.6, 13); g.fillStyle = '#e3b04b'; g.fillRect(x - 2, -46, 4, 1.2); g.fillStyle = '#6a4a2a'; g.fillRect(x - .6, -48, 1.2, 2.4); }
+    g.fillStyle = '#e8e4dc'; g.beginPath(); g.moveTo(32, -50); g.lineTo(40, -50); g.lineTo(40, -44); g.quadraticCurveTo(36, -38, 36, -38); g.quadraticCurveTo(32, -42, 32, -44); g.closePath(); g.fill();
+    g.fillStyle = '#d8902a'; g.beginPath(); g.moveTo(36, -50); g.lineTo(40, -50); g.lineTo(40, -44); g.quadraticCurveTo(38, -41, 36, -38); g.closePath(); g.fill(); g.strokeStyle = '#6a4a20'; g.lineWidth = .8; g.beginPath(); g.moveTo(32, -50); g.lineTo(40, -50); g.lineTo(40, -44); g.quadraticCurveTo(36, -38, 36, -38); g.quadraticCurveTo(32, -42, 32, -44); g.closePath(); g.stroke();
+    // workbenches with ingots, the anvil on its stump
+    for (const [bx, w] of [[-40, 14], [24, 16]]){ g.fillStyle = '#7a5230'; g.fillRect(bx, -16, w, 2.4); g.fillStyle = '#5a3a1e'; g.fillRect(bx + 1, -14, 1.6, 8); g.fillRect(bx + w - 2.6, -14, 1.6, 8);
+      g.fillStyle = '#c8ccd4'; g.fillRect(bx + 2, -19.6, 5, 3.6); g.fillRect(bx + 4, -22.4, 5, 2.8); g.fillStyle = 'rgba(255,255,255,.5)'; g.fillRect(bx + 2, -19.6, 5, .6); }
+    g.fillStyle = '#8a5a30'; g.fillRect(-5, -11, 12, 7); g.fillStyle = '#6a4220'; g.fillRect(-5, -11, 12, 1.4); g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(4, -11, 3, 7);
+    g.fillStyle = '#5a5e6a'; pv(g, [-8, -18, 12, -18, 10, -15, 5, -14, 5, -11, -1, -11, -1, -14, -4, -15]); g.fill(); g.fillStyle = 'rgba(255,255,255,.4)'; g.fillRect(-7, -18, 18, .8);
+    // timber posts with knee braces
+    for (const x of [-46, 41]){ g.fillStyle = vsLin(g, x, 0, x + 5, 0, [[0, '#3a2412'], [.5, '#7a5230'], [1, '#3a2412']]); g.fillRect(x, -56, 5, 50); }
+    g.strokeStyle = '#5a3a1e'; g.lineWidth = 2.2; g.beginPath(); g.moveTo(-41, -44); g.lineTo(-30, -55); g.moveTo(41, -44); g.lineTo(30, -55); g.stroke();
+    g.fillStyle = '#5a3a1e'; g.fillRect(-50, -58, 100, 4);
+    // lanterns on the posts
+    for (const x of [-48, 48]){ g.strokeStyle = '#2a1a0a'; g.lineWidth = .8; g.beginPath(); g.moveTo(x, -50); g.lineTo(x, -46); g.stroke(); g.fillStyle = '#2a1a0a'; g.fillRect(x - 2.6, -46, 5.2, 1.2); g.fillRect(x - 2.6, -38, 5.2, 1.2);
+      g.fillStyle = '#ffd068'; g.fillRect(x - 2, -45, 4, 7); g.fillStyle = 'rgba(255,220,120,.35)'; g.beginPath(); g.arc(x, -41.5, 7, 0, 7); g.fill(); }
+    // the dark slate hip roof, a vent house with glowing windows on the ridge
+    tileQuad(g, [-60, -56, 60, -56, 30, -82, -30, -82], 7, 10, ['#3a3e48', '#5a606c', '#1e2028']);
+    g.fillStyle = vsLin(g, -40, -82, 40, -56, [[0, 'rgba(255,255,255,.16)'], [1, 'rgba(0,0,0,.25)']]); pv(g, [-60, -56, 60, -56, 30, -82, -30, -82]); g.fill();
+    g.fillStyle = '#1a1c22'; g.fillRect(-60, -57, 120, 2.4);
+    g.fillStyle = '#2a2c34'; g.fillRect(-11, -91, 22, 9); for (const x of [-8, -2, 4]){ g.fillStyle = '#ffb050'; g.fillRect(x, -89, 4, 5); }
+    tileQuad(g, [-15, -90, 15, -90, 8, -97, -8, -97], 2, 4, ['#3a3e48', '#5a606c', '#1e2028']); S3.smoke(g, 0, -99, 4);
+    // the tall red brick chimney on the right
+    blocks(g, 44, -104, 11, 98, 5.5, 3, ['#a04830', '#b05638', '#8a3c26'], '#3a1a12', rng); g.fillStyle = '#2a1a14'; g.fillRect(43, -106, 13, 3.4); S3.smoke(g, 50, -110, 4);
+    // barrels and a crate at the sides
+    for (const [x, y] of [[-58, 0], [-56, -9]]){ g.fillStyle = '#7a4a26'; ov(g, x, y - 5, 4.6, 5.6); g.fill(); g.fillStyle = '#4a2a12'; g.fillRect(x - 4.6, y - 8, 9.2, 1); g.fillRect(x - 4.6, y - 3, 9.2, 1); }
+    g.fillStyle = '#8a5a2c'; g.fillRect(52, -9, 9, 9); g.strokeStyle = '#4a2c12'; g.lineWidth = .8; g.strokeRect(52, -9, 9, 9); g.beginPath(); g.moveTo(52, -9); g.lineTo(61, 0); g.stroke();
+    // the sign: a dark board with a gold frame under the eave
+    S3.board(g, 0, -55, S3_NAME('smith'), {bg:['#3a2a1a', '#1e140a'], fg:'#ffd27a', frame:'#e3b04b', w:42, h:9.6, font:6.6});
   },
-  forger(g, rng){
-    S3.plinth(g, -50, 98, 5, rng);
-    // the lean-to shed (right) with a rusty tin roof
-    S3.boards(g, 2, -48, 42, 43, rng, ['#7a5a3a', '#6a4a2e', '#8a6a46']); S3.shade(g, 2, -48, 42, 43);
-    g.fillStyle = '#1e1008'; g.fillRect(8, -40, 30, 26); { const gr = g.createRadialGradient(22, -24, 1, 22, -24, 22); gr.addColorStop(0, 'rgba(255,140,40,.55)'); gr.addColorStop(1, 'rgba(255,100,20,0)'); g.fillStyle = gr; g.fillRect(8, -40, 30, 26); }
-    for (let r = 0; r < 3; r++) for (let i = 0; i < 4 - r; i++){ const x = 12 + i * 5.6 + r * 2.8, y = -16 - r * 2.6; g.fillStyle = PAL.goldD; pv(g, [x, y, x + 5, y, x + 4, y - 2.4, x + 1, y - 2.4]); g.fill(); g.fillStyle = PAL.goldL; g.fillRect(x + 1, y - 2.4, 3, .7); }
-    g.fillStyle = '#3a2a24'; ov(g, 32, -22, 4, 3); g.fill(); g.fillStyle = '#ff8a2a'; ov(g, 32, -24, 3.2, 1.2); g.fill();
-    S3.tin(g, [-2, -46, 50, -54, 50, -48, -2, -40], rng, '#8a8a90'); g.fillStyle = '#4a4a50'; g.fillRect(-2, -41, 52, 1.2);
-    for (const x of [3, 41]) S3.rect(g, x, -46, 3, 41, '#4a3220');
-    S3.board(g, 23, -38, S3_NAME('forger'), {bg:['#5a2a18', '#3a180c'], fg:'#ffc070', frame:'#c88a40', w:30, h:7.6, font:5.6});
-    // the bottle kiln (left): brick body narrowing to a neck, a glowing fire mouth
-    const body = [-46, -4, -46, -40, -40, -62, -30, -74, -26, -96, -16, -96, -12, -74, -2, -62, 4, -40, 4, -4];
-    g.save(); pv(g, body); g.clip(); blocks(g, -48, -98, 54, 96, 5, 3, ['#9a4a2e', '#8a3e26', '#aa5838', '#7a3420'], '#4a2216', rng, 4);
-    g.fillStyle = vsLin(g, -46, 0, 4, 0, [[0, 'rgba(255,220,180,.18)'], [.45, 'rgba(0,0,0,0)'], [1, 'rgba(20,6,0,.45)']]); g.fillRect(-48, -98, 54, 96); g.restore();
+  forger(g, rng){   // (v259) the owner's picture: a brick bottle kiln with a glowing mouth beside an open shed of ingots under a tin roof
+    S3.plinth(g, -52, 108, 5, rng);
+    g.fillStyle = '#c8c0ac'; g.fillRect(-10, -1, 34, 3.4); g.fillStyle = 'rgba(0,0,0,.2)'; g.fillRect(-10, 2, 34, .6);   // the front step
+    // the shed (right): plank back wall, shelves of ingots
+    S3.boards(g, 2, -50, 46, 45, rng, ['#7a5230', '#6a4628', '#8a5e38']); S3.shade(g, 2, -50, 46, 45, .45);
+    { const gr = g.createRadialGradient(28, -20, 1, 28, -20, 26); gr.addColorStop(0, 'rgba(255,170,70,.45)'); gr.addColorStop(1, 'rgba(255,110,30,0)'); g.fillStyle = gr; g.fillRect(2, -50, 46, 45); }
+    for (const y of [-38, -26]){ g.fillStyle = '#4a2c14'; g.fillRect(6, y, 38, 1.8); }
+    const bar = (x, y, c, hi) => { g.fillStyle = c; pv(g, [x, y, x + 5, y, x + 4, y - 2.2, x + 1, y - 2.2]); g.fill(); g.fillStyle = hi; g.fillRect(x + 1, y - 2.2, 3, .6); };
+    for (let r = 0; r < 3; r++) for (let k = 0; k < 3 - r; k++) bar(8 + k * 5 + r * 2.5, -38 - r * 2.2, '#e8b030', '#fff0a0');      // gold
+    for (let r = 0; r < 2; r++) for (let k = 0; k < 3 - r; k++) bar(28 + k * 5 + r * 2.5, -38 - r * 2.2, '#b8bcc4', '#ffffff');     // silver
+    for (let k = 0; k < 3; k++) bar(16 + k * 5.4, -26, '#c86a3a', '#ffb080');                                                           // copper
+    g.fillStyle = '#5a4a40'; ov(g, 11, -28, 3.4, 2.2); g.fill(); g.fillStyle = '#ff9a3a'; ov(g, 11, -29, 2.6, .9); g.fill();
+    // the casting table: a crucible pouring into the moulds
+    blocks(g, 22, -14, 24, 10, 4, 2.5, ['#7a7a80', '#8a8a92', '#6a6a72'], '#3a3a40', rng); g.fillStyle = '#9a9aa2'; g.fillRect(21, -15, 26, 2);
+    for (const x of [24, 31, 38]){ g.fillStyle = '#3a3a40'; g.fillRect(x, -18, 6, 3); g.fillStyle = x === 31 ? '#ffb030' : '#5a5a62'; g.fillRect(x + 1, -17.4, 4, 1.6); }
+    g.fillStyle = '#4a4a52'; pv(g, [36, -28, 44, -30, 45, -26, 38, -24]); g.fill(); g.fillStyle = '#2a2a30'; g.fillRect(43, -31, 4, 6);
+    g.strokeStyle = '#ffb030'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(37, -26); g.quadraticCurveTo(34, -22, 34, -18); g.stroke(); g.fillStyle = 'rgba(255,200,80,.5)'; g.beginPath(); g.arc(34, -18, 3, 0, 7); g.fill();
+    // the timber frame with knee braces, the tin roof in silver and rust stripes
+    for (const x of [2, 46]){ g.fillStyle = vsLin(g, x, 0, x + 4, 0, [[0, '#3a2412'], [.5, '#8a5a30'], [1, '#3a2412']]); g.fillRect(x, -54, 4, 49); }
+    g.fillStyle = '#5a3a1e'; g.fillRect(0, -56, 52, 3.4); g.strokeStyle = '#5a3a1e'; g.lineWidth = 2; g.beginPath(); g.moveTo(6, -44); g.lineTo(14, -54); g.moveTo(46, -44); g.lineTo(38, -54); g.stroke();
+    { const q = [-4, -54, 56, -62, 58, -55, -4, -48]; g.save(); pv(g, q); g.fillStyle = '#9a9aa2'; g.fill(); g.clip();
+      for (let x = -6, k = 0; x < 60; x += 4.2, k++){ g.fillStyle = k % 3 === 1 ? '#b8683a' : (k % 2 ? '#c8ccd4' : '#a8acb4'); g.fillRect(x, -64, 4.2, 18); g.fillStyle = 'rgba(0,0,0,.2)'; g.fillRect(x + 3.4, -64, .8, 18); }
+      g.restore(); g.fillStyle = '#5a5a62'; pv(g, [-4, -48, 58, -55, 58, -53.6, -4, -46.6]); g.fill(); }
+    // the sign with crossed picks
+    S3.board(g, 25, -51, S3_NAME('forger'), {bg:['#6a3a1a', '#3a1e0a'], fg:'#ffd27a', frame:'#e3b04b', w:34, h:8.4, font:6});
+    g.strokeStyle = '#d8dce4'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(21, -60); g.lineTo(29, -53); g.moveTo(29, -60); g.lineTo(21, -53); g.stroke(); g.fillStyle = '#e3b04b'; g.fillRect(20, -61, 3, 1.4); g.fillRect(27, -61, 3, 1.4);
+    // a lantern on a bracket
+    g.fillStyle = '#3a2412'; g.fillRect(50, -46, 6, 1.4); g.fillStyle = '#2a1a0a'; g.fillRect(52.4, -45, 5.2, 1.2); g.fillRect(52.4, -37, 5.2, 1.2); g.fillStyle = '#ffd068'; g.fillRect(53, -44, 4, 7);
+    g.fillStyle = 'rgba(255,220,120,.35)'; g.beginPath(); g.arc(55, -40.5, 7, 0, 7); g.fill();
+    // the bottle kiln (left): a brick body with iron bands, narrowing to a neck with a cap, a wide glowing mouth
+    const body = [-50, -5, -50, -46, -44, -56, -38, -74, -30, -90, -30, -100, -16, -100, -16, -90, -8, -74, -2, -56, 4, -46, 4, -5];
+    g.save(); pv(g, body); g.clip(); blocks(g, -52, -102, 58, 98, 5, 3, ['#b04a2c', '#9a4026', '#c05834', '#8a3620'], '#4a2216', rng, 4);
+    g.fillStyle = vsLin(g, -50, 0, 4, 0, [[0, 'rgba(255,220,180,.2)'], [.45, 'rgba(0,0,0,0)'], [1, 'rgba(20,6,0,.45)']]); g.fillRect(-52, -102, 58, 98); g.restore();
     g.strokeStyle = '#3a1a0e'; g.lineWidth = 1; pv(g, body); g.stroke();
-    for (const y of [-40, -62]){ g.fillStyle = '#5a2a18'; g.fillRect(-47, y - 1, 52, 2); }
-    g.fillStyle = '#1a0804'; g.beginPath(); g.moveTo(-30, -4); g.lineTo(-30, -16); g.arc(-21, -16, 9, Math.PI, 0); g.lineTo(-12, -4); g.closePath(); g.fill();
-    { const gr = g.createRadialGradient(-21, -10, 1, -21, -10, 14); gr.addColorStop(0, 'rgba(255,200,90,.95)'); gr.addColorStop(1, 'rgba(255,90,20,0)'); g.fillStyle = gr; g.fillRect(-36, -26, 30, 24); } vgFire(g, -21, -6, 1.2);
-    S3.smoke(g, -20, -100, 4);
-    // an ore cart
-    g.fillStyle = '#5a4030'; pv(g, [36, -10, 56, -10, 54, -2, 38, -2]); g.fill(); g.fillStyle = '#6a6a72'; for (let i = 0; i < 5; i++){ ov(g, 40 + i * 3.4, -11 - (i % 2) * 1.6, 2.2, 1.8); g.fill(); }
-    g.fillStyle = '#2a2a2e'; for (const x of [41, 51]){ g.beginPath(); g.arc(x, -1, 2.4, 0, 7); g.fill(); }
+    for (const [y, x0, x1] of [[-46, -51, 5], [-74, -39, -7]]){ g.fillStyle = '#5a5e66'; g.fillRect(x0, y - 2, x1 - x0, 3.4); g.fillStyle = '#8a8e96'; g.fillRect(x0, y - 2, x1 - x0, .8); for (let x = x0 + 4; x < x1; x += 8){ g.fillStyle = '#3a3e46'; g.fillRect(x, y - 1, 1.4, 1.4); } }
+    g.fillStyle = '#3a3e46'; g.fillRect(-32, -104, 18, 5); g.fillStyle = '#6a6e76'; g.fillRect(-32, -104, 18, 1.2);
+    g.fillStyle = '#1a0804'; g.beginPath(); g.moveTo(-38, -5); g.lineTo(-38, -22); g.arc(-23, -22, 15, Math.PI, 0); g.lineTo(-8, -5); g.closePath(); g.fill();
+    { const gr = g.createRadialGradient(-23, -12, 1, -23, -12, 18); gr.addColorStop(0, '#fff6b8'); gr.addColorStop(.4, '#ffb030'); gr.addColorStop(1, 'rgba(220,70,10,.5)'); g.fillStyle = gr; g.beginPath(); g.moveTo(-36, -5); g.lineTo(-36, -21); g.arc(-23, -21, 13, Math.PI, 0); g.lineTo(-10, -5); g.closePath(); g.fill(); }
+    vgFire(g, -23, -9, 1.1); g.strokeStyle = '#d8603a'; g.lineWidth = 2; g.beginPath(); g.arc(-23, -22, 16, Math.PI, 0); g.stroke();
+    g.fillStyle = '#ffe080'; for (let i = 0; i < 6; i++) g.fillRect(-30 + rng() * 14, -26 + rng() * 14, .9, .9);
+    S3.smoke(g, -23, -108, 5);
+    // barrels of ore and a crate (left), the ore cart on its rails (right)
+    for (const [x, y] of [[-58, 0], [-58, -12]]){ g.fillStyle = '#7a4a26'; g.fillRect(x - 5, y - 10, 10, 10); g.fillStyle = '#4a4e56'; g.fillRect(x - 5, y - 8, 10, 1.2); g.fillRect(x - 5, y - 3, 10, 1.2); }
+    g.fillStyle = '#8a8e96'; for (let i = 0; i < 4; i++){ ov(g, -61 + i * 2.2, -22.5 - (i % 2), 1.6, 1.2); g.fill(); }
+    g.fillStyle = '#8a5a2c'; g.fillRect(-50, -10, 11, 10); g.strokeStyle = '#4a2c12'; g.lineWidth = .8; g.strokeRect(-50, -10, 11, 10); g.beginPath(); g.moveTo(-50, -10); g.lineTo(-39, 0); g.stroke();
+    g.fillStyle = '#9a9ea6'; for (let i = 0; i < 4; i++){ ov(g, -48 + i * 2.6, -10.5 - (i % 2), 1.6, 1.2); g.fill(); }
+    g.fillStyle = '#4a3a2a'; g.fillRect(34, -1.4, 26, 1.2); g.fillRect(34, .8, 26, 1.2);
+    g.fillStyle = '#6a4a2a'; pv(g, [36, -12, 58, -12, 56, -4, 38, -4]); g.fill(); g.fillStyle = '#4a4e56'; g.fillRect(36, -12, 22, 1.2);
+    g.fillStyle = '#9a9ea6'; for (let i = 0; i < 6; i++){ ov(g, 39 + i * 3.4, -13 - (i % 2) * 1.6, 2.2, 1.8); g.fill(); }
+    g.fillStyle = '#2a2a2e'; for (const x of [41, 53]){ g.beginPath(); g.arc(x, -2.4, 2.6, 0, 7); g.fill(); g.fillStyle = '#6a6e76'; g.beginPath(); g.arc(x, -2.4, 1, 0, 7); g.fill(); g.fillStyle = '#2a2a2e'; }
   },
   driller(g, rng){
     S3.plinth(g, -46, 90, 6, rng);
@@ -316,7 +368,7 @@ const S3_DRAW = {
 /* (v214) one standard for all twelve: each house's main body (from the ground to its roof ridge, eave to eave — not
    smoke, chimneys, flags or spires) is scaled to the same height on the same ground line, within the same width */
 const S3_STD = {h:92, w:120, base:2};
-const S3_MAIN = {smith:[-86, -54, 54], forger:[-96, -50, 50], driller:[-88, -56, 56], shop:[-98, -48, 46], herbal:[-98, -54, 54], cook:[-82, -54, 56],
+const S3_MAIN = {smith:[-90, -60, 60], forger:[-100, -60, 60], driller:[-88, -56, 56], shop:[-98, -48, 46], herbal:[-98, -54, 54], cook:[-82, -54, 56],
   tailor:[-88, -52, 52], banker:[-98, -50, 50], registrar:[-92, -54, 54], festival:[-96, -50, 50], trader:[-94, -54, 54], beast:[-90, -56, 56]};
 PROP_TYPES.vshop = (seed, v = 0) => makeProp({w:128, h:124, ax:64, ay:112,   // (v214) taller canvas: chimneys and spires are no longer cut off
   seed, shadow:[52, 12, 3], collide:30, glow:[0, -40, 62], paint(g, rng){

@@ -6,30 +6,32 @@
      number carved in it) to the staircase (back), the back wall with arched niches and banners, the tower's outer
      wall falling away below the front rim, and the sky (or the dark) all round;
    · eight pillars with braziers round the rim, braziers by the stairs and the entrance; nothing else stands in it;
-   · six halls, a new one every 10 floors (then round again): ศิลาอรุณ · หยกมรกต · ราตรีคราม · ผลึกหิมะ · เพลิงนิล ·
-     สวรรค์ทอง. The monsters are still those of the level's region (unchanged), only the place is the tower's;
+   · (v259) six zones by floor: 1–20 ดินแดนผู้พิทักษ์ · 21–40 ป่าต้องสาป · 41–60 วิหารแห่งเวทมนตร์ · 61–80 อาณาจักรปีศาจ ·
+     81–99 ดินแดนเทพโบราณ · 100 บัลลังก์ราชันย์ VAYRATHEN (towerart259.js). The monsters are still those of the level's region (unchanged), only the place is the tower's;
    · CLIMBING: when a floor is cleared the stairs at the back light up; walk onto them to go up (you arrive at the
      entrance of the next floor). They open by themselves after a few seconds if you stay away, and Auto walks there.
    Nothing else of the tower changes (levels, waves, timers, blessings, rewards, rankings, party climbs). */
 'use strict';
 
 const TWM_W = 1500, TWM_H = 1300, TWM_RX = 580, TWM_RY = 390;
+/* (v259) the owner's six zones, by floor: 1–20 · 21–40 · 41–60 · 61–80 · 81–99 · 100 (towerart259.js paints what
+   makes each one itself) */
 const TWM_TIERS = [
-  {th:'ศิลาอรุณ', en:'Dawn Sandstone', sky:['#f7c48a', '#8a64b0'], floor:['#dcc49c', '#ccb288', '#e8d4b0'], rim:'#8a6a44', wall:['#c9a878', '#7a5a38'], acc:'#e3b04b', carpet:'#a8322a', glow:'255,190,110'},
-  {th:'หยกมรกต', en:'Emerald Jade', sky:['#a8e4d4', '#2a5a6a'], floor:['#a0cca8', '#8ab896', '#b6dcbc'], rim:'#3a6a54', wall:['#7aa88c', '#2e5a46'], acc:'#ecd56a', carpet:'#24684a', glow:'200,255,190'},
-  {th:'ราตรีคราม', en:'Indigo Night', sky:['#2a2a6a', '#06061c'], floor:['#5e6c9c', '#4e5c8c', '#6e7cac'], rim:'#232a5c', wall:['#4a5888', '#1c2244'], acc:'#9ad0ff', carpet:'#3a2a7a', glow:'150,200,255', stars:true},
-  {th:'ผลึกหิมะ', en:'Snow Crystal', sky:['#e6f4ff', '#86b4dc'], floor:['#e6f0f8', '#d0e2f0', '#f6fbff'], rim:'#7a9ab8', wall:['#bcd4e8', '#6e8eae'], acc:'#6ac8ff', carpet:'#3e70aa', glow:'190,235,255'},
-  {th:'เพลิงนิล', en:'Obsidian Flame', sky:['#4a1408', '#100402'], floor:['#4c3c3c', '#3c2e2e', '#5c4848'], rim:'#180e0e', wall:['#4a3434', '#1a1010'], acc:'#ff7a2a', carpet:'#8a1a10', glow:'255,140,60', embers:true},
-  {th:'สวรรค์ทอง', en:'Golden Heaven', sky:['#fff6d8', '#f2c8a0'], floor:['#faf2e2', '#eee2ca', '#fffbf2'], rim:'#c8a060', wall:['#f2e4c6', '#c49a58'], acc:'#ffcf3a', carpet:'#cc4466', glow:'255,230,150', clouds:true}
+  {th:'ดินแดนผู้พิทักษ์', en:"Guardians' Land", sky:['#7fb0e6', '#f0d2bc'], floor:['#d8d4ca', '#c6c0b2', '#e8e4da'], rim:'#6e665a', wall:['#d2ccbe', '#8a8274'], acc:'#e3b04b', carpet:'#a8222a', glow:'255,190,110', islands:true, moon:true, statues:'stone', banners:true},
+  {th:'ป่าต้องสาป', en:'Cursed Forest', sky:['#2c3c2c', '#0a120c'], floor:['#4c5c3e', '#404e34', '#58684a'], rim:'#1c2414', wall:['#4a4a34', '#1e2216'], acc:'#9ad04a', carpet:'#4a2a5a', glow:'170,255,120', fog:true, vines:true, trees:true, roots:true},
+  {th:'วิหารแห่งเวทมนตร์', en:'Temple of Magic', sky:['#2a2a7a', '#080824'], floor:['#5e6c9c', '#4e5c8c', '#6e7cac'], rim:'#232a5c', wall:['#4a5888', '#1c2244'], acc:'#9ad0ff', carpet:'#3a2a7a', glow:'150,200,255', stars:true, runes:true, crystals:true},
+  {th:'อาณาจักรปีศาจ', en:'Demon Kingdom', sky:['#4a1408', '#100402'], floor:['#4c3c3c', '#3c2e2e', '#5c4848'], rim:'#180e0e', wall:['#4a3434', '#1a1010'], acc:'#ff6a2a', carpet:'#6a0a0a', glow:'255,120,50', embers:true, lava:true, horns:true, statues:'demon'},
+  {th:'ดินแดนเทพโบราณ', en:'Land of the Ancient Gods', sky:['#fff6d8', '#f2c8a0'], floor:['#faf2e2', '#eee2ca', '#fffbf2'], rim:'#c8a060', wall:['#f2e4c6', '#c49a58'], acc:'#ffcf3a', carpet:'#cc4466', glow:'255,230,150', clouds:true, islands:true, islandRock:'#d8ccb4', islandGrass:'#9ad07a', statues:'gold'},
+  {th:'บัลลังก์ราชันย์ VAYRATHEN', en:'Throne of King VAYRATHEN', sky:['#3a0a1a', '#120208'], floor:['#e8d8b8', '#d8c49c', '#f4e8cc'], rim:'#5a1a1a', wall:['#7a2a2a', '#2a0a0a'], acc:'#ffcf3a', carpet:'#b0182a', glow:'255,210,120', stars:true, throne:true, royal:true, drapes:true, statues:'gold', banners:true}
 ];
 const TWM = {tier:-1, open:false, climbT:0};
 const twmOn = () => typeof TW !== 'undefined' && TW.active && typeof DG !== 'undefined' && DG.did === 'tower';
-const twmTierOf = f => Math.floor((Math.max(1, f) - 1) / 10) % TWM_TIERS.length;
+const twmTierOf = f => (f >= 100 ? 5 : f > 80 ? 4 : f > 60 ? 3 : f > 40 ? 2 : f > 20 ? 1 : 0);   // (v259) the owner's zones
 const twmT = () => TWM_TIERS[twmTierOf(TW.f)];
 const twmC = () => ({x:W / 2, y:H / 2 + 70});
 const twmStairs = () => { const c = twmC(); return {x:c.x, y:c.y - TWM_RY + 70}; };
 const twmEntry = () => { const c = twmC(); return {x:c.x, y:c.y + TWM_RY - 90}; };
-const twmIn = (x, y, m = 0) => { const c = twmC(); return Math.hypot((x - c.x) / (TWM_RX - m), (y - c.y) / (TWM_RY - m * .66)) < 1; };
+const twmIn = (x, y, m = 0) => { if (typeof twzInOct === 'function') return twzInOct(x, y, m); const c = twmC(); return Math.hypot((x - c.x) / (TWM_RX - m), (y - c.y) / (TWM_RY - m * .66)) < 1; };
 
 /* ---------- props: pillars and braziers in the hall's stone ---------- */
 function twmFire(g, x, y, s, t){ g.fillStyle = 'rgba(255,170,60,.9)'; g.beginPath(); g.moveTo(x - 6 * s, y); g.quadraticCurveTo(x - 7 * s, y - 10 * s, x, y - 20 * s); g.quadraticCurveTo(x + 7 * s, y - 10 * s, x + 6 * s, y); g.closePath(); g.fill();
@@ -52,6 +54,7 @@ PROP_TYPES.twbrazier = (seed, v = 0) => { const T0 = TWM_TIERS[v % TWM_TIERS.len
 
 /* ---------- painting the hall ---------- */
 function twmPaint(){
+  if (typeof twzHall === 'function'){ twzHall(); return; }   // (v259) the owner's hall (towerart259.js)
   const T0 = twmT(), c = twmC(); let sd = 4242 + TWM.tier * 97; const r = () => (sd = (sd * 9301 + 49297) % 233280) / 233280;
   const g = terr.getContext('2d'); g.save(); g.setTransform(TS, 0, 0, TS, 0, 0);
   // sky (or the dark) all round
@@ -60,6 +63,7 @@ function twmPaint(){
   if (T0.embers) for (let i = 0; i < 160; i++){ g.fillStyle = `rgba(255,${100 + r() * 100 | 0},40,${.3 + r() * .5})`; g.beginPath(); g.arc(r() * W, r() * H, 1 + r() * 2, 0, 7); g.fill(); }
   const cloud = (x, y, s, a) => { g.fillStyle = `rgba(255,255,255,${a})`; for (let k = 0; k < 6; k++){ g.beginPath(); g.ellipse(x + (k - 2.5) * 34 * s, y + Math.sin(k * 1.7) * 8 * s, 46 * s, 22 * s, 0, 0, 7); g.fill(); } };
   for (let i = 0; i < (T0.clouds ? 14 : 8); i++) cloud(r() * W, r() * H, .6 + r() * .9, T0.stars || T0.embers ? .05 : .35);
+  if (typeof twzSky === 'function') twzSky(g, T0, r);
   // the tower's outer wall falling away under the front rim (gives the hall its height)
   g.save(); g.beginPath(); g.ellipse(c.x, c.y + 150, TWM_RX * .97, TWM_RY, 0, 0, Math.PI); g.lineTo(c.x - TWM_RX, c.y); g.ellipse(c.x, c.y, TWM_RX, TWM_RY, 0, Math.PI, 0, true); g.closePath();
   g.fillStyle = T0.wall[0]; g.fill(); g.clip();
@@ -77,6 +81,7 @@ function twmPaint(){
     g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.moveTo(x - 22, y + 50); g.lineTo(x - 22, y - 10); g.arc(x, y - 10, 22, Math.PI, 0); g.lineTo(x + 22, y + 50); g.closePath(); g.fill();
     if (i % 2){ g.fillStyle = T0.carpet; g.fillRect(x - 13, y - 26, 26, 64); g.fillStyle = T0.acc; g.fillRect(x - 13, y - 26, 26, 4); g.beginPath(); g.moveTo(x - 13, y + 38); g.lineTo(x, y + 48); g.lineTo(x + 13, y + 38); g.closePath(); g.fill(); }
     else { g.fillStyle = `rgba(${T0.glow},.55)`; g.beginPath(); g.arc(x, y + 8, 7, 0, 7); g.fill(); } }
+  if (typeof twzWall === 'function') twzWall(g, T0, c);
   g.restore();
   // the floor: rings and spokes of stone, each slab its own shade
   g.save(); g.beginPath(); g.ellipse(c.x, c.y, TWM_RX, TWM_RY, 0, 0, 7); g.clip(); g.fillStyle = T0.floor[0]; g.fillRect(c.x - TWM_RX, c.y - TWM_RY, TWM_RX * 2, TWM_RY * 2);
@@ -109,24 +114,28 @@ function twmPaint(){
   g.fillStyle = T0.floor[2]; g.beginPath(); g.ellipse(c.x, c.y, 140, 93, 0, 0, 7); g.fill(); g.strokeStyle = T0.rim; g.lineWidth = 3; g.stroke();
   g.strokeStyle = T0.acc; g.lineWidth = 2.5; for (let i = 0; i < 8; i++){ const a = i / 8 * 6.283, b = a + Math.PI * .75; g.beginPath(); g.moveTo(c.x + Math.cos(a) * 128, c.y + Math.sin(a) * 85); g.lineTo(c.x + Math.cos(b) * 128, c.y + Math.sin(b) * 85); g.stroke(); }
   for (let i = 0; i < 24; i++){ const a = i / 24 * 6.283; g.fillStyle = T0.rim; g.fillRect(c.x + Math.cos(a) * 138 - 2, c.y + Math.sin(a) * 92 - 2, 4, 4); }
+  if (typeof twzFloor === 'function') twzFloor(g, T0, c, r);
   g.restore();
   // the rim: a raised lip of darker stone round the floor
   g.strokeStyle = T0.rim; g.lineWidth = 16; g.beginPath(); g.ellipse(c.x, c.y, TWM_RX - 6, TWM_RY - 4, 0, 0, 7); g.stroke();
   g.strokeStyle = T0.acc; g.lineWidth = 3; g.beginPath(); g.ellipse(c.x, c.y, TWM_RX - 16, TWM_RY - 11, 0, 0, 7); g.stroke();
-  // the staircase at the back: steps up into an archway
+  // the staircase at the back: steps up into an archway (floor 100: the king's throne)
+  if (T0.throne && typeof twzThrone === 'function') twzThrone(g, T0, st); else {
   g.fillStyle = 'rgba(0,0,0,.45)'; g.beginPath(); g.moveTo(st.x - 62, st.y - 10); g.lineTo(st.x - 62, st.y - 120); g.arc(st.x, st.y - 120, 62, Math.PI, 0); g.lineTo(st.x + 62, st.y - 10); g.closePath(); g.fill();
   g.strokeStyle = T0.acc; g.lineWidth = 6; g.beginPath(); g.moveTo(st.x - 66, st.y - 10); g.lineTo(st.x - 66, st.y - 120); g.arc(st.x, st.y - 120, 66, Math.PI, 0); g.lineTo(st.x + 66, st.y - 10); g.stroke();
-  for (let k = 0; k < 6; k++){ const y = st.y - 8 - k * 17, w = 58 - k * 4; g.fillStyle = k % 2 ? T0.wall[0] : T0.floor[2]; g.fillRect(st.x - w, y - 15, w * 2, 15); g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(st.x - w, y - 2, w * 2, 2); }
+  for (let k = 0; k < 6; k++){ const y = st.y - 8 - k * 17, w = 58 - k * 4; g.fillStyle = k % 2 ? T0.wall[0] : T0.floor[2]; g.fillRect(st.x - w, y - 15, w * 2, 15); g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(st.x - w, y - 2, w * 2, 2); } }
   // the entrance at the front: a threshold slab
   g.fillStyle = T0.rim; g.fillRect(en.x - 70, en.y + 42, 140, 16); g.fillStyle = T0.acc; g.fillRect(en.x - 70, en.y + 42, 140, 3);
   g.restore();
 }
 function twmBuild(){
+  if (typeof twzBuild === 'function'){ twzBuild(); return; }   // (v259)
   const T0i = TWM.tier, c = twmC(), st = twmStairs(), en = twmEntry();
   twmPaint();
   // pillars round the rim (none in front of the entrance or the stairs), braziers by the stairs and the entrance
   for (let i = 0; i < 10; i++){ const a = (i + .5) / 10 * 6.283; if (Math.abs(Math.sin(a)) > .93) continue; addProp('twpillar', Math.round(c.x + Math.cos(a) * TWM_RX * .84), Math.round(c.y + Math.sin(a) * TWM_RY * .84), T0i); }
   for (const d of [-1, 1]){ addProp('twbrazier', st.x + d * 96, st.y + 6, T0i); addProp('twbrazier', en.x + d * 120, en.y + 24, T0i); }
+  if (typeof twzProps === 'function') twzProps(TWM_TIERS[T0i], T0i, c, st, en);
   // the edge of the hall: a ring of invisible stones you cannot pass (walkable, paths and spawns all respect it)
   const n = 120; for (let i = 0; i < n; i++){ const a = i / n * 6.283; obstacles.push({x:c.x + Math.cos(a) * (TWM_RX + 10), y:c.y + Math.sin(a) * (TWM_RY + 8), r:40, twEdge:true}); }
   // the wall behind the stairs is solid too

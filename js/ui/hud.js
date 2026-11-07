@@ -252,9 +252,14 @@ function placeChat(){
   if (moba){
     // joystick mode: chat sits bottom-centre, in the free lane between the left thumb (stick + potions) and the right one (skills)
     const R = id => { const e = el(id); if (!e || e.hidden || !e.offsetWidth) return null; const r = brect(e); return {l:r.left - u.left, r:r.right - u.left, t:r.top - u.top}; };
-    const lefts = ['joy'].map(R).filter(Boolean), rights = ['mobaAct', 'mobaUtil', 'mobaPot'].map(R).filter(Boolean);
+    // (v259) the v244 layout stretches the button groups over the whole screen and places each button itself: measure
+    // the buttons, not the groups (the groups made the lane look empty and the chat opened above the top of the screen)
+    const ml = ui.classList.contains('ml244'), RB = e => { const r = brect(e); return {l:r.left - u.left, r:r.right - u.left, t:r.top - u.top}; }, shown = e => e && !e.hidden && e.offsetWidth > 0;
+    const lefts = ['joy'].map(R).filter(Boolean), rights = ml ? [...document.querySelectorAll('#mobaAct .mo')].filter(shown).map(RB) : ['mobaAct', 'mobaUtil', 'mobaPot'].map(R).filter(Boolean);
     const L0 = Math.max(12, ...lefts.map(o => o.r)) + 10, R0 = Math.min(u.width - 12, ...rights.map(o => o.l)) - 10, span = R0 - L0;
-    if (span >= 220){ w = Math.min(360, Math.round(span / k)); l = Math.round((L0 + (span - w * k) / 2) / k); b = 10; }
+    if (span >= 220){ w = Math.min(360, Math.round(span / k)); l = Math.round((L0 + (span - w * k) / 2) / k); b = 10;
+      if (ml){ const row = [...document.querySelectorAll('#mobaPot .mo, #mobaUtil .mu, #chatBtn')].filter(shown).map(RB).filter(o => o.r > L0 && o.l < R0);   // above the bottom row of potions and small buttons
+        if (row.length) b = Math.round((u.height - Math.min(...row.map(o => o.t))) / k + 8); } }
     else { // narrow (upright phone): above the controls, beside the column of small buttons if it stands on the right
       const mu = R('mobaUtil'), col = mu && el('mobaUtil') && !el('mobaUtil').classList.contains('row'), xr = col ? mu.l - 10 : u.width - 12, avail = xr - 12;
       w = Math.min(340, Math.round(avail / k)); l = Math.round((12 + (avail - w * k) / 2) / k);

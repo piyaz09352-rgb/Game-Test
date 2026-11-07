@@ -30,6 +30,15 @@ function dg3Btn(){
   const mc = el('mapCard'), r = mc && !mc.hidden && mc.offsetWidth ? mc.getBoundingClientRect() : null;
   const top = r ? Math.round(r.top) + 'px' : '64px', right = r ? Math.round(innerWidth - r.left + 8) + 'px' : '12px';
   if (b.style.top !== top) b.style.top = top; if (b.style.right !== right) b.style.right = right;
+  // (v259) the owner on a phone: it lay on the chips beside the minimap (Auto · ออนไลน์ · พักจอ · GM). If it covers
+  // anything up there, it steps down below what it covers (a few tries)
+  const hit = () => { const q = b.getBoundingClientRect(); if (!q.width) return null; let low = null;
+    for (const e of document.querySelectorAll('#ui button, #ui .chip, #ui [class*="chip"], #ui .card, #ui #mapCard')){
+      if (e === b || b.contains(e) || e.contains(b) || !e.offsetWidth || e.closest('.win,#dialog')) continue; const s = getComputedStyle(e); if (s.visibility === 'hidden' || s.display === 'none') continue;
+      const o = e.getBoundingClientRect(); if (o.bottom > innerHeight * .5) continue;
+      if (q.left < o.right - 1 && q.right > o.left + 1 && q.top < o.bottom - 1 && q.bottom > o.top + 1) low = Math.max(low || 0, o.bottom); }
+    return low; };
+  for (let k = 0, low; k < 4 && (low = hit()) != null; k++){ const t2 = Math.round(low + 6) + 'px'; if (b.style.top === t2) break; b.style.top = t2; }
 }
 /* once cleared, leaving needs no warning */
 document.addEventListener('click', e => { const t = e.target.closest && e.target.closest('#dgLeave'); if (!t || !DG.done) return;
