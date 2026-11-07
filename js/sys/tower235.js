@@ -69,7 +69,7 @@ EV.on('tick', () => { if (typeof TW !== 'undefined' && TW.active && typeof BGM !
    (v255, the tower ends at 100) floor 90: two guardians · floor 100: the Shadow of Vaira and one guardian at its side
    (v256: two on every floor 80–95 stopped every Lv 300 hero in shop gear at floor 95). Of different regions round the level when possible (the floor's own guardian, plus guardians
    of the regions just below and above). Each extra one is a full tower guardian. */
-const tw236Bosses = f => (f === 90 || f === 100) ? 2 : 1;   // (v256) two guardians only on floor 90, and the Shadow with one at its side on 100
+const tw236Bosses = f => (f === 90 || f === 100) ? 3 : f >= 50 ? 2 : 1;   // (v267) the owner: two guardians from floor 50, three on 90 and 100 (100: the Shadow and two at its side)
 { const _sp = twSpawn; twSpawn = function(){ const r = _sp.apply(this, arguments); const f = TW.f, n = tw236Bosses(f); if (n < 2 || !TW.active || TW.phase !== 'fight') return r;
     const th = typeof twThemes === 'function' ? twThemes() : [], i = th.findIndex(o => o.i === TW.theme), pool = [th[i - 1], th[i + 1], th[i - 2], th[i]].filter(o => o && MAPS[o.i].boss && MOB[MAPS[o.i].boss]).map(o => MAPS[o.i].boss);
     const c = twmC(); let have = mobs.filter(m => m.tw === f && !m.dead && m.def.boss).length;

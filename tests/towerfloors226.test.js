@@ -22,9 +22,8 @@ test('tower floor kinds: curse, survive, leader, treasure', { skip, timeout: 240
       o.reached = TW.f; return o;
     });
     assert.ok(r.reached > 12, `climbed past floor 12 (reached ${r.reached})`);
-    assert.strictEqual(r.kinds[3], 'curse'); assert.strictEqual(r.kinds[4], 'survive'); assert.strictEqual(r.kinds[9], 'elite'); assert.strictEqual(r.kinds[11], 'treasure');
+    assert.strictEqual(r.kinds[3], 'curse'); assert.strictEqual(r.kinds[4], 'survive'); assert.strictEqual(r.kinds[9], 'elite'); assert.strictEqual(r.kinds[11], 'hunt');   // (v267) no treasure rooms: those floors are hunts
     assert.ok(r.dur[4] >= 38, `the survive floor lasts its 40 s (${r.dur[4]} s)`);
-    assert.ok(r.dur[11] < 26, `the treasure room ends when the chests are open or time is up (${r.dur[11]} s)`);
     assert.ok(r.drought === undefined || r.drought === true, 'a drought curse halves what potions heal');
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no runtime errors');
