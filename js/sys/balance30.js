@@ -93,8 +93,9 @@ function mskCast(m, id){
   else if (s.kind === 'circle'){ const x = s.atPlayer ? P.x : m.x, y = s.atPlayer ? P.y : m.y; VFX.play('warnCircle', {x, y, r:s.area, t:.9});
     later(.9, () => { if (!mskOk(m)) return; VFX.play(s.magic ? 'boom' : 'quake', {x, y, r:s.area}); if (inHit(x, y, s.area) && !P.roll) mskHit(m, s, s.mul); }); }
   else if (s.kind === 'leap'){ const x0 = m.x, y0 = m.y, tx = P.x, ty = P.y; VFX.play('warnLine', {x:x0, y:y0, ux:(tx - x0) / (Math.hypot(tx - x0, ty - y0) || 1), uy:(ty - y0) / (Math.hypot(tx - x0, ty - y0) || 1), len:Math.hypot(tx - x0, ty - y0), w:30, t:.6});
-    later(.6, () => { if (!mskOk(m)) return; VFX.play('blink', {x:m.x, y:m.y, x2:tx, y2:ty}); m.x = tx - (tx - x0) * .08; m.y = ty - (ty - y0) * .08; if (typeof pushOut === 'function') pushOut(m, m.def.r * .6);
-      if (Math.hypot(P.x - m.x, P.y - m.y) < 46 && !P.roll) mskHit(m, s, s.mul); }); }
+    later(.6, () => { if (!mskOk(m)) return; VFX.play('blink', {x:m.x, y:m.y, x2:tx, y2:ty}); const dl = Math.hypot(tx - x0, ty - y0) || 1, land = Math.min(dl, (m.def.r || 12) + 12 + (typeof MSP_GAP !== 'undefined' ? MSP_GAP * .6 : 8));   // (v269) lands in front of the hero, never on top
+      m.x = tx - (tx - x0) / dl * land; m.y = ty - (ty - y0) / dl * land; if (typeof pushOut === 'function') pushOut(m, m.def.r * .6);
+      if (Math.hypot(P.x - m.x, P.y - m.y) < land + 14 && !P.roll) mskHit(m, s, s.mul); }); }
   else if (s.kind === 'heal'){ const who = [m, ...near(s.r)].filter(o => o.hp < o.maxhp).sort((a, b) => a.hp / a.maxhp - b.hp / b.maxhp)[0] || m;
     later(.5, () => { if (!mskOk(m) || who.dead) return; const h = Math.round(who.maxhp * s.heal); who.hp = Math.min(who.maxhp, who.hp + h); VFX.play('heal', {x:who.x, y:who.y}); addText(who.x, who.y - (MOB_H[who.type] || 30) - 4, `+${fmtN(h)}`, '#9cffb0', 13); }); }
   else if (s.kind === 'rally') later(.4, () => { for (const o of [m, ...near(s.r)]){ o.rallyT = T + s.dur; o.aggro = true; } VFX.play('roar', {x:m.x, y:m.y}); });

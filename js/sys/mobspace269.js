@@ -23,18 +23,27 @@
 { const _u = updMob; updMob = function(m, dt){
     if (m && !m.dead && m.tw && !m.aggro && typeof TW !== 'undefined' && TW.active && !P.dead && Math.hypot(m.x - P.x, m.y - P.y) < 210) m.aggro = true;
     return _u.apply(this, arguments); }; }
+// the last few of a wave (three or fewer, or after 25 s of the fight) stop waiting and come for the hero: no hunting
+// round the corners of a big hall for one straggler
+{ let f0 = -1, t0 = 0; EV.on('tick', dt => { if (typeof TW === 'undefined' || !TW.active || TW.phase !== 'fight' || P.dead) { f0 = -1; return; }
+    if (f0 !== TW.f){ f0 = TW.f; t0 = 0; } t0 += dt;
+    const left = mobs.filter(m => m.tw === TW.f && !m.dead); if (!left.length || (left.length > 3 && t0 < 25)) return;
+    for (const m of left) if (!m.aggro){ m.aggro = true; m.wait = 0; } }); }
 { const _ad = applyDamage; applyDamage = function(m){ const was = m && m.aggro; const r = _ad.apply(this, arguments);
     if (m && m.tw && !was && !m.dead) for (const o of mobs) if (o !== m && o.tw === m.tw && !o.dead && !o.aggro && Math.hypot(o.x - m.x, o.y - m.y) < 160) o.aggro = true;
     return r; }; }
 
 /* ---------- close range: a gap, no stacking, everywhere ---------- */
 const MSP_GAP = 22;   // ≈ two body-widths between the monster's edge and the hero's
-{ const _u = updMob; updMob = function(m, dt){ const out = _u.apply(this, arguments); if (!m || m.dead || !m.def || m.def.range || !m.aggro || P.dead) return out;
-    const d = m.def, minD = (d.r || 12) + 12 + MSP_GAP * .6, dx = m.x - P.x, dy = m.y - P.y, dd = Math.hypot(dx, dy) || .01;
-    if (dd < minD){ const k = (minD - dd) / dd; const nx = m.x + dx * k, ny = m.y + dy * k; if (walkable(nx, ny, (d.r || 12) * .6)){ m.x = nx; m.y = ny; } }
+{ const _u = updMob; updMob = function(m, dt){ const out = _u.apply(this, arguments); if (!m || m.dead || !m.def || P.dead) return out;
+    const d = m.def, melee = !d.range, minD = melee && m.aggro ? (d.r || 12) + 12 + MSP_GAP * .6 : (d.r || 12) + 12;   // any monster, calm or ranged too, never stands inside the hero
     // spread round the hero: two monsters fighting side by side do not overlap
-    for (const o of mobs){ if (o === m || o.dead || !o.aggro || !o.def) continue; const ox = m.x - o.x, oy = m.y - o.y, od = Math.hypot(ox, oy) || .01, want = ((d.r || 12) + (o.def.r || 12)) * .9;
+    if (melee && m.aggro) for (const o of mobs){ if (o === m || o.dead || !o.aggro || !o.def) continue; const ox = m.x - o.x, oy = m.y - o.y, od = Math.hypot(ox, oy) || .01, want = ((d.r || 12) + (o.def.r || 12)) * .9;
       if (od < want){ const k = (want - od) / od * .5, nx = m.x + ox * k, ny = m.y + oy * k; if (walkable(nx, ny, (d.r || 12) * .6)){ m.x = nx; m.y = ny; } } }
+    // then out of the hero's space, last, so nothing pushes it back in (sideways along a wall when straight back is blocked)
+    { const ex = m.x - P.x, ey = m.y - P.y, ed = Math.hypot(ex, ey) || .01;
+      if (ed < minD){ const ux = ex / ed, uy = ey / ed;
+        for (const a of [0, .6, -.6, 1.2, -1.2, 1.8, -1.8]){ const c = Math.cos(a), sn = Math.sin(a), nx = P.x + (ux * c - uy * sn) * minD, ny = P.y + (ux * sn + uy * c) * minD; if (walkable(nx, ny, (d.r || 12) * .5)){ m.x = nx; m.y = ny; break; } } } }
     return out; }; }
 // melee strikes from the gap (their reach grows to it)
 for (const k in MOB){ const d = MOB[k]; if (!d || d.range || !d.r) continue; d.reach = Math.max(d.reach || d.r + 12, d.r + 12 + MSP_GAP); }
