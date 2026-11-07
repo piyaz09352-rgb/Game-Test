@@ -44,7 +44,7 @@ function groundDetail(g, B, mapId){
   const patch = (n, col, a, rmin, rmax) => { for (let i = 0; i < n * A; i++){ const cx = R() * W, cy = R() * H, r = rmin + R() * (rmax - rmin), k = 14 + Math.floor(R() * 12); a *= .82;
       for (let j = 0; j < k; j++){ const x = cx + (R() - .5) * r * 1.6, y = cy + (R() - .5) * r * .9, rr = r * (.12 + R() * .3); g.fillStyle = g2a(col, a * (.5 + R() * .5)); g.beginPath(); g.ellipse(x, y, rr, rr * (.45 + R() * .25), R() * .6 - .3, 0, 7); g.fill(); } } };
   // a tuft: a few short blades fanning out of one root, dark at the base and lit at the tips
-  const tufts = (n, cols, h, clump) => { for (let i = 0; i < n * A; i++){ const cx = R() * W, cy = R() * H, m = 1 + Math.floor(R() * clump); if (trailD(cx, cy) < 26) continue;
+  const tufts = (n, cols, h, clump) => { for (let i = 0; i < n * A; i++){ const cx = R() * W, cy = R() * H, m = 1 + Math.floor(R() * clump); 
       for (let j = 0; j < m; j++){ const x = cx + (R() - .5) * 18, y = cy + (R() - .5) * 8, bl = 4 + Math.floor(R() * 4), hh = h * (.6 + R() * .7);
         for (let b = 0; b < bl; b++){ const a = -Math.PI / 2 + (b / (bl - 1) - .5) * 1.5 + (R() - .5) * .3, L = hh * (.7 + R() * .4), ex = x + Math.cos(a) * L * .6, ey = y + Math.sin(a) * L;
           g.strokeStyle = cols[0]; g.lineWidth = 1.1; g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + (ex - x) * .3, y + (ey - y) * .6, ex, ey); g.stroke();
@@ -58,7 +58,7 @@ function groundDetail(g, B, mapId){
         g.fillStyle = lc; g.beginPath(); g.ellipse(x - s * .3, y - s * .25, s * .38, s * .2, rot, 0, 7); g.fill(); } } };
   const cracks = (n, col, a, len) => { g.strokeStyle = g2a(col, a); for (let i = 0; i < n * A; i++){ let x = R() * W, y = R() * H, ang = R() * 6.28; g.lineWidth = .9 + R() * .6; g.beginPath(); g.moveTo(x, y);
       for (let s = 0; s < 5 + R() * 6; s++){ ang += (R() - .5) * 1.1; x += Math.cos(ang) * len * (.5 + R()); y += Math.sin(ang) * len * .55 * (.5 + R()); g.lineTo(x, y); if (R() < .25){ const bx = x, by = y, ba = ang + (R() < .5 ? 1 : -1) * (.8 + R() * .6); g.moveTo(bx, by); g.lineTo(bx + Math.cos(ba) * len * .8, by + Math.sin(ba) * len * .45); g.moveTo(x, y); } } g.stroke(); } };
-  const litter = (n, cols, s) => { for (let i = 0; i < n * A; i++){ const x = R() * W, y = R() * H; if (trailD(x, y) < 20) continue; const c = cols[Math.floor(R() * cols.length)], r = R() * 3.14;
+  const litter = (n, cols, s) => { for (let i = 0; i < n * A; i++){ const x = R() * W, y = R() * H;  const c = cols[Math.floor(R() * cols.length)], r = R() * 3.14;
       g.fillStyle = c; g.beginPath(); g.ellipse(x, y, s * (.8 + R() * .6), s * .4, r, 0, 7); g.fill(); g.strokeStyle = g2a('#2a1a0c', .35); g.lineWidth = .4; g.beginPath(); g.moveTo(x - Math.cos(r) * s, y - Math.sin(r) * s * .4); g.lineTo(x + Math.cos(r) * s, y + Math.sin(r) * s * .4); g.stroke(); } };
   const twigs = (n, col) => { g.strokeStyle = col; g.lineCap = 'round'; for (let i = 0; i < n * A; i++){ const x = R() * W, y = R() * H, a = R() * 6.28, L = 5 + R() * 9; g.lineWidth = .8 + R() * .5; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * L, y + Math.sin(a) * L * .5); if (R() < .5){ g.moveTo(x + Math.cos(a) * L * .5, y + Math.sin(a) * L * .25); g.lineTo(x + Math.cos(a + .7) * L * .9, y + Math.sin(a + .7) * L * .45); } g.stroke(); } };
   const ripples = (n, col, a) => { g.strokeStyle = g2a(col, a); g.lineWidth = 1.1; for (let i = 0; i < n * A; i++){ const x = R() * W, y = R() * H, L = 30 + R() * 50, k = 3 + Math.floor(R() * 4);

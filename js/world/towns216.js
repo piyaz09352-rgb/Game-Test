@@ -206,7 +206,7 @@ function twLayout(mapId){
   const g = terr.getContext('2d'); g.save(); g.setTransform(TS, 0, 0, TS, 0, 0);
   // 1) worn ground: many soft overlapping patches along the streets and over the square, feathered at the edge
   const blob = (x, y, rr, a) => { const gr = g.createRadialGradient(x, y, 0, x, y, rr); gr.addColorStop(0, G0.dirt[(r() * 2) | 0] + a + ')'); gr.addColorStop(1, G0.dirt[0] + '0)'); g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, rr, rr * .8, 0, 0, 7); g.fill(); };
-  for (const tr of TRAIL.lines) tr.forEach(([x, y], i) => { if (i % 2 || Math.hypot(x - cx, y - cy) > 1180) return; blob(x + (r() - .5) * 20, y + (r() - .5) * 14, 46 + r() * 22, .55); });
+  if (false) for (const tr of TRAIL.lines) tr.forEach(([x, y], i) => { if (i % 2 || Math.hypot(x - cx, y - cy) > 1180) return; blob(x + (r() - .5) * 20, y + (r() - .5) * 14, 46 + r() * 22, .55); });
   for (let i = 0; i < 260; i++){ const a = r() * 6.283, d = Math.sqrt(r()) * twPaveR(a, k) * 1.05, x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d / 1.32; blob(x, y, 50 + r() * 40, .5); }
   // 2) cobbles: rounded stones of uneven size and shade, thick in the middle, thinning out toward the edges
   for (let i = 0; i < 34000; i++){ const x = cx + (r() - .5) * 2400, y = cy + (r() - .5) * 1700, m = twInPave(x, y, cx, cy, k); if (m <= 0 || r() > Math.min(1, m * 2.6)) continue;

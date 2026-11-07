@@ -95,13 +95,14 @@ function buildTerrain(){
   }
   // laterite road with ruts and stones
   const road = (w, col) => { g.beginPath(); g.moveTo(0, roadY(0)); for (let x = 0; x <= W; x += 12) g.lineTo(x, roadY(x)); g.strokeStyle = col; g.lineWidth = w; g.stroke(); };
-  road(56, '#8a6a3e'); road(48, '#b08a56'); road(40, '#bf9a62');
-  for (const off of [-8, 8]){ g.beginPath(); for (let x = 0; x <= W; x += 12) g.lineTo(x, roadY(x) + off); g.strokeStyle = 'rgba(120,85,45,.35)'; g.lineWidth = 2.4; g.stroke(); }
-  for (let i = 0; i < 700; i++){ const x = R() * W, y = roadY(x) + (R() - .5) * 40;
+  const NOROAD = true;   // (v263) no dirt roads
+  if (!NOROAD){ road(56, '#8a6a3e'); road(48, '#b08a56'); road(40, '#bf9a62'); }
+  if (!NOROAD) for (const off of [-8, 8]){ g.beginPath(); for (let x = 0; x <= W; x += 12) g.lineTo(x, roadY(x) + off); g.strokeStyle = 'rgba(120,85,45,.35)'; g.lineWidth = 2.4; g.stroke(); }
+  if (!NOROAD) for (let i = 0; i < 700; i++){ const x = R() * W, y = roadY(x) + (R() - .5) * 40;
     g.fillStyle = R() < .5 ? 'rgba(100,70,40,.45)' : 'rgba(230,200,150,.3)'; g.beginPath(); g.ellipse(x, y, .8 + R() * 1.6, .6 + R(), R() * 3, 0, 7); g.fill(); }
   // north and south roads: from the gates down to the village and the market
   const roadV = (y0, y1) => { for (const [w, col] of [[48, '#8a6a3e'], [40, '#b08a56'], [32, '#bf9a62']]){ g.beginPath(); for (let y = y0; y <= y1; y += 12){ const x = VC + Math.sin(y / 170) * 26; y === y0 ? g.moveTo(x, y) : g.lineTo(x, y); } g.strokeStyle = col; g.lineWidth = w; g.stroke(); } };
-  roadV(40, 360); roadV(1240, H - 30);
+  if (!NOROAD){ roadV(40, 360); roadV(1240, H - 30); }
   g.save(); g.translate(VX, 0);
   // village ground: the square, streets and yards (village2.js) + laterite brick court round the shrine
   villageGround(g);
