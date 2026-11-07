@@ -7,7 +7,7 @@
 |---|---|
 | apothecary.png | ร้านยา |
 | smithy.png | โรงตีเหล็ก / ร้านตีบวก (ช่างตีบวก) |
-| smelter.png | โรงหลอมแร่ |
+| smelter.png | โรงหลอมแร่ & อุปกรณ์ (ช่างหลอม) |
 | driller.png | ร้านเจาะมณี |
 | herbal.png | สมุนไพร |
 | cook.png | โรงครัว |
