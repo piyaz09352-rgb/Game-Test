@@ -8,12 +8,17 @@
    Auto also fights the guardian inside the tower (it keeps away from bosses everywhere else, as before). */
 'use strict';
 const TWB = {hp:6, atk:1.3, def:1.2};
+/* (v255) the 100-floor tower: tools/tower-report.js showed heroes of Lv 200–300 stopped by guardians 20–27 levels
+   under their own (low floors were fine, about their own level). A guardian's HP and hits ease off from floor 30 to
+   the top (×1 → ×TWB_TOP), so the last floors stay hard but a strong Lv 300 can reach the top. */
+const TWB_TOP = {hp:.4, atk:.7};
+const twbEase = (f, k) => f <= 30 ? 1 : 1 - (1 - TWB_TOP[k]) * Math.min(1, (f - 30) / 70);
 { const _m = twMob; twMob = function(type, x, y, f){ const m = _m.apply(this, arguments);
     if (m && MOB[type] && MOB[type].boss){
       // measured against an ordinary monster of the same floor (same level, same party size, same past-Lv-300 growth)
       const mp = MAPS[TW.theme] || {}, kind = (mp.mobs || []).find(t => MOB[t] && !MOB[t].boss && !MOB[t].night);
       if (kind){ const ref = {def:dgDef(kind, m.dgc)}; ref.maxhp = ref.hp = ref.def.hp; twScale(ref, f); const pc = clamp(DG.pc | 0 || 1, 1, 5);
-        m.def = {...m.def, hp:Math.max(60, Math.round(ref.def.hp * TWB.hp * (1 + (pc - 1) * .35))), atk:ref.def.atk.map(v => Math.max(1, Math.round(v * TWB.atk))), def:Math.round(ref.def.def * TWB.def)};
+        m.def = {...m.def, hp:Math.max(60, Math.round(ref.def.hp * TWB.hp * twbEase(f, 'hp') * (1 + (pc - 1) * .35))), atk:ref.def.atk.map(v => Math.max(1, Math.round(v * TWB.atk * twbEase(f, 'atk')))), def:Math.round(ref.def.def * TWB.def)};
         m.maxhp = m.hp = m.def.hp; m.twGuard = true; } }
     return m; }; }
 // Auto: no keeping away from the tower's guardian (restored when the climb ends)

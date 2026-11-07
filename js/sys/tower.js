@@ -1,6 +1,6 @@
-/* VAYRATHEN — js/sys/tower.js — (v102) หอคอยวายรา · the endless tower, with a ranking
-   A solo climb with no top floor. Open it from the menu (หอคอย) or at Gatekeeper Saeng in Aren (Lv 10+).
-   · Floor f: monsters of level 4 + 2f (Lv 300 at floor 148; past that they keep gaining 7% HP and 3% power a floor).
+/* VAYRATHEN — js/sys/tower.js — (v102) หอคอยวายรา · the tower, with a ranking
+   A climb of 100 floors (v255; it was endless). Open it from the menu (หอคอย) or at Gatekeeper Saeng in Aren (Lv 10+).
+   · (v255) 100 floors: floor f has monsters of level 3f (Lv 300 at the top); clearing floor 100 wins the climb.
      The land changes every 10 floors to the region whose monsters match that level.
    · Every floor is one wave · every 5th floor a region guardian (with its guard call and berserk phase) ·
      every 10th floor the guardian brings two ★ elites · from floor 10 red circles burst on the ground.
@@ -16,12 +16,15 @@
 
 const TW_MIN = 10, TW_T = 75, TW_TB = 105;
 const TW = {active:false, entering:false, f:1, f0:1, t:0, phase:'idle', restT:0, theme:0, spawned:false, gain:{z:0, coin:0, gear:0}, hazT:8, sub:null, rows:[], startF:1, end:null};
-const twLv = f => 4 + f * 2, twLvC = f => clamp(twLv(f), 1, 300), twOver = f => Math.max(0, twLv(f) - 300);
+/* (v255) the tower has 100 floors (the owner's call): floor f has Lv 3f monsters (Lv 30 at floor 10, 150 at 50, 300 at
+   the top), so the whole climb spans the hero's whole life; clearing floor 100 ends the run as a win */
+const TW_MAX = 100;
+const twLv = f => Math.max(5, Math.min(TW_MAX, f) * 3), twLvC = f => clamp(twLv(f), 1, 300), twOver = () => 0;
 /* who runs the floors: a solo climber, or the room host of a party climb */
 const twHost = () => !(TW.party && typeof NM !== 'undefined' && NM.slave);
 const twBoss = f => f % 5 === 0, twElite = f => f % 10 === 0;
-const twSt = () => (S.tower = S.tower || {best:0, runs:0});
-const twCks = () => { const b = twSt().best, out = [1]; for (let c = 11; c <= b + 1; c += 10) out.push(c); return out; };
+const twSt = () => { const st = (S.tower = S.tower || {best:0, runs:0}); if (st.best > TW_MAX) st.best = TW_MAX; return st; };   // (v255) a best from the endless tower stops at the top
+const twCks = () => { const b = twSt().best, out = [1]; for (let c = 11; c <= Math.min(b + 1, TW_MAX); c += 10) out.push(c); return out; };
 /* the land for a floor: the region whose monsters sit closest below the floor's level */
 let TW_THEMES = null;
 function twThemes(){
@@ -32,7 +35,7 @@ function twThemes(){
 function twThemeFor(f){ const lv = twLvC(f), th = twThemes(); let pick = th[0]; for (const o of th) if (o.lv <= lv) pick = o; return pick ? pick.i : 1; }
 
 DUNGEONS.push({id:'tower', base:1, min:TW_MIN, name:'หอคอยวายรา', th:'หอคอยวายรา', en:'Vayra Tower', tower:true,
-  d:['ปีนหอคอยไม่มีที่สิ้นสุด คนเดียว ชั้นละรอบ ทุก 5 ชั้นมีผู้พิทักษ์ · ชิงอันดับชั้นสูงสุด', 'An endless solo climb, one wave a floor, a guardian every 5th · race for the highest floor']});
+  d:['ปีนหอคอย 100 ชั้น ชั้นละรอบ ทุก 5 ชั้นมีผู้พิทักษ์ · ไปให้ถึงยอดและชิงอันดับ', 'A climb of 100 floors, one wave a floor, a guardian every 5th · reach the top and race for the ranking']});
 const twInfo = () => DUNGEONS.find(d => d.id === 'tower');
 
 /* ---------- a run ---------- */
@@ -91,7 +94,7 @@ function twSpawn(){
     for (let i = 0; i < n; i++){ const [x, y] = twSpot(i, n, 150); twMob(kinds[(i + f) % kinds.length], x, y, f); VFX.play('bossSummon', {x, y}); }
     banner(L(`ชั้น ${f} · มอน Lv ${twLvC(f)}`, `Floor ${f} · monsters Lv ${twLvC(f)}`)); SFX.play('quest');
   }
-  TW.spawned = true; TW.mine = true; TW.phase = 'fight'; TW.t = twBoss(f) ? TW_TB : TW_T; DG.lv = twLvC(f); dgLabel();
+  TW.spawned = true; TW.mine = true; TW.phase = 'fight'; TW.t = (twBoss(f) ? TW_TB : TW_T) + (f > 50 ? Math.round((f - 50) * .4) : 0);   // (v255) up to +20 s near the top: the halls of Lv 250+ monsters take longer DG.lv = twLvC(f); dgLabel();
 }
 /* a floor is cleared: pay, heal, and maybe a blessing */
 function twClear(){
@@ -121,7 +124,7 @@ function twFinish(why){
 function twQuit(why){ if (!TW.active) return; twFinish(why || 'leave'); if (DG.active) dgExit(L('ออกจากหอคอยแล้ว', 'You left the tower')); }
 function twSummary(){
   const e = TW.end; if (!e) return; const old = document.getElementById('twSum'); if (old) old.remove();
-  const why = {fell:L('ล้มลงระหว่างทาง', 'You fell'), time:L('หมดเวลา', 'Time ran out'), leave:L('ออกจากหอคอย', 'You left')}[e.why] || '';
+  const why = {fell:L('ล้มลงระหว่างทาง', 'You fell'), time:L('หมดเวลา', 'Time ran out'), leave:L('ออกจากหอคอย', 'You left'), top:L(`พิชิตครบ ${TW_MAX} ชั้น!`, `All ${TW_MAX} floors conquered!`)}[e.why] || '';
   const box = document.createElement('div'); box.id = 'twSum'; box.className = 'dgrank twsum';
   box.innerHTML = `<div class="rk">${e.reached}</div><h3>${L(`หอคอยวายรา · ถึงชั้น ${e.reached}`, `Vayra Tower · floor ${e.reached}`)}</h3><small>${why}</small>
     <ul><li>${L('เริ่มที่ชั้น', 'Started at')} <b>${e.start}</b></li><li>${L('สถิติสูงสุด', 'Best floor')} <b>${e.best}</b></li>
@@ -141,7 +144,11 @@ EV.on('tick', dt => {
   if (TW.phase === 'rest'){
     if (typeof DG3 !== 'undefined' && DG3.boonOpen) return;
     if (!twHost()) return;   // a party mate follows the host's floors (towerparty.js)
-    if ((TW.restT -= dt) <= 0){ twTheme(TW.f); twSpawn(); }
+    if ((TW.restT -= dt) <= 0){
+      // (v255) floor 100 cleared: the climb is won (after Chandra's last chapter has been read)
+      if (TW.f > TW_MAX){ const dl = el('dialog'); if ((typeof TLR !== 'undefined' && TLR.pending) || (dl && !dl.hidden)) return;
+        banner(L('พิชิตยอดหอคอยวายรา!', 'The top of the Vayra Tower!')); twFinish('top'); if (DG.active) dgExit(L('ลงจากยอดหอคอย', 'You came down from the top')); return; }
+      twTheme(TW.f); twSpawn(); }
     return;
   }
   if (TW.phase !== 'fight') return;
@@ -184,15 +191,15 @@ EV.on('tick', () => { if (TW.sub && !winOpen('tower') && !(typeof RK !== 'undefi
 WIN_RENDER.tower = function(){
   const pane = el('pane-tower'); if (!pane) return; const st = twSt(), cks = twCks(), why = twCan(); if (!cks.includes(TW.startF)) TW.startF = cks[cks.length - 1];
   twRankLoad(); const me = netName();
-  const rows = TW.rows.length ? TW.rows.map((r, i) => `<div class="twr${clean(r.name, 18) === me ? ' me' : ''}"><i class="rk${i < 3 ? ' top' + i : ''}">${i + 1}</i><b class="pn"></b><small>${JOBS[r.job] ? nm(JOBS[r.job]) : ''}</small><em>${L('ชั้น', 'F')} ${clamp(r.tower | 0, 0, 99999)}</em></div>`).join('')
+  const rows = TW.rows.length ? TW.rows.map((r, i) => `<div class="twr${clean(r.name, 18) === me ? ' me' : ''}"><i class="rk${i < 3 ? ' top' + i : ''}">${i + 1}</i><b class="pn"></b><small>${JOBS[r.job] ? nm(JOBS[r.job]) : ''}</small><em>${L('ชั้น', 'F')} ${clamp(r.tower | 0, 0, TW_MAX)}</em></div>`).join('')
     : `<p class="hint">${typeof NET !== 'undefined' && NET.db ? L('ยังไม่มีใครขึ้นอันดับ · เป็นคนแรกเลย!', 'Nobody on the board yet · be the first!') : L('อันดับใช้ได้เมื่อออนไลน์', 'The ranking works online')}</p>`;
-  pane.innerHTML = `<div class="twbox"><div class="twhero"><div class="twart">🗼</div><div><b>${L('หอคอยวายรา', 'Vayra Tower')}</b><small>${L('ไม่มีชั้นบนสุด · ปีนให้สูงที่สุด', 'No top floor · climb as high as you can')}</small>
+  pane.innerHTML = `<div class="twbox"><div class="twhero"><div class="twart">🗼</div><div><b>${L('หอคอยวายรา', 'Vayra Tower')}</b><small>${L(`${TW_MAX} ชั้น · ปีนให้ถึงยอด`, `${TW_MAX} floors · climb to the top`)}</small>
       <div class="twstat"><span>${L('สถิติ', 'Best')} <b>${st.best || 0}</b></span><span>${L('ปีนไปแล้ว', 'Runs')} <b>${st.runs || 0}</b></span></div></div></div>
     <div class="twsec">${L('เริ่มที่ชั้น', 'Start at floor')}</div>
     <div class="twcks">${cks.map(c => `<button class="btn sm${c === TW.startF ? ' gold' : ''}" data-twck="${c}">${c}<small>Lv ${twLvC(c)}</small></button>`).join('')}</div>
     <button class="btn gold twgo" data-twgo="1" ${why ? 'disabled' : ''}>${TW.active ? L('กำลังปีนอยู่', 'Climbing now') : L(`เริ่มปีนชั้น ${TW.startF}`, `Climb from floor ${TW.startF}`)}</button>${why && !TW.active ? `<small class="twwhy">${why}</small>` : ''}
     <details class="twrules"><summary>${L('กติกาและรางวัล', 'Rules and rewards')}</summary><ul>
-      <li>${L('ชั้น f มอนเลเวล 4 + 2f (ชั้น 148 = Lv 300 · สูงกว่านั้นมอนแข็งขึ้นทุกชั้น) · ดินแดนเปลี่ยนทุก 10 ชั้น', 'Floor f has Lv 4 + 2f monsters (Lv 300 at floor 148, tougher every floor past it) · the land changes every 10 floors')}</li>
+      <li>${L(`${TW_MAX} ชั้น ยิ่งสูงมอนยิ่งเลเวลสูง (ชั้น 10 = Lv 30 · ชั้น 50 = Lv 150 · ชั้น 100 = Lv 300) · ดินแดนเปลี่ยนทุก 10 ชั้น · ชั้น 100 คือยอดหอคอย`, `${TW_MAX} floors, higher means stronger (floor 10 = Lv 30 · 50 = Lv 150 · 100 = Lv 300) · the land changes every 10 floors · floor 100 is the top`)}</li>
       <li>${L(`ชั้นละ 1 รอบ จำกัดเวลา ${TW_T} วิ · ทุก 5 ชั้นมีผู้พิทักษ์ (${TW_TB} วิ) · ทุก 10 ชั้นผู้พิทักษ์มีหัวหน้าฝูง ★ 2 ตัว · ตั้งแต่ชั้น 10 มีวงแดงระเบิด`, `One wave a floor, ${TW_T} s · a guardian every 5th floor (${TW_TB} s) · two ★ elites with it every 10th · red blasts from floor 10`)}</li>
       <li>${L('ผ่านชั้นฟื้น HP/SP 25% · ทุก 5 ชั้นเลือกพร 1 ใน 3 ใช้ได้ตลอดการปีน', 'Clearing a floor heals 25% HP/SP · every 5th floor pick 1 of 3 blessings for the run')}</li>
       <li>${L('ทุกชั้นได้เบี้ย · ชั้นที่สูงกว่าสถิติเดิม: ◈ 1 ทุก 5 ชั้น (◈ 3 ทุก 10 ชั้น) และอุปกรณ์จากหีบบอสทุก 10 ชั้น', 'Bia every floor · above your old best: ◈ 1 every 5 floors (◈ 3 every 10) and a boss-chest piece every 10')}</li>
@@ -209,18 +216,18 @@ if (typeof RK_TABS !== 'undefined' && typeof renderSocial === 'function'){ RK_TA
   /* rank2.js writes the value line for its own tabs; on this tab it is rewritten with the floor */
   const _rs = renderSocial; renderSocial = function(){ const r = _rs.apply(this, arguments); if (RK.tab !== 'tower') return r;
     const box = el('soRank'); if (!box) return r; const rows = (RK.rows.tower || []).filter(x => RK.line === 'all' || rkLine(x.job) === RK.line).slice(0, 50);
-    box.querySelectorAll('.item small').forEach((s, i) => { const x = rows[i]; if (x) s.textContent = `${JOBS[x.job] ? nm(JOBS[x.job]) : '—'} · ${L('ชั้น', 'Floor')} ${clamp(x.tower | 0, 0, 99999)}`; });
+    box.querySelectorAll('.item small').forEach((s, i) => { const x = rows[i]; if (x) s.textContent = `${JOBS[x.job] ? nm(JOBS[x.job]) : '—'} · ${L('ชั้น', 'Floor')} ${clamp(x.tower | 0, 0, TW_MAX)}`; });
     return r; }; }
 
 /* ---------- achievements, Wiki, what's new ---------- */
 if (typeof ACH !== 'undefined' && typeof ACH_BY !== 'undefined'){
-  for (const [id, tier, th, en, n, coin] of [['tower10', 0, 'ผู้ปีนหอคอย', 'Tower Climber', 10, 5], ['tower50', 2, 'ผู้พิชิตหอคอย', 'Tower Conqueror', 50, 30], ['tower150', 3, 'เหนือยอดหอคอย', 'Above the Spire', 150, 100]]){
+  for (const [id, tier, th, en, n, coin] of [['tower10', 0, 'ผู้ปีนหอคอย', 'Tower Climber', 10, 5], ['tower50', 2, 'ผู้พิชิตหอคอย', 'Tower Conqueror', 50, 30], ['tower150', 3, 'ผู้ไต่ฟ้า', 'Sky Climber', 75, 60]]){
     const a = {id, cat:'hunt', tier, th, en, dth:`ผ่านหอคอยวายราชั้น ${n}`, den:`Clear floor ${n} of the Vayra Tower`, prog:() => [(S.tower && S.tower.best) || 0, n], coin, title:[th, en]};
     ACH.push(a); ACH_BY[id] = a; }
   EV.on('tower', () => { if (typeof achCheck === 'function') achCheck(); });
 }
-if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'tower', t:['หอคอยวายรา', 'Vayra Tower'], b:() => `<p>${L(`หอคอยไม่มีชั้นบนสุด ปีนคนเดียว (Lv ${TW_MIN}+) เปิดจากเมนู \"หอคอย\" หรือผู้เฝ้าประตูแสงในอาเรน`, `An endless tower climbed alone (Lv ${TW_MIN}+), from the \"Tower\" menu button or Gatekeeper Saeng in Aren`)}</p>
-  <ul><li>${L('ชั้น f มอน Lv 4 + 2f · ชั้นละ 1 รอบ จำกัดเวลา · ทุก 5 ชั้นมีผู้พิทักษ์ · ทุก 10 ชั้นมีหัวหน้าฝูง ★', 'Floor f: Lv 4 + 2f monsters · one timed wave a floor · a guardian every 5th · ★ elites every 10th')}</li>
+if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'tower', t:['หอคอยวายรา', 'Vayra Tower'], b:() => `<p>${L(`หอคอย ${TW_MAX} ชั้น ปีนคนเดียวหรือกับปาร์ตี้ (Lv ${TW_MIN}+) เปิดจากเมนู \"หอคอย\" หรือผู้เฝ้าประตูแสงในอาเรน`, `An endless tower climbed alone (Lv ${TW_MIN}+), from the \"Tower\" menu button or Gatekeeper Saeng in Aren`)}</p>
+  <ul><li>${L('ยิ่งสูงมอนยิ่งแรง ชั้น 100 = Lv 300 · ชั้นละ 1 รอบ จำกัดเวลา · ทุก 5 ชั้นมีผู้พิทักษ์ · ทุก 10 ชั้นมีหัวหน้าฝูง ★ · ชั้น 100 คือยอดหอคอย', 'Higher is stronger, floor 100 = Lv 300 · one timed wave a floor · a guardian every 5th · ★ elites every 10th · floor 100 is the top')}</li>
   <li>${L('ผ่านชั้นฟื้น 25% · ทุก 5 ชั้นเลือกพร · ตั้งแต่ชั้น 10 วงแดงระเบิด', 'Clearing heals 25% · a blessing every 5th floor · red blasts from floor 10')}</li>
   <li>${L('รางวัลครั้งแรกเมื่อทำสถิติใหม่: เหรียญวายราทุก 5 ชั้น อุปกรณ์ทุก 10 ชั้น · จุดเริ่มใหม่ทุก 10 ชั้น', 'New-best rewards: Vayra Coins every 5 floors, gear every 10 · a checkpoint every 10 floors')}</li>
   <li>${L('อันดับ 20 คนแรกในหน้าต่างหอคอย และแท็บ \"หอคอย\" ในอันดับของหน้าต่างสังคม', 'Top 20 in the Tower window and a \"Tower\" tab in the Social ranking')}</li></ul>`});

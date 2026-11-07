@@ -50,7 +50,7 @@ function climbOne({ line, lv, max, noAvoid }){
   const job = towerHero(line, lv);
   if (TW.active) twQuit('leave');
   loadMap(0); twSt().best = 400;
-  const lvToF = L0 => Math.max(1, Math.floor((L0 - 4) / 2));
+  const lvToF = L0 => Math.max(1, Math.floor(L0 / 3));   // (v255) floor f = Lv 3f
   let f0 = 1; for (const c of twCks()) if (c <= lvToF(lv - 20)) f0 = c;
   twStart(f0); setBot(true); if (typeof botSet === 'function') botSet(); if (noAvoid && S.bot) S.bot.avoidBoss = false;
   let t = 0, why = '', pots0 = Object.values(S.inv).reduce((a, b) => a + (+b || 0), 0), floors = [];
@@ -75,7 +75,7 @@ async function main(){
     if (process.env.LINES) lines = lines.filter(l => process.env.LINES.split(',').includes(l));
     for (const line of lines) for (const lv of LEVELS){ const r = await page.evaluate(climbOne, {line, lv, max:MAX_SEC, noAvoid:!!process.env.NOAVOID}); rows.push(r); console.log(JSON.stringify(r)); }
   } finally { await close(); }
-  const why = w => ({fell:'ตาย', time:'หมดเวลา', cap:'ครบเวลาทดสอบ', leave:'ออก'}[w] || w);
+  const why = w => ({fell:'ตาย', time:'หมดเวลา', cap:'ครบเวลาทดสอบ', leave:'ออก', top:'ถึงยอด (ชั้น 100)'}[w] || w);
   const md = ['# หอคอยวายรา · แต่ละอาชีพปีนได้ถึงชั้นไหน', '', `Auto ปีนจากเช็คพอยต์ที่มอนเลเวลต่ำกว่าตัวเองประมาณ 20 จนตาย/หมดเวลาชั้น (สูงสุด ${MAX_SEC} วินาทีเกม) · ชุด สเตตัส สกิล ยา เหมือน docs/BALANCE.md`, '',
     '| สาย | อาชีพ | Lv | เริ่มชั้น | ถึงชั้น | ปีนได้ | มอนชั้นที่จบ | ห่างจากเลเวลเรา | จบเพราะ |', '|---|---|---|---|---|---|---|---|---|',
     ...rows.map(r => `| ${r.line} | ${r.jobName} | ${r.lv} | ${r.start} | ${r.reached} | ${r.climbed} | Lv ${r.mobLv} | ${r.gap >= 0 ? '+' : ''}${r.gap} | ${why(r.why)} |`)];
