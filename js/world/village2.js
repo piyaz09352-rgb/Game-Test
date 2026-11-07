@@ -267,7 +267,7 @@ function villageGround(g){   // called inside buildTerrain() with the village tr
     g.fillStyle = R() < .5 ? 'rgba(110,78,42,.3)' : 'rgba(225,195,145,.26)'; g.beginPath(); g.ellipse(x, y, .8 + R() * 2, .6 + R(), R() * 3, 0, 7); g.fill(); }
   const lane = (r, w) => { for (const [lw, col] of [[w, '#a8804c'], [w - 6, '#bf9a62']]){ g.strokeStyle = col; g.lineWidth = lw; g.beginPath(); g.arc(cx, cy, r, 0, 7); g.stroke(); } };
   const spoke = d => { const a = d * Math.PI / 180; for (const [lw, col] of [[52, '#a8804c'], [46, '#bf9a62']]){ g.strokeStyle = col; g.lineWidth = lw; g.lineCap = 'butt'; g.beginPath(); g.moveTo(cx + Math.cos(a) * (ARC.ring - 20), cy + Math.sin(a) * (ARC.ring - 20)); g.lineTo(cx + Math.cos(a) * (ARC.r + 24), cy + Math.sin(a) * (ARC.r + 24)); g.stroke(); } };
-  for (const d of ARC_GATES) spoke(d);
+  if (false) for (const d of ARC_GATES) spoke(d);   // (v263) the owner: no dirt roads (the four gate roads)
   lane(ARC.ring, 56);
   // the market lane: the south half, in front of the stalls
   for (const [lw, col] of [[46, '#a8804c'], [40, '#bf9a62']]){ g.strokeStyle = col; g.lineWidth = lw; g.beginPath(); g.arc(cx, cy, ARC.lane, 15 * Math.PI / 180, 165 * Math.PI / 180); g.stroke(); }

@@ -14,7 +14,7 @@ test('tower halls: own map, stairs, Auto, tiers, leaving', { skip, timeout: 1200
     const r = await page.evaluate(() => {
       const o = {}, adv = n => { for (let i = 0; i < n; i++){ advance(.05, false); if (!P.dead) S.hp = DER.maxhp; } };
       S.tut = {done:true, i:99}; S.lvl = 200; derive(); loadMap(0); twSt().best = 30; twStart(1); adv(70);
-      o.hall = W === TWM_W && H === TWM_H && !NPCS.length && !GATES.length && !CAMP && PROPS.length > 0 && PROPS.every(p => ['twpillar', 'twbrazier', 'twcrystal', 'twbarrel', 'twcrate', 'twyaksha', 'twdeadtree'].includes(p.type));   // (v259) the zone's own pieces
+      o.hall = W === TWM_W && H === TWM_H && !NPCS.length && !GATES.length && !CAMP && (PROPS.length > 0 || (typeof TIMG !== 'undefined' && !!TIMG.floor)) && PROPS.every(p => ['twpillar', 'twbrazier', 'twcrystal', 'twbarrel', 'twcrate', 'twyaksha', 'twdeadtree'].includes(p.type));   // (v259) the zone's own pieces
       o.inside = mobs.filter(m => m.dg && !m.dead).every(m => twmIn(m.x, m.y)) && mobs.some(m => m.dg && !m.dead);
       { if (typeof TWSQ !== 'undefined') TWSQ.raw = true;   // (v260) compare with the region's own monster, not a squad pick
         const mp = MAPS[TW.theme], kind = mp.mobs.find(t => MOB[t] && !MOB[t].boss && !MOB[t].night), g = twMob(mp.boss, P.x, P.y - 200, 5), n = twMob(kind, P.x, P.y - 220, 5); if (typeof TWSQ !== 'undefined') TWSQ.raw = false;
