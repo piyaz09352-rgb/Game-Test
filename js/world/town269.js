@@ -63,18 +63,18 @@ if (typeof arnLife === 'function'){
 /* ---------- the shops come alive ---------- */
 // [kind, fx, fy, extra] in fractions of each shop picture (mirrored with the picture)
 const T269_FX = {
-  shop:[['lamp', .04, .42, '120,200,255'], ['lamp', .96, .42, '120,200,255'], ['twinkle', .5, .55, .25], ['twinkle', .5, .12, .05]],
-  smith:[['fire', .42, .6], ['sparks', .36, .72], ['lamp', .13, .52, '255,170,80'], ['lamp', .87, .52, '255,170,80'], ['twinkle', .2, .76, .04], ['twinkle', .78, .78, .04]],
-  forger:[['smoke', .84, .06], ['fire', .77, .74], ['sparks', .77, .72], ['lamp', .86, .34, '255,150,60']],
-  driller:[['orb', .5, .62, '200,120,255'], ['twinkle', .5, .6, .08], ['twinkle', .5, .08, .06], ['lamp', .07, .5, '220,150,255'], ['lamp', .93, .5, '220,150,255']],
-  herbal:[['steam', .73, .6, '170,255,150'], ['bubbles', .73, .63], ['lamp', .92, .32, '255,200,110'], ['lamp', .08, .52, '255,200,110']],
-  cook:[['steam', .72, .6], ['steam', .38, .64], ['lamp', .08, .3, '255,170,80'], ['lamp', .92, .3, '255,170,80'], ['fire', .72, .72]],
-  tailor:[['twinkle', .67, .66, .04], ['petals', .07, .14], ['twinkle', .5, .4, .1], ['lamp', .5, .5, '255,190,220']],
+  shop:[['lamp', .035, .38, '120,200,255'], ['lamp', .965, .38, '120,200,255'], ['twinkle', .5, .55, .25], ['twinkle', .5, .2, .05]],
+  smith:[['fire', .42, .64], ['sparks', .35, .74], ['lamp', .22, .55, '255,170,80'], ['lamp', .79, .55, '255,170,80'], ['twinkle', .2, .76, .04], ['twinkle', .78, .78, .04]],
+  forger:[['smoke', .8, .1], ['fire', .76, .74], ['sparks', .76, .72], ['lamp', .86, .34, '255,150,60']],
+  driller:[['orb', .36, .68, '200,120,255'], ['twinkle', .36, .66, .05], ['twinkle', .5, .08, .06], ['lamp', .3, .58, '220,150,255'], ['lamp', .72, .58, '220,150,255']],
+  herbal:[['steam', .74, .64, '170,255,150'], ['bubbles', .74, .66], ['lamp', .91, .31, '255,200,110'], ['lamp', .24, .58, '255,200,110']],
+  cook:[['steam', .71, .62], ['steam', .37, .63], ['lamp', .09, .29, '255,170,80'], ['lamp', .92, .29, '255,170,80'], ['fire', .71, .72]],
+  tailor:[['twinkle', .6, .64, .04], ['petals', .08, .14], ['twinkle', .5, .4, .1], ['lamp', .5, .5, '255,190,220']],
   banker:[['twinkle', .62, .62, .06], ['twinkle', .3, .6, .06], ['twinkle', .5, .38, .08], ['lamp', .5, .55, '255,220,120']],
-  registrar:[['twinkle', .84, .62, .05], ['twinkle', .08, .84, .03], ['lamp', .05, .46, '255,200,110'], ['lamp', .95, .46, '255,200,110'], ['flag', .32, .04]],
-  festival:[['firework', .64, .04], ['petals', .06, .1], ['twinkle', .5, .4, .12], ['lamp', .3, .55, '255,140,200'], ['lamp', .7, .55, '255,140,200']],
-  trader:[['twinkle', .55, .58, .1], ['flag', .3, .08], ['flag', .75, .06], ['lamp', .5, .52, '255,200,110']],
-  beast:[['butterfly', .2, .35], ['butterfly', .8, .3], ['hearts', .88, .72], ['hearts', .12, .72], ['lamp', .5, .48, '255,200,110']]
+  registrar:[['twinkle', .84, .62, .05], ['twinkle', .08, .84, .03], ['lamp', .05, .45, '255,200,110'], ['lamp', .95, .45, '255,200,110'], ['flag', .31, .04, '40,80,170']],
+  festival:[['firework', .7, .08], ['petals', .06, .1], ['twinkle', .5, .4, .12], ['lamp', .3, .55, '255,140,200'], ['lamp', .7, .55, '255,140,200']],
+  trader:[['twinkle', .55, .58, .1], ['flag', .3, .08, '40,80,170'], ['flag', .75, .06, '220,60,50'], ['lamp', .5, .52, '255,200,110']],
+  beast:[['butterfly', .2, .35], ['butterfly', .8, .3], ['hearts', .88, .72], ['hearts', .12, .72], ['lamp', .39, .54, '255,200,110']]
 };
 const T269 = {fx:new Map()};
 const t269Shops = () => { if (typeof MAP_ID === 'undefined' || MAP_ID !== 0 || (typeof DG !== 'undefined' && DG.active) || typeof BIMG === 'undefined' || typeof VSHOP === 'undefined') return [];
@@ -112,8 +112,8 @@ EV.on('tick', dt => {
         const gr = g.createRadialGradient(X, Y, 0, X, Y, rr); gr.addColorStop(0, `rgba(${c},${(.32 + night * .3) * fl})`); gr.addColorStop(1, `rgba(${c},0)`); g.fillStyle = gr; g.fillRect(X - rr, Y - rr, rr * 2, rr * 2); }
       // flags flutter: a little pennant waving on the painted pole
       g.globalCompositeOperation = 'source-over';
-      for (const [kind, fx, fy] of T269_FX[b.k]){ if (kind !== 'flag') continue; const [x, y] = t269At(b, fx, fy), X = x - cam.x, Y = y - cam.y, d = b.mir ? -1 : 1;
-        g.fillStyle = 'rgba(230,60,50,.9)'; g.beginPath(); g.moveTo(X, Y); for (let i = 0; i <= 6; i++) g.lineTo(X + d * i * 2, Y + Math.sin(T * 6 - i * .9) * 1.4 * (i / 6)); for (let i = 6; i >= 0; i--) g.lineTo(X + d * i * 2, Y + 5 - i * .45 + Math.sin(T * 6 - i * .9) * 1.4 * (i / 6)); g.closePath(); g.fill(); }
+      for (const [kind, fx, fy, ex] of T269_FX[b.k]){ if (kind !== 'flag') continue; const [x, y] = t269At(b, fx, fy), X = x - cam.x, Y = y - cam.y, d = b.mir ? -1 : 1;
+        g.fillStyle = `rgba(${ex || '230,60,50'},.92)`; g.beginPath(); g.moveTo(X, Y); for (let i = 0; i <= 6; i++) g.lineTo(X + d * i * 2, Y + Math.sin(T * 6 - i * .9) * 1.4 * (i / 6)); for (let i = 6; i >= 0; i--) g.lineTo(X + d * i * 2, Y + 5 - i * .45 + Math.sin(T * 6 - i * .9) * 1.4 * (i / 6)); g.closePath(); g.fill(); }
       // the particles
       for (const q of T269.fx.get(b.p) || []){ const u = q.t / q.life, X = q.x - cam.x, Y = q.y - cam.y, al = (q.a || 1) * (q.bf != null ? 1 : u < .15 ? u / .15 : 1 - u);
         g.globalCompositeOperation = q.add ? 'lighter' : 'source-over'; g.globalAlpha = Math.max(0, al);
