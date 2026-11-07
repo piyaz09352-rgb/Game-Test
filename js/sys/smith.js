@@ -244,7 +244,7 @@ WIN_RENDER.forge = function(){
         <span class="pr">${fmtN(gr.buy)}<small> /${L('ห่อ', 'pack')}</small></span>${qtyBox(id, 'pack')}</div>`; };
     if (RF.shop === 'ammo') rows = GEAR_LIST.filter(g => g[1] === 'ammo' && ammoKind(g[0]) === ammoWant()).sort((a, b) => a[4] - b[4]).map(ammoRow).join('');
     else if (RF.shop === 'mat') rows = ['ore', 'ore_a', 'rf_luck', 'rf_guard'].map(matRow).join('');
-    else rows = GEAR_LIST.filter(g => g[1] === RF.shop && lineOk(g[6]) && (RF.shop !== 'weapon' || (g[6] && g[6].wtype === wt && !(g[6].hands === '2h' && wt === 'dagger' && !jobChain().includes('rogue'))))).sort((a, b) => a[4] - b[4]).map(gearRow).join('') || `<p class="hint">${L('ไม่มีสินค้าสำหรับอาชีพนี้', 'Nothing for this class')}</p>`;
+    else rows = GEAR_LIST.filter(g => g[1] === RF.shop && lineOk(g[6]) && (RF.shop !== 'weapon' || (ITEMS[g[0]] && canWield(ITEMS[g[0]])))).sort((a, b) => a[4] - b[4]).map(gearRow).join('') || `<p class="hint">${L('ไม่มีสินค้าสำหรับอาชีพนี้', 'Nothing for this class')}</p>`;
     body = `<div class="fgsub">${subs.map(([k, th, en]) => `<button class="${RF.shop === k ? 'on' : ''}" data-fgshop="${k}">${L(th, en)}</button>`).join('')}</div>
       ${RF.shop === 'weapon' ? `<p class="hint">${L(`อาวุธสำหรับ${nm(JOBS[S.job])} (${L(...WTYPE[wt])})`, `Weapons for ${nm(JOBS[S.job])} (${WTYPE[wt][1]})`)} · ${L('ของจากร้านมีโอกาสออกหายากขึ้นไป', 'shop pieces can come out Rare or better')}</p>` : ''}
       <div class="shop">${rows}</div>`;
