@@ -11,7 +11,7 @@
 | driller.png | ร้านเจาะมณี |
 | herbal.png | สมุนไพร |
 | cook.png | โรงครัว |
-| tailor.png | ร้านตัดชุด |
+| tailor.png | ร้านช่างตัดชุด (ช่างตัดชุด) |
 | bank.png | คลังเบี้ย |
 | registrar.png | ทะเบียน |
 | festival.png | เทศกาล |
