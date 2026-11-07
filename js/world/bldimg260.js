@@ -50,15 +50,14 @@ function bimgClinic(){ if (typeof MAP_ID === 'undefined' || MAP_ID !== 0 || (typ
     addProp('healerhut', x, y); }
 EV.on('map', () => setTimeout(bimgClinic, 0)); EV.on('tick', () => { if (typeof MAP_ID !== 'undefined' && MAP_ID === 0 && !(PROPS || []).some(p => p.type === 'healerhut')) bimgClinic(); });
 
-/* ---------- (v262) Master Vayra's temple «วิหารเปลี่ยนอาชีพ»: the owner's picture in place of the shrine behind him ---------- */
+/* ---------- (v262) the dungeon gate «ประตูวิหาร»: the owner's picture in place of the portal behind Gatekeeper Saeng ---------- */
 BIMG.files.temple = 'temple'; if (location.protocol !== 'file:') bimgLoad('temple');
 PROP_TYPES.jobtemple = (seed) => { const pic = BIMG.ready.temple;
-  return pic ? bimgProp(pic, seed, {w:200, h:186, ax:100, ay:174, shadow:[78, 14, 3], collide:40, glow:[0, -60, 80]}) : propImg('shrine', 0); };
+  return pic ? bimgProp(pic, seed, {w:200, h:186, ax:100, ay:174, shadow:[78, 14, 3], collide:40, glow:[0, -60, 80]}) : propImg('portal', 0); };
 function bimgTemple(){ if (typeof MAP_ID === 'undefined' || MAP_ID !== 0 || !BIMG.ready.temple || (typeof DG !== 'undefined' && DG.active)) return;
-  const n = NPCS.find(o => o.id === 'job'); if (!n || PROPS.some(p => p.type === 'jobtemple')) return;
-  const sh = PROPS.find(p => p.type === 'shrine' && Math.hypot(p.x - n.x, p.y - n.y) < 160), x = sh ? sh.x : n.x, y = sh ? sh.y : n.y - 74;
-  // the shrine and the small spirit house beside it give way to the temple
-  for (let i = PROPS.length - 1; i >= 0; i--){ const p = PROPS[i]; if (!['shrine', 'spirit'].includes(p.type) || Math.hypot(p.x - x, p.y - y) > 140) continue;
+  const n = NPCS.find(o => o.id === 'gatekeeper'); if (!n || PROPS.some(p => p.type === 'jobtemple')) return;
+  const pt = PROPS.find(p => p.type === 'portal' && Math.hypot(p.x - n.x, p.y - n.y) < 160), x = pt ? pt.x : n.x, y = pt ? pt.y : n.y - 32;
+  for (let i = PROPS.length - 1; i >= 0; i--){ const p = PROPS[i]; if (p.type !== 'portal' || Math.hypot(p.x - x, p.y - y) > 60) continue;
     PROPS.splice(i, 1); for (let j = obstacles.length - 1; j >= 0; j--) if (obstacles[j].prop === p) obstacles.splice(j, 1); }
   addProp('jobtemple', x, y); }
 EV.on('map', () => setTimeout(bimgTemple, 0)); EV.on('tick', () => { if (typeof MAP_ID !== 'undefined' && MAP_ID === 0 && BIMG.ready.temple && !(PROPS || []).some(p => p.type === 'jobtemple')) bimgTemple(); });
