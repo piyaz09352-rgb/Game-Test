@@ -34,22 +34,30 @@ function t269Garden(){
 
 /* ---------- the keepers walk right ---------- */
 // (their place, not their stroll, is what the hidden-NPC check looks at: npcclear222.js ncSig)
+// nothing drawn over the figure there: no building in front of it, no tree, bush or lamp touching it
+const t269Clear = (x, y) => { const q = {x, y}; return !PROPS.some(p => Math.abs(p.x - x) < 280 && Math.abs(p.y - y) < 420 && (!NC_STRUCT.has(p.type) || p.y > y + 1) && ncCover(q, p) > .03); };
 // a stroll target: walkable, not behind a building's picture, not on top of another NPC
 function t269Spot(n, x, y){
   if (!walkable(x, y, 10) || NPCS.some(m => m !== n && Math.hypot(m.x - x, m.y - y) < 26)) return false;
   if (typeof ncCover !== 'function' || typeof NC_STRUCT === 'undefined') return true;
-  const q = {x, y}; NC.used = [];
-  try { return !PROPS.some(p => NC_STRUCT.has(p.type) && p.y > y + 1 && Math.abs(p.x - x) < 200 && Math.abs(p.y - y) < 260 && ncCover(q, p) > .08); }
+  NC.used = [];
+  try { return t269Clear(x, y); }
   finally { for (const im of NC.used) delete im._ncA; NC.used = []; }
 }
 if (typeof arnLife === 'function'){
   // the keeper's place is where the town set them down (after the hidden-NPC check), not a spot behind the shop
   arnLife = function(n){ let s = ARN_L.get(n); if (!s){ s = {hx:n.x, hy:n.y, st:'idle', t:1 + Math.random() * 3, tx:n.x, ty:n.y, dir:0, sayCd:4 + Math.random() * 8, fx:[], spots:null}; ARN_L.set(n, s); }
-    if (!s.spots){ s.spots = []; for (let k = 0; k < 24 && s.spots.length < 6; k++){ const x = s.hx + (Math.random() - .5) * 90, y = s.hy + Math.random() * 28 - 6; if (t269Spot(n, x, y)) s.spots.push([x, y]); } s.spots.push([s.hx, s.hy]); }
+    if (!s.spots){ s.spots = [];
+      // the place itself must be clear too: if not, the nearest clear spot in front becomes the place
+      if (!t269Spot(n, s.hx, s.hy)) for (let t = 1; t < 40; t++){ const a = t * 2.4, d = 6 + t * 4, x = s.hx + Math.cos(a) * d * .8, y = s.hy + Math.abs(Math.sin(a)) * d; if (t269Spot(n, x, y)){ s.hx = n.x = s.tx = x; s.hy = n.y = s.ty = y; break; } }
+      // strolls: the spot and the way there (checked every few steps) are clear
+      for (let k = 0; k < 30 && s.spots.length < 6; k++){ const x = s.hx + (Math.random() - .5) * 90, y = s.hy + Math.random() * 28 - 6;
+        let ok = true; for (let f = .25; f <= 1 && ok; f += .25) ok = t269Spot(n, s.hx + (x - s.hx) * f, s.hy + (y - s.hy) * f); if (ok) s.spots.push([x, y]); }
+      s.spots.push([s.hx, s.hy]); }
     return s; };
   // pick strolls only from the checked spots: replace the target the old code picked when it is not one of them
   EV.on('tick', () => { if (typeof MAP_ID === 'undefined' || MAP_ID !== 0) return;
-    for (const [n, s] of ARN_L){ if (s.st !== 'walk' || !s.spots || s.spots.some(q => q[0] === s.tx && q[1] === s.ty)) continue; const q = s.spots[(Math.random() * s.spots.length) | 0]; s.tx = q[0]; s.ty = q[1]; } });
+    for (const [n, s] of ARN_L){ if (s.st !== 'walk' || !s.spots || s.spots.some(q => q[0] === s.tx && q[1] === s.ty)) continue; const atHome = Math.hypot(n.x - s.hx, n.y - s.hy) < 3, q = atHome ? s.spots[(Math.random() * s.spots.length) | 0] : [s.hx, s.hy]; s.tx = q[0]; s.ty = q[1]; } });   // out from the place and back: only checked ways
 }
 
 /* ---------- the shops come alive ---------- */
