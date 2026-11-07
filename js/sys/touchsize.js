@@ -35,6 +35,5 @@ EV.on('tick', () => { if ((TSZ.m = (TSZ.m || 0) + 1) % 45 === 0) tszMark(); });
   .win input[type=number],.win input[type=text],.win input:not([type]),.win select,#dialog input,#dialog select{min-height:calc(36px / var(--uiz,1))}
 }`;
   document.head.appendChild(st); }
-/* (v132) the smith's workshop (refine · forge · shop) is big: its window takes about 80% of the screen, content scrolls inside */
-{ const st = document.createElement('style'); st.textContent = `html body #win-forge{width:calc(80vw / var(--uiz,1))!important;max-width:none!important;height:calc(80vh / var(--uiz,1))!important;max-height:none!important}
-html body #win-forge .wb,html body #win-forge #pane-forge{max-height:none!important}`; document.head.appendChild(st); }
+/* (v132) the smith's workshop (refine · forge · shop): content scrolls inside · (v188) its size comes from npctable.js (big screens) and winfit.js (phones) */
+{ const st = document.createElement('style'); st.textContent = `html body #win-forge .wb,html body #win-forge #pane-forge{max-height:none!important}`; document.head.appendChild(st); }

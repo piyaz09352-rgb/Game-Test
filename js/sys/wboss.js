@@ -40,13 +40,13 @@ function wbSpawn(w){
   const m = spawnMob('asuraking', x, y, {zone:MAPZ}); m.def = d; m.maxhp = d.hp; m.split = true; m.wb = true; m.roamT = 30;
   let f = 1; if (NET.mapRoom) for (const p of NET.mapRoom.peers()){ const q = p.presence || {}; if (!p.isMe && q.wbk === w.key && typeof q.wb === 'number') f = Math.min(f, clamp(q.wb, .01, 1)); }
   m.hp = Math.round(d.hp * f); WB.m = m; WB.key = w.key; WB.my = 0; WB.acc = 0;
-  banner(L(`☠ ราหูอสูรจันทรคราสลงมาที่${nm(MAPS[MAP_ID])}!`, `☠ Rahu, the Eclipse Asura, has landed in ${nm(MAPS[MAP_ID])}!`)); SFX.play('wbhorn'); SFX.music('worldboss');
+  banner(L(`☠ ราหูอสูรจันทรคราสลงมาที่${nm(MAPS[MAP_ID])}!`, `☠ Rahu, the Eclipse Asura, has landed in ${nm(MAPS[MAP_ID])}!`)); SFX.music('worldboss');
   VFX.play('jobChange', {x, y}); log(L('บอสโลกปรากฏ! ร่วมมือกันล้มมันภายใน 15 นาที', 'World boss! Bring it down within 15 minutes'), 'r');
 }
 function wbHit(dmg){ if (!WB.m) return; const f = dmg / WB.m.maxhp; WB.acc += f; WB.my += f; }
 EV.on('tick', dt => {
   if (PAUSED || !S || !S.lvl) return; const w = wbWindow();
-  if (w && !w.active && !WB.warned[w.key]){ WB.warned[w.key] = 1; banner(L(`บอสโลกจะปรากฏที่${wbMapName(w.key)}ในอีก ${Math.ceil(w.soon)} นาที! · กดวาร์ปที่แถบเควส`, `A world boss appears in ${wbMapName(w.key)} in ${Math.ceil(w.soon)} minutes! · warp from the quest bar`)); SFX.play('wbhorn'); }
+  if (w && !w.active && !WB.warned[w.key]){ WB.warned[w.key] = 1; banner(L(`บอสโลกจะปรากฏที่${wbMapName(w.key)}ในอีก ${Math.ceil(w.soon)} นาที! · กดวาร์ปที่แถบเควส`, `A world boss appears in ${wbMapName(w.key)} in ${Math.ceil(w.soon)} minutes! · warp from the quest bar`)); }
   if (w && MAP_ID === wbMap(w.key)) wbPrewarm();   // paint it before it lands, so the landing never hitches
   if (w && w.active && MAP_ID === wbMap(w.key) && !WB.m && !(S.wbDone || {})[w.key] && !(typeof NM !== 'undefined' && NM.slave)) wbSpawn(w);
   if (WB.m && (WB.m.dead || !mobs.includes(WB.m))){ if (!WB.m.dead) WB.m = null; }

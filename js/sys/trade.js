@@ -62,6 +62,13 @@ function onTrade(msg){
   WIN_RENDER.trade();
 }
 EV.on('netready', () => { if (NET.room) NET.room.on('trade', onTrade, () => {}); });
+/* (v188) the online list (N) offers a trade button beside each other player, so a trade never depends on landing a tap on a small hero */
+if (typeof renderSocial === 'function'){ const _rs = renderSocial; renderSocial = function(){ const r = _rs.apply(this, arguments); const pane = el('pane-social'); if (!pane || !NET.room) return r;
+    const peers = NET.room.peers().filter(p => p.kind === 'viewer'), rows = pane.querySelectorAll('#soPeers > .item');
+    peers.forEach((p, i) => { const row = rows[i]; if (!row || p.isMe || row.querySelector('[data-strade]')) return;
+      row.insertAdjacentHTML('beforeend', `<button class="btn sm gold" data-strade="${escH(String(p.peer))}">${L('แลกของ', 'Trade')}</button>`); row.querySelector('[data-strade]')._n = clean(p.presence && p.presence.n, 18) || L('นักผจญภัย', 'Adventurer'); });
+    return r; }; }
+document.addEventListener('click', e => { const t = e.target.closest && e.target.closest('[data-strade]'); if (t) tradeRequest(t.dataset.strade, t._n || L('นักผจญภัย', 'Adventurer')); });
 
 /* ---------- player card (tap another hero) ---------- */
 function playerMenu(gh){
@@ -84,6 +91,8 @@ const tTabOf = id => (tIsCard(id) ? 'card' : ITEMS[id].kind === 'gear' ? 'gear' 
 const tInOffer = id => { const x = TRADE.mine.items.find(o => o[0] === id); return x ? x[1] : 0; };
 const tLeft = id => tHave(id) - tInOffer(id);
 const tName = id => (tIsCard(id) ? escH(nm(CARDS[id])) : rarName(id));
+// (v188) a card shows as its card picture (the same art as the bag's card tab), not as a plain item icon
+const tIcon = (id, big) => (tIsCard(id) && typeof cardHTML === 'function' ? cardHTML(id, big ? 'full' : 'mini') : itemIcon(id));
 const tInfo = id => (tIsCard(id) ? escH(cardDesc(id)) : ITEMS[id].st ? gearLines(id) : escH(itemDesc(id)));
 function tBagList(){ const u = TRADE.ui, q = u.q.trim().toLowerCase();
   const ids = Object.keys(S.inv).filter(k => S.inv[k] > 0 && !tIsCard(k) && tradable(k)).concat(Object.keys(S.cards || {}).filter(k => S.cards[k] > 0 && tIsCard(k)));
@@ -92,7 +101,7 @@ function tBagList(){ const u = TRADE.ui, q = u.q.trim().toLowerCase();
 function tSide(o, me){
   const lock = me ? TRADE.lockMe : TRADE.lockThem, ok = me ? TRADE.okMe : TRADE.okThem, chg = !me && TRADE.chgT > Date.now();
   const st = ok ? ['ok', L('ยืนยันแล้ว', 'Confirmed')] : lock ? ['lk', L('ล็อกแล้ว', 'Locked')] : ['ed', L('กำลังเลือกของ', 'Choosing')];
-  const rows = o.items.map(([id, n]) => `<div class="tr-it"><span class="bico">${itemIcon(id)}</span><div class="tr-itx"><b>${tName(id)}${tIsCard(id) ? ` <i class="tr-tag">${L('การ์ด', 'Card')}</i>` : ''}</b><small>${tInfo(id)}</small></div><em>×${fmtN(n)}</em>${me && !TRADE.lockMe ? `<button class="tr-x" data-trem="${id}" aria-label="${L('เอาออก', 'Remove')}">✕</button>` : ''}</div>`).join('');
+  const rows = o.items.map(([id, n]) => `<div class="tr-it${tIsCard(id) ? ' tr-card' : ''}"><span class="bico">${tIcon(id)}</span><div class="tr-itx"><b>${tName(id)}${tIsCard(id) ? ` <i class="tr-tag">${L('การ์ด', 'Card')}</i>` : ''}</b><small>${tInfo(id)}</small></div><em>×${fmtN(n)}</em>${me && !TRADE.lockMe ? `<button class="tr-x" data-trem="${id}" aria-label="${L('เอาออก', 'Remove')}">✕</button>` : ''}</div>`).join('');
   const z = me && !TRADE.lockMe ? `<div class="tr-z"><label>${L('เงิน', 'Bia')} <i class="biaI"></i><input id="tZ" type="number" inputmode="numeric" min="0" max="${S.bia}" value="${o.z}"></label>
       <span class="tr-zq">${[1e3, 1e4, 1e5].map(v => `<button class="btn sm" data-tzadd="${v}">+${fmtN(v)}</button>`).join('')}<button class="btn sm" data-tzadd="0">${L('ล้าง', 'Clear')}</button></span><small>${L('มีอยู่', 'You have')} <i class="biaI"></i>${fmtN(S.bia)}</small></div>`
     : `<div class="tr-z"><span>${L('เงิน', 'Bia')}</span><b><i class="biaI"></i>${fmtN(o.z)}</b></div>`;
@@ -107,11 +116,11 @@ function tStep(){ return TRADE.okMe ? [3, L(`รอ ${TRADE.name} กดยื�
 function tBagHTML(){
   const u = TRADE.ui, list = tBagList(), sel = u.sel && tLeft(u.sel) > 0 ? u.sel : null, left = sel ? tLeft(sel) : 0, qty = sel ? clamp(u.qty | 0, 1, left) : 1;
   const one = sel && !tIsCard(sel) && ITEMS[sel].kind === 'gear';
-  const pick = sel ? `<div class="tr-pick"><span class="bico">${itemIcon(sel)}</span><div class="tr-itx"><b>${tName(sel)}</b><small>${tInfo(sel)}</small></div>
+  const pick = sel ? `<div class="tr-pick${tIsCard(sel) ? ' tr-card' : ''}">${tIsCard(sel) ? `<span class="tr-cardbig">${tIcon(sel, true)}</span>` : `<span class="bico">${itemIcon(sel)}</span><div class="tr-itx"><b>${tName(sel)}</b><small>${tInfo(sel)}</small></div>`}
       ${one ? '' : `<span class="tr-qty"><button class="btn sm" data-tqty="-1">−</button><input id="tQty" type="number" inputmode="numeric" min="1" max="${left}" value="${qty}"><button class="btn sm" data-tqty="1">+</button><button class="btn sm" data-tqty="all">${L('ทั้งหมด', 'All')} ${fmtN(left)}</button></span>`}
       <button class="btn gold" data-tput="1">${L('ใส่ในการแลก', 'Add to trade')}</button></div>`
     : `<p class="tr-pickhint">${L('แตะของในกระเป๋าเพื่อดูรายละเอียดและใส่ในการแลก', 'Tap something in your bag to see it and add it')}</p>`;
-  const grid = list.map(k => `<button class="bslot${ITEMS[k] && ITEMS[k].rar ? ' r' + ITEMS[k].rar : ''}${k === sel ? ' sel' : ''}${tIsCard(k) ? ' card' : ''}" data-tsel="${k}" title="${escH(nm(tDef(k)))}">${itemIcon(k)}${tLeft(k) > 1 ? `<em>${fmtN(tLeft(k))}</em>` : ''}</button>`).join('');
+  const grid = list.map(k => `<button class="bslot${ITEMS[k] && ITEMS[k].rar ? ' r' + ITEMS[k].rar : ''}${k === sel ? ' sel' : ''}${tIsCard(k) ? ' card' : ''}" data-tsel="${k}" title="${escH(nm(tDef(k)))}">${tIcon(k)}${tLeft(k) > 1 ? `<em>${fmtN(tLeft(k))}</em>` : ''}</button>`).join('');
   return `<div class="tr-tabs">${T_TABS.map(([k, th, en]) => `<button class="${u.tab === k ? 'on' : ''}" data-ttab="${k}">${L(th, en)}</button>`).join('')}<input id="tQ" type="search" placeholder="${L('ค้นหา', 'Search')}" value="${escH(u.q)}"></div>
     ${pick}<div class="tr-bag" id="tBagGrid">${grid || `<p class="tr-empty">${L('ไม่มีของที่แลกได้ในหมวดนี้', 'Nothing tradable here')}</p>`}</div>`;
 }

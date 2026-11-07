@@ -25,7 +25,7 @@ function applyPX(px){
   VW = Math.ceil(SW / PX); VH = Math.ceil(SH / PX);
   // zoom around the screen centre (your hero), not the top-left corner: shift the camera by half the change
   if (CAMS.x != null && isFinite(ow)){ CAMS.x += (ow - SW / PX) / 2; CAMS.y += (oh - SH / PX) / 2; }
-  if (night.width !== VW || night.height !== VH){ night.width = VW; night.height = VH; }
+  { const nw = Math.ceil(VW / 2), nh = Math.ceil(VH / 2); if (night.width !== nw || night.height !== nh){ night.width = nw; night.height = nh; } }   // (v218) the night layer at half size: it is a soft darkness, a quarter of the pixels to fill
 }
 function resize(){
   const w = $('#wrap').clientWidth;
@@ -34,16 +34,20 @@ function resize(){
   const top = brect($('#wrap')).top + window.scrollY;
   SW = w; SH = Math.max(200, Math.round(vpH() - top - pb));
   // auto balance: about 270 world units of height on any screen (v83: closer, so heroes and monsters read bigger; half steps keep pixels even)
-  PX_AUTO = clamp(Math.round(SH / 270 * 2) / 2, 2, 4.5);
+  // (v188) the camera sits 20% further out at every zoom step (phones too: their 2 px floor becomes 1.6 px)
+  PX_AUTO = clamp(Math.round(SH / 270 * 2) / 2, 2, 4.5) * .8;
   // one UI scale for every screen: proportional above 1280×720, gently smaller below it (square-root curve, so phone
   // text and buttons stay readable and touchable), times the player's own size setting (Settings → UI size)
   { const f = SH > SW * 1.15 ? Math.min(SH / 1280, SW / 720) : Math.min(SH / 720, SW / 1280), us = typeof SETTINGS !== 'undefined' ? +SETTINGS.uiScale || 1 : 1;
     UIZ = clamp((f >= 1 ? Math.min(f, 1.75) : Math.pow(f, .5)) * us, .5, 2.2); }
   const ui = $('#ui'); ui.style.zoom = UIZ; ui.style.setProperty('--sh', SH / UIZ + 'px'); $('#wrap').style.setProperty('--sh', SH + 'px');
   DPR = Math.min(GFX.dpr, window.devicePixelRatio || 1);   // the quality preset caps the canvas resolution
-  cv.width = Math.round(SW * DPR); cv.height = Math.round(SH * DPR); cv.style.height = SH + 'px';
+  // (v190) only when the size really changes: setting a canvas's width or height (even to the same number) wipes it, and
+  // resize() runs whenever the HUD lays itself out again (opening a window, switching a tab, pressing a button), so the
+  // game picture and the minimap blinked on every click
+  const cw = Math.round(SW * DPR), ch = Math.round(SH * DPR); if (cv.width !== cw) cv.width = cw; if (cv.height !== ch) cv.height = ch; if (cv.style.height !== SH + 'px') cv.style.height = SH + 'px';
   applyPX(PX_AUTO * ZOOM.lvl);
-  const mmc = $('#minimap'), mw = mmc.clientWidth || (w < 700 ? 104 : 170); mmc.width = Math.round(mw * DPR); mmc.height = Math.round(mw * 2 / 3 * DPR);
+  const mmc = $('#minimap'), mw = mmc.clientWidth || (w < 700 ? 104 : 170); { const a = Math.round(mw * DPR), b = Math.round(mw * 2 / 3 * DPR); if (mmc.width !== a) mmc.width = a; if (mmc.height !== b) mmc.height = b; }
 }
 function setZoom(z, snap = true){
   if (snap){ let best = ZSTEPS[0]; for (const s of ZSTEPS) if (Math.abs(s - z) < Math.abs(best - z)) best = s; z = best; }
@@ -478,7 +482,7 @@ function render(){
   const target = isNight() ? .58 : 0;
   nightA += ((SETTINGS.nightFx ? target : 0) - nightA) * .02;
   if (nightA > .01){
-    nctx.globalCompositeOperation = 'source-over'; nctx.clearRect(0, 0, VW, VH);
+    nctx.setTransform(1, 0, 0, 1, 0, 0); nctx.globalCompositeOperation = 'source-over'; nctx.clearRect(0, 0, night.width, night.height); nctx.setTransform(night.width / VW, 0, 0, night.height / VH, 0, 0);
     nctx.fillStyle = `rgba(14,12,48,${nightA})`; nctx.fillRect(0, 0, VW, VH);
     nctx.globalCompositeOperation = 'destination-out';
     // (v97) one soft round picture stamped for every light, not a new gradient per lantern per frame; off-screen ones skipped
@@ -543,7 +547,7 @@ function drawWeather(g){
   const B = MAP_ID ? BIOME[MAPS[MAP_ID].biome] : null; if (!B || !B.fx && !B.tint) return;
   if (B.tint){ g.fillStyle = B.tint; g.fillRect(0, 0, VW, VH); }
   if (B.fx === 'dark'){
-    nctx.globalCompositeOperation = 'source-over'; nctx.clearRect(0, 0, VW, VH);
+    nctx.setTransform(1, 0, 0, 1, 0, 0); nctx.globalCompositeOperation = 'source-over'; nctx.clearRect(0, 0, night.width, night.height); nctx.setTransform(night.width / VW, 0, 0, night.height / VH, 0, 0);
     nctx.fillStyle = `rgba(8,6,16,${B.fxA + (isNight() ? .15 : 0)})`; nctx.fillRect(0, 0, VW, VH);
     nctx.globalCompositeOperation = 'destination-out';
     const hole = (x, y, r, a) => { if (x < -r || y < -r || x > VW + r || y > VH + r) return; nctx.globalAlpha = a; nctx.drawImage(holeSpr(), x - r, y - r, r * 2, r * 2); nctx.globalAlpha = 1; };

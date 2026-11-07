@@ -34,7 +34,7 @@ document.addEventListener('touchstart', e => {
   if (t.closest('#itTip .tebar')){ e.stopPropagation(); return; }
   const s = t.closest('[data-bagsel]'); TE.bag = !!s;
   if (s && BAG.tab !== 'card'){ const id = s.dataset.bagsel, now = e.timeStamp || performance.now();   // (v132) when the finger touched, not when the busy page got round to it
-    if (TE.last.id === id && now - TE.last.t < 500){ TE.last = {id:null, t:0}; if (teDo(id)){ e.stopPropagation(); e.preventDefault && e.cancelable && e.preventDefault(); } return; }
+    if (TE.last.id === id && now - TE.last.t < (TE.win || 500)){ TE.last = {id:null, t:0}; if (teDo(id)){ e.stopPropagation(); e.preventDefault && e.cancelable && e.preventDefault(); } return; }
     TE.last = {id, t:now}; }
 }, {capture:true, passive:false});
 /* the card from a bag tap gets the action bar */

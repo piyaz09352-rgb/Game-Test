@@ -41,7 +41,11 @@
     Object.defineProperty(d, 'innerHTML', {configurable:true, get(){ return desc.get.call(this); }, set(v){
       if (this.hidden || !this.firstElementChild){ desc.set.call(this, v); return; }   // a fresh open: draw it normally
       const t = document.createElement('template'); t.innerHTML = v; changed.length = 0;
+      // (v192) swapping rows one by one makes the list shorter for a moment, which cut its scroll position (buying in a
+      // shop threw the list up): note where each scrolled list was and put it back (again next frames: keepscroll.js)
+      const sc = []; for (const e of this.querySelectorAll('*')) if (e.scrollTop > 0) sc.push([e, (typeof KSC !== 'undefined' && KSC.want.get(e)) || e.scrollTop, e.scrollLeft]);
       kids(this, t.content);
+      for (const [e, top, left] of sc) if (e.isConnected){ if (typeof kscPut === 'function') kscPut(e, top, left); else { e.scrollTop = top; e.scrollLeft = left; } }
       if (changed.length && typeof srCheck === 'function') for (const e of new Set(changed)) if (e.isConnected) srCheck(e);
     }});
   }

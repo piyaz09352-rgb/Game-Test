@@ -13,7 +13,7 @@
 <link rel="stylesheet" href="css/thai.css?v=111">
 <link rel="stylesheet" href="css/ornate.css?v=111">
 <link rel="stylesheet" href="css/palace.css?v=111">
-<link rel="stylesheet" href="css/systems.css?v=123">
+<link rel="stylesheet" href="css/systems.css?v=190">
 <link rel="stylesheet" href="css/warpgrid.css?v=159">
 <link rel="stylesheet" href="css/auth.css?v=111">
 <link rel="stylesheet" href="css/pastel.css?v=111">
@@ -22,6 +22,20 @@
 <link rel="stylesheet" href="css/chatglass.css?v=111">
 <link rel="stylesheet" href="css/hudname.css?v=111">
 <link rel="stylesheet" href="css/sunlit.css?v=111">
+<link rel="stylesheet" href="css/charcard221.css?v=222">
+<link rel="stylesheet" href="css/login233.css?v=244">
+<link rel="stylesheet" href="css/phi237.css?v=245">
+<link rel="stylesheet" href="css/eqstyle245.css?v=246">
+<!-- (v188) opened without its folders (index.html double-clicked inside the zip, or only some files uploaded): no CSS loads,
+     so the "turn your device" notice showed as a giant icon. Keep it hidden without CSS, and say what to do instead. -->
+<style>.rotate{display:none}#filesMissing{display:none}</style>
+<script>addEventListener('load', function(){ var r = document.getElementById('rotate'); if (r && getComputedStyle(r).position === 'fixed') return;   /* css/hud.css loaded */
+  var d = document.getElementById('filesMissing'); if (d) d.style.cssText = 'display:block;max-width:640px;margin:60px auto;padding:24px 28px;font:16px/1.7 sans-serif;color:#222;background:#fff7e0;border:2px solid #d9a441;border-radius:14px'; });</script>
+<div id="filesMissing" role="alert"><b>เปิดเกมไม่ได้: ไฟล์เกมไม่ครบ</b><br>
+  หน้านี้หาโฟลเดอร์ <code>css</code> และ <code>js</code> ไม่เจอ<br>
+  · ถ้าเปิดจากไฟล์ zip: คลิกขวาที่ไฟล์ zip → <b>แตกไฟล์ทั้งหมด (Extract All)</b> แล้วเปิด <code>index.html</code> ในโฟลเดอร์ที่แตกออกมา<br>
+  · ถ้าเป็นเว็บ: อัปขึ้นให้ครบทั้งโฟลเดอร์ (<code>index.html</code> คู่กับ <code>assets</code> <code>audio</code> <code>css</code> <code>js</code>)<br><br>
+  <small>Game files are missing: extract the whole zip (Extract All) and open index.html from the extracted folder, or upload the whole folder.</small></div>
 <div class="rotate" id="rotate" role="alert">
   <div class="rot-card">
     <svg class="rot-ic" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="8" width="24" height="44" rx="4"/><path d="M29 46h6"/><path d="M50 22a18 18 0 016 14M56 36l-4-3M56 36l3-4"/></svg>
@@ -30,7 +44,7 @@
   </div>
 </div>
 <div class="app">
-  <header class="top"><h1>VAYRATHEN</h1><span class="thai"><span data-en="Realm of Vayra">อาณาจักรวายรา</span></span><span class="sub"><span data-en="Prototype 0.3 · Suwannin Fields · EXP x2 · Job x2">Prototype 0.3 · ทุ่งสุวรรณิน · EXP x2 · Job x2</span></span></header>
+  <header class="top"><h1>VAYRATHEN</h1><span class="thai"><span data-en="Realm of Vayra">อาณาจักรวายรา</span></span><span class="sub"><span data-en="Prototype 0.3 · Suwannin Fields · EXP x1 · Job x1">Prototype 0.3 · ทุ่งสุวรรณิน · EXP x1 · Job x1</span></span></header>
   <div class="stage" id="wrap">
     <canvas id="cv" aria-label="แผนที่เกม ทุ่งสุวรรณิน" data-en-label="Game map, Suwannin Fields"></canvas>
     <div class="ui" id="ui">
@@ -136,7 +150,7 @@
 
 <!-- scripts load in dependency order: gfx → core → data → world → game → render → ui → main -->
 <script>globalThis.__SPR_DOM = true;</script>
-<script src="js/gfx/sprites.js?v=184"></script>
+<script src="js/gfx/sprites.js?v=221"></script>
 <script src="js/gfx/beasts.js?v=164"></script>
 <script src="js/gfx/variety.js?v=158"></script>
 <script src="js/gfx/dinos.js?v=151"></script>
@@ -144,26 +158,28 @@
 <script src="js/gfx/themepal.js?v=128"></script>
 
 <script src="js/gfx/art.js?v=111"></script>
-<script src="js/core/util.js?v=111"></script>
+<script src="js/core/util.js?v=192"></script>
 <script src="js/core/rotate.js?v=111"></script>
 <script src="js/core/i18n.js?v=111"></script>
-<script src="js/core/sfx.js?v=184"></script>
-<script src="js/data/elements.js?v=184"></script>
+<script src="js/core/sfx.js?v=188"></script>
+<script src="js/data/elements.js?v=230"></script>
 <script src="js/data/jobs.js?v=166"></script>
 <script src="js/data/monsters.js?v=111"></script>
-<script src="js/data/items.js?v=111"></script>
+<script src="js/data/items.js?v=241"></script>
 <script src="js/data/world3.js?v=111"></script>
 <script src="js/data/world4.js?v=151"></script>
 <script src="js/data/world.js?v=151"></script>
 <script src="js/data/lore.js?v=151"></script>
-<script src="js/data/gear.js?v=187"></script>
+<script src="js/data/gear.js?v=194"></script>
 <script src="js/data/quests.js?v=111"></script>
 <script src="js/game/state.js?v=184"></script>
 <script src="js/world/props.js?v=111"></script>
 <script src="js/world/props2.js?v=111"></script>
 <script src="js/world/village2.js?v=111"></script>
+<script src="js/world/shops212.js?v=212"></script>
+<script src="js/world/shops213.js?v=214"></script>
 <script src="js/world/arenbloom.js?v=111"></script>
-<script src="js/world/terrain.js?v=111"></script>
+<script src="js/world/terrain.js?v=221"></script>
 <script src="js/world/physics.js?v=111"></script>
 <script src="js/world/maps.js?v=156"></script>
 <script src="js/world/water2.js?v=152"></script>
@@ -172,8 +188,8 @@
 <script src="js/world/lava2.js?v=111"></script>
 <script src="js/world/biome3.js?v=111"></script>
 <script src="js/world/ground2.js?v=157"></script>
-<script src="js/game/mobs.js?v=111"></script>
-<script src="js/game/combat.js?v=184"></script>
+<script src="js/game/mobs.js?v=220"></script>
+<script src="js/game/combat.js?v=242"></script>
 <script src="js/game/skills.js?v=184"></script>
 <script src="js/game/items.js?v=111"></script>
 <script src="js/game/loot.js?v=111"></script>
@@ -183,17 +199,17 @@
 <script src="js/game/effects.js?v=132"></script>
 <script src="js/render/vfx.js?v=164"></script>
 <script src="js/sys/stdfont.js?v=111"></script>
-<script src="js/render/render.js?v=133"></script>
+<script src="js/render/render.js?v=218"></script>
 <script src="js/render/namecache.js?v=111"></script>
 <script src="js/sys/mobscale.js?v=111"></script>
 <script src="js/game/perf.js?v=111"></script>
 <script src="js/ui/input.js?v=111"></script>
-<script src="js/ui/npc.js?v=184"></script>
+<script src="js/ui/npc.js?v=241"></script>
 <script src="js/ui/equip.js?v=184"></script>
 <script src="js/ui/worldmap.js?v=161"></script>
 <script src="js/net/firebase-config.js?v=184"></script>
 <script src="js/net/firebase-shim.js?v=185"></script>
-<script src="js/net/online.js?v=186"></script>
+<script src="js/net/online.js?v=189"></script>
 <script src="js/ui/icons.js?v=184"></script>
 <script src="js/ui/skicons2.js?v=161"></script>
 <script src="js/ui/itemart.js?v=184"></script>
@@ -201,16 +217,16 @@
 <script src="js/ui/warpgrid.js?v=154"></script>
 <script src="js/ui/bag.js?v=184"></script>
 <script src="js/ui/cards.js?v=111"></script>
-<script src="js/ui/wiki.js?v=111"></script>
-<script src="js/ui/hud.js?v=184"></script>
-<script src="js/ui/menu.js?v=185"></script>
-<script src="js/ui/keys.js?v=111"></script>
+<script src="js/ui/wiki.js?v=243"></script>
+<script src="js/ui/hud.js?v=239"></script>
+<script src="js/ui/menu.js?v=194"></script>
+<script src="js/ui/keys.js?v=189"></script>
 <script src="js/ui/joystick.js?v=111"></script>
-<script src="js/game/save.js?v=111"></script>
+<script src="js/game/save.js?v=236"></script>
 <script src="js/sys/core.js?v=111"></script>
 <script src="js/net/maproute.js?v=185"></script>
 <script src="js/sys/hooks.js?v=111"></script>
-<script src="js/sys/rarity.js?v=111"></script>
+<script src="js/sys/rarity.js?v=193"></script>
 <script src="js/sys/account.js?v=111"></script>
 <script src="js/sys/costume.js?v=111"></script>
 <script src="js/sys/achieve.js?v=111"></script>
@@ -219,11 +235,11 @@
 <script src="js/sys/story.js?v=111"></script>
 <script src="js/sys/craft.js?v=111"></script>
 <script src="js/sys/guild.js?v=111"></script>
-<script src="js/sys/trade.js?v=111"></script>
-<script src="js/sys/wboss.js?v=185"></script>
+<script src="js/sys/trade.js?v=188"></script>
+<script src="js/sys/wboss.js?v=193"></script>
 <script src="js/sys/wboss2.js?v=111"></script>
 <script src="js/sys/netmob.js?v=185"></script>
-<script src="js/sys/dungeon.js?v=111"></script>
+<script src="js/sys/dungeon.js?v=193"></script>
 <script src="js/sys/pvp.js?v=111"></script>
 <script src="js/sys/social2.js?v=111"></script>
 <script src="js/sys/tutorial.js?v=111"></script>
@@ -236,22 +252,22 @@
 <script src="js/sys/world2.js?v=111"></script>
 <script src="js/sys/ambience.js?v=111"></script>
 <script src="js/sys/netboss.js?v=185"></script>
-<script src="js/sys/costume2.js?v=149"></script>
+<script src="js/sys/costume2.js?v=193"></script>
 <script src="js/world/falls.js?v=111"></script>
 <script src="js/sys/cosx.js?v=111"></script>
-<script src="js/sys/events.js?v=111"></script>
-<script src="js/sys/festivals2.js?v=111"></script>
+<script src="js/sys/events.js?v=213"></script>
+<script src="js/sys/festivals2.js?v=213"></script>
 <script src="js/sys/siege.js?v=111"></script>
 <script src="js/sys/guildwar.js?v=111"></script>
 <script src="js/sys/house.js?v=111"></script>
 <script src="js/sys/backup.js?v=111"></script>
-<script src="js/sys/thumbs.js?v=123"></script>
-<script src="js/sys/smith.js?v=184"></script>
+<script src="js/sys/thumbs.js?v=198"></script>
+<script src="js/sys/smith.js?v=190"></script>
 <script src="js/sys/starter.js?v=161"></script>
 <script src="js/sys/balance.js?v=111"></script>
 <script src="js/sys/grandfx.js?v=111"></script>
 <script src="js/sys/camp.js?v=111"></script>
-<script src="js/sys/bgm.js?v=182"></script>
+<script src="js/sys/bgm.js?v=188"></script>
 <script src="js/sys/talkbtn.js?v=111"></script>
 <script src="js/sys/camp2.js?v=111"></script>
 <script src="js/sys/fishing.js?v=111"></script>
@@ -260,15 +276,15 @@
 <script src="js/sys/tamed.js?v=111"></script>
 <script src="js/sys/aqua.js?v=111"></script>
 <script src="js/sys/hands.js?v=111"></script>
-<script src="js/sys/slots.js?v=159"></script>
+<script src="js/sys/slots.js?v=190"></script>
 <script src="js/sys/party.js?v=111"></script>
 <script src="js/sys/refinefx.js?v=167"></script>
 <script src="js/sys/visual.js?v=111"></script>
-<script src="js/sys/statfix.js?v=111"></script>
+<script src="js/sys/statfix.js?v=241"></script>
 <script src="js/sys/cute.js?v=157"></script>
 <script src="js/sys/dummy.js?v=111"></script>
-<script src="js/sys/dlgmove.js?v=162"></script>
-<script src="js/sys/dlgmorph.js?v=111"></script>
+<script src="js/sys/dlgmove.js?v=238"></script>
+<script src="js/sys/dlgmorph.js?v=192"></script>
 <script src="js/sys/compare.js?v=111"></script>
 <script src="js/sys/buyqty.js?v=184"></script>
 <script src="js/sys/statup.js?v=111"></script>
@@ -304,7 +320,7 @@
 <script src="js/sys/joyfit.js?v=146"></script>
 <script src="js/sys/joylay.js?v=112"></script>
 <script src="js/sys/gmlock.js?v=111"></script>
-<script src="js/sys/auth.js?v=111"></script>
+<script src="js/sys/auth.js?v=240"></script>
 <script src="js/sys/healer.js?v=111"></script>
 <script src="js/sys/wincenter.js?v=111"></script>
 <script src="js/sys/ridefight.js?v=111"></script>
@@ -320,9 +336,9 @@
 <script src="js/sys/sockets.js?v=126"></script>
 <script src="js/sys/classlines.js?v=166"></script>
 <script src="js/sys/wardrobe2.js?v=111"></script>
-<script src="js/sys/fashion30.js?v=111"></script>
+<script src="js/sys/fashion30.js?v=198"></script>
 <script src="js/sys/resetpts.js?v=111"></script>
-<script src="js/sys/portrait.js?v=111"></script>
+<script src="js/sys/portrait.js?v=221"></script>
 <script src="js/sys/statdetail.js?v=111"></script>
 <script src="js/sys/npclook.js?v=111"></script>
 <script src="js/sys/npcspace.js?v=111"></script>
@@ -335,7 +351,7 @@
 <script src="js/sys/warpgate.js?v=111"></script>
 <script src="js/sys/tgtstatus.js?v=111"></script>
 <script src="js/sys/partyfind.js?v=111"></script>
-<script src="js/sys/endgame.js?v=160"></script>
+<script src="js/sys/endgame.js?v=230"></script>
 <script src="js/sys/autofix.js?v=111"></script>
 <script src="js/sys/partyassist.js?v=111"></script>
 <script src="js/sys/hudfit.js?v=138"></script>
@@ -353,7 +369,7 @@
 <script src="js/sys/bagplus.js?v=111"></script>
 <script src="js/sys/menutrim.js?v=111"></script>
 <script src="js/sys/textoutline.js?v=111"></script>
-<script src="js/sys/sunread.js?v=111"></script>
+<script src="js/sys/sunread.js?v=244"></script>
 <script src="js/sys/steady.js?v=111"></script>
 <script src="js/sys/equip6.js?v=111"></script>
 <script src="js/sys/skshout.js?v=111"></script>
@@ -363,10 +379,10 @@
 <script src="js/sys/cards8.js?v=111"></script>
 <script src="js/sys/pets3.js?v=111"></script>
 <script src="js/sys/petevo.js?v=111"></script>
-<script src="js/sys/gear10.js?v=111"></script>
+<script src="js/sys/gear10.js?v=190"></script>
 <script src="js/sys/balance30.js?v=111"></script>
 <script src="js/sys/zonesets.js?v=111"></script>
-<script src="js/sys/classswap.js?v=184"></script>
+<script src="js/sys/classswap.js?v=218"></script>
 <script src="js/sys/advbook.js?v=111"></script>
 <script src="js/sys/camp3.js?v=111"></script>
 <script src="js/sys/campround.js?v=111"></script>
@@ -375,12 +391,13 @@
 <script src="js/sys/w4camp.js?v=158"></script>
 <script src="js/sys/nohouse.js?v=159"></script>
 <script src="js/sys/authsec.js?v=111"></script>
-<script src="js/sys/winfit.js?v=132"></script>
+<script src="js/sys/winfit.js?v=238"></script>
 <script src="js/sys/bosshard.js?v=111"></script>
 <script src="js/sys/tgticons.js?v=111"></script>
 <script src="js/sys/tgtframe.js?v=111"></script>
 <script src="js/sys/sktone.js?v=111"></script>
 <script src="js/sys/backcute.js?v=111"></script>
+<script src="js/sys/fashion194.js?v=198"></script>
 <script src="js/sys/bossshout.js?v=155"></script>
 <script src="js/sys/shieldfx.js?v=111"></script>
 <script src="js/world/villagenpc.js?v=111"></script>
@@ -398,20 +415,21 @@
 <script src="js/sys/login.js?v=111"></script>
 <script src="js/sys/lfgplus.js?v=111"></script>
 <script src="js/sys/mkplus.js?v=111"></script>
-<script src="js/sys/itemtip.js?v=148"></script>
+<script src="js/sys/itemtip.js?v=192"></script>
 <script src="js/sys/hands2.js?v=184"></script>
-<script src="js/sys/tower.js?v=111"></script>
+<script src="js/sys/tower.js?v=193"></script>
 <script src="js/sys/mail.js?v=166"></script>
 <script src="js/sys/towerweek.js?v=111"></script>
 <script src="js/sys/towerparty.js?v=111"></script>
-<script src="js/sys/featureoff.js?v=129"></script>
-<script src="js/main.js?v=111"></script>
+<script src="js/sys/festival213.js?v=213"></script>
+<script src="js/sys/featureoff.js?v=213"></script>
+<script src="js/main.js?v=236"></script>
 <script src="js/sys/smooth3.js?v=111"></script>
-<script src="js/sys/perf4.js?v=111"></script>
-<script src="js/sys/touchequip.js?v=184"></script>
+<script src="js/sys/perf4.js?v=222"></script>
+<script src="js/sys/touchequip.js?v=237"></script>
 <script src="js/sys/bia.js?v=111"></script>
-<script src="js/sys/touchsize.js?v=132"></script>
-<script src="js/sys/bagsub.js?v=115"></script>
+<script src="js/sys/touchsize.js?v=188"></script>
+<script src="js/sys/bagsub.js?v=194"></script>
 <script src="js/sys/skillfx2.js?v=116"></script>
 <script src="js/sys/jobfx.js?v=126"></script>
 <script src="js/sys/tutfold.js?v=127"></script>
@@ -431,9 +449,9 @@
 <script src="js/sys/tapsize.js?v=112"></script>
 <script src="js/sys/tipcompact.js?v=153"></script>
 <script src="js/sys/w4test.js?v=151"></script>
-<script src="js/sys/weapons2.js?v=159"></script>
-<script src="js/sys/skills8.js?v=166"></script>
-<script src="js/sys/sheath.js?v=162"></script>
+<script src="js/sys/weapons2.js?v=208"></script>
+<script src="js/sys/skills8.js?v=209"></script>
+<script src="js/sys/sheath.js?v=196"></script>
 <script src="js/sys/styleopts.js?v=160"></script>
 <script src="js/sys/chatemo.js?v=160"></script>
 <script src="js/sys/cardlazy.js?v=160"></script>
@@ -441,14 +459,14 @@
 <script src="js/sys/drops2.js?v=159"></script>
 <script src="js/sys/bag100.js?v=166"></script>
 <script src="js/sys/chatsimple.js?v=159"></script>
-<script src="js/sys/npctable.js?v=162"></script>
+<script src="js/sys/npctable.js?v=189"></script>
 <script src="js/sys/newlines.js?v=184"></script>
-<script src="js/sys/newlines2.js?v=184"></script>
+<script src="js/sys/newlines2.js?v=196"></script>
 <script src="js/sys/sfxsamples.js?v=185"></script>
 <script src="js/sys/twohand2.js?v=177"></script>
 <script src="js/sys/botgate.js?v=180"></script>
 <script src="js/sys/skilluniq.js?v=183"></script>
-<script src="js/sys/shuriken.js?v=184"></script>
+<script src="js/sys/shuriken.js?v=190"></script>
 <script src="js/sys/nanguard.js?v=184"></script>
 <script src="js/sys/sharp.js?v=186"></script>
 <script src="js/sys/livequota.js?v=186"></script>
@@ -458,3 +476,54 @@
 <script src="js/sys/bossact.js?v=166"></script>
 <script src="js/sys/stylecal.js?v=165"></script>
 <script src="js/sys/nofl.js?v=160"></script>
+<script src="js/sys/economy.js?v=192"></script>
+<script src="js/sys/balance192.js?v=209"></script>
+<script src="js/sys/mobs192.js?v=241"></script>
+<script src="js/sys/boss192.js?v=207"></script>
+<script src="js/sys/linefx192.js?v=192"></script>
+<script src="js/sys/ranger193.js?v=193"></script>
+<script src="js/sys/ninja195.js?v=196"></script>
+<script src="js/sys/skillfix199.js?v=199"></script>
+<script src="js/sys/rune200.js?v=202"></script>
+<script src="js/sys/grandfx200.js?v=202"></script>
+<script src="js/sys/rogmer203.js?v=203"></script>
+<script src="js/sys/blademuay204.js?v=204"></script>
+<script src="js/sys/catdog205.js?v=205"></script>
+<script src="js/sys/last3206.js?v=206"></script>
+<script src="js/sys/skill5_209.js?v=209"></script>
+<script src="js/data/mapstory_east.js?v=214"></script>
+<script src="js/data/mapstory_south.js?v=214"></script>
+<script src="js/data/mapstory_west.js?v=215"></script>
+<script src="js/data/mapstory_north.js?v=217"></script>
+<script src="js/sys/mapstory212.js?v=218"></script>
+<script src="js/world/towns216.js?v=219"></script>
+<script src="js/ui/qguide218.js?v=218"></script>
+<script src="js/ui/storytalk220.js?v=220"></script>
+<script src="js/sys/heavyhit220.js?v=222"></script>
+<script src="js/sys/autoquest220.js?v=220"></script>
+<script src="js/world/townlife221.js?v=222"></script>
+<script src="js/sys/marketgear221.js?v=221"></script>
+<script src="js/world/npcclear222.js?v=222"></script>
+<script src="js/world/towermap223.js?v=235"></script>
+<script src="js/sys/towerbal224.js?v=224"></script>
+<script src="js/sys/balance225.js?v=225"></script>
+<script src="js/sys/towerfloors226.js?v=226"></script>
+<script src="js/sys/towershop227.js?v=227"></script>
+<script src="js/sys/towerlore228.js?v=228"></script>
+<script src="js/sys/fixes229.js?v=229"></script>
+<script src="js/sys/sizepot231.js?v=231"></script>
+<script src="js/world/towermon232.js?v=232"></script>
+<script src="js/sys/login234.js?v=235"></script>
+<script src="js/sys/tower235.js?v=236"></script>
+<script src="js/sys/mobstatus236.js?v=236"></script>
+<script src="js/sys/finder236.js?v=236"></script>
+<script src="js/sys/jobfix236.js?v=236"></script>
+<script src="js/sys/phi237.js?v=239"></script>
+<script src="js/sys/death241.js?v=241"></script>
+<script src="js/sys/cleave242.js?v=242"></script>
+<script src="js/sys/bossrange242.js?v=243"></script>
+<script src="js/sys/moblay244.js?v=244"></script>
+<script src="js/sys/fashfix244.js?v=245"></script>
+<script src="js/sys/caps193.js?v=193"></script>
+<script src="js/sys/cards193.js?v=194"></script>
+<script src="js/sys/keepscroll.js?v=192"></script>

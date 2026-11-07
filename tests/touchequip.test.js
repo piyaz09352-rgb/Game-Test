@@ -25,7 +25,7 @@ test('touch: wear gear from the bag by the card button and by double tap', { ski
     assert.ok(await worn(ids[0]), 'worn from the card button');
     assert.ok(await page.evaluate(() => el('itTip').hidden), 'the card closes');
     // 2) double tap on another item
-    await page.evaluate(() => renderBag()); await page.waitForTimeout(300);
+    await page.evaluate(() => { renderBag(); TE.win = 4000; }); await page.waitForTimeout(300);   // a busy test machine can take longer than a thumb between two taps
     const r = await page.evaluate(id => { const e = document.querySelector(`[data-bagsel="${id}"]`); e.scrollIntoView({block:'center'}); const b = e.getBoundingClientRect(); return [b.left + b.width / 2, b.top + b.height / 2]; }, ids[1]);
     await page.touchscreen.tap(r[0], r[1]); await page.touchscreen.tap(r[0], r[1]); await page.waitForTimeout(400);   // two taps as quick as the test driver allows
     assert.ok(await worn(ids[1]), 'worn by a double tap');

@@ -121,7 +121,7 @@ const NL_LOOK = {
   bangkaew:['houndknight', {name:'อัศวินบางแก้ว', en:'Bangkaew Paladin', hair:'hairWhite', sideMat:'hairChestnut', tail:'hairWhite', top:'ivory', sleeve:'ivory', pauldron:'gold', cape:'scarlet', capeTex:'gold',
     shield:['gold', 'ivory', 'gold', 1.12, 'scarlet'], aura:'auraGold', topTex:nlTrim('ivory', 'gold', 'gold'), ...NL_WRAP('ivory', 'gold', 'gold', 'scarlet', {pauldron:'gold'}), faceFur:'hairWhite', muzzle:'white'}],
   ninja:['rogue', {name:'นินจา', en:'Ninja', hair:'hairBlack', iris:'irisBr', top:'charcoal', sleeve:'charcoal', forearm:'charcoal', handWrap:'charcoal', pants:'charcoal', boots:'charcoal', bootCuff:'scarlet', belt:'scarlet',
-    ninjaMask:'charcoal', hat:'band', bandMat:'steel', twin:false, weapon:'shuriken', shield:null, katana:false, aura:'auraWhite', topTex:nlTrim('charcoal', 'scarlet')}],
+    hat:'band', bandMat:'steel', twin:false, weapon:'shuriken', shield:null, katana:false, aura:'auraWhite', topTex:nlTrim('charcoal', 'scarlet')}],
   shinobi:['ninja', {name:'นินจาเงา', en:'Shadow Shinobi', top:'midnight', sleeve:'midnight', pants:'midnight', bootCuff:'navy', belt:'navy', bandMat:'navy', cape:'scarlet', topTex:nlTrim('midnight', 'navy')}],
   kage:['shinobi', {name:'จอมนินจาคาเงะ', en:'Kage', top:'charcoal', sleeve:'charcoal', pants:'charcoal', belt:'gold', bandMat:'gold', cape:'charcoal', capeTex:'gold', hair:'hairCrimson', aura:'auraWhite', topTex:nlTrim('charcoal', 'gold', 'gold')}]
 };
@@ -138,7 +138,7 @@ for (const [j, [b, o]] of Object.entries(NL_LOOK)){ const base = SPR.CHARS[b]; i
       cfg.twoHand = wi && wi.st ? wi.st.hands === '2h' : !!base.twoHand; }
     if (line === 'catfolk' && !cfg.glove && !(wi && wi.st && wi.st.claw)){ cfg.fistClaw = base.fistClaw; cfg.clawTier = base.clawTier; }
     if (line === 'catfolk' && job !== 'catqueen'){ cfg.earMat = cfg.hair; if (job === 'catfolk') cfg.tail = cfg.hair; }
-    if (base.ninjaMask) cfg.ninjaMask = base.ninjaMask;   // a look or a hat must not take the ninja's mask off
+    // (v196) the ninja no longer wears a mouth cloth of its own: it is a face piece in the wardrobe (sys/fashion194.js)
     if (line === 'catfolk' || line === 'dogfolk'){   // the wrap stays on whatever is worn, and the face follows the hair (Siamese and Bangkaew keep their own coat)
       for (const k of ['top', 'sleeve', 'forearm', 'pants', 'baggy', 'sandals', 'boots', 'bootCuff', 'belt', 'pauldron', 'armband']) if (!(k === 'top' && cfg.cosTop)) cfg[k] = base[k];
       cfg.cape = null; cfg.skirt = null; cfg.chest = null; cfg.topTex = cfg.lashes ? base.topTexF : base.topTex;

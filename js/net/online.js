@@ -136,7 +136,16 @@ function drawGhostTags(){
   }
   if (P.sayT > T && P.say) nameTag(sx(P.x), (P.tagTop != null ? P.tagTop : sy(P.y - 60)) - 4 * TAG_Z(), P.say, '#fff', 'rgba(40,30,20,.88)');
 }
-function ghostAt(p){ for (const gh of NET.ghosts.values()) if (!(typeof gmHidden === 'function' && gmHidden(gh)) && Math.hypot(p.x - gh.x, p.y - 20 - gh.y) < 18) return gh; return null; }
+/* (v188) the hero under a tap: the whole body counts (feet to the top of the head), at least ~30 screen px on a touch
+   screen whatever the zoom, and the closest hero wins when two stand together (it used to be an 18-unit circle on the
+   chest, first match: easy to miss, so the player card with its Trade button often did not open) */
+function ghostAt(p){ const touch = typeof GFX !== 'undefined' && GFX.touch, slop = Math.max(touch ? 8 : 3, (touch ? 30 : 16) / (PX || 2));
+  let best = null, bd = 1e9;
+  for (const gh of NET.ghosts.values()){ if (typeof gmHidden === 'function' && gmHidden(gh)) continue;
+    const dx = Math.abs(p.x - gh.x), dy = p.y - gh.y;
+    if (dx > 12 + slop || dy < -44 - slop || dy > 6 + slop) continue;
+    const d = Math.hypot(dx, dy + 20); if (d < bd){ bd = d; best = gh; } }
+  return best; }
 
 /* ---------- chat ---------- */
 function onChat(msg){
@@ -291,5 +300,9 @@ document.addEventListener('click', e => {
 document.addEventListener('change', e => { if (e.target.id === 'importFile' && e.target.files[0]){ importSave(e.target.files[0]); e.target.value = ''; } });
 document.addEventListener('keydown', e => {
   const inp = el('chatIn'); if (!inp) return;
-  if (e.target === inp){ e.stopPropagation(); if (e.key === 'Enter' && !e.isComposing){ e.preventDefault(); chatSubmit(); } if (e.key === 'Escape') inp.blur(); return; }
+  if (e.target === inp){ e.stopPropagation();
+    if (e.key === 'Enter' && !e.isComposing){ e.preventDefault();
+      if (!inp.value.trim()){ inp.value = ''; inp.blur(); if (typeof chatSet === 'function') chatSet(false); return; }   // (v189) Enter on an empty box closes the chat again
+      chatSubmit(); }
+    if (e.key === 'Escape') inp.blur(); return; }
 }, true);

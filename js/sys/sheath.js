@@ -30,6 +30,7 @@ if (typeof drawWings === 'function'){ const _dw = drawWings;
   drawWings = function(g, id, x, y, dir, t, o = {}){
     const away = dir >= 3 && dir <= 5, mine = typeof P !== 'undefined' && typeof cam !== 'undefined' && Math.abs(x - (P.x - cam.x)) < 2 && Math.abs(y - (P.y - cam.y)) < 2;
     if (!(away && mine && o.part === 'front' && (SHEATH.on || P.ride) && sheathBack())) return _dw.apply(this, arguments);
+    { const W = typeof wingDef === 'function' && wingDef(id); if (W && W.tech) return _dw.apply(this, arguments); }   // (v196) a jetpack, reactor or other back piece is drawn whole, over the stowed weapon (it was cut open down the middle)
     const k = o.scale || 1, top = y - (o.ride ? 44 : 29) * k, bot = y - (o.ride ? 14 : 4) * k, hw = 6.5 * k;
     g.save(); g.beginPath(); g.rect(-1e4, -1e4, 2e4, 2e4); g.rect(x - hw, top, hw * 2, bot - top); g.clip('evenodd');
     try { return _dw.apply(this, arguments); } finally { g.restore(); } }; }

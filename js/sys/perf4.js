@@ -31,7 +31,7 @@ function pf4Scan(){
 }
 /* the full-screen flash (crits, level ups, skills) blinks the whole picture: drop it */
 if (typeof VFX !== 'undefined' && VFX.drawFlash) VFX.drawFlash = () => {};
-pf4Scan(); setTimeout(pf4Scan, 3000); setTimeout(pf4Scan, 15000);   // systems add their own <style> as they load and open
+pf4Scan(); { const idle = f => (window.requestIdleCallback ? requestIdleCallback(f, {timeout:2000}) : f()); setTimeout(() => idle(pf4Scan), 3000); setTimeout(() => idle(pf4Scan), 15000); }   // (v221) the later scans wait for idle time   // systems add their own <style> as they load and open
 
 /* ---------- 3. phones: a lighter canvas at the sharp presets ---------- */
 if (typeof GFX !== 'undefined' && GFX.touch){
@@ -47,7 +47,8 @@ const pf4Cap = () => { const s = typeof SETTINGS !== 'undefined' ? SETTINGS.fpsC
 if (typeof frame === 'function'){
   const _fr = frame; let lastDraw = 0;
   frame = function(ts){
-    const cap = pf4Cap();
+    // (v221) behind the title / login card the world is only a blurred backdrop and the game is paused: 8 frames a second is plenty
+    const tt = PAUSED && document.getElementById('title'), cap = tt && !tt.hidden ? 8 : pf4Cap();
     // skip this refresh when it comes too soon (a little slack so a 60 Hz screen lands on every second refresh)
     if (cap && !document.hidden && ts - lastDraw < 1000 / cap - 4){ requestAnimationFrame(frame); return; }
     lastDraw = ts; return _fr.apply(this, arguments);

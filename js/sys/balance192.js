@@ -1,0 +1,31 @@
+/* VAYRATHEN — js/sys/balance192.js — (v192) every class line hunts at about the same pace
+   Measured with tools/balance-report.js (Auto plays each line at Lv 15 · 45 · 80 · 115 on a same-level map): the
+   casters killed a third to two thirds as fast as the average and the hunter half again as fast late on. Each line's
+   damage (normal attacks and skills, everything that goes through physDamage / magicDamage) is scaled by its job tier.
+   Damage was not what held the casters back: the report showed them casting 20–46% of the time and waiting out the
+   1.5 s delay after every area spell (physical ones wait 0.8 s), so their cast time and after-cast delay are shortened.
+   1 = unchanged. Re-run the report after any change. */
+'use strict';
+const LINE_POW = {   // [tier 1 (Lv <40), tier 2, tier 3, tier 4]
+  blade:[.88, .88, .7, .88], rune:[1.6, 1.1, 1.12, 1.1], ranger:[.62, 1.05, 1.42, 1.4], muay:[.88, .8, 1.02, .82],
+  healer:[1.9, 1.4, 1.4, 1.02], rogue:[1.05, 1.15, 1.55, 1.5], summoner:[2.6, 1.45, 1.15, .75], occult:[3.3, 1.5, 1.4, 1.4],
+  merchant:[.82, .82, 1.02, .95], catfolk:[.85, .58, .72, .92], dogfolk:[.9, .74, .68, .88], ninja:[.52, 1.35, 1.45, 1.5]
+};
+function linePow(){
+  const ch = jobChain(), line = ch[1]; if (!line || !LINE_POW[line]) return 1;
+  return LINE_POW[line][Math.min(3, Math.max(0, ch.length - 2))] || 1;
+}
+{ const _p = physDamage; physDamage = function(){ const r = _p.apply(this, arguments); if (r && r.dmg > 0) r.dmg = Math.max(1, Math.round(r.dmg * linePow())); return r; }; }
+{ const _m = magicDamage; magicDamage = function(){ const r = _m.apply(this, arguments); if (r && r.dmg > 0) r.dmg = Math.max(1, Math.round(r.dmg * linePow())); return r; }; }
+const LINE_CAST = {rune:[.45, .5, .6, .6], healer:[.55, .55, .55, .55], occult:[.4, .5, .5, .5], summoner:[.8, .8, 1, 1]};   // cast time × by tier
+const LINE_ACD = {rune:[.5, .55, .6, .6], healer:[.55, .55, .55, .55], occult:[.45, .5, .5, .5], summoner:[.8, .8, 1, 1]};    // after-cast delay × by tier
+{ const _d = derive; derive = function(){ const r = _d.apply(this, arguments); const ch = jobChain(), line = ch[1], ti = Math.min(3, Math.max(0, ch.length - 2));
+    if (DER && line){ if (LINE_CAST[line]) DER.castMul *= LINE_CAST[line][ti]; if (LINE_ACD[line]) DER.acdMul = (DER.acdMul || 1) * LINE_ACD[line][ti]; }
+    return r; }; }
+/* (v198) SP cost × by tier: the report showed the hexer at Lv 15 limited by SP, not damage (most SP potions of any
+   line, little time casting), so its skills cost less SP while it is still on its first job */
+const LINE_SP = {occult:[.6, 1, 1, 1]};
+for (const id in SKILLS){ const sk = SKILLS[id], ln = typeof NL_LINE_OF !== 'undefined' && NL_LINE_OF[sk.job]; if (!ln || !LINE_SP[ln] || typeof sk.sp !== 'function' || sk._spLine) continue;
+  const o = sk.sp; sk._spLine = 1; sk.sp = lv => { const ch = jobChain(), ti = Math.min(3, Math.max(0, ch.length - 2)); return ch[1] === ln ? Math.max(1, Math.round(o(lv) * LINE_SP[ln][ti])) : o(lv); }; }
+/* (v209) summoned beasts hit harder for the summoner line (its own spells barely matter: the beasts do the killing) */
+{ const _d = derive; derive = function(){ const r = _d.apply(this, arguments); if (DER && DER.pas && jobChain()[1] === 'summoner') DER.pas.sumAtk = (DER.pas.sumAtk || 0) + .9; return r; }; }

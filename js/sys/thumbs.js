@@ -15,6 +15,7 @@ const cthKind = id => (typeof WINGS !== 'undefined' && WINGS[id] ? 'wing' : type
 function cthKey(id){
   const k = cthKind(id); if (!k) return null;
   if (k === 'mount' || k === 'pet') return id + (k === 'mount' ? '|' + S.job + '|' + SPR.lookKey(S.look) : '');
+  if (k === 'mask') return `${id}|${S.job}|${SPR.lookKey(S.look)}|z3`;   // (v198) face pieces drawn close up, without the weapon
   return `${id}|${S.job}|${SPR.lookKey(S.look)}|${cthWeapon()}`;
 }
 /* portraits show the hero in plain clothes with their weapon, so wearing or changing gear never re-renders them */
@@ -58,12 +59,13 @@ function cthRender(id){
     g.beginPath(); g.moveTo(x - r * 3, y); g.lineTo(x, y + r * .7); g.lineTo(x + r * 3, y); g.lineTo(x, y - r * .7); g.closePath(); g.fill(); } }
   return c.toDataURL('image/png');
 }
-function cthApply(node, url){ node.style.backgroundImage = `url(${url})`; node.classList.add('th'); node.dataset.thk = node.dataset.cthk; }
+function cthApply(node, url){ node.style.backgroundImage = `url(${url})`; node.classList.add('th'); node.classList.remove('slt');   // (v194) the bright-theme pass may have lit the dark swatch before the picture came: that hid it
+  node.dataset.thk = node.dataset.cthk; }
 /* cache: in memory, and kept in this browser so reopening the wardrobe is instant */
 const CTH_LS = 'vay-cth-v4';   // (v123) v3 kept pictures drawn before some wing kinds existed: blank cards — start fresh
 try { localStorage.removeItem('vay-cth-v3'); } catch (e) {}
 try { const o = JSON.parse(localStorage.getItem(CTH_LS) || '{}'); for (const k in o) CTH.cache.set(k, o[k]); } catch (e) {}
-function cthSave(){ clearTimeout(CTH.saveT); CTH.saveT = setTimeout(() => { try { const o = {}; [...CTH.cache.entries()].filter(e => e[1]).slice(-140).forEach(([k, v]) => { o[k] = v; }); localStorage.setItem(CTH_LS, JSON.stringify(o)); } catch (e) {} }, 1500); }
+function cthSave(){ clearTimeout(CTH.saveT); CTH.saveT = setTimeout(() => { try { const o = {}; [...CTH.cache.entries()].filter(e => e[1]).slice(-240).forEach(([k, v]) => { o[k] = v; }); localStorage.setItem(CTH_LS, JSON.stringify(o)); } catch (e) {} }, 1500); }
 /* only portraits that are on screen get drawn, a few at a time */
 const CTH_IO = typeof IntersectionObserver !== 'undefined' ? new IntersectionObserver(es => { for (const e of es){ if (!e.isIntersecting) continue; CTH_IO.unobserve(e.target); cthNeed(e.target); } }, {rootMargin:'120px'}) : null;
 function cthNeed(n){
@@ -81,8 +83,10 @@ function cthFill(){
 }
 function cthWork(){
   const t0 = performance.now();
-  while (CTH.q.length && performance.now() - t0 < 6){
-    const [id, key] = CTH.q.shift(); CTH.qs.delete(key); if (CTH.cache.has(key)) continue;
+  const budget = document.querySelector('.fwgrid, #dialog .cosw') ? 14 : 6;   // (v193) the wardrobe open: draw its pictures faster
+  while (CTH.q.length && performance.now() - t0 < budget){
+    const [id, key] = CTH.q.shift(); CTH.qs.delete(key);
+    if (CTH.cache.has(key)){ const u = CTH.cache.get(key); if (u) for (const n of document.querySelectorAll(`.cosw[data-cth="${id}"]`)) if (n.dataset.cthk === key) cthApply(n, u); continue; }   // (v193) drawn ahead already: still hand it to the waiting boxes (they stayed empty)
     const url = cthRender(id); CTH.cache.set(key, url || ''); if (CTH.cache.size > 400) CTH.cache.delete(CTH.cache.keys().next().value); if (url) cthSave();
     if (url) for (const n of document.querySelectorAll(`.cosw[data-cth="${id}"]`)) if (n.dataset.cthk === key) cthApply(n, url);
   }
@@ -91,3 +95,21 @@ function cthWork(){
 }
 new MutationObserver(() => { CTH.dirty = true; }).observe(document.body, {childList:true, subtree:true});
 requestAnimationFrame(cthWork);
+
+/* (v193) the wardrobe's pictures are drawn ahead, while the game is idle after you enter the world, so opening it shows
+   them at once (they took 5–10 s to fill in, a few a second, and showed empty boxes meanwhile). Any look change makes
+   new keys and they are drawn again the same way. */
+function cthWarm(){
+  if (typeof S === 'undefined' || !S || !S.look || typeof PAUSED !== 'undefined' && PAUSED) return setTimeout(cthWarm, 3000);
+  const ids = [...(typeof WINGS !== 'undefined' ? Object.keys(WINGS) : []), ...(typeof XCOS !== 'undefined' ? Object.keys(XCOS) : []), ...(typeof COSTUME !== 'undefined' ? Object.keys(COSTUME) : [])];
+  // one picture every 0.15 s, so no frame ever waits long (the game draws every frame, so the browser seldom has idle time to offer)
+  let i = 0; const step = () => { let n = 0; while (i < ids.length && n < 1){ const id = ids[i++], key = cthKey(id); if (!key || CTH.cache.has(key)) continue;
+      const url = cthRender(id); CTH.cache.set(key, url || ''); if (url) cthSave(); n++; }
+    if (i < ids.length) setTimeout(step, 150); };
+  step();
+}
+setTimeout(cthWarm, 6000);
+/* while a picture is still being drawn: the piece's own colours with a passing shine, never an empty box */
+{ const st = document.createElement('style'); st.textContent = `.cosw[data-cth]:not(.th){background:linear-gradient(135deg,var(--c1,#e8d8b0),var(--c2,#c8b8e8))!important;position:relative;overflow:hidden;opacity:.55}
+.cosw[data-cth]:not(.th)::after{content:'';position:absolute;inset:0;background:linear-gradient(100deg,transparent 30%,rgba(255,255,255,.65) 50%,transparent 70%);transform:translateX(-100%);animation:cthShine 1.2s linear infinite}
+@keyframes cthShine{to{transform:translateX(100%)}}`; document.head.appendChild(st); }

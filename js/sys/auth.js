@@ -351,7 +351,7 @@ function authWipeAsk(){
 
 document.addEventListener('click', e => {
   const t = e.target; if (!t.closest) return;
-  if (t.closest('#btnTitleSettings') && !el('title').hidden && !authed()){ e.preventDefault(); e.stopPropagation(); return; }
+  // (v240) «ตั้งค่า» on the title works before signing in too: js/sys/login234.js opens it above the title (the old block dated from when it entered the world)
   if (t.closest('#setLogout,[data-aulogout]')){ e.preventDefault(); e.stopPropagation(); authLogoutAsk(); return; }
   if (t.closest('[data-aubind]')){ e.preventDefault(); e.stopPropagation(); AUTH.bind = true; AUTH.f = {keep:AUTH.f.keep, auId:ACC.name}; renderTitleBody(); return; }
   const b = t.closest('#auBox [data-autab],#auBox [data-aueye],#auBox [data-auth],#auBox [data-aulang],#auBox [data-auforgot],#auBox [data-auoff],#auBox [data-auguest],#auBox [data-auback],#auBox [data-auwipe]'); if (!b) return;

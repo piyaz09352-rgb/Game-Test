@@ -66,7 +66,7 @@ function applyDamage(m, res, sk){
   }
   if (m.hp <= 0) killMob(m);
 }
-const GEAR_DROP = .05;   // was .02: gear from 1 kill in 20    // balance: a piece of gear from 1 normal kill in 50, so hunting the right affixes is reachable
+const GEAR_DROP = .025;   // (v192) half (sys/economy.js)  ·   // was .02: gear from 1 kill in 20    // balance: a piece of gear from 1 normal kill in 50, so hunting the right affixes is reachable
 /* (v101) EXP by level gap (monster Lv − your Lv): stronger monsters give more, much weaker ones less */
 const EXP_GAP = [[10, 1.2], [5, 1.1], [-5, 1], [-10, .9], [-15, .75], [-20, .6], [-30, .4], [-Infinity, .2]];
 const expGap = lv => { const g = (lv || 1) - S.lvl; return (EXP_GAP.find(([d]) => g >= d) || [0, 1])[1]; };
@@ -88,8 +88,8 @@ function killMob(m){
   }
   if (d.boss && !d.wb){
     boss = null; bossTimer = bossGap();
-    S.bia += 3000;
-    banner(L('คุณคือ MVP! +3,000 เบี้ย', 'You are the MVP! +3,000 Bia')); log(L(`MVP: ล้ม${d.name} ได้ 3,000 เบี้ย`, `MVP: defeated ${d.en}, +3,000 Bia`), 'g');
+    const mv = typeof ECON !== 'undefined' ? ECON.mvpBia : 3000; S.bia += mv;
+    banner(L(`คุณคือ MVP! +${mv.toLocaleString()} เบี้ย`, `You are the MVP! +${mv.toLocaleString()} Bia`)); log(L(`MVP: ล้ม${d.name} ได้ ${mv.toLocaleString()} เบี้ย`, `MVP: defeated ${d.en}, +${mv.toLocaleString()} Bia`), 'g');
     { const ln = typeof bossLine === 'function' && bossLine(m.type, 1); if (ln) log(L(...ln), 'g'); }
     for (const o of mobs) if (o.minion && !o.dead){ o.dead = true; o.deadT = 0; }
   }
@@ -155,7 +155,7 @@ function basicAttack(t){
   if (JOBS[S.job].caster){ SFX.play('orb', {elem:DER.welem}); projs.push({k:'orb', elem:DER.welem, x:P.x, y:P.y - 34, t, delay:.12, speed:520, hit:() => { applyDamage(t, magicDamage(t, .7, DER.welem)); VFX.play('orbHit', {x:t.x, y:t.y - MOB_H[t.type] * .5, elem:DER.welem}); }}); return; }
   { const wt = JOBS[S.job].weapon.type; if (wt === 'dagger' || wt === 'sword') later(wt === 'dagger' ? .06 : .1, () => VFX.play('swingArc', {x:P.x, y:P.y, ang:Math.atan2(t.y - P.y, t.x - P.x), flip:typeof DAGGER_LEFT !== 'undefined' && DAGGER_LEFT.includes(P.dir | 0), kind:wt})); }
   const strike = () => { if (JOBS[S.job].weapon.type === 'shuriken'){ projs.push(shurShot(t, mul)); return; }   // (v184) a thrown star: magic damage
-    if (JOBS[S.job].ranged) projs.push({k:'arrow', elem:DER.welem, x:P.x, y:P.y - 20, t, delay:0, speed:720, hit:() => { applyDamage(t, physDamage(t, mul)); VFX.play('arrowHit', {x:t.x, y:t.y - MOB_H[t.type] * .5, elem:DER.welem}); }}); else applyDamage(t, physDamage(t, mul)); };
+    if (JOBS[S.job].ranged) projs.push({k:'arrow', elem:DER.welem, x:P.x, y:P.y - 20, t, delay:0, speed:720, hit:() => { applyDamage(t, physDamage(t, mul)); VFX.play('arrowHit', {x:t.x, y:t.y - MOB_H[t.type] * .5, elem:DER.welem}); }}); else { applyDamage(t, physDamage(t, mul)); if (typeof meleeCleave === 'function') meleeCleave(t, mul); } };
   strike();
   if (DER.pas.dbl && Math.random() < DER.pas.dbl){ later(.14, () => { if (!t.dead){ strike(); VFX.play('slashHit', {x:t.x, y:t.y - MOB_H[t.type] * .5, gold:true}); } }); }
 }

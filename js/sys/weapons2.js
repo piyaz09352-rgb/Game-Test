@@ -21,25 +21,34 @@
 
 /* ---------- the katana takes the twin daggers' place ---------- */
 const KATANA_TIER = [['ฝึกหัด', 'Apprentice'], ['เหล็กกล้า', 'Steel'], ['ยันต์เพลิง', 'Ember'], ['นิลกาฬ', 'Obsidian'], ['นาคราช', 'Naga'], ['สุริยเทพ', 'Solar'], ['อัคนีกาฬ', 'Infernal'], ['วชิระ', 'Vajra'], ['เทวราช', 'Devaraja'], ['หิมพานต์', 'Himmapan'], ['จักรพรรดิ', 'Chakravartin']];
-const isKatana = st => !!(st && st.wtype === 'dagger' && (st.hands === '2h' || st.katana) && !st.claw);
+const isKatana = st => !!(st && st.wtype === 'dagger' && (st.hands === '2h' || st.katana) && !st.claw && !st.twin);
+// (v194) a two-handed dagger NAMED a twin dagger (the Shadow Tiger's own pair) is a pair of daggers, not a katana
+for (const [id, it] of Object.entries(ITEMS)) if (/^k_/.test(id) && it && it.kind === 'gear' && it.st && it.st.wtype === 'dagger' && it.st.hands === '2h' && !it.st.katana && /มีดคู่|twin dagger/i.test(`${it.name || ''} ${it.en || ''}`)) it.st.twin = 1;   // class weapons only (the shop's katanas were named twin daggers before their rename)
 function katanaRename(){
   for (const g of GEAR_LIST){ const m = /^w_tdagger(\d+)$/.exec(g[0]); if (!m) continue; const t = KATANA_TIER[+m[1]] || KATANA_TIER[0];
     g[2] = `คาตานะ${t[0]}`; g[3] = `${t[1]} Katana`; g[6].katana = 1; g[6].hands = '2h';
     for (const o of [GEAR[g[0]], ITEMS[g[0]]]) if (o){ o.name = g[2]; o.en = g[3]; if (o.st) o.st.katana = 1; } }
   for (const k in ITEMS){ const it = ITEMS[k]; if (it && it.base && /^w_tdagger\d+$/.test(it.base)){ it.name = ITEMS[it.base].name; it.en = ITEMS[it.base].en; if (it.st) it.st.katana = 1; } }
 }
-katanaRename();
+// (v208) the owner: a thief holds a dagger in EACH hand — the shop's twin daggers stay twin daggers (one blade in each
+// hand), they are no longer turned into a katana. A katana found, forged or dropped (st.katana) is still a katana.
+for (const g of GEAR_LIST) if (/^w_tdagger\d+$/.test(g[0])){ g[6].twin = 1; delete g[6].katana; for (const o of [GEAR[g[0]], ITEMS[g[0]]]) if (o && o.st){ o.st.twin = 1; delete o.st.katana; } }
+for (const k in ITEMS){ const it = ITEMS[k]; if (it && it.st && (/^w_tdagger\d+$/.test(k) || (it.base && /^w_tdagger\d+$/.test(it.base)))){ it.st.twin = 1; delete it.st.katana; if (it.base && ITEMS[it.base]){ it.name = ITEMS[it.base].name; it.en = ITEMS[it.base].en; } } }
 /* the thief line's own bare weapons are single daggers now (a katana is something you find, buy or forge) */
 if (JOBS.rogue){ JOBS.rogue.weapon.name = 'มีดสั้นหางไก่'; JOBS.rogue.weapon.en = 'Rooster-tail Dagger'; }
 if (JOBS.bandit){ JOBS.bandit.weapon.name = 'มีดสั้นเงาเสือ'; JOBS.bandit.weapon.en = 'Tiger Shadow Dagger'; }
 if (typeof HANDS_RULE !== 'undefined') HANDS_RULE.dagger = n => (/คาตานะ|katana|คู่|twin/i.test(n) ? '2h' : '1h');
 if (typeof handsFixAll === 'function') handsFixAll();
-if (typeof BAG_SUB !== 'undefined'){ const r = BAG_SUB.find(b => b[0] === 'dagger2'); if (r){ r[1] = 'คาตานะ'; r[2] = 'Katana'; } }
+if (typeof BAG_SUB !== 'undefined'){ const r = BAG_SUB.find(b => b[0] === 'dagger2'); if (r){ r[1] = 'มีดคู่'; r[2] = 'Twin daggers'; } }   // (v208)
 /* the hero holds a katana in both hands (no second blade) */
 if (typeof SPR !== 'undefined' && SPR.heroKey){ const _hk = SPR.heroKey;
   SPR.heroKey = function(job, gear = {}){ const key = _hk.apply(this, arguments), cfg = SPR.CHARS && SPR.CHARS[key];
     if (cfg && cfg.weapon === 'dagger'){ const wi = gear && gear.weapon && ITEMS[gear.weapon]; const kat = !!(wi && isKatana(wi.st));
-      cfg.katana = kat; if (kat){ cfg.offWeapon = false; cfg.shield = null; } else if (!(wi && wi.st && wi.st.hands === '2h')) cfg.offWeapon = false; }
+      const line = typeof jobChain === 'function' && JOBS[job] ? (() => { let j = job; while (JOBS[j] && JOBS[j].parent && JOBS[j].parent !== 'novice') j = JOBS[j].parent; return j; })() : '';
+      cfg.katana = kat; if (kat){ cfg.offWeapon = false; cfg.shield = null; }
+      else if (wi && wi.st && wi.st.hands === '2h'){ cfg.offWeapon = true; cfg.shield = null; }   // (v208) twin daggers: a blade in each hand
+      else if (!wi && line === 'rogue'){ cfg.offWeapon = true; cfg.shield = null; }               // (v208) the thief line's own weapon is a pair of daggers
+      else cfg.offWeapon = false; }
     return key; }; }
 
 /* ---------- one power curve for every weapon kind ---------- */
@@ -48,9 +57,9 @@ const WPN_KIND = st => {
   if (!st || !st.wtype) return null; const two = st.hands === '2h';
   if (st.wtype === 'sword') return two ? 'gsword' : 'sword';
   if (st.wtype === 'staff') return two ? 'lstaff' : 'rod';
-  if (st.wtype === 'dagger') return st.claw ? 'fist' : isKatana(st) ? 'katana' : 'dagger';
+  if (st.wtype === 'dagger') return st.claw ? 'fist' : isKatana(st) ? 'katana' : st.twin ? 'twin' : 'dagger';
   return st.wtype; };
-const WPN_RATIO = {sword:[1, 0], gsword:[1.24, 0], dagger:[.84, 0], katana:[1.1, 0], fist:[1, 0], bow:[.94, 0], rod:[.45, 1.2], lstaff:[.5, 1.5]};
+const WPN_RATIO = {sword:[1, 0], gsword:[1.24, 0], dagger:[.84, 0], katana:[1.1, 0], twin:[1.08, 0], fist:[1, 0], bow:[.94, 0], rod:[.45, 1.2], lstaff:[.5, 1.5]};
 for (const g of GEAR_LIST){ if (g[1] !== 'weapon' || !g[6] || g[6].line) continue; const k = WPN_KIND(g[6]), r = WPN_RATIO[k]; if (!r) continue;
   const c = WPN_CURVE(g[4]); g[6].watk = Math.round(c * r[0]); if (r[1]) g[6].wmatk = Math.round(c * r[1]);
   for (const o of [GEAR[g[0]], ITEMS[g[0]]]) if (o && o.st){ o.st.watk = g[6].watk; if (r[1]) o.st.wmatk = g[6].wmatk; } }
@@ -76,11 +85,12 @@ const WTRAIT = {
   rod:{th:'สนับสนุน: ฮีลและโล่ +15% · รับดาเมจ −6% · ใช้คู่โล่ได้', en:'Support: heals and shields +15% · damage taken −6% · shield allowed'},
   lstaff:{th:'ดาเมจมหาศาล: MATK +20% · ร่ายช้าลง 10%', en:'Overwhelming: MATK +20% · casting 10% slower'},
   dagger:{th:'เจาะเกราะ 20% · พิษ: 15% ต่อครั้งที่ตี · ใช้คู่โล่ได้', en:'Armour pierce 20% · Venom: 15% per hit · shield allowed'},
+  twin:{th:'มีดคู่ (มือละเล่ม): เจาะเกราะ 20% · พิษ 15% ต่อครั้ง · เร็ว: ASPD +4 · CRIT +5%', en:'Twin daggers (one in each hand): armour pierce 20% · venom 15% per hit · speed: ASPD +4 · CRIT +5%'},
   katana:{th:'เร็ว: ASPD +6 · CRIT +8% คริแรงขึ้น 20% · เลือดออก 12% ต่อครั้ง · หลบ: FLEE +10% หลบแน่นอน +5%', en:'Speed: ASPD +6 · CRIT +8%, crits +20% · Bleed 12% per hit · Evasion: FLEE +10%, Perfect Dodge +5%'},
   fist:{th:'เจาะเกราะ 30% · หนัก +8% · เลือดไหล 10% · มึนสั้น 8% · คอมโบ: ทุกหมัดที่ 3 ต่อเนื่อง ×1.5', en:'Armour pierce 30% · Heavy +8% · Bleed 10% · Mini-stun 8% · Combo: every 3rd hit in a row ×1.5'},
   bow:{th:'แม่นยำ: HIT +20 · ยิงเร็ว: ASPD +4 · ยิงต่อเนื่อง: ตีเป้าเดิมต่อกัน +3% ต่อครั้ง สูงสุด +18%', en:'Accurate: HIT +20 · Rapid: ASPD +4 · Steady fire: +3% per hit in a row on one target, up to +18%'}
 };
-const WK_PIERCE = {gsword:.25, dagger:.2, fist:.3};
+const WK_PIERCE = {gsword:.25, dagger:.2, twin:.2, fist:.3};
 
 /* numbers that live in DER */
 { const _dv = derive;
@@ -89,6 +99,7 @@ const WK_PIERCE = {gsword:.25, dagger:.2, fist:.3};
     if (k === 'rod'){ pas.healPow = (pas.healPow || 0) + .15; pas.wkRed = .06; }
     if (k === 'lstaff'){ DER.matk = Math.round(DER.matk * 1.2); DER.castMul *= 1.1; }
     if (k === 'katana'){ DER.aspd = Math.min(ASPD_CAP, DER.aspd + 6); DER.crit = +(DER.crit + 8).toFixed(1); DER.critDmg += .2; DER.flee = Math.round(DER.flee * 1.1); pas.dodge = (pas.dodge || 0) + .05; }
+    if (k === 'twin'){ DER.aspd = Math.min(ASPD_CAP, DER.aspd + 4); DER.crit = +(DER.crit + 5).toFixed(1); }   // (v208)
     if (k === 'gsword') DER.critDmg += .3;
     if (k === 'bow'){ DER.hit += 20; DER.aspd = Math.min(ASPD_CAP, DER.aspd + 4); }
     DER.interval = aspdIv(DER.aspd);
@@ -120,7 +131,7 @@ const WKC = {tgt:null, chain:0};
     const out = _ad.apply(this, arguments);
     if (live && !m.dead && !m.def.boss){
       const roll = p => Math.random() < p, st = m.st || (m.st = {});
-      if (k === 'dagger' && roll(.15)){ applyStatus(m, {poison:[.3, 4]}); addText(m.x, m.y - MOB_H[m.type] - 18, L('พิษ', 'Venom'), '#7fe05a', 12); }
+      if ((k === 'dagger' || k === 'twin') && roll(.15)){ applyStatus(m, {poison:[.3, 4]}); addText(m.x, m.y - MOB_H[m.type] - 18, L('พิษ', 'Venom'), '#7fe05a', 12); }
       if ((k === 'katana' && roll(.12)) || (k === 'fist' && roll(.1))){ st.bleed = 4; st.bleedDps = DER.atk * .3; st.bleedT = 1; addText(m.x, m.y - MOB_H[m.type] - 18, L('เลือดออก', 'Bleed'), '#ff4a5a', 12); }
       if (k === 'fist' && roll(.08)) applyStatus(m, {stun:.4}); }
     if (live && res.combo) addText(m.x, m.y - MOB_H[m.type] - 30, L('คอมโบ!', 'Combo!'), '#ffd56a', 13);

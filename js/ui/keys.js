@@ -38,7 +38,7 @@ const KEYMAP = [
   [['F', 'P', 'U', 'Alt+Z'], 'เพื่อน · สนามประลอง · ตลาดผู้เล่น · ปาร์ตี้', 'Friends · Arena · Player market · Party'],   // Alt+Z: js/sys/party.js
   [['O', '?'], 'ตั้งค่า · คู่มือนี้', 'Settings · this guide'],
   [['V', 'F2'], 'วงล้ออีโมต · โหมดถ่ายรูป', 'Emote wheel · photo mode'],                                                       // js/sys/cosx.js
-  [['Enter'], 'เปิดแชต · Enter อีกครั้งเพื่อส่ง · Esc ออกจากช่องแชต', 'Open chat · Enter again sends · Esc leaves the chat box'],  // js/ui/hud.js, js/net/online.js
+  [['Enter'], 'เปิดแชต · Enter อีกครั้งเพื่อส่ง (ช่องว่าง = ปิดแชต) · Esc ออกจากช่องแชต', 'Open chat · Enter again sends (empty = closes the chat) · Esc leaves the chat box'],  // js/ui/hud.js, js/net/online.js
   [['↑', '↓', '←', '→'], 'เดินด้วยปุ่มลูกศร · โหมดจอยใช้ W A S D ได้ด้วย (A กับ S จึงเป็นปุ่มเดิน)', 'Move with the arrows · joystick mode adds W A S D (A and S then move)'],   // js/ui/joystick.js
   [['H'], 'ซ่อน/แสดง UI ทั้งหมด', 'Hide/show all UI'],
   [['Esc'], 'ปิดหน้าต่างบนสุด', 'Close the top window'],

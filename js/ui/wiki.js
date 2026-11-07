@@ -79,11 +79,25 @@ const WIKI_SYS = [
      <ul><li>เดิน: คลิก/แตะพื้น หรือจอยซ้าย · แตะแผนที่ย่อเพื่อเดินไปจุดนั้น</li><li>โจมตี: คลิกมอน หรือปุ่มโจมตีใหญ่</li><li>ยา: ช่อง 7–8 หรือปุ่มยาข้างจอย</li><li>Auto (B): ให้ตัวละครล่ามอนเอง ตั้งชุดสกิลได้</li><li>บัญชีละ 3 ตัวละคร เลือกที่หน้าเริ่มเกม</li></ul>`,
     `<p>You start as a <b>Villager</b> in Aren. Hunt in the Suwannin Fields for EXP · spend Stat (A) and Skill (S) points · at Job Lv 10 with "Ready to Journey" learned, talk to <b>Master Vayra</b> to change class.</p>
      <ul><li>Move: click/tap the ground or use the left stick · tap the minimap to walk there</li><li>Attack: click a monster or the big attack button</li><li>Potions: slots 7–8 or the buttons by the stick</li><li>Auto (B): the hero hunts on its own with your skill set</li><li>3 characters per account, picked on the title screen</li></ul>`)},
-  {id:'stats', t:['ค่าสถานะ (Stat)', 'Stats'], b:() => `<table class="wkt"><tr><th>Stat</th><th>${L('ผล', 'Effect')}</th></tr>
-    <tr><td>STR</td><td>${L('ATK ประชิด ×2', 'Melee ATK ×2')}</td></tr><tr><td>AGI</td><td>${L('ความเร็วโจมตี · FLEE (หลบ)', 'Attack speed · FLEE (dodge)')}</td></tr>
-    <tr><td>VIT</td><td>${L('Max HP +1% ต่อแต้ม · DEF', 'Max HP +1% per point · DEF')}</td></tr><tr><td>INT</td><td>${L('MATK · Max SP · MDEF · ร่ายเร็วขึ้น', 'MATK · Max SP · MDEF · faster casts')}</td></tr>
-    <tr><td>DEX</td><td>${L('HIT (แม่น) · ATK ระยะไกล ×2 · ร่ายเร็วขึ้นมาก', 'HIT · ranged ATK ×2 · much faster casts')}</td></tr><tr><td>LUK</td><td>${L('คริติคอล +0.3% ต่อแต้ม', 'Crit +0.3% per point')}</td></tr></table>
-    <p>${L('เวทไม่คริติคอล · คริติคอลแรง ×1.5 และไม่พลาด', 'Spells never crit · crits deal ×1.5 and never miss')}</p>`},
+  {id:'stats', t:['ค่าสถานะ (Stat)', 'Stats'], b:() => { const capRow = [1, 45, 70, 100, 130, 150, 180, 200, 240, 270, 300];   // (v243) current: what each stat does, the points and the cap that grows with level
+    return `<table class="wkt"><tr><th>Stat</th><th>${L('ผล', 'Effect')}</th></tr>
+    <tr><td>STR</td><td>${L('พลังโจมตีของอาวุธระยะใกล้ (หลัก) · เพิ่มพลังโจมตีระยะไกลเล็กน้อย', 'Close-range weapon ATK (main) · a little ranged ATK')}</td></tr>
+    <tr><td>AGI</td><td>${L('ตีเร็วขึ้น · หลบ (FLEE) · ต้านเชื่องช้าและตรึง', 'Faster attacks · FLEE (dodge) · resists slow and root')}</td></tr>
+    <tr><td>VIT</td><td>${L('HP สูงสุด · ป้องกัน (DEF) · ฟื้น HP เร็วขึ้น · ต้านมึน พิษ เลือดไหล ไฟลวก', 'Max HP · DEF · faster HP recovery · resists stun, poison, bleed, burn')}</td></tr>
+    <tr><td>INT</td><td>${L('พลังเวท (ยิ่งสูงยิ่งคุ้ม) · SP สูงสุด · ป้องกันเวท (MDEF) · ร่ายเร็วขึ้น · ฟื้น SP เร็วขึ้น · ต้านใบ้ แช่แข็ง ตาพร่า', 'Magic ATK (pays more the higher it goes) · Max SP · MDEF · faster casts · faster SP recovery · resists silence, freeze, blind')}</td></tr>
+    <tr><td>DEX</td><td>${L('ความแม่น (HIT) · พลังโจมตีของธนู (หลัก) · ร่ายเร็วขึ้นมาก · เพิ่มพลังโจมตีระยะใกล้เล็กน้อย', 'HIT · bow ATK (main) · much faster casts · a little close-range ATK')}</td></tr>
+    <tr><td>LUK</td><td>${L('คริติคอล · หลบแน่นอน (Perfect Dodge) · เพิ่มพลังโจมตีเล็กน้อย · ต้านคำสาป', 'Critical hits · Perfect Dodge · a little ATK · resists curse')}</td></tr></table>
+    <ul><li>${L('คริติคอลแรงกว่าตีปกติและไม่พลาด · เวทไม่คริ ยกเว้นดาวกระจายของนินจา', 'Crits hit harder than normal hits and never miss · spells never crit, except the ninja\'s stars')}</li>
+    <li>${L('ตีมอนที่เลเวลสูงกว่าเรา ต้องมีความแม่น (DEX) มากขึ้น ไม่งั้นจะตีพลาดบ่อย', 'Monsters above your level need more HIT (DEX), or you miss often')}</li>
+    <li>${L('บอสสายเวทยิงเข้าทางป้องกันเวท (MDEF) เกราะหนาช่วยไม่ได้', 'Caster bosses hit your MDEF: heavy armour does not help')}</li></ul>
+    <h4>${L('แต้มสเตตัส', 'Stat points')}</h4>
+    <ul><li>${L('เริ่มเกมได้ 48 แต้ม · ขึ้นเลเวลได้ 8 แต้ม และได้มากขึ้นอีก 1 แต้มทุก 38 เลเวล (ถึง Lv 300 ได้เลเวลละ 15)', 'You start with 48 points · each level gives 8, one more every 38 levels (15 a level by Lv 300)')}</li>
+    <li>${L('ยิ่งสเตตัสสูง แต่ละแต้มยิ่งแพง (ราคาขึ้นทุก 10 แต้ม)', 'The higher a stat, the more each point costs (up every 10 points)')}</li>
+    <li>${L('รีเซตสเตตัสได้ฟรีทุกเมื่อ ที่หน้าต่างสถานะ', 'Reset your stats for free any time in the Status window')}</li></ul>
+    <h4>${L('เพดานสเตตัส (โตตามเลเวล)', 'Stat cap (grows with your level)')}</h4>
+    <div class="wkscroll"><table class="wkt"><tr><th>Lv</th>${capRow.map(l => `<td>${l}</td>`).join('')}</tr><tr><th>${L('เพดาน', 'Cap')}</th>${capRow.map(l => `<td>${STAT_CAP(l)}</td>`).join('')}</tr></table></div>
+    <ul><li>${L('แต้มแต่ละช่วงพอดันสเตตัสหลัก 2 ตัวถึงเพดาน และยังมีเหลือให้ตัวอื่น ที่ Lv 300 ได้ประมาณ 150 · 150 · 90 · 60 ต้องเลือกว่าจะเน้นอะไร', 'At every level the points are enough to raise two main stats to the cap with some left for others: about 150 · 150 · 90 · 60 at Lv 300, so choose what to focus on')}</li>
+    <li>${L('ค่าที่ได้จากอุปกรณ์ การ์ด และบัฟ บวกเพิ่มได้เกินเพดาน', 'Bonuses from gear, cards and buffs add on top and may go past the cap')}</li></ul>`; }},
   {id:'elem', t:['ธาตุ', 'Elements'], b:() => { const E = ELEM;
     return `<p>${L('ดาเมจ % เมื่อธาตุโจมตี (แถว) ตีใส่ธาตุมอน (คอลัมน์) · เขียว = แรง แดง = เบา', 'Damage % when an attack element (row) hits a monster element (column) · green = strong, red = weak')}</p>
       <div class="wkscroll"><table class="wkt wkel-t"><tr><th></th>${E.map(e => `<th>${wkElem(e)}</th>`).join('')}</tr>${E.map(a => `<tr><th>${wkElem(a)}</th>${ETAB[a].map(v => `<td class="${v > 100 ? 'up' : v < 100 ? 'dn' : ''}">${v}</td>`).join('')}</tr>`).join('')}</table></div>

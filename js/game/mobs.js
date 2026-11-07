@@ -28,7 +28,7 @@ function updSlots(dt){
   if (typeof nmSlave === 'function' && nmSlave()){ mobs = mobs.filter(m => !m.dead || m.deadT < (m.vanish ? .6 : 1.2)); return; }   // the room's host spawns for everyone
   const night = isNight();
   for (const s of spawnSlots){
-    if (s.night && !night){
+    if (s.night && !night && !(typeof msDayWant === 'function' && msDayWant(s.type))){   /* (v220) a story step that needs a night monster brings it out by day too */
       if (s.mob && !s.mob.dead){ s.mob.dead = true; s.mob.deadT = 0; s.mob.vanish = true; if (P.target === s.mob) P.target = null; }
       s.mob = null; s.timer = rand(0, 3); continue;
     }

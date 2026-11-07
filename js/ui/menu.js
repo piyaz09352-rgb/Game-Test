@@ -40,6 +40,13 @@ const TITLE = {mode:'slots', make:null, dir:0, raf:0};
 const escH = t => String(t || '').replace(/[&<>"']/g, c => ({'&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'}[c]));
 const HAIR_NAMES = {m:[['ผมตั้งตามคลาส', 'Class spikes'], ['ผมสั้นนุ่ม', 'Short & soft'], ['ผมมัดหาง', 'Tied back'], ['ผมยาวแผงคอ', 'Long mane'], ['มวยจุก', 'Topknot'], ['ผมตั้งชี้', 'Wild spikes'], ['ผมปัดข้าง', 'Side-swept'], ['ผมสั้นเกรียน', 'Short crop'], ['ผมยาวปอยข้าง', 'Side locks']],
   f:[['ผมยาวสยาย', 'Long & loose'], ['ผมแกละสองข้าง', 'Twin tails'], ['หางม้าสูง', 'High ponytail'], ['ผมมวย', 'Bun'], ['ผมบ็อบสั้น', 'Short bob'], ['ผมยาวพิเศษ', 'Extra long'], ['ผมยาวปัดข้าง', 'Side-swept long'], ['หางม้าปอยยาว', 'Ponytail & locks'], ['แกละผมยาว', 'Long twin tails']]};
+// (v194) fifteen more of each (gfx/sprites.js HAIR_M / HAIR_F 9–23)
+HAIR_NAMES.m.push(['แอฟโฟร', 'Afro'], ['ม็อฮอว์ก', 'Mohawk'], ['ปอมปาดัวร์', 'Pompadour'], ['ปัดปิดตา', 'Swoop'], ['ลอนสั้น', 'Short curls'], ['หางต่ำ แสกกลาง', 'Low tail, curtain'],
+  ['เปียยาว', 'Long braid'], ['พุ่งตั้ง', 'Tall spikes'], ['แสกกลาง', 'Curtain fringe'], ['หางข้าง', 'Side tail'], ['วูล์ฟคัต', 'Wolf cut'], ['เดรดล็อก', 'Dreadlocks'],
+  ['ทรงกะลา', 'Bowl cut'], ['คลื่นประบ่า', 'Wavy, shoulder'], ['เปียคู่', 'Twin braids']);
+HAIR_NAMES.f.push(['ฮิเมะคัต', 'Hime cut'], ['ซาลาเปาคู่', 'Double buns'], ['ลอนสว่าน', 'Drill curls'], ['หางม้าข้าง', 'Side ponytail'], ['เปียยาว', 'Long braid'], ['เปียคู่', 'Twin braids'],
+  ['ลอนคลื่นยาว', 'Long waves'], ['บ๊อบลอน', 'Curly bob'], ['หางม้าต่ำ', 'Low ponytail'], ['ครึ่งหัว', 'Half-up'], ['แอฟโฟรพัฟ', 'Afro puff'], ['พิกซี่', 'Pixie cut'],
+  ['แสกกลางยาว', 'Curtain, long'], ['ซาลาเปา+ทวินเทล', 'Buns + tails'], ['ร็อกกาบิลลี่', 'Rockabilly']);
 const HAIR_COL_NAMES = {'':['ตามอาชีพ', 'By class'], hairBlack:['ดำ', 'Black'], hairBrown:['น้ำตาล', 'Brown'], hairBlonde:['บลอนด์', 'Blonde'], hairAuburn:['น้ำตาลแดง', 'Auburn'], hairSilver:['เงิน', 'Silver'], hairNavy:['น้ำเงิน', 'Navy'], maroon:['แดงเลือดหมู', 'Maroon'], hairPink:['ชมพู', 'Pink'], hairTeal:['เขียวน้ำทะเล', 'Teal'],
   hairWhite:['ขาว', 'White'], hairViolet:['ม่วง', 'Violet'], hairGreen:['เขียว', 'Green'], hairCrimson:['แดงสด', 'Crimson'], hairAsh:['เทาหม่น', 'Ash'], hairGold:['ทอง', 'Gold'], hairChestnut:['เกาลัด', 'Chestnut'], hairOrange:['ส้ม', 'Orange'], hairRose:['ชมพูกุหลาบ', 'Rose'], hairLilac:['ม่วงอ่อน', 'Lilac'], hairSky:['ฟ้า', 'Sky blue'], hairMint:['มิ้นต์', 'Mint']};
 const EYE_NAMES = {'':['ตามอาชีพ', 'By class'], irisBr:['น้ำตาล', 'Brown'], irisBl:['ฟ้า', 'Blue'], irisGr:['เขียว', 'Green'], irisVi:['ม่วง', 'Violet'], irisRd:['แดง', 'Red'], irisGd:['ทอง', 'Gold'], irisPk:['ชมพู', 'Pink'], irisSv:['เงิน', 'Silver'], irisTl:['เขียวน้ำทะเล', 'Teal']};

@@ -511,7 +511,9 @@ if (!GHOST_SLOTS.includes('mask')) GHOST_SLOTS.push('mask');
     const c0 = COSTUME[id]; if (!c0 || c0.slot !== 'mask') return _rf.apply(this, arguments);
     const c = document.createElement('canvas'); c.width = CTH_W; c.height = CTH_H; const g = c.getContext('2d'), SC = CTH_W / 120, s = 3.5 * SC;
     const bg = g.createRadialGradient(CTH_W / 2, CTH_H * .55, 4, CTH_W / 2, CTH_H * .55, CTH_W * .75); bg.addColorStop(0, 'rgba(255,214,120,.42)'); bg.addColorStop(1, 'rgba(255,220,150,0)'); g.fillStyle = bg; g.fillRect(0, 0, CTH_W, CTH_H);
-    try { g.setTransform(s, 0, 0, s, CTH_W / 2, CTH_H * .5 + CTH_HEAD * s); cthHero(g, {weapon:cthWeapon() || null, mask:id}, 0); } catch (e) { return null; }
+    // (v198) pieces painted on the face (glasses, visors, marks, mouth cloths) are shown close up: at head size they were too small to make out
+    const lk = c0.look || {}, close = !!(lk.faceMask || lk.ninjaMask), z = close ? 5.6 * SC : s, fy = close ? CTH_HEAD - 9.5 : CTH_HEAD;
+    try { g.setTransform(z, 0, 0, z, CTH_W / 2, CTH_H * .5 + fy * z); cthHero(g, {weapon:null, mask:id}, 0); } catch (e) { return null; }
     return c.toDataURL('image/png'); }; }
 
 /* ---------- wearing ---------- */
@@ -565,7 +567,9 @@ document.addEventListener('click', e => { const b = e.target.closest && e.target
   .fw .wrtabs{display:flex;flex-wrap:wrap;gap:6px}.fw .wrtabs button{border:1px solid rgba(232,194,106,.55);background:linear-gradient(180deg,#2a3563,#171e3d);color:var(--rn-cream,#f7edd6);border-radius:9px;padding:5px 14px;font:600 13px var(--thai,sans-serif);cursor:pointer}
   .fw .wrtabs button.on{background:linear-gradient(180deg,#fff0c2,#e8c26a 50%,#b8862f);color:#2a1a00;border-color:#fff0c2}
   .fw .fwgrid{max-height:calc(100dvh - 210px);overflow-y:auto;overscroll-behavior:contain;padding-right:4px}
-  .fw .fwgrid > .sec:first-child{margin-top:0}`;
+  .fw .fwgrid > .sec:first-child{margin-top:0;position:sticky;top:0;z-index:2;padding:4px 2px;background:linear-gradient(#fdf6e8 75%,rgba(253,246,232,0))}
+  /* (v193) every card the same height: a name takes at most two lines */
+  .fw .coslist .cosit b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:2.5em;line-height:1.25em;word-break:break-word}`;
   document.head.appendChild(st); }
 
 /* the tailor: every collection for sale (coins), grouped */

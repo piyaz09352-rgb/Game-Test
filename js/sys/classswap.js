@@ -92,13 +92,32 @@ function csHTML(){
     const btn = on ? `<span class="pr">${L('กำลังเล่น', 'Playing')}</span>`
       : open ? `<button class="btn sm gold" data-csgo="${line}" ${why ? 'disabled' : ''}>${L('สลับ', 'Switch')}</button>`
       : `<button class="btn sm" data-csgo="${line}" ${why || (!free && csCoins() < fee) ? 'disabled' : ''}>${free ? L('ปลดฟรี', 'Unlock free') : `${L('ปลด', 'Unlock')} ◈ ${fmtN(fee)}`}</button>`;
-    return `<div class="srow${on ? ' owned' : open ? '' : ' locked'}"><span class="ic">${on ? '★' : open ? '⚔' : '🔒'}</span><div class="nm"><b>${nm(now)}</b><small>${open ? `Job Lv ${jl}` : L('ยังไม่ปลด', 'Locked')} · ${j.stat || ''}</small></div>${btn}</div>`; };
-  return `<div class="sec">${L('สลับอาชีพ', 'Switch class')} <span class="ct">${Object.keys(C.have).length}/${CS_LINES.length}</span></div><div class="shop">${CS_LINES.map(row).join('')}</div>
+    // (v218) a card in a grid (the owner asked for a table): the class's own figure, its name, Job Lv and stats, the button
+    const pj = on ? S.job : open && JOBS[st.job] ? st.job : line;
+    return `<div class="cscard${on ? ' on' : open ? '' : ' locked'}"><canvas class="jp" data-jp="${pj}" width="56" height="56"></canvas>${on ? '<i class="csstar">★</i>' : !open ? '<i class="csstar">🔒</i>' : ''}<b>${nm(now)}</b><small>${open ? `Job Lv ${jl}` : L('ยังไม่ปลด', 'Locked')}</small><em>${j.stat || ''}</em>${btn}</div>`; };
+  return `<div class="sec">${L('สลับอาชีพ', 'Switch class')} <span class="ct">${Object.keys(C.have).length}/${CS_LINES.length}</span></div><div class="csgrid">${CS_LINES.map(row).join('')}</div>
     <p class="hint">${why ? `<b>${why}</b> · ` : ''}${L(`เลเวล สเตตัส ของ และเงินติดตัวไปทุกอาชีพ · Job Lv และสกิลแยกตามอาชีพ อาชีพใหม่เริ่ม Job Lv 1 · ปลดฟรีได้ 1 อาชีพ${free ? ' (ยังเหลือ)' : ' (ใช้แล้ว)'} อาชีพต่อไป ${csFeeTxt()} (มี ${fmtN(csCoins())}) · สลับไปมาระหว่างอาชีพที่ปลดแล้วฟรี`,
       `Level, stats, gear and money go with you · Job Lv and skills belong to each class, a new one starts at Job Lv 1 · one free unlock${free ? ' (unused)' : ' (used)'}, then ${csFeeTxt()} each (you have ${fmtN(csCoins())}) · switching between unlocked classes is free`)}</p>`;
 }
 function csAppend(){ const d = document.getElementById('dialog'), db = d && !d.hidden && d.querySelector('.db'); if (!db || db.querySelector('.cswap')) return; const h = csHTML(); if (!h) return;
-  const box = document.createElement('div'); box.className = 'cswap'; box.innerHTML = h; const say = db.querySelector('.say'); if (say) say.after(box); else db.prepend(box); }
+  const box = document.createElement('div'); box.className = 'cswap'; box.innerHTML = h; const say = db.querySelector('.say'); if (say) say.after(box); else db.prepend(box);
+  // each card shows the class's figure (the dialog paints its own portraits before this box arrives)
+  for (const cv of box.querySelectorAll('canvas.jp')){ const sh = heroSheet(cv.dataset.jp, {}, S.look); if (!sh) continue; const K = sh.K, fs = sh.fs, c = SPR.ensure(sh, 'idle'), g = cv.getContext('2d');
+    g.imageSmoothingEnabled = false; g.clearRect(0, 0, cv.width, cv.height); g.drawImage(c, fs / 2 - 18 * K, sh.anchor[1] - 50 * K, 36 * K, 36 * K, 0, 0, cv.width, cv.height); } }
+{ const st = document.createElement('style'); st.textContent = `
+  .cswap .csgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(132px,1fr));gap:8px;margin:4px 0 6px}
+  .cswap .cscard{position:relative;display:flex;flex-direction:column;align-items:center;gap:1px;padding:8px 6px 7px;border-radius:12px;background:linear-gradient(#fffdf6,#fbf1dc);border:1px solid #e8d4a8;box-shadow:0 2px 0 rgba(150,110,40,.18);text-align:center;min-width:0}
+  .cswap .cscard.on{border:2px solid #e3a92a;background:linear-gradient(#fff7d8,#ffe9a8)}
+  .cswap .cscard.locked{filter:saturate(.35);opacity:.85}
+  .cswap .cscard canvas.jp{width:56px;height:56px;border-radius:50%;background:radial-gradient(#fff,#f0e2c0);border:2px solid #ead7aa;image-rendering:pixelated}
+  .cswap .cscard b{font-size:14px;line-height:1.2;color:#3a2410;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cswap .cscard small{font-size:11.5px;color:#7a5a30}
+  .cswap .cscard em{font-style:normal;font-size:11px;color:#9a7a4a;margin-bottom:4px}
+  .cswap .cscard .btn,.cswap .cscard .pr{width:100%;margin-top:auto}
+  .cswap .cscard .pr{display:block;font-size:12px;font-weight:700;color:#a8701a;padding:5px 0}
+  .cswap .cscard .csstar{position:absolute;top:6px;right:8px;font-style:normal;font-size:14px;color:#e3a92a}
+  @media (max-height:460px){ .cswap .csgrid{grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:6px} .cswap .cscard canvas.jp{width:44px;height:44px} .cswap .cscard b{font-size:12.5px} }`;
+  document.head.appendChild(st); }
 function csReopen(){ const d = document.getElementById('dialog'), n = d && !d.hidden && NPCS.find(x => x.id === d.dataset.npc); if (!n) return; if (NPC_OPEN[n.id]) NPC_OPEN[n.id](n); else openNpc(n); csAppend(); }
 { const _o = openNpc; openNpc = function(n){ const r = _o.apply(this, arguments); if (n && n.id === 'job') csAppend(); return r; }; }
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-csgo]'); if (!b || b.disabled) return; e.stopPropagation(); csSwitch(b.dataset.csgo); }, true);

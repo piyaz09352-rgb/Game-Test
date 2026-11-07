@@ -21,7 +21,7 @@ Object.assign(EVENTS, {
     c_ev_candle:{slot:'top', ev:'candle', th:'ชุดผ้าไหมแห่เทียน', en:'Candle Procession Silk', tok:40, look:{top:'ivory', sleeve:'ivory', forearm:'skin', armband:'gold', pants:'ochre', bootCuff:'gold', belt:'gold', skirtM:'ochre', skirtT:'gold', necklace:true, neckMat:'gold'}},
     hc_ev_candle:{slot:'head', ev:'candle', th:'มงกุฎเทียนแกะสลัก', en:'Carved Candle Crown', tok:20, look:{hat:'crest', bandMat:'gold', crestMat:'ivory', crestN:7}}
   };
-  for (const id in ev){ const c = {...ev[id], src:'event'}; COSTUME[id] = c; SPR.GEAR_LOOK[id] = c.slot === 'top' ? {...TOP0, ...c.look} : {...c.look}; }
+  for (const id in ev){ const c = {...ev[id], src:'event'}; COSTUME[id] = c; SPR.GEAR_LOOK[id] = c.slot === 'top' ? {...TOP0, ...c.look} : {...c.look}; (window.EV_COS = window.EV_COS || {})[id] = c; }   // (v213) kept aside: the new wardrobe (fashion30.js) clears COSTUME
 }
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'festivals2', t:['ปฏิทินเทศกาล', 'Festival calendar'], b:() => `<table class="wkt"><tr><th>${L('เทศกาล', 'Festival')}</th><th>${L('ช่วงเวลา', 'When')}</th><th>${L('เหรียญ', 'Token')}</th></tr>
   ${Object.keys(EVENTS).map(k => { const E = EVENTS[k]; return `<tr><td>${L(E.th, E.en)}</td><td>${E.from[1]}/${E.from[0]} – ${E.to[1]}/${E.to[0]}</td><td>${L(...E.tok)}</td></tr>`; }).join('')}</table>

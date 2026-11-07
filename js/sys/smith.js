@@ -212,11 +212,11 @@ WIN_RENDER.forge = function(){
       const res = RF.last ? `<div class="rfres ${RF.last.ok ? 'ok' : 'fail'}">${RF.last.ok ? `✦ ${L('สำเร็จ', 'Success')} +${RF.last.from} → +${RF.last.to} ✦` : RF.last.guard ? L('ล้มเหลว · ยันต์รักษาขั้นไว้', 'Failed · the ward kept the level') : RF.last.to < RF.last.from ? L(`ล้มเหลว · +${RF.last.from} → +${RF.last.to}`, `Failed · +${RF.last.from} → +${RF.last.to}`) : L('ล้มเหลว · ขั้นเท่าเดิม', 'Failed · level kept')}</div>` : '';
       const tog = (k, item, txt) => { const have = haveN(item); return `<label class="rftog${have ? '' : ' off'}"><input type="checkbox" data-rftog="${k}" ${RF[k] && have ? 'checked' : ''} ${have ? '' : 'disabled'}><span class="ic">${itemIcon(item)}</span><span><b>${nm(ITEMS[item])} <em>×${have}</em></b><small>${txt}</small></span></label>`; };
       stage = `<div class="rfstage ${lvc}${RF.last ? (RF.last.ok ? ' ok' : ' fail') : ''}" id="rfStage">
-        <div class="rfanvil"><i class="rfray"></i><i class="rfring"></i><div class="rfbig">${info.icon}</div><i class="rfspark"></i><b class="rflv">+${info.rf}</b></div>
-        <b class="rfname rar r${info.it ? rarOf(info.id) : 0}">${info.name}</b>${res}
-        ${max ? `<p class="rfmax">${L('ตีบวกสูงสุด +15 แล้ว · หัตถ์เทวะ!', 'Maxed at +15 · Hand of the Gods!')}</p>` : `
+        <div class="rfhead"><div class="rfanvil"><i class="rfray"></i><i class="rfring"></i><div class="rfbig">${info.icon}</div><i class="rfspark"></i><b class="rflv">+${info.rf}</b></div>
+        <div class="rfhinfo"><b class="rfname rar r${info.it ? rarOf(info.id) : 0}">${info.name}</b>${res}
+        ${max ? `<p class="rfmax">${L('ตีบวกสูงสุด +15 แล้ว · หัตถ์เทวะ!', 'Maxed at +15 · Hand of the Gods!')}</p></div></div>` : `
         <div class="rfstep"><span>+${info.rf}</span><i>➜</i><span class="nx">+${nx}</span></div>
-        <div class="rfgain"><span>${rfGain(info, info.rf)}</span><i>➜</i><b>${rfGain(info, nx)}</b></div>
+        <div class="rfgain"><span>${rfGain(info, info.rf)}</span><i>➜</i><b>${rfGain(info, nx)}</b></div></div></div>
         <div class="pbar rate rfrate"><i style="width:${rate}%"></i><span>${L('โอกาสสำเร็จ', 'Success')} ${rate}%</span></div>
         <div class="rfneed"><span class="cneed${hm >= c.n ? ' ok' : ''}"><i>${itemIcon(c.mat)}</i>${nm(ITEMS[c.mat])} ${fmtN(hm)}/${c.n}</span><span class="cneed${S.bia >= c.z ? ' ok' : ''}"><i class="cz"><i class="biaI"></i></i>${fmtN(c.z)} ${CUR()}</span></div>
         <div class="rftogs">${REFINE_RATE(nx) < 100 ? tog('luck', 'rf_luck', L('+10% โอกาสสำเร็จ', '+10% success')) : ''}${nx >= 5 ? tog('guard', 'rf_guard', L('ล้มเหลวไม่ลดขั้น', 'Failure keeps the level')) : ''}</div>

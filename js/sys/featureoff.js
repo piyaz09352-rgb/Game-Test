@@ -10,7 +10,7 @@
    To bring a system back, set its switch to false. Loaded last, so it only overrides; nothing else is removed. */
 'use strict';
 
-const FEATURE_OFF = {festival:true, weather:true};
+const FEATURE_OFF = {festival:false, weather:true};   // (v213) the owner asked for festivals back; their decorations were made lighter
 
 /* ---------- festivals ---------- */
 if (FEATURE_OFF.festival && typeof EVENTS !== 'undefined'){

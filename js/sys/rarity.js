@@ -24,7 +24,12 @@ const AFFIX = [
   ['hp', [1, 4, 3, 2], L => 20 + L * 4], ['sp', [1, 2, 2, 2], L => 10 + L], ['def', [0, 3, 2, 0], L => 1 + Math.floor(L / 12)], ['mdef', [0, 2, 3, 1], L => 1 + Math.floor(L / 15)],
   ['crit', [3, 0, 1, 3], L => 1 + Math.floor(L / 40)], ['atkPct', [3, 0, 1, 2], L => .02 + Math.min(.04, L / 3000)], ['matkPct', [3, 0, 1, 2], L => .02 + Math.min(.04, L / 3000)],
   ['hpPct', [0, 3, 2, 2], L => .02 + Math.min(.04, L / 3000)], ['spPct', [0, 1, 2, 2], L => .02 + Math.min(.05, L / 2500)],
-  ['race', [3, 0, 0, 2], L => .04 + Math.min(.06, L / 2000)]];
+  ['race', [3, 0, 0, 2], L => .04 + Math.min(.06, L / 2000)],
+  // (v193) a target element, a target size, a status to shrug off (each rolls its own kind, like race)
+  ['vsElem', [3, 0, 0, 1], L => .04 + Math.min(.06, L / 2000)], ['vsSize', [3, 0, 0, 1], L => .03 + Math.min(.05, L / 2400)], ['res', [0, 2, 3, 2], L => .08 + Math.min(.17, L / 700)],
+  ['proc', [2, 0, 0, 0], L => .02 + Math.min(.015, L / 8000)]];   // a chance to inflict a status with each hit (weapons)
+const OPT_PARAM = {race:() => RACES, vsElem:() => ELEM, vsSize:() => ['s', 'm', 'l'], res:() => ['poison', 'burn', 'bleed', 'slow', 'freeze', 'root', 'silence', 'blind', 'curse'], proc:() => ['poison', 'burn', 'bleed', 'slow', 'freeze', 'stun', 'blind', 'curse']};
+const OPT_KEY = {vsElem:'vsElem_', vsSize:'vsSize_', res:'res_', proc:'proc_'};   // option → the stat key the game reads (race stays a table)
 const RACES = ['brute', 'plant', 'insect', 'fish', 'undead', 'human', 'demon', 'angel', 'dragon', 'formless'];
 const SLOT_I = {weapon:0, armor:1, head:2, acc:3};
 const baseOf = id => (ITEMS[id] && ITEMS[id].base) || id;
@@ -47,8 +52,8 @@ function rollOpts(base, r){
     for (const a of pool){ if (used.has(a[0])) continue; u -= a[1][si]; if (u <= 0){ pick = a; break; } }
     if (!pick) break; used.add(pick[0]);
     const k = pick[0], v = pick[2](L) * (.75 + Math.random() * .5) * (1 + r * .25);   // ±25% roll, +25% per rarity tier
-    const pct = k.endsWith('Pct') || k === 'race';
-    out.push(k === 'race' ? [k, +v.toFixed(3), RACES[Math.floor(Math.random() * RACES.length)]] : [k, pct ? +Math.max(.01, v).toFixed(3) : Math.max(1, Math.round(v))]);
+    const pct = k.endsWith('Pct') || OPT_PARAM[k]; const ps = OPT_PARAM[k] && OPT_PARAM[k]();
+    out.push(ps ? [k, +v.toFixed(3), ps[Math.floor(Math.random() * ps.length)]] : [k, pct ? +Math.max(.01, v).toFixed(3) : Math.max(1, Math.round(v))]);
   }
   return out;
 }
@@ -59,6 +64,7 @@ function instStats(base, r, opts, roll){
     st[k] = typeof v !== 'number' || k === 'wtype' ? v : (k.endsWith('Pct') ? +(v * R.mul * q).toFixed(3) : Math.max(1, Math.round(v * R.mul * q))); }
   for (const [k, v, rc] of opts){
     if (k === 'race'){ st.race = st.race || {}; st.race[rc] = +(((st.race[rc] || 0) + v)).toFixed(3); }
+    else if (OPT_KEY[k]){ const kk = OPT_KEY[k] + rc; st[kk] = +(((st[kk] || 0) + v)).toFixed(3); }
     else st[k] = +(((st[k] || 0) + v)).toFixed(3); }
   return st;
 }
@@ -83,7 +89,12 @@ function rerollOpts(key){
 /* text of the random options: "◆ STR +2 · ◆ +5% vs Brute" */
 function optText(id){
   const it = ITEMS[id]; if (!it || !it.opts) return '';
-  return it.opts.map(([k, v, rc]) => '◆ ' + (k === 'race' ? L(`ดาเมจต่อเผ่า${RACE_TH[rc] || rc} +${Math.round(v * 100)}%`, `+${Math.round(v * 100)}% vs ${RACE_EN[rc] || rc}`) : gearStatText({[k]:v}))).join(' · ');
+  const P = v => Math.round(v * 100) + '%', ST = {poison:['พิษ', 'Poison'], burn:['ไฟลวก', 'Burn'], bleed:['เลือดไหล', 'Bleed'], slow:['เชื่องช้า', 'Slow'], freeze:['แช่แข็ง', 'Freeze'], root:['ตรึง', 'Root'], silence:['ใบ้', 'Silence'], blind:['ตาพร่า', 'Blind'], curse:['คำสาป', 'Curse']};
+  return it.opts.map(([k, v, rc]) => '◆ ' + (k === 'race' ? L(`ดาเมจต่อเผ่า${RACE_TH[rc] || rc} +${P(v)}`, `+${P(v)} vs ${RACE_EN[rc] || rc}`)
+    : k === 'vsElem' ? L(`ตีมอนธาตุ${ELEM_TH[rc] || rc} +${P(v)}`, `+${P(v)} vs ${ELEM_EN[rc] || rc} monsters`)
+    : k === 'vsSize' ? L(`ตีมอนขนาด${SIZE_TH[rc] || rc} +${P(v)}`, `+${P(v)} vs ${SIZE_EN[rc] || rc} monsters`)
+    : k === 'res' ? L(`ต้าน${(ST[rc] || [rc])[0]} ${P(v)}`, `${P(v)} to resist ${(ST[rc] || [rc, rc])[1]}`)
+    : k === 'proc' ? L(`ตีแล้ว ${P(v)} ติด${(ST[rc] || {stun:['สลบ']}[rc] || [rc])[0]}`, `${P(v)} to inflict ${(ST[rc] || {stun:['', 'Stun']}[rc] || [rc, rc])[1]}`) : gearStatText({[k]:v}))).join(' · ');
 }
 /* the base part of an instance's stats (without its options), for showing the two apart */
 function baseText(id){ const it = ITEMS[id]; if (!it || !it.base) return it && it.st ? gearStatText(it.st) : ''; const d = instStore()[id] || {}; const b = ITEMS[it.base];
@@ -97,7 +108,7 @@ function sanitizeInst(d){
   const o = [], q = {};
   for (const x of Array.isArray(d.o) ? d.o.slice(0, 4) : []){ if (!Array.isArray(x)) continue; const [k, v, rc] = x;
     const af = AFFIX.find(a => a[0] === k), cap = af ? af[2](base.lv || 1) * 2.3 : 0;   // never above the best roll an item of this level can get
-    if (k === 'race'){ if (RACES.includes(rc) && typeof v === 'number') o.push(['race', +clamp(v, 0, cap).toFixed(3), rc]); continue; }
+    if (OPT_PARAM[k]){ if (OPT_PARAM[k]().includes(rc) && typeof v === 'number' && isFinite(v)) o.push([k, +clamp(v, 0, cap).toFixed(3), rc]); continue; }   // race · vsElem · vsSize · res: a known kind only
     if (!af || typeof v !== 'number' || !isFinite(v)) continue; o.push([k, k.endsWith('Pct') ? +clamp(v, 0, cap).toFixed(3) : clamp(Math.round(v), 0, Math.ceil(cap))]); }
   for (const k in d.q || {}) if (typeof base.st[k] === 'number') q[k] = clamp(+d.q[k] || 1, .9, 1.1);
   if (!d.o && d.st){   // instances from before random options: keep their extra lines as options

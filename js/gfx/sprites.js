@@ -52,6 +52,7 @@ const DIR_TH = ['ใต้','ตะวันตกเฉียงใต้','ต
 /* ---------- materials ---------- */
 const hex = h => { const n = parseInt(h.slice(1), 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; };
 const MATS = [], M = {};
+const TECH_HATS = ['headset', 'antenna', 'holoHalo', 'techCrown', 'mechHelm', 'vfin', 'ledBand'];   // (v194) AI headpieces
 const toHex = c => '#' + c.map(v => Math.max(0, Math.min(255, Math.round(v))).toString(16).padStart(2, '0')).join('');
 /* a 4-tone ramp (light → dark) from one base colour, for generated monster palettes */
 function rampOf(name, base, o = {}){
@@ -117,6 +118,13 @@ mat('orb',    ['#ffffff','#efe4ff','#c4a8ff','#9370ea'], {emissive:true});
 mat('rune',   ['#ffffff','#d8f0ff','#8fd0ff','#5aa0e8'], {emissive:true});
 mat('slime',  ['#e6fbff','#86d4ec','#48a4cc','#2a6c9a']);
 mat('slimeG', ['#fff8cc','#f5cc50','#d0961e','#8c5a14']);
+// (v193) the Golden Jelly King: a warmer, more colourful body (gold into peach and rose), a glowing halo, feathered wings with rainbow tips
+mat('slimeRoyal', ['#fffbe6','#ffd86a','#ff9e7a','#d65a8a']);
+mat('haloGlow', ['#ffffff','#fff3b0','#ffd34a','#c8901a'], {emissive:true});
+mat('featherW', ['#ffffff','#f4f2ff','#d8d4f0','#a8a0d0']);
+mat('tipPink', ['#fff0f8','#ffb0dc','#ff6ab0','#c03a80'], {emissive:true});
+mat('tipAqua', ['#f0ffff','#a8f4ff','#40d0f0','#1a8ab8'], {emissive:true});
+mat('tipViolet', ['#f6f0ff','#d0b8ff','#9a70ff','#5a3ac0'], {emissive:true});
 mat('slimeE', ['#ffffff','#2a3a48','#1c2834','#101820'], {noEdge:true});
 mat('fur',    ['#ffffff','#f1e6d2','#d3c2a6','#9c8a72']);
 mat('furPink',['#ffd6dc','#eea4b0','#c97888','#94505e']);
@@ -497,6 +505,29 @@ const SK_POSE = {
 };
 
 /* ---------- human model ---------- */
+/* (v197) a two-handed weapon (greatsword, war axe) is swung with both hands on the grip: brought up over the head,
+   then chopped down in front of the body, the hips behind it, then back to guard. The hands stay near the middle of
+   the chest so the other hand can close on the hilt (drawHuman grip2); the one-handed side swing is not used. */
+function twoHandChop(P, f){
+  // (v210) a real overhead chop, as heavy weapons swing in action games: guard with the head up in front, wind up over
+  // the shoulder, raised beside the head (the big chibi head hid it when it went straight overhead), bring it over the top, and drive it down to the ground in front with
+  // a step, bent knees and a forward lean; then haul it back up. It used to stop level with the shoulders, like a thrust.
+  // The weapon points along armR + elbR·0.7 + wpn − 0.1 (0 down · π/2 forward · π up · past π behind).
+  P.armR = [.9, 2.5, 2.2, .95, .9][f]; P.elbR = [.5, .4, .2, .05, .3][f]; P.outR = [.05, -.2, -.2, -.04, .03][f]; P.gripUp = f === 1 || f === 2; P.wRoll = [0, .95, .4, 0, 0][f]; P.wpn = [1.3, .65, .35, .1, 1.2][f];
+  P.armL = [.85, 2.6, 2.2, .9, .85][f]; P.elbL = [.55, .45, .25, .1, .35][f]; P.outL = [.05, .02, 0, -.04, .03][f];
+  P.lean = [0, -.16, 0, .34, .12][f]; P.twist = [0, -.12, -.02, .12, .04][f]; P.sway = [0, .3, 0, -.4, -.15][f];
+  P.legL = [0, -.12, .25, .55, .2][f]; P.legR = -P.legL * .7; P.bob = [0, .5, .1, -1.6, -.5][f];
+  return P;
+}
+/* (v210) a one-handed axe is chopped, not swept: the elbow goes up and out and the axe high beside the head, then it comes down
+   at a slant with the hips behind it, bites low in front and follows through; the free arm swings back for balance */
+function axeChop1(P, f){
+  P.armR = [.55, 2.3, 2.0, 1.05, .45][f]; P.elbR = [.9, .9, .3, .05, .25][f]; P.outR = [.2, .6, .35, -.05, .1][f]; P.wRoll = [0, .7, .3, 0, 0][f]; P.wpn = [1.0, .95, .3, .1, .45][f];
+  P.armL = [.25, .75, .35, -.35, -.1][f]; P.elbL = [.4, .9, .6, .3, .35][f]; P.outL = [.2, .25, .2, .3, .2][f];
+  P.lean = [0, -.12, .06, .3, .16][f]; P.twist = [0, -.42, -.05, .36, .2][f]; P.sway = [0, .45, -.1, -.6, -.3][f];
+  P.legL = [0, -.15, .3, .52, .22][f]; P.legR = -P.legL * .7; P.bob = [0, .35, -.1, -1.3, -.6][f];
+  return P;
+}
 function humanPose(act, f, n, weapon){
   const P = {bob:0, legL:0, legR:0, liftL:0, liftR:0, armL:.1, armR:.1, outL:.16, outR:.16, elbL:.28, elbR:.28, lean:0, twist:0, hipX:0, fall:0, wpn:1.7,
     eyes:'open', sit:false, spin:0, draw:0, glow:0, ring:-1, mouth:0, kneel:0, head:0, sway:0, aura:-1, sparks:-1, lasso:null, ride:null, tuck:0, roll:0, noWeapon:false, breath:0};
@@ -753,16 +784,22 @@ function drawHuman(cx, cfg, P){
     G(); ell(cx, hand, cfg.handWrap ? 2.4 : 2.2, cfg.handWrap ? 2.4 : 2.2, M[cfg.handWrap || cfg.skinM || 'skin'], {});
     return {hand, dir:nrm([hand[0] - el[0], hand[1] - el[1], hand[2] - el[2]])};
   };
+  const wRot = v => (P.wRoll ? rotZ(v, P.wLeft ? -P.wRoll : P.wRoll) : v);   // (v210) a weapon cocked out to the side (a wind-up beside the head)
   const arm0 = (side, pitch, out, elb) => { const sh = lean([hipC[0] + side * 6.0 * (cfg.slim || 1), 19.4 + B, 0]), el = add(sh, upper(rotX(rotZ([0, -4.1, 0], side * out), -pitch)));
     return add(el, upper(rotX(rotZ([0, -3.8, 0], side * out * .6), -(pitch + elb)))); };
   const grip2 = !P.noWeapon && !ride && !cfg.sheathed && (cfg.twoHand || cfg.katana) && (cfg.weapon === 'sword' || cfg.weapon === 'staff' || cfg.weapon === 'dagger') && !(cfg.weapon === 'staff' && P.ring >= 0);
   let AR, AL;
   if (grip2){
-    const wa = P.wLeft ? P.armL + P.elbL * .7 : P.armR + P.elbR * .7, wd = nrm(upper(rotX([0, -1, 0], -(wa + P.wpn - .1))));
+    const wa = P.wLeft ? P.armL + P.elbL * .7 : P.armR + P.elbR * .7, wd = nrm(upper(wRot(rotX([0, -1, 0], -(wa + P.wpn - .1)))));
     // the weapon hand keeps its pose but is drawn in toward the front of the body, so the other hand can close on the
     // hilt just below it: both hands on the grip, like a real two-handed hold
     const side = P.wLeft ? 1 : -1, posed = arm0(side, P.wLeft ? P.armL : P.armR, P.wLeft ? P.outL : P.outR, P.wLeft ? P.elbL : P.elbR);
-    const front = lean([hipC[0] + side * 1.6, 15.2 + B, 4.2]), main = lerp3(posed, front, .5), off = add(main, mul(wd, -3.1));
+    // (v197) the grip is drawn in toward the chest only as far as needed for BOTH hands to reach it (short chibi arms
+    // stretch 25% at most): in wide swings the other hand used to stop short of the hilt, so it looked one-handed
+    const front = lean([hipC[0] + side * 1.6, 15.2 * .45 + (posed[1] - B) * .55 + B, 4.2]), shOff = lean([hipC[0] - side * 6.0 * (cfg.slim || 1), 19.4 + B, 0]), shMain = lean([hipC[0] + side * 6.0 * (cfg.slim || 1), 19.4 + B, 0]), reach = 7.85 * 1.22;
+    // (v210) gripUp: a wind-up keeps the hands up high instead of pulling them in to the chest
+    let main, off; for (const k of (P.gripUp ? [0, .15, .3, .5, .62, .74, .86, 1] : [.5, .62, .74, .86, 1])){ main = lerp3(posed, front, k); off = add(main, mul(wd, -3.1));
+      if (Math.hypot(off[0] - shOff[0], off[1] - shOff[1], off[2] - shOff[2]) <= reach * (P.gripUp ? 1.15 : 1) && Math.hypot(main[0] - shMain[0], main[1] - shMain[1], main[2] - shMain[2]) <= reach) break; }
     if (P.wLeft){ AL = armTo(1, main); AR = armTo(-1, off); } else { AR = armTo(-1, main); AL = armTo(1, off); }
   } else { AR = arm(-1, P.armR, P.outR, P.elbR); AL = arm(1, P.armL, P.outL, P.elbL); }
   const handR = AR.hand, handL = AL.hand;
@@ -774,7 +811,7 @@ function drawHuman(cx, cfg, P){
   if (cfg.beard){ G(); ell(cx, add(hc, [0, -6.5, 5.2]), 5.8, 4.6, M[cfg.beard], {tex:n => (n[2] < -.2 ? false : n[1] > .35 && Math.abs(n[0]) < .45 ? false : undefined)}); }
   const hairG0 = gid; G(); ell(cx, add(hc, [0, 1.0, -1.4]), 11.2, 11.2, M[cfg.hair], {tex:n => hairTex(n, cfg)});
   const sw = P.sway || 0;
-  if (cfg.spikes && !['wizard', 'cap', 'mala', 'lomphok', 'hermit', 'ngob', 'helm', 'crown'].includes(cfg.hat)){
+  if (cfg.spikes && !['wizard', 'cap', 'mala', 'lomphok', 'hermit', 'ngob', 'helm', 'crown', 'mechHelm'].includes(cfg.hat)){
     // messy locks: tapered tufts around the crown and back (never over the face), each its own outline group
     const n = cfg.spikes, L = cfg.spikeLen || 4.5, c0 = add(hc, [0, 1.2, -1.4]);
     for (let i = 0; i < n; i++){
@@ -795,7 +832,7 @@ function drawHuman(cx, cfg, P){
       G(); cap(cx, add(hc, [x * .9, 8.6, 6.8 - Math.abs(k) * .9]), add(hc, [x * 1.18 + sw * .2, 8.4 - drop, 10.2 - Math.abs(k) * 1.4]), 2.6, .5, M[cfg.hair], {});
     }
   }
-  cx.head = {hc, skinG, hairG0, hairG1:gid, P, cfg, hatTop:['wizard', 'cap', 'mala', 'lomphok', 'hermit', 'ngob', 'helm', 'crown'].includes(cfg.hat)};
+  cx.head = {hc, skinG, hairG0, hairG1:gid, P, cfg, hatTop:['wizard', 'cap', 'mala', 'lomphok', 'hermit', 'ngob', 'helm', 'crown', 'mechHelm'].includes(cfg.hat)};
   if (cfg.backHair){ G(); for (let i = 0; i <= 6; i++){ const k = i / 6; ell(cx, add(hc, upper([sw * k * 1.4, -2 - k * (cfg.backLen || 9), -6.5 - k * 1.5 - Math.abs(sw) * k])), (cfg.backW || 8.6) - k * 2.4, 4.5, M[cfg.hair], {tex:n => (Math.sin(Math.atan2(n[0], -n[2]) * 9) > .6 ? {dt:1} : undefined)}); } }
   if (cfg.ponytail){ G(); for (let i = 0; i <= 8; i++){ const k = i / 8; ell(cx, add(hc, upper([sw * k * 3, 4 - k * 11 + Math.abs(sw) * k * 2, -10.5 - Math.sin(k * 2.5) * 3 - Math.abs(sw) * k * 2])), 3.4 - k * 1.4, 3.4 - k * 1.4, M[cfg.hair]); } }
   if (cfg.sideLocks){ const len = cfg.sideLocks; for (const sd of [-1, 1]){ G(); for (let i = 0; i <= 7; i++){ const k = i / 7;
@@ -806,6 +843,36 @@ function drawHuman(cx, cfg, P){
   if (cfg.twintail){ for (const sd of [-1, 1]){ G(); ell(cx, add(hc, upper([sd * 9.6, 6.2, -3.4])), 2.4, 2.4, M[cfg.belt === 'gold' ? 'gold' : 'scarlet']);
       G(); for (let i = 0; i <= 8; i++){ const k = i / 8; ell(cx, add(hc, upper([sd * (10.6 + k * 2.6) + sw * k * 2, 5 - k * 15 + Math.abs(sw) * k * 2, -4.6 - k * 2.4 - Math.abs(sw) * k])), 3.5 - k * 1.5, 3.5 - k * 1.5, M[cfg.hair], {tex:n => (Math.sin(Math.atan2(n[0], n[1]) * 5 + k * 6) > .55 ? {dt:1} : undefined)}); } } }
   if (cfg.bun){ G(); ell(cx, add(hc, upper([0, 7.5, -8])), 4.6, 4.6, M[cfg.hair], {tex:n => (Math.sin(Math.atan2(n[0], n[1]) * 6) > .5 ? {dt:1} : undefined)}); G(); line(cx, add(hc, upper([-4, 9, -9])), add(hc, upper([5, 10.5, -8])), M.gold, {t:1}); }
+  // (v194) thirty more hairstyles: new shapes (hidden on top under a full hat, like the spikes)
+  { const H = M[cfg.hair], topOk = !['wizard', 'cap', 'mala', 'lomphok', 'hermit', 'ngob', 'helm', 'crown', 'mechHelm'].includes(cfg.hat), curl = n => (Math.sin(n[0] * 9) * Math.sin(n[1] * 9) > .25 ? {dt:1} : undefined);
+    const tie = cfg.tieMat ? M[cfg.tieMat] : M.gold;
+    if (cfg.afro && topOk){ const A = cfg.afro, ac = add(hc, upper([0, 3.4, -3.6])); G(); ell(cx, ac, 14.6 * A, 13.2 * A, H, {rz:10.4 * A, tex:curl});
+      // tight curls all over its surface (it read as a smooth helmet)
+      for (let i = 0; i < 26; i++){ const a = i * 2.399, y = -.25 + 1.15 * ((i * .618) % 1), r = Math.sqrt(Math.max(0, 1 - y * y)), d = [Math.sin(a) * r, y, Math.cos(a) * r];
+        if (d[2] > .35 && d[1] < .45) continue; G(); ell(cx, add(ac, [d[0] * 14 * A, d[1] * 12.6 * A, d[2] * 9.8 * A]), 3.2 * A, 3.2 * A, H, {tex:curl}); } }
+    if (cfg.bowl) for (let i = 0; i < 11; i++){ const a = (i / 10 - .5) * 3.6 + Math.PI, x0 = Math.sin(a) * 11.2, z0 = Math.cos(a) * 11.2 - 1;   // a bowl's rim at ear height, all round but the face
+      G(); ell(cx, add(hc, upper([x0, -.6, z0])), 3.4, 2.6, H, {}); }
+    if (cfg.pompadour && topOk){ G(); ell(cx, add(hc, upper([0, 9.6, 3.2])), 8.6, 5.2, H, {rz:6.4, tex:n => (Math.sin(n[0] * 6 + n[2] * 3) > .6 ? {dt:1} : undefined)}); G(); ell(cx, add(hc, upper([0, 11.4, -1])), 7.4, 3.6, H, {rz:7}); }
+    if (cfg.mohawk && topOk) for (let i = 0; i < 7; i++){ const a = -.35 + i * .42, d = nrm([0, Math.cos(a), Math.sin(a) * -1 + .55]), base = add(hc, upper(mul(d, 9.4))), len = 6.4 + Math.sin(i / 6 * Math.PI) * 3.4;
+      G(); cap(cx, base, add(base, mul(d, len)), 2.9, .5, H, {}); }
+    if (cfg.curls && topOk) for (let i = 0; i < 22; i++){ const a = i * 2.399 + .3, y = .1 + .85 * ((i * .618) % 1), r = Math.sqrt(1 - y * y), d = [Math.sin(a) * r, y, Math.cos(a) * r];
+      if (d[2] > .45 && d[1] < .55) continue; G(); ell(cx, add(hc, upper(add([0, 1, -1.4], mul(d, 10.6)))), 3.1, 3.1, H, {tex:curl}); }
+    if (cfg.braid){ G(); for (let i = 0; i <= 11; i++){ const k = i / 11; ell(cx, add(hc, upper([(i % 2 ? .9 : -.9) + sw * k * 2, -1 - k * cfg.braid, -9.6 - k * 2 - Math.abs(sw) * k])), 2.6 - k * .9, 2.2 - k * .7, H, {tex:n => (n[0] * (i % 2 ? 1 : -1) > .3 ? {dt:1} : undefined)}); }
+      G(); ell(cx, add(hc, upper([sw * 2, -2 - cfg.braid, -11.6 - Math.abs(sw)])), 1.4, 1.4, tie); }
+    if (cfg.twinBraid) for (const sd of [-1, 1]){ G(); for (let i = 0; i <= 9; i++){ const k = i / 9; ell(cx, add(hc, upper([sd * (9.8 + k * .6) + (i % 2 ? .6 : -.6) + sw * k, 1 - k * cfg.twinBraid, 2.6 - k * 1.2])), 2.3 - k * .7, 2 - k * .6, H, {}); }
+      G(); ell(cx, add(hc, upper([sd * 10.4 + sw, -.2 - cfg.twinBraid, 1.4])), 1.3, 1.3, tie); }
+    if (cfg.drills) for (const sd of [-1, 1]){ G(); for (let i = 0; i <= 12; i++){ const k = i / 12, sp = k * Math.PI * 5; ell(cx, add(hc, upper([sd * (10.8 + Math.cos(sp) * 1.6) + sw * k, 3 - k * cfg.drills, -1.6 + Math.sin(sp) * 1.6])), 3.4 - k * 2, 2.6 - k * 1.5, H, {tex:n => (n[1] > .3 ? {dt:-1} : undefined)}); }
+      G(); ell(cx, add(hc, upper([sd * 9.8, 5.4, -1.4])), 1.6, 1.6, tie); }
+    if (cfg.sideTail){ const sd = cfg.sideTail; G(); ell(cx, add(hc, upper([sd * 9.4, 6.8, -4.2])), 2.2, 2.2, tie);
+      G(); for (let i = 0; i <= 9; i++){ const k = i / 9; ell(cx, add(hc, upper([sd * (11 + Math.sin(k * 2.4) * 3) + sw * k * 2, 6 - k * 16, -5 - k * 2])), 3.6 - k * 1.8, 3.6 - k * 1.8, H, {tex:n => (Math.sin(Math.atan2(n[0], n[1]) * 5 + k * 6) > .55 ? {dt:1} : undefined)}); } }
+    if (cfg.lowTail){ G(); ell(cx, add(hc, upper([0, -2.2, -11.4])), 2.3, 2.3, tie); G(); for (let i = 0; i <= 9; i++){ const k = i / 9; ell(cx, add(hc, upper([sw * k * 2.4, -3 - k * cfg.lowTail, -12.6 - k * 2.4 - Math.sin(k * 2) * 1.4])), 3.6 - k * 1.4, 3.6 - k * 1.4, H, {tex:n => (Math.sin(Math.atan2(n[0], n[1]) * 5 + k * 5) > .55 ? {dt:1} : undefined)}); } }   // stands clear of the back so you can see it
+    if (cfg.odango && topOk) for (const sd of [-1, 1]){ G(); ell(cx, add(hc, upper([sd * 6.6, 9.4, -3.6])), 4.2, 4.2, H, {tex:n => (Math.sin(Math.atan2(n[0], n[2]) * 6) > .5 ? {dt:1} : undefined)}); G(); ell(cx, add(hc, upper([sd * 5, 7.4, -.8])), 1.2, 1.2, tie); }
+    if (cfg.wave){ G(); for (let i = 0; i <= 9; i++){ const k = i / 9; ell(cx, add(hc, upper([Math.sin(k * Math.PI * 3) * 1.8 + sw * k * 1.6, -2 - k * cfg.wave, -6.8 - k * 1.6 - Math.abs(sw) * k])), (cfg.backW || 9.6) - k * 2.2 + Math.cos(k * Math.PI * 3) * .9, 4.6, H, {tex:n => (Math.sin(Math.atan2(n[0], -n[2]) * 7 + k * 4) > .55 ? {dt:1} : undefined)}); } }
+    if (cfg.dreads) for (let j = 0; j < 9; j++){ const a = (j / 8 - .5) * 2.4, x0 = Math.sin(a) * 9.4, z0 = -Math.cos(a) * 9.4 - 1.4;
+      G(); cap(cx, add(hc, upper([x0, 2, z0])), add(hc, upper([x0 * 1.15 + sw * 1.5, 2 - cfg.dreads - (j % 3), z0 * 1.1 - 1])), 1.6, 1.1, H, {tex:(n, lo, q, t) => (Math.sin(t * 22) > .4 ? {dt:1} : undefined)}); }
+    if (cfg.wolf) for (let j = 0; j < 7; j++){ const a = (j / 6 - .5) * 2.6, x0 = Math.sin(a) * 9.6, z0 = -Math.cos(a) * 9.6 - 1;
+      G(); cap(cx, add(hc, upper([x0, 1, z0])), add(hc, upper([x0 * 1.25 + sw, -4 - (j % 2) * 3, z0 * 1.15 - 1.4])), 3, .6, H, {}); }
+  }
   // hats
   if (cfg.hat === 'wizard'){
     G(); frustum(cx, add(hc, [0, 0, -.8]), hc[1] + 7.2, hc[1] + 6.4, 12.6, 12.6, M.indigoD, {g:cx.gid});
@@ -834,7 +901,7 @@ function drawHuman(cx, cfg, P){
     G(); ell(cx, add(hc, [5.5, 8.5, 7]), 2.8, 2.4, M[cfg.bandMat || 'cloth']);
   } else if (cfg.hat === 'ngob'){
     // งอบ: the wide palm-leaf farmer's hat
-    G(); frustum(cx, add(hc, [0, 0, -.5]), hc[1] + 15, hc[1] + 6.6, 3, 17.5, M.straw, {tex:(n, k) => (Math.sin(Math.atan2(n[0], n[2]) * 14) > .7 ? {dt:1} : k > .92 ? {m:M.wood} : undefined)});
+    G(); frustum(cx, add(hc, [0, 0, -.5]), hc[1] + 15, hc[1] + 6.6, 3, 17.5, M[cfg.hatMat] ?? M.straw, {tex:(n, k) => (Math.sin(Math.atan2(n[0], n[2]) * 14) > .7 ? {dt:1} : k > .92 ? {m:M[cfg.ngobBand] ?? M.wood} : undefined)});   // (v212) a wardrobe ngob may be dyed
     G(); ell(cx, add(hc, [0, 15.6, -.5]), 2, 1.6, M.wood);
   } else if (cfg.hat === 'lomphok' || cfg.hat === 'hermit'){
     // ลอมพอก: tall cone hat of Ayutthaya envoys and astrologers (tiger-striped for the hermit)
@@ -896,6 +963,37 @@ function drawHuman(cx, cfg, P){
       for (const sd of [-1, 1]){ G(); let p0 = add(hc, [sd * 5.4, 8, 2]);
         for (let j = 1; j <= 9; j++){ const k = j / 9, p1 = add(hc, [sd * (5.4 + k * 6) + sw * k, 8 + Math.sin(k * 2.2) * 9, 2 - k * 13]); cap(cx, p0, p1, 1.9 - k * 1.2, 1.9 - k * 1.5, j > 6 ? cm : hm, {}); p0 = p1; } }
       for (let i = 0; i < 4; i++){ G(); cap(cx, add(hc, [0, 10 - i * 1.5, -6 - i * 2.4]), add(hc, [sw * .3, 14.5 - i * 1.8, -8.5 - i * 2.6]), 1.2, .3, cm, {}); }
+    }
+  }
+  // (v194) AI / future headpieces: headset, twin antennas, digital halo, circuit crown, mecha helmet, V-fin, LED band
+  if (cfg.hat && TECH_HATS.includes(cfg.hat)){ const h = cfg.hat, hm = M[cfg.hatMat] ?? M.steel, cm = M[cfg.crestMat] ?? M.gem, arc = (r, y0, a0, a1, st, rr, m, z = -.4) => { for (let a = a0; a <= a1 + 1e-6; a += st) ell(cx, add(hc, [Math.sin(a) * r, y0 + Math.cos(a) * r, z]), rr, rr, m); };
+    if (h === 'headset'){
+      G(); arc(12.3, 2.2, -1.25, 1.25, .12, 1.15, hm);
+      for (const sd of [-1, 1]){ G(); ell(cx, add(hc, [sd * 11.6, 1.2, -.4]), 2.6, 4, hm, {tex:n => (n[1] > -.25 && n[1] < .25 ? {m:cm} : undefined)}); G(); ell(cx, add(hc, [sd * 12.6, 1.2, -.4]), 1.4, 2.4, cm, {et:0});
+        if (cfg.catEar){ G(); cap(cx, add(hc, [sd * 7.2, 11.2, -.6]), add(hc, [sd * 9 + sw * .4, 17.6, -1.2]), 3.2, .35, hm, {tex:n => (n[2] > .3 && Math.abs(n[0]) < .5 ? {m:cm} : undefined)}); } }
+      if (!cfg.catEar){ G(); cap(cx, add(hc, [-11.6, -1.4, 1]), add(hc, [-8.4, -6.2, 8.4]), .55, .5, hm, {}); G(); ell(cx, add(hc, [-7.6, -6.4, 9.2]), 1.1, 1.1, cm, {et:0}); }
+    } else if (h === 'antenna'){
+      G(); arc(12.1, 2.2, -1.2, 1.2, .14, .85, hm);
+      for (const sd of [-1, 1]){ G(); ell(cx, add(hc, [sd * 11.4, 1.8, -.4]), 2.2, 2.6, hm); const top = add(hc, [sd * 13.4 + sw * .8, 15.5, -2.4]);
+        G(); cap(cx, add(hc, [sd * 11.8, 3.6, -.6]), top, .55, .35, hm, {}); G(); ell(cx, top, 1.9, 1.9, cm, {et:0}); }
+    } else if (h === 'holoHalo'){
+      G(); for (let i = 0; i < 12; i++){ const a0 = i / 12 * Math.PI * 2; for (let a = a0; a < a0 + .38; a += .1) ell(cx, add(hc, [Math.sin(a) * 9, 18 + sw * .4, Math.cos(a) * 9 - 1.6]), .95, .95, i % 3 ? hm : cm, {et:0}); }
+      G(); for (let a = 0; a < Math.PI * 2; a += .2) ell(cx, add(hc, [Math.sin(a) * 6, 19.4 + sw * .4, Math.cos(a) * 6 - 1.6]), .6, .6, cm, {et:0});
+    } else if (h === 'techCrown'){
+      G(); ell(cx, add(hc, [0, 3, -.5]), 12, 12, hm, {tex:n => (n[1] > .24 && n[1] < .46 ? (Math.abs(Math.sin(Math.atan2(n[0], n[2]) * 6)) < .2 ? {m:cm} : undefined) : false)});
+      for (let i = -2; i <= 2; i++){ const a = i * .42, r = 11.4, ht = 8 - Math.abs(i) * 1.6; G(); cap(cx, add(hc, [Math.sin(a) * r, 7, Math.cos(a) * r - .5]), add(hc, [Math.sin(a) * (r + 1.2), 7 + ht, Math.cos(a) * (r + 1.2) - 1.5]), 1.4, .2, hm, {tex:n => (Math.abs(n[0]) < .25 ? {m:cm} : undefined)}); }
+      G(); ell(cx, add(hc, [0, 8.4, 11.4]), 1.7, 1.7, cm, {et:0});
+    } else if (h === 'mechHelm'){
+      G(); ell(cx, add(hc, [0, 3.2, -.6]), 12.6, 11.6, hm, {tex:n => (n[1] < -.4 ? false : n[2] > .55 && n[1] < .3 && n[1] > -.4 ? false : Math.abs(n[1] - .34) < .06 && n[2] > 0 ? {m:cm} : Math.abs(n[0]) < .06 && n[1] > .34 ? {m:cm} : undefined)});
+      G(); cap(cx, add(hc, [0, 14, 2]), add(hc, [sw * .5, 16, -12]), 1.8, .5, hm, {tex:() => ({m:cm})});
+      for (const sd of [-1, 1]){ G(); ell(cx, add(hc, [sd * 12.2, 2, -1]), 2.4, 3.2, hm, {tex:n => (Math.hypot(n[0], n[1]) < .45 ? {m:cm} : undefined)}); }
+    } else if (h === 'vfin'){
+      G(); ell(cx, add(hc, [0, 2.4, -.5]), 12, 12, hm, {tex:n => (n[1] > .26 && n[1] < .48 ? undefined : false)});
+      for (const sd of [-1, 1]){ G(); cap(cx, add(hc, [sd * 1.2, 8, 11]), add(hc, [sd * 10 + sw * .4, 19, 8]), 1.3, .25, M[cfg.finMat] ?? M.gold, {}); }
+      G(); ell(cx, add(hc, [0, 8.2, 11.6]), 2, 1.8, cm, {et:0});
+    } else if (h === 'ledBand'){
+      G(); ell(cx, add(hc, [0, 2.4, -.5]), 12, 12, hm, {tex:n => (n[1] > .22 && n[1] < .5 ? (Math.abs(n[1] - .36) < .05 ? {m:cm} : undefined) : false)});
+      for (const sd of [-1, 1]){ G(); ell(cx, add(hc, [sd * 11.6, 6.4, 1]), 1.8, 1.8, cm, {et:0}); }
     }
   }
   if (cfg.krabenTail && !ride && !sitK){ G(); cap(cx, lean([hipC[0], 10.2 + B, -5.6]), lean([hipC[0] + (P.sway || 0) * .4, 5.8 + B, -6.6]), 1.8, 1.2, M[cfg.pants], {}); }
@@ -998,7 +1096,7 @@ function drawHuman(cx, cfg, P){
       }
       else if (w === 'staff' || cfg.axe){
         // head over the right shoulder beside the head, the foot toward the left hip (v164: an axe hangs the same way, by its haft)
-        const len = cfg.axe ? (17 + Math.max(0, wt) * .7) * (two ? 1.45 : .88) * WPN_BIG * (two ? 1.02 : .82) : (20 + Math.max(0, wt) * .5) * (two ? .86 : .5) * WPN_BIG, tot = len + 6, tip = back(-10.6, 27.5, zb), sn = Math.min(.8, (27.5 - 3) / tot);
+        const len = cfg.axe ? (17 + Math.max(0, wt) * .7) * (two ? 1.45 : .88) * WPN_BIG * (two ? 1.02 : .82) * AXE_K[two ? 1 : 0] : (20 + Math.max(0, wt) * .5) * (two ? .86 : .5) * WPN_BIG, tot = len + 6, tip = back(-10.6, 27.5, zb), sn = Math.min(.8, (27.5 - 3) / tot);
         P2.wdir = nrm(upper([-Math.sqrt(1 - sn * sn), sn, 0])); const h = add(tip, mul(P2.wdir, -len));
         sash(-6.2, 6.0, .55, strapM);
         drawWeapon(cx, w, P2, h, h, G, cf);
@@ -1035,7 +1133,7 @@ function drawHuman(cx, cfg, P){
   // weapon follows the forearm
   if (!P.noWeapon && !stow){
     const wa = P.wLeft ? P.armL + P.elbL * .7 : P.armR + P.elbR * .7;
-    P.wdir = nrm(upper(rotX([0, -1, 0], -(wa + P.wpn - .1))));
+    P.wdir = nrm(upper(wRot(rotX([0, -1, 0], -(wa + P.wpn - .1)))));
     drawWeapon(cx, cfg.weapon, P, P.wLeft ? handL : handR, P.wLeft ? handR : handL, () => (cx.gid = gid++), cfg);
   }
   // a second one-handed weapon in the free hand
@@ -1258,6 +1356,30 @@ function paintHead(img, F, cx){
           if (k > .9 && Math.abs(Math.sin(u * 1.6)) < .35) return rgb('gold', 0); return rgb(fm, Math.sin(u * 2 + v) > .6 ? 1 : 2); },
         visor:(u, v) => { const band = Math.abs(v - .2); if (band > 2 || Math.abs(u) > 11.2) return null;
           if (band < .5 && Math.abs(u) < 8) return eg ? rgb(eg, Math.abs(u) < 5 ? 0 : 1) : [24, 14, 22]; return band > 1.55 ? rgb(tr, 1) : rgb(fm, v > .2 ? 1 : 2); },
+        // (v194) AI / future face pieces
+        cybshade:(u, v) => { const au = Math.abs(u); if (au > 11.2) return null; const top = 2.1 - au * .04, bot = -1.5 + Math.max(0, au - 6) * .35;
+          if (v < top && v > bot && au > .6){ if (v > top - .45) return rgb(tr, 1); const sl = Math.abs((u * .5 + v) % 2.2); return sl < .25 ? rgb(eg || tr, 1) : rgb(fm, v > .4 ? 2 : 3); }
+          if (au <= .6 && Math.abs(v - 1) < .4) return rgb(tr, 1); return null; },
+        monocle:(u, v) => { const x = u - 3.9, y = v - .2, d = Math.hypot(x, y);
+          if (d < 2.3){ if (Math.abs(x) < .12 || Math.abs(y) < .12) return rgb(eg || tr, 1); return Math.abs(d - 1.3) < .16 ? rgb(eg || tr, 1) : null; }
+          if (d < 2.95) return rgb(tr, d < 2.6 ? 1 : 2); if (u > 6.4 && u < 10.8 && Math.abs(v - .2 - (u - 6.4) * .12) < .4) return rgb(fm, 1);
+          if (u > 1 && u < 3 && Math.abs(v - 3) < .25) return rgb(eg || tr, 1); return null; },
+        circuit:(u, v) => { for (const sd of [-1, 1]){ const x = u * sd; if (x < 5 || x > 10.6 || v > -.4 || v < -3.2) continue;
+            if (Math.abs(v + 1) < .26 && x < 9.2) return rgb(fm, 2); if (Math.abs(x - 9.2) < .26 && v < -1 && v > -2.6) return rgb(fm, 2); if (Math.abs(v + 2.6) < .26 && x > 7.4 && x < 9.2) return rgb(fm, 2);
+            if (Math.hypot(x - 5.3, v + 1) < .5 || Math.hypot(x - 7.4, v + 2.6) < .5) return rgb(fm, 0); }
+          if (Math.abs(u) < .26 && v > 2.4 && v < 4.4) return rgb(fm, 2); if (Math.hypot(u, v - 2.2) < .5) return rgb(tr, 0); return null; },
+        respirator:(u, v) => { const k = face(u, v, 10.2, 7.4, -1.8); if (k > 1 || v > -.5) return null; const au = Math.abs(u);
+          if (v > -1.05) return rgb(tr, 1); if (au > 4.6 && au < 8 && v < -1.3){ const d = Math.hypot(au - 6.3, v + 2.3); return d < 1.3 ? (Math.sin(d * 9) > 0 ? rgb(fm, 3) : rgb(tr, 1)) : rgb(fm, 2); }
+          if (au < 2.2 && v < -1.4) return Math.abs(Math.sin(v * 5)) < .45 ? rgb(eg || tr, 1) : rgb(fm, 3); return rgb(fm, v > -2 ? 1 : 2); },
+        ledface:(u, v) => { const k = face(u, v, 10.6, 7.6, -1.2); if (k > 1) return null; if (k > .86) return rgb(tr, 1);
+          const px = Math.round(u * 1.1), py = Math.round(v * 1.1), on = (px, py) => { for (const ex of [-4, 4]){ const dx = px - ex; if (py === 1 + -Math.abs(dx) && Math.abs(dx) <= 2) return true; }
+            if (py === -4 && Math.abs(px) <= 2) return true; if (py === -3 && Math.abs(px) === 3) return true; return false; };
+          if (on(px, py)) return rgb(eg || 'cyanGlow', 1); return (px + py) % 2 ? rgb(fm, 3) : [14, 16, 24]; },
+        scanline:(u, v) => { const au = Math.abs(u); if (au > 11.2) return null; const band = Math.abs(v - .3 - au * au * .006);
+          if (band < .55) return au < 8 ? rgb(eg || tr, au < 2 ? 0 : 1) : rgb(fm, 1); if (band < 1.1) return rgb(fm, v > .3 ? 2 : 3); if (au > 9.4 && au < 11.2 && Math.abs(v - .3) < 1.8) return rgb(tr, 1); return null; },
+        techmark:(u, v) => { for (const sd of [-1, 1]){ const x = u * sd - 3.9, y = v + .9; if (y < 0 && y > -1.3 && Math.abs(x) < (y + 1.3) * .75) return rgb(fm, 2); }
+          if (u > -10.4 && u < -6.8 && v > -2.6 && v < -.8){ const c = Math.floor((u + 10.4) * 2.5); return [1, 0, 1, 1, 0, 1, 0, 0, 1][c] ? rgb(tr, 3) : null; }
+          if (u > 6.4 && u < 9.6 && Math.abs(v + 1.6) < .2) return rgb(fm, 2); if (Math.hypot(u - 9.8, v + 1.6) < .45) return rgb(fm, 2); return null; },
         tiger:(u, v) => { const k = face(u, v); if (k > 1) return null; const e = eye(u, v, 1.9, 1.1); if (e !== 0) return e;
           if (Math.sin(Math.abs(u) * 1.25 - v * .35) > .72 && Math.abs(u) > 2.4) return rgb(tr, 3); if (Math.abs(u) < .7 && v > 2) return rgb(tr, 3);
           if (Math.abs(v + 4.4) < .35 && Math.abs(u) < 2) return [30, 18, 24]; return k > .86 ? rgb(tr, 1) : tone(v, k); },
@@ -1313,6 +1435,7 @@ function hairTex(n, cfg){
 }
 /* (v101) held weapons drawn bigger (length × WPN_BIG, sword blades a little wider) so the weapon reads at game zoom */
 const WPN_BIG = 1.3;
+const AXE_K = [.55, .5];   // (v210) smaller again: the war axe stood nearly as tall as the character
 function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   if (!w || w === 'fist') return;
   if (w === 'bow'){
@@ -1355,20 +1478,23 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   // (v159) one-handed blades and rods are visibly smaller than their two-handed kin: a 1H sword ×0.88, a greatsword ×1.45;
   // a rod ×0.72, a longstaff ×1.3; the katana is its own long single blade
   const kat = w === 'dagger' && !!cfg.katana, two = !!cfg.twoHand || kat;
-  const len = kat ? (19.5 + Math.max(0, wt) * .5) * WPN_BIG : ((w === 'sword' ? 17 : w === 'staff' ? 20 : 9.5) + Math.max(0, wt) * (w === 'sword' ? .7 : w === 'staff' ? .5 : .3)) * (w === 'sword' ? (two ? 1.45 : .88) : w === 'staff' ? (two ? .86 : .5) : 1) * WPN_BIG * (w === 'dagger' ? 1.15 : 1);   // daggers a touch more: they were the hardest to see
+  // (v188) the merchant's axes are short hand axes: AXE_K shortens the whole weapon (haft, swing trail) and its head
+  const len = (cfg.axe && w === 'sword' ? AXE_K[two ? 1 : 0] : 1) * (kat ? (19.5 + Math.max(0, wt) * .5) * WPN_BIG : ((w === 'sword' ? 17 : w === 'staff' ? 20 : 9.5) + Math.max(0, wt) * (w === 'sword' ? .7 : w === 'staff' ? .5 : .3)) * (w === 'sword' ? (two ? 1.45 : .88) : w === 'staff' ? (two ? .86 : .5) : 1) * WPN_BIG * (w === 'dagger' ? 1.15 : 1));   // daggers a touch more: they were the hardest to see
   let dir = P.wdir || rotX(rotX([0, -1, 0], P.armR + P.wpn), P.lean);
   if (w === 'staff' && P.ring >= 0) dir = nrm([0, 1, .25]);
-  const base = add(hR, mul(dir, w === 'staff' ? -6 : -.8)), tip = add(hR, mul(dir, len));
+  // (v211) an axe is held up the haft, not at its very end: the head sits closer to the hands and the haft runs on past the lower hand
+  const axeHL = cfg.axe && w === 'sword' ? len * (two ? .8 : .7) : 0;
+  const base = add(hR, mul(dir, w === 'staff' ? -6 : -.8)), tip = axeHL ? add(base, mul(dir, axeHL)) : add(hR, mul(dir, len));
   (cx.wsegs || (cx.wsegs = [])).push(w === 'staff' ? [proj(cx, add(tip, mul(dir, -.4))), proj(cx, add(tip, mul(dir, 3.2)))]   // (v159) a staff glows at its head only, never along the shaft
     : [proj(cx, add(base, mul(dir, kat ? 2 : 1))), proj(cx, tip)]);   // the blade in this frame
   G();
   if (w === 'sword' && cfg.axe){
     // (v164) the merchant line's axe: a wooden haft wrapped at the grip, an iron head with a curved bit (a bearded
     // hand axe in one hand; a broad double-bit war axe in two), a steel cap on the butt
-    const wvR = [-dir[1], dir[0], 0], wv = Math.hypot(...wvR) < .25 ? [1, 0, 0] : nrm(wvR), hl = len * (two ? 1.02 : .82), grip = two ? 6.4 : 3.6;
+    const wvR = [-dir[1], dir[0], 0], wv = Math.hypot(...wvR) < .25 ? [1, 0, 0] : nrm(wvR), hl = axeHL, grip = two ? 5.6 + len * .22 : 3.4 + len * .12;   // (v211) total length kept; the hands moved up the haft
     cap(cx, add(base, mul(dir, -grip)), add(base, mul(dir, hl)), two ? 1.05 : .9, two ? .95 : .82, M[SH[wt] || 'wood'], {tex:(n, lo, q, t) => (t < grip / (hl + grip) && Math.abs(Math.sin(t * 40)) < .35 ? {m:M.leather, t:1} : undefined)});
     G(); ell(cx, add(base, mul(dir, -grip - .6)), 1.1, 1.1, M.steel);
-    const hd = add(base, mul(dir, hl - (two ? 2.6 : 2))), bw = two ? 6.6 : 5, bh = two ? 5.4 : 3.8, metal = blade;
+    const hd = add(base, mul(dir, hl - (two ? 2.2 : 1.7))), bw = two ? 4.6 : 3.7, bh = two ? 3.9 : 2.9, metal = blade;
     for (const sd of (two ? [-1, 1] : [1])){
       G(); cap(cx, add(hd, mul(wv, sd * .6)), add(hd, mul(wv, sd * bw * .55)), two ? 1.5 : 1.2, two ? 1.1 : .9, metal, {tex:() => ({t:1})});   // the cheek
       const edge = []; for (let i = 0; i <= 8; i++){ const u = -1 + i / 4; edge.push(add(add(hd, mul(wv, sd * bw * (1 - .22 * u * u))), mul(dir, u * bh))); }
@@ -1433,6 +1559,10 @@ const BANG_SWEEP = [[-6.4, -1.4, -3.6, 1.6], [-3.8, -.7, -2.6, 1.7], [-1.2, .1, 
 const BANG_SHARP = [[-6.6, -2.2, -4.4, 1.4], [-3.6, -1.4, -3.8, 1.5], [-.6, -.2, -4.6, 1.6], [2.4, 1.2, -3.4, 1.5], [5.4, 2.2, -4.2, 1.4]];
 const BANG_SIDE = [[-6.2, .6, -4.8, 1.8], [-3.2, 1.4, -4.2, 1.9], [-.2, 2.2, -3.6, 1.9], [2.8, 2.8, -2.8, 1.7], [5.8, 3.0, -2.2, 1.5]];
 const BANG_SOFT = [[-5.8, -.8, -3.0, 2.0], [-2.2, -.2, -2.4, 2.1], [1.6, .4, -2.6, 2.1], [5.2, 1.0, -3.0, 1.9]];
+// (v194) blunt fringe (straight across) · curtain fringe (parted in the middle) · a swoop over one eye
+const BANG_BLUNT = [[-6.4, -1.0, -3.6, 1.9], [-3.2, -1.0, -3.6, 1.95], [0, -1.0, -3.6, 1.95], [3.2, -1.0, -3.6, 1.95], [6.4, -1.0, -3.6, 1.9]];
+const BANG_CURTAIN = [[-6.4, 1.2, -2.4, 1.8], [-3.4, .2, -3.6, 1.9], [3.4, .2, -3.6, 1.9], [6.4, 1.2, -2.4, 1.8]];
+const BANG_SWOOP = [[-6.8, -3.0, -5.4, 2.2], [-3.8, -2.2, -5.0, 2.2], [-.8, -1.0, -4.4, 2.1], [2.4, .6, -3.2, 1.8], [5.6, 1.8, -2.4, 1.5]];
 const CHARS = {
   // ages: the villager is a 15-year-old (a little shorter); every class is a young adult of about 18
   // ages: the villager is a 15-year-old (a little shorter); every class is a young adult of about 18.
@@ -1561,6 +1691,39 @@ const HAIR_F = [{backHair:true, backLen:17, backW:10.2, sideLocks:15, ponytail:f
   HS({backHair:true, backLen:14, backW:9.6, sideLocks:12, spikes:12, spikeLen:3.6, paintBangs:BANG_SIDE, deco:['ribbon', 'teal']}),  // 6 side-swept long
   HS({ponytail:true, sideLocks:15, spikes:10, spikeLen:3.2, jag:.12, crown:2, deco:['ribbon', 'gold']}),                            // 7 ponytail + long locks
   HS({twintail:true, backHair:true, backLen:12, backW:9.2, sideLocks:6, spikes:10, spikeLen:3, paintBangs:BANG_SOFT, deco:['hairpin', 'hairLilac']})];   // 8 long twin tails
+/* (v194) thirty more, fifteen each — every one with its own silhouette */
+HAIR_M.push(
+  HS({afro:1, spikes:0, paintBangs:BANG_SOFT}),                                                       // 9 afro
+  HS({mohawk:true, spikes:0, paintBangs:BANG_SHARP, short:true}),                                     // 10 mohawk
+  HS({pompadour:true, spikes:10, spikeLen:2.6, paintBangs:BANG_SWEEP}),                              // 11 pompadour
+  HS({spikes:8, spikeLen:3, paintBangs:BANG_SWOOP, sideLocks:5}),                                    // 12 swoop over one eye
+  HS({curls:true, spikes:0, paintBangs:BANG_SOFT}),                                                   // 13 short curls
+  HS({lowTail:9, spikes:12, spikeLen:3.2, paintBangs:BANG_CURTAIN, tieMat:'leather'}),                // 14 low tail, curtain fringe
+  HS({braid:20, spikes:10, spikeLen:3.4, paintBangs:BANG_SIDE, tieMat:'gold'}),                       // 15 long single braid
+  HS({spikes:20, spikeLen:7.4, crown:9, jag:.3, paintBangs:BANG_SHARP}),                              // 16 tall spiky
+  HS({backHair:true, backLen:8, backW:9, spikes:10, spikeLen:3.4, paintBangs:BANG_CURTAIN, sideLocks:9}),   // 17 curtain fringe, shoulder length
+  HS({sideTail:1, spikes:12, spikeLen:3.4, paintBangs:BANG_SIDE, tieMat:'scarlet'}),                  // 18 side tail
+  HS({wolf:true, spikes:22, spikeLen:4.4, jag:.24, paintBangs:BANG_SHARP, sideLocks:8}),              // 19 wolf cut
+  HS({dreads:16, spikes:6, spikeLen:2.6, paintBangs:BANG_SOFT}),                                      // 20 dreadlocks
+  HS({spikes:0, paintBangs:BANG_BLUNT, bowl:true}),                                                   // 21 bowl cut
+  HS({wave:11, backW:9.2, spikes:8, spikeLen:3, paintBangs:BANG_SWEEP}),                              // 22 wavy shoulder length
+  HS({twinBraid:13, spikes:12, spikeLen:3.6, paintBangs:BANG_SHARP, tieMat:'leather'}));              // 23 twin braids
+HAIR_F.push(
+  HS({backHair:true, backLen:21, backW:10.4, sideLocks:15, spikes:0, paintBangs:BANG_BLUNT, deco:['hairpin', 'scarlet']}),   // 9 hime cut
+  HS({odango:true, sideLocks:7, spikes:8, spikeLen:2.8, paintBangs:BANG_SWEEP, tieMat:'hairPink'}),                        // 10 double buns
+  HS({drills:16, sideLocks:0, spikes:8, spikeLen:3, paintBangs:BANG_SOFT, tieMat:'gold', deco:['ribbon', 'crimson']}),     // 11 drill curls
+  HS({sideTail:-1, sideLocks:8, spikes:10, spikeLen:3.2, paintBangs:BANG_SIDE, tieMat:'hairSky'}),                         // 12 side ponytail
+  HS({braid:24, sideLocks:9, spikes:8, spikeLen:3, paintBangs:BANG_SWEEP, tieMat:'hairLilac'}),                             // 13 long braid
+  HS({twinBraid:15, sideLocks:0, spikes:9, spikeLen:3, paintBangs:BANG_BLUNT, tieMat:'scarlet'}),                           // 14 twin braids
+  HS({wave:22, backW:10.6, sideLocks:12, spikes:8, spikeLen:3, paintBangs:BANG_SIDE, deco:['hairpin', 'gold']}),            // 15 long waves
+  HS({curls:true, sideLocks:6, spikes:0, paintBangs:BANG_SOFT, deco:['hairpin', 'hairPink']}),                              // 16 curly bob
+  HS({lowTail:16, sideLocks:12, spikes:9, spikeLen:3, paintBangs:BANG_CURTAIN, tieMat:'teal'}),                             // 17 low ponytail
+  HS({backHair:true, backLen:15, backW:9.8, bun:true, sideLocks:10, spikes:8, spikeLen:3, paintBangs:BANG_SWEEP}),          // 18 half-up
+  HS({afro:.82, sideLocks:0, spikes:0, paintBangs:BANG_SOFT, deco:['ribbon', 'hairSky']}),                                  // 19 afro puff
+  HS({spikes:20, spikeLen:2.2, jag:.1, paintBangs:BANG_SWOOP, sideLocks:3}),                                                // 20 pixie cut
+  HS({backHair:true, backLen:17, backW:10, sideLocks:13, spikes:8, spikeLen:3, paintBangs:BANG_CURTAIN}),                   // 21 curtain fringe, long
+  HS({odango:true, twintail:true, sideLocks:5, spikes:8, spikeLen:2.8, paintBangs:BANG_SOFT, tieMat:'hairMint'}),           // 22 buns + tails
+  HS({pompadour:true, lowTail:12, sideLocks:6, spikes:8, spikeLen:2.6, paintBangs:BANG_SWEEP, tieMat:'scarlet'}));          // 23 rockabilly
 const HAIR_COLORS = ['', 'hairBlack', 'hairBrown', 'hairBlonde', 'hairAuburn', 'hairSilver', 'hairNavy', 'maroon', 'hairPink', 'hairTeal',
   'hairWhite', 'hairViolet', 'hairGreen', 'hairCrimson', 'hairAsh', 'hairGold', 'hairChestnut', 'hairOrange', 'hairRose', 'hairLilac', 'hairSky', 'hairMint'];
 const IRIS_COLORS = ['', 'irisBr', 'irisBl', 'irisGr', 'irisVi', 'irisRd', 'irisGd', 'irisPk', 'irisSv', 'irisTl'];
@@ -1570,11 +1733,11 @@ const b36 = n => (n | 0).toString(36);
 function lookKey(lk){
   if (!lk) return 'm00';
   const f = lk.sex === 'f', hs = (lk.hair | 0) % (f ? HAIR_F : HAIR_M).length, ci = Math.max(0, HAIR_COLORS.indexOf(lk.color || '')), ei = Math.max(0, IRIS_COLORS.indexOf(lk.eye || ''));
-  return `${f ? 'f' : 'm'}${hs}${b36(ci)}${ei ? 'e' + b36(ei) : ''}${lk.rft > 0 ? 'r' + Math.min(4, lk.rft | 0) : ''}${lk.sh ? 's' : ''}`;
+  return `${f ? 'f' : 'm'}${b36(hs)}${b36(ci)}${ei ? 'e' + b36(ei) : ''}${lk.rft > 0 ? 'r' + Math.min(4, lk.rft | 0) : ''}${lk.sh ? 's' : ''}`;
 }
 function parseLookKey(k){
-  const m = typeof k === 'string' && /^([mf])([0-9])([0-9a-z])(?:e([0-9a-z]))?(?:r([0-4]))?(s)?$/.exec(k); if (!m) return null;
-  return {sex:m[1], hair:+m[2], color:HAIR_COLORS[parseInt(m[3], 36)] || '', eye:m[4] ? IRIS_COLORS[parseInt(m[4], 36)] || '' : '', ...(m[6] ? {sh:1} : {})};   // (v161) s: the weapon is put away
+  const m = typeof k === 'string' && /^([mf])([0-9a-z])([0-9a-z])(?:e([0-9a-z]))?(?:r([0-4]))?(s)?$/.exec(k); if (!m) return null;   // (v194) the style is one base-36 character (0–9 then a–z): old keys read as before
+  return {sex:m[1], hair:parseInt(m[2], 36), color:HAIR_COLORS[parseInt(m[3], 36)] || '', eye:m[4] ? IRIS_COLORS[parseInt(m[4], 36)] || '' : '', ...(m[6] ? {sh:1} : {})};   // (v161) s: the weapon is put away
 }
 function applyLook(cfg, lk){
   const f = lk.sex === 'f', list = f ? HAIR_F : HAIR_M, st = {...(list[(lk.hair | 0) % list.length] || {})}, deco = st.deco; delete st.deco;
@@ -1631,7 +1794,7 @@ function slimeModel(big){
     if (act === 'attack'){ sq = [1.15, .8, 1.2, 1][f]; lun = [0, -1, 5, 1][f]; hop = [0, 0, 2, 0][f]; }
     if (act === 'hurt'){ sq = [.78, .9][f]; eyes = 'hurt'; }
     if (act === 'die'){ melt = [.15, .45, .7, .9][f]; eyes = 'closed'; }
-    const body = big ? M.slimeG : M.slime;
+    const body = big ? M.slimeRoyal : M.slime;
     const r = 9 * S, h = (1 - melt) / sq;
     const yc = (r * .82 * h) + hop * S;
     cx.gid = 1;
@@ -1645,11 +1808,15 @@ function slimeModel(big){
     }});
     cx.gid = 2;
     if (melt < .6) for (let i = 0; i < 6; i++){ const k = i / 6; ell(cx, [0, yc + r * .7 * h + k * 6 * S * h, lun * S - k * 1.5 * S], (4.6 - k * 4) * S, (4.6 - k * 4) * S * .9, body, {}); }
-    if (big){
-      cx.gid = 3; const cy = yc + r * .75 * h + 6 * S * h;
-      frustum(cx, [0, 0, lun * S - 3], cy + 3, cy + 1, 9, 9, M.crown, {});
-      for (let i = 0; i < 5; i++){ const a = i / 5 * Math.PI * 2; cx.gid = 4 + i; cap(cx, [Math.cos(a) * 8, cy + 2, lun * S - 3 + Math.sin(a) * 8], [Math.cos(a) * 7, cy + 8 + (i % 2) * 2, lun * S - 3 + Math.sin(a) * 7], 1.6, .6, M.crown, {}); }
-      cx.gid = 10; ell(cx, [0, cy + 3.5, lun * S - 3 + 9], 1.8, 1.8, M.gem, {});
+    if (big && melt < .9){
+      // an angel's halo floats above the crest, bobbing (it was a crown)
+      const top = yc + r * .75 * h + 6 * S * h, hy = top + 7 + Math.sin(ph) * 1.2, hz = lun * S - 2, HR = 8.5;
+      for (let i = 0; i < 16; i++){ const a0 = i / 16 * Math.PI * 2, a1 = (i + 1) / 16 * Math.PI * 2; cx.gid = 3 + (i % 3);
+        cap(cx, [Math.cos(a0) * HR, hy, hz + Math.sin(a0) * HR * .45], [Math.cos(a1) * HR, hy, hz + Math.sin(a1) * HR * .45], 1.1, 1.1, M.haloGlow, {}); }
+      // (v195) no wings any more (the owner found them ugly): a cloud of floating hearts drifts round it instead (sys/fashion194.js)
+      // a rainbow of gems around its belly
+      const gem = [M.tipPink, M.haloGlow, M.tipAqua, M.tipViolet];
+      for (let i = 0; i < 4; i++){ const a = -.9 + i * .6; cx.gid = 90 + i; ell(cx, [Math.sin(a) * r * .95, yc - r * .25, lun * S + Math.cos(a) * r * .55], 1.4, 1.4, gem[i], {}); }
     }
   };
 }
@@ -1764,6 +1931,8 @@ function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
   if (kind === 'char'){
     const cfg = CHARS[key], A = ACTIONS[act], fs = Math.ceil(FS * K), F = new Frame(fs, fs), cx = new Ctx(F, -dir * Math.PI / 4, fs / 2, ANCHOR_Y * K, K * (cfg.bodyScale || 1));
     let P = humanPose(act, f, A.n, cfg.weapon);
+    if (act === 'attack' && cfg.twoHand && cfg.weapon === 'sword') P = twoHandChop(P, f);   // (v197) greatswords and war axes: both hands, overhead chop
+    else if (act === 'attack' && cfg.axe && cfg.weapon === 'sword') P = axeChop1(P, f);   // (v210) a hand axe chops down at a slant
     if (ONE_HAND.includes(cfg.weapon) && !cfg.twoHand && DAGGER_LEFT.includes(dir)) P = mirrorArms(P);   // one-handed weapons are carried in the hand the camera can see
     drawHuman(cx, cfg, P);
     const img = finish(F, K);
@@ -1889,7 +2058,7 @@ async function buildAll(onProgress, prewarm = []){
   for (const k of Object.keys(CHARS)) out[k] = sheet('char', k);
   for (const k of Object.keys(MOBS)) out[k] = sheet('mob', k);
   for (let i = 0; i < prewarm.length; i++){
-    const [key, act, dirs] = prewarm[i]; if (out[key]) for (const d of dirs || [0, 1, 2, 3, 4, 5, 6, 7]) ensureFrames(out[key], act, d);
+    const [key, act, dirs] = prewarm[i]; if (out[key]) for (const d of dirs || [0, 1, 2, 3, 4, 5, 6, 7]){ ensureFrames(out[key], act, d); await new Promise(r => setTimeout(r, 0)); }   // (v221) a breath after every direction, not every sheet
     if (onProgress) onProgress((i + 1) / prewarm.length, key);
     await new Promise(r => setTimeout(r, 0));
   }

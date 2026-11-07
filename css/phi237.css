@@ -1,0 +1,62 @@
+/* VAYRATHEN — css/phi237.css — (v237) the golden ratio on the HUD (φ = 1.618)
+   The owner asked for golden proportions in every element on every screen. First group: the HUD.
+   · character card: width : height = φ : 1 (it grows taller if its content needs more) — was 2.06 : 1
+   · quest card: same width, width : height = φ² : 1 at least, placed under the character card at a gap of
+     (edge margin ÷ φ) — js/sys/phi237.js keeps it there as the card above grows
+   · target card: width : height = φ² : 1 at least
+   · hotbar: 61.8% of the screen width, centred (was 57–60%) · chat: 38.2% of the screen width, centred (was 32%):
+     hotbar : chat = φ : 1, and both together span the screen 1 : φ
+   Sizes are proportions of the card or of the screen, so every screen keeps the same ratios. */
+html body #ui.ui #charCard{aspect-ratio:1.618 / 1 !important;height:auto !important;box-sizing:border-box !important;align-content:center !important}
+html body #ui.ui #goalCard{aspect-ratio:2.618 / 1 !important;height:auto !important;box-sizing:border-box !important}
+html body #ui.ui #target{aspect-ratio:2.618 / 1 !important;height:auto !important;box-sizing:border-box !important;align-content:center}
+html body #ui.ui > .chatbox{width:38.2% !important;left:30.9% !important;right:auto !important;box-sizing:border-box !important}
+html body #ui.ui #dock{min-width:61.8% !important;left:19.1% !important;right:auto !important;box-sizing:border-box !important;display:flex !important;justify-content:center !important;transform:none !important}
+
+/* ---------- (v238) group 2: windows are golden rectangles ----------
+   Tall screens: a single-column window (status, quest, settings, social, log, wiki, tower, auto…) is height = width × φ,
+   its height taken from the screen (so it never runs off) and its width = height ÷ φ. Short screens (phones held
+   sideways): the same windows lie down, width = height × φ. The skill tree (wide by nature) is width = height × φ
+   everywhere. The inventory / equipment screen stays full-screen. The window body scrolls inside. Sizes are divided by
+   the game's UI zoom (--uiz) so a big screen is not scaled twice. */
+html body #ui.ui > .win.phiw:not([hidden]):not(#win-equip):not(#win-skill){
+  --ph:calc(min(680px, 100vh - 150px) / var(--uiz, 1));
+  height:var(--ph) !important;width:calc(var(--ph) / 1.618) !important;max-height:none !important;max-width:calc(100% - 16px) !important;box-sizing:border-box !important;display:flex !important;flex-direction:column !important}
+html body #ui.ui > #win-skill.phiw:not([hidden]){--ph:calc(min(600px, 100vh - 150px) / var(--uiz, 1));height:var(--ph) !important;width:min(calc(var(--ph) * 1.618), calc(100% - 16px)) !important;max-width:none !important;max-height:none !important;box-sizing:border-box !important;display:flex !important;flex-direction:column !important}
+html body #ui.ui > .win.phiw:not([hidden]) > :not(header){flex:1 1 auto;min-height:0;overflow-y:auto}
+@media (max-height:560px){
+  html body #ui.ui > .win.phiw:not([hidden]):not(#win-equip):not(#win-skill){--ph:calc((100vh - 24px) / var(--uiz, 1));width:min(calc(var(--ph) * 1.618), calc(100% - 16px)) !important}
+  html body #ui.ui > #win-skill.phiw:not([hidden]){--ph:calc((100vh - 24px) / var(--uiz, 1))}
+}
+
+/* ---------- (v238) group 3: NPC and shop dialogs are golden rectangles ----------
+   Every NPC dialog (shops, job master, market, warp, story NPCs…) used to be its own shape (0.9 : 1 to 2.3 : 1).
+   Now all of them share one: width = height × φ (js/sys/dlgmove.js), the height taken from the screen, the list
+   inside scrolls. A size the player sets by dragging the corner is still kept. */
+html body #ui.ui #dialog:not([hidden]){display:flex !important;flex-direction:column !important;box-sizing:border-box !important}   /* the size itself: js/sys/dlgmove.js dlgSize (width = height × φ) */
+html body #ui.ui #dialog:not([hidden]) > .db{flex:1 1 auto;min-height:0;overflow-y:auto}
+
+/* ---------- (v239) group 4: the touch controls in golden steps from the attack button (104 px before the group's scale) ----------
+   skill = attack ÷ φ (64) · dodge, small skill slots, potions, small buttons = attack ÷ φ² (40) ·
+   joystick = attack × φ (168, set by js/sys/phi237.js so it holds after each group's own scale) · its knob = joystick ÷ φ² */
+html body #ui.ui.moba .mobaact .mo.sk:not(.mini){width:64px!important;height:64px!important}
+html body #ui.ui.moba .mobaact .mo.sk.mini,html body #ui.ui.moba .mobaact .mo.sm{width:40px!important;height:40px!important}
+html body #ui.ui.moba .mobapot .mo{width:var(--phpot,40px)!important;height:var(--phpot,40px)!important}
+html body #ui.ui.moba .mobautil .mu{width:40px!important;height:40px!important}
+html body #ui.ui.moba .joy{width:var(--phjoy,168px)!important;height:var(--phjoy,168px)!important}
+html body #ui.ui.moba .joy .knob{width:calc(var(--phjoy,168px) * .382)!important;height:calc(var(--phjoy,168px) * .382)!important;margin:calc(var(--phjoy,168px) * -.191) 0 0 calc(var(--phjoy,168px) * -.191)!important}
+
+/* (v244) the wardrobe on a phone: the hero preview stays in sight while trying things on. The left column is a
+   flex column that scrolls; with the try/buy buttons and the dye palette under it, the preview box (overflow hidden)
+   was squeezed to 0 px high and the player could not see the outfit they were trying */
+html body #ui.ui #win-equip .eqstage > .eqaura{flex-shrink:0 !important}
+/* the preview fills the left column at its own shape, and the hero stands on the pedestal (on a phone the box shrank
+   to 91×111 with the hero floating small in its middle) */
+html body #ui.ui #win-equip.cosmode .eqaura{width:min(100%,184px) !important;height:auto !important;aspect-ratio:160/196;place-items:end center !important}
+html body #ui.ui #win-equip.cosmode .eqaura #eqPrev{width:86% !important;height:auto !important;aspect-ratio:108/140;margin-bottom:9%}
+/* (v244) bag · equipment on a landscape phone: the doll and the bag side by side, as on a PC. A rule meant for narrow
+   (portrait) screens stacked them under 820 px wide, so on a landscape phone the doll ring was squashed into a strip
+   about 100 px high (slot pictures gone, labels on top of each other) and the bag's footer sat on its grid */
+@media (orientation:landscape){
+  html body #ui.ui #win-equip.invwin:not(.cosmode) .invcombo{grid-template-columns:minmax(0,1fr) minmax(0,1.25fr) !important;overflow-y:hidden !important}
+}

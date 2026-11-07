@@ -92,7 +92,33 @@ function bgmPlay(key){
 /* nature sounds run on the synth's audio context: wake it up with the first touch even when a recorded song is playing */
 ['pointerdown', 'keydown'].forEach(ev => window.addEventListener(ev, () => { try { const r = SFX.raw && SFX.raw(); if (r && r.ac && r.ac.state === 'suspended') r.ac.resume(); } catch (e) {} }, {capture:true}));
 ['pointerdown', 'keydown'].forEach(ev => window.addEventListener(ev, () => { if (BGM.blocked && BGM.el && BGM.want){ BGM.blocked = false; BGM.el.play().catch(() => { BGM.blocked = true; }); } }, {capture:true}));
-document.addEventListener('visibilitychange', () => { if (!BGM.el || !BGM.want) return; if (document.hidden) BGM.el.pause(); else BGM.el.play().catch(() => { BGM.blocked = true; }); });
+/* (v188) the game keeps quiet when the phone is busy. A phone set to silent, or one taking a call, used to get game
+   sounds over the ringtone and the call:
+   · the session is "ambient" where the browser supports it (Safari): the game obeys the silent switch and never takes
+     the speaker from a call or from other apps;
+   · while the page is hidden, or (touch screens) loses focus to a call screen or another app, or the system interrupts
+     the audio, everything goes quiet: the recorded song pauses, the synth's context suspends and no effect wakes it
+     (sfx.js asks SFX.away before resuming);
+   · back on the game (visible, focused) the sound returns; if the browser wants a touch first, the next touch does it. */
+try { if (navigator.audioSession) navigator.audioSession.type = 'ambient'; } catch (e) {}
+const AFOC = {blur:false, intr:false};
+function audioAway(){ return document.hidden || AFOC.blur || AFOC.intr; }
+function audioFocus(){
+  const away = audioAway(); SFX.away = away;
+  let r = null; try { r = SFX.raw && SFX.raw(); } catch (e) {}
+  const ac = r && r.ac;
+  if (ac && !ac._afoc){ ac._afoc = 1; ac.addEventListener('statechange', () => { AFOC.intr = ac.state === 'interrupted'; if (AFOC.intr) audioFocus(); }); }
+  if (away){ if (BGM.el) BGM.el.pause(); if (ac && ac.state === 'running') ac.suspend().catch(() => {}); return; }
+  if (ac && ac.state !== 'running' && ac.state !== 'closed') ac.resume().catch(() => {});
+  if (BGM.el && BGM.want && BGM.el.paused) BGM.el.play().catch(() => { BGM.blocked = true; });
+}
+document.addEventListener('visibilitychange', audioFocus);
+addEventListener('pagehide', () => { AFOC.blur = true; audioFocus(); });
+addEventListener('pageshow', () => { AFOC.blur = false; audioFocus(); });
+// a computer keeps its music when you click into another window; a phone or tablet losing focus means a call or another app
+addEventListener('blur', () => { if (typeof GFX !== 'undefined' && GFX.touch){ AFOC.blur = true; audioFocus(); } });
+addEventListener('focus', () => { if (AFOC.blur){ AFOC.blur = false; audioFocus(); } });
+['pointerdown', 'keydown'].forEach(ev => window.addEventListener(ev, () => { if (AFOC.blur || AFOC.intr){ AFOC.blur = AFOC.intr = false; audioFocus(); } }, {capture:true}));   // a touch on the game means you are back
 
 /* ---------- the camp song (v27) ----------
    Walk into the campfire camp of any field map and its song plays; walk out and the map's music comes back.

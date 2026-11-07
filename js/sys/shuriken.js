@@ -12,6 +12,7 @@
 'use strict';
 
 const SHUR = {gift:1000};
+EV.on('tick', () => { if ((ammoClean.t = (ammoClean.t || 0) + 1) % 20 === 0) ammoClean(); });   // (v190) every class: wrong ammo leaves the slot (data/gear.js)
 const shurUser = () => !!(S && JOBS[S.job] && JOBS[S.job].weapon.type === 'shuriken');
 EV.on('tick', () => {
   if (typeof PAUSED !== 'undefined' && PAUSED || !S || !S.lvl || !shurUser()) return;
@@ -22,7 +23,7 @@ EV.on('tick', () => {
   if (S.starGift !== 1){ S.starGift = 1;
     if (!arrowCount()){ addItem('s_iron', SHUR.gift); S.gear.ammo = 's_iron'; derive(); dirty = true;
       log(L('ได้รับดาวกระจายเหล็ก 1,000 ดวง · นินจาปาดาวกระจายแล้ว ใช้ 1 ดวงต่อการโจมตี 1 ครั้ง ซื้อเพิ่มที่โรงตีเหล็ก', 'Received 1,000 iron stars · ninjas now throw shuriken, one per attack · buy more at the smith'), 'g'); } }
-  if (!S.gear.ammo){ const o = ammoOther(); if (o){ S.gear.ammo = o[0]; derive(); } }
+  // (v190) no longer loads stars by itself: an empty pouch stays empty until you load it (data/gear.js useArrows)
 });
 /* (v183's skilluniq.js gave the Kage's passive speed and dodge; it keeps them and gains the MATK the stars need) */
 if (SKILLS.kagemastery) SKILLS.kagemastery.pas = lv => ({matkPct:+(lv * .03).toFixed(2), aspdPct:+(lv * .02).toFixed(2), dodge:+(lv * .005).toFixed(3)});

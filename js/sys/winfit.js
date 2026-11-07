@@ -5,8 +5,8 @@
    with brect() and corrected, a few passes, like wincenter.js. Runs on open, on resize, and when the UI turns compact. */
 'use strict';
 const WF_M = 4, WF_WIDE = 720;   // margin; widest a window gets on a phone held sideways
-const WF_FULL = ['equip', 'bag'];   // (v58) the bag · equipment window fills the whole screen on a phone
-const WF_BIG = ['forge'];          // (v132) the smith's workshop takes 80% of the screen both ways
+const WF_FULL = ['equip', 'bag', 'forge', 'craft'];   // (v58) the bag · equipment window fills the whole screen on a phone · (v188) so do the smith and the forger (long lists); (v189) guild, castle war and market fit their content like other windows
+const WF_BIG = [];                 // (v132–v187) the smith's workshop took 80% of the screen; v188: whole screen like the other workshops
 function winFit(id){
   const w = el('win-' + id), ui = el('ui'); if (!w || w.hidden || !ui) return;
   const props = ['left', 'top', 'width', 'height', 'right', 'bottom', 'transform', 'margin'];
@@ -17,9 +17,9 @@ function winFit(id){
   let X = parseFloat(w.style.left) || 0, Y = parseFloat(w.style.top) || 0;
   for (let i = 0; i < 4; i++){
     const u = brect(ui), b = brect(w), k = (b.width / (w.offsetWidth || 1)) || 1;
-    const full = WF_FULL.includes(id), big = WF_BIG.includes(id), tw = big ? u.width * .8 / k : Math.min((u.width - WF_M * 2) / k, u.width > u.height && !full ? WF_WIDE : 1e9);
+    const full = WF_FULL.includes(id), big = WF_BIG.includes(id), gold = !full && !big && u.width > u.height, tw = big ? u.width * .8 / k : gold ? Math.min((u.width - WF_M * 2) / k, (u.height - WF_M * 2) / k * 1.618) : Math.min((u.width - WF_M * 2) / k, u.width > u.height && !full ? WF_WIDE : 1e9);   // (v238) a phone window lying down is a golden rectangle: width = height × φ
     put('width', tw + 'px'); put('height', 'auto');                 // v31: as tall as what it holds, up to the screen
-    const th = full ? (u.height - WF_M * 2) / k : big ? u.height * .8 / k : Math.min((u.height - WF_M * 2) / k, w.offsetHeight), b2 = brect(w);
+    const th = full || gold ? (u.height - WF_M * 2) / k : big ? u.height * .8 / k : Math.min((u.height - WF_M * 2) / k, w.offsetHeight), b2 = brect(w);
     const dx = (u.left + (u.width - tw * k) / 2 - b2.left) / k, dy = (u.top + (u.height - th * k) / 2 - b2.top) / k;
     put('height', th + 'px');
     if (Math.abs(dx) < .75 && Math.abs(dy) < .75) break;
