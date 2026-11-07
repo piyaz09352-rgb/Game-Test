@@ -11,7 +11,7 @@ html body #ui.ui #charCard{aspect-ratio:1.618 / 1 !important;height:auto !import
 html body #ui.ui #goalCard{aspect-ratio:2.618 / 1 !important;height:auto !important;box-sizing:border-box !important}
 html body #ui.ui #target{aspect-ratio:2.618 / 1 !important;height:auto !important;box-sizing:border-box !important;align-content:center}
 html body #ui.ui > .chatbox{width:38.2% !important;left:30.9% !important;right:auto !important;box-sizing:border-box !important}
-html body #ui.ui #dock{min-width:61.8% !important;left:19.1% !important;right:auto !important;box-sizing:border-box !important;display:flex !important;justify-content:center !important;transform:none !important}
+html body #ui.ui:not(.moba) #dock{min-width:61.8% !important;left:19.1% !important;right:auto !important;box-sizing:border-box !important;display:flex !important;justify-content:center !important;transform:none !important}
 
 /* ---------- (v238) group 2: windows are golden rectangles ----------
    Tall screens: a single-column window (status, quest, settings, social, log, wiki, tower, auto…) is height = width × φ,
@@ -101,3 +101,9 @@ html body #ui.ui #win-skill.phiw .skmain > .sktree{margin:0 !important}
 html body #ui.ui #win-skill.phiw .skmain > .skdetail{position:static !important;flex-wrap:wrap !important;align-items:flex-start !important;align-content:flex-start !important;margin:0 !important}
 html body #ui.ui #win-skill.phiw .skmain > .skdetail .nm{flex:1 1 120px !important;min-width:0 !important}
 html body #ui.ui #win-skill.phiw .skmain > .skdetail .ska{flex:1 0 100% !important;display:flex !important;flex-direction:row !important;justify-content:flex-end !important;align-items:center;gap:6px;margin-top:6px}
+/* (v250) the hotbar rule above (61.8% wide, display:flex) also hit touch screens, where the hotbar is hidden: its empty
+   frame stood as a long thin white bar across the top of the screen. Now it only applies with mouse and keyboard. */
+html body #ui.ui.moba #dock{display:none !important}
+/* (v251) a folded quest card is just its title bar: the golden shape (φ² : 1) is for the open card. Folded, it kept its
+   full height with nothing inside, an empty box under the character card */
+html body #ui.ui #goalCard.folded{aspect-ratio:auto !important;min-height:0 !important}

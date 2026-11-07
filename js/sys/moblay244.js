@@ -27,7 +27,7 @@ function mlyLayout(){
   const pots = pot ? [...pot.children].filter(e => e.offsetWidth || e.classList.contains('mo')) : [], mus = util ? [...util.querySelectorAll('.mu')].filter(e => !e.hidden && getComputedStyle(e).display !== 'none') : [];
   const map = el('mapCard'), goal = el('goalCard'), char = el('charCard');
   const mapR = mlVis(map) && !map.classList.contains('folded') ? rel(map) : null, goalR = mlVis(goal) ? rel(goal) : (mlVis(char) ? rel(char) : null);
-  const key = [W, H, big.length, small.length, !!roll, pots.length, mus.length, mapR ? Math.round(mapR.y + mapR.h) : 0, goalR ? Math.round(goalR.y + goalR.h) : 0].join('|');
+  const key = [W, H, big.length, small.length, !!roll, pots.length, mus.length, mapR ? Math.round(mapR.y + mapR.h) : 0, goalR ? Math.round(goalR.y + goalR.h) : 0, chat && mlVis(chat) ? chat.offsetWidth : 0].join('|');
   MLY.on = true; ui.classList.add('ml244');
   // sizes
   const m = Math.max(6, Math.round(H * .028)), g = Math.max(4, Math.round(H * .016));
@@ -56,19 +56,21 @@ function mlyLayout(){
   if (zone) mlSet(zone, {left:'0px', bottom:'0px', top:'auto', right:'auto', width:Math.max(W * .42, J + 2 * m + 40) + 'px', height:Math.max(H * .6, J + 2 * m + 40) + 'px', transform:'none'});
   ui.style.setProperty('--mlJ', J + 'px'); ui.style.setProperty('--mlJx', (jx) + 'px'); ui.style.setProperty('--mlJb', (m + jp) + 'px');
   const joyR = {x:jx - J / 2, y:jy - J / 2, w:J, h:J};
-  // the chat button: under the quest card, above the joystick (else at the start of the bottom row)
-  let chatInRow = false;
-  if (chat && mlVis(chat)){ const cw = chat.offsetWidth, ch = chat.offsetHeight, cy = (goalR ? goalR.y + goalR.h : m) + g;
-    if (cy + ch <= joyR.y - g) mlSet(chat, {position:'absolute', left:m + 'px', top:cy + 'px', right:'auto', bottom:'auto'}); else chatInRow = true; }
-  // the bottom row(s): potions then small buttons, right to left, from the ring's lower-left edge to the joystick
-  const row = [...pots, ...mus]; let y = H - m - s / 2, rowN = 0;
+  // (v252) the chat button sits at the bottom, just right of the joystick, level with the bottom row (the owner's
+  // choice; it was under the quest card, by itself in the middle of the left side), and the row of potions and small
+  // buttons starts after it so nothing touches. Its message preview stays folded here (the unread badge still shows).
+  const cw0 = chat && mlVis(chat) ? chat.offsetWidth : 0, ch0 = chat && mlVis(chat) ? chat.offsetHeight : 0;
   const leftEdge = joyR.x + joyR.w + g, rightEdgeAt = yc => { let xr = W - m; for (const q of rects) if (q.y < yc + s / 2 + g && q.y + q.h > yc - s / 2 - g) xr = Math.min(xr, q.x - g); return xr; };
+  let y = H - m - s / 2, rowN = 0;
+  if (cw0) mlSet(chat, {position:'absolute', left:leftEdge + 'px', top:(y - ch0 / 2) + 'px', right:'auto', bottom:'auto'});
+  // the bottom row(s): potions then small buttons, right to left, from the ring's lower-left edge to the chat button
+  // (rows above the first reach back to the joystick)
+  const row = [...pots, ...mus], rowLeft = () => (rowN === 0 && cw0 ? leftEdge + cw0 + g : leftEdge);
   let x = rightEdgeAt(y) - s / 2;
   for (const e of row){
-    if (x - s / 2 < leftEdge){ rowN++; y -= s + g; x = rightEdgeAt(y) - s / 2; }
+    if (x - s / 2 < rowLeft()){ rowN++; y -= s + g; x = rightEdgeAt(y) - s / 2; }
     put(e, x, y, s); x -= s + g;
   }
-  if (chatInRow && chat){ const cw = chat.offsetWidth, ch = chat.offsetHeight; mlSet(chat, {position:'absolute', left:Math.max(leftEdge, x - cw + s / 2) + 'px', top:(y - ch / 2) + 'px', right:'auto', bottom:'auto'}); }
   MLY.key = key;
 }
 function mlyOff(){ if (!MLY.on) return; MLY.on = false; const ui = el('ui'); if (ui) ui.classList.remove('ml244');
@@ -90,6 +92,7 @@ setInterval(() => { try { mlyLayout(); } catch (e) {} }, 700);
   /* (v249) this layout stretches the small-button group (#mobaUtil, class "row") over the whole screen and places each
      button inside it; the bright theme paints every .row white at 62% (css/sunlit.css), so the whole game behind it
      went pale — a white veil on every touch screen. The group's frame is invisible again (its buttons keep their look). */
+  html body #ui.ui.moba.ml244 #chatBtn .cprev{display:none!important}
   html body #ui.ui.moba:not(.hedit) #mobaUtil,html body #ui.ui.moba:not(.hedit) #mobaAct,html body #ui.ui.moba:not(.hedit) #mobaPot{background:none!important;background-color:transparent!important;border-color:transparent!important;box-shadow:none!important}`; document.head.appendChild(st); }
 /* a group redrawn on its own (the potion counts, the small buttons) is placed again at once */
 { let q = 0; const mo = new MutationObserver(() => { if (q) return; q = requestAnimationFrame(() => { q = 0; try { mlyLayout(); } catch (e) {} }); });
