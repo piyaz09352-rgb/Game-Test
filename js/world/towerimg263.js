@@ -20,7 +20,7 @@ function timgHall(){
   const im = TIMG.floor, c = twmC(), g = terr.getContext('2d'); g.save(); g.setTransform(TS, 0, 0, TS, 0, 0);
   const FW = Math.max(W, terr.width / TS), FH = Math.max(H, terr.height / TS);
   const sky = g.createLinearGradient(0, 0, 0, FH); sky.addColorStop(0, '#1c2448'); sky.addColorStop(1, '#0a0e22'); g.fillStyle = sky; g.fillRect(0, 0, FW, FH);
-  const w = W, h = w * im.naturalHeight / im.naturalWidth, x = c.x - w * TIMG_FLOOR.cx, y = c.y - h * TIMG_FLOOR.cy;
+  const h = H, w = h * im.naturalWidth / im.naturalHeight, x = c.x - w * TIMG_FLOOR.cx, y = c.y - h * TIMG_FLOOR.cy;   // (v264) as tall as the map: it fills it
   g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(im, x, y, w, h);
   g.restore();
 }

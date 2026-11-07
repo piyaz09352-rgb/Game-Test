@@ -13,7 +13,7 @@
    Nothing else of the tower changes (levels, waves, timers, blessings, rewards, rankings, party climbs). */
 'use strict';
 
-const TWM_W = 1500, TWM_H = 1300, TWM_RX = 580, TWM_RY = 255;   // (v263) the floor of the owner's hall picture (towerimg263.js); was 390
+const TWM_W = 2310, TWM_H = 1300, TWM_RX = 900, TWM_RY = 385;   // (v264) the owner's hall picture fills the whole map (1300 tall, 16:9 → 2310 wide) and the floor in it
 /* (v259) the owner's six zones, by floor: 1–20 · 21–40 · 41–60 · 61–80 · 81–99 · 100 (towerart259.js paints what
    makes each one itself) */
 const TWM_TIERS = [
@@ -28,7 +28,7 @@ const TWM = {tier:-1, open:false, climbT:0};
 const twmOn = () => typeof TW !== 'undefined' && TW.active && typeof DG !== 'undefined' && DG.did === 'tower';
 const twmTierOf = f => (f >= 100 ? 5 : f > 80 ? 4 : f > 60 ? 3 : f > 40 ? 2 : f > 20 ? 1 : 0);   // (v259) the owner's zones
 const twmT = () => TWM_TIERS[twmTierOf(TW.f)];
-const twmC = () => ({x:W / 2, y:H / 2 + 70});
+const twmC = () => ({x:W / 2, y:H * .615});   // (v264) the centre of the picture's floor
 const twmStairs = () => { const c = twmC(); return {x:c.x, y:c.y - TWM_RY + 5}; };   // (v263) at the foot of the gate's steps in the picture
 const twmEntry = () => { const c = twmC(); return {x:c.x, y:c.y + TWM_RY - 90}; };
 const twmIn = (x, y, m = 0) => { if (typeof twzInOct === 'function') return twzInOct(x, y, m); const c = twmC(); return Math.hypot((x - c.x) / (TWM_RX - m), (y - c.y) / (TWM_RY - m * .66)) < 1; };
