@@ -161,7 +161,7 @@ function twmBuild(){
 // a cleared floor: the stairs light up and wait for you (they open by themselves after a while)
 { const _tc = twClear; twClear = function(){ const r = _tc.apply(this, arguments); TWM.open = true; TW.restT = Math.max(TW.restT, 9); TWM.climbT = 0; return r; }; }
 function twmClimb(){ TWM.open = false; TW.restT = 0; const e = twmEntry(); P.x = e.x; P.y = e.y; P.tx = null; P.target = null; P.nav = null;
-  const f = document.getElementById('mapFade'); if (f){ f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); } SFX.play('warp'); }
+  SFX.play('warp'); }   // (v264) no fade: the owner did not want the screen to blink between floors
 EV.on('tick', dt => {
   if (!twmOn()) { TWM.open = false; return; }
   if (NPCS.length) NPCS.length = 0;   // a story NPC never turns up in the tower

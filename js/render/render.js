@@ -482,7 +482,7 @@ function render(){
   }
   VFX.drawOver(g, cam.x, cam.y);
   if (typeof LIVE !== 'undefined') LIVE.drawOver(g);   // birds, butterflies, fireflies, leaves, smoke, cloud shadows
-  const target = isNight() ? .58 : 0;
+  const target = isNight() && !(typeof twmOn === 'function' && twmOn()) ? .58 : 0;   // (v264) indoors in the tower: no night veil (it dulled the hall's own fire and light)
   nightA += ((SETTINGS.nightFx ? target : 0) - nightA) * .02;
   if (nightA > .01){
     nctx.setTransform(1, 0, 0, 1, 0, 0); nctx.globalCompositeOperation = 'source-over'; nctx.clearRect(0, 0, night.width, night.height); nctx.setTransform(night.width / VW, 0, 0, night.height / VH, 0, 0);
