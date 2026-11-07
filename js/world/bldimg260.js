@@ -24,7 +24,7 @@ function bimgCut(img){
   g.putImageData(d, 0, 0); return c;
 }
 function bimgLoad(key){
-  const im = new Image(); im.onload = () => { try { BIMG.ready[key] = bimgCut(im); for (const k in propCache) if (/^(vshop|twmonument)/.test(k)) delete propCache[k]; } catch (e) {} };
+  const im = new Image(); im.onload = () => { try { BIMG.ready[key] = bimgCut(im); for (const k in propCache) if (/^(vshop|twmonument|healerhut)/.test(k)) delete propCache[k]; } catch (e) {} };
   im.onerror = () => {}; im.src = `assets/buildings/${BIMG.files[key]}.png?v=${typeof GAMEV !== 'undefined' && GAMEV ? GAMEV : 260}`;
 }
 if (location.protocol !== 'file:') for (const k in BIMG.files) bimgLoad(k);
@@ -35,3 +35,17 @@ function bimgProp(pic, seed, box){ return makeProp({...box, seed, paint(g){ cons
     return pic ? bimgProp(pic, seed, {w:140, h:136, ax:70, ay:124, shadow:[52, 12, 3], collide:30, glow:[0, -40, 62]}) : _v(seed, v); }; }
 { const _t = PROP_TYPES.twmonument; if (_t) PROP_TYPES.twmonument = (seed, v = 0) => { const pic = BIMG.ready.twmonument;
     return pic ? bimgProp(pic, seed, {w:250, h:340, ax:125, ay:330, shadow:[100, 16], collide:0, glow:[0, -312, 80]}) : _t(seed, v); }; }
+
+/* ---------- (v262) Doctor Oon's own clinic: the owner's picture «หมออาสา บริการผู้เล่น», behind her in Aren ---------- */
+BIMG.files.healerhut = 'healer'; if (location.protocol !== 'file:') bimgLoad('healerhut');
+PROP_TYPES.healerhut = (seed) => { const pic = BIMG.ready.healerhut;
+  return pic ? bimgProp(pic, seed, {w:140, h:136, ax:70, ay:124, shadow:[52, 12, 3], collide:30, glow:[0, -40, 62]}) : makeProp({w:4, h:4, ax:2, ay:2, seed, paint(){}}); };
+function bimgClinic(){ if (typeof MAP_ID === 'undefined' || MAP_ID !== 0 || (typeof DG !== 'undefined' && DG.active)) return;
+    const n = NPCS.find(o => o.id === 'healer_oon'); if (!n || PROPS.some(p => p.type === 'healerhut')) return;
+    const x = n.x, y = n.y - 26;
+    // clear trees, bushes and small things where the clinic stands (buildings stay)
+    const keep = new Set(['vshop', 'sala', 'armytent', 'house', 'shrine', 'tbld', 'tland', 'lamp']);
+    for (let i = PROPS.length - 1; i >= 0; i--){ const p = PROPS[i]; if (keep.has(p.type)) continue; const im = propImg(p.type, p.variant), half = (im.w || 40) / 2;
+      if (Math.abs(p.x - x) < 70 + half && p.y > y - 130 && p.y - (im.ay || 40) < y + 6){ PROPS.splice(i, 1); for (let j = obstacles.length - 1; j >= 0; j--) if (obstacles[j].prop === p) obstacles.splice(j, 1); } }
+    addProp('healerhut', x, y); }
+EV.on('map', () => setTimeout(bimgClinic, 0)); EV.on('tick', () => { if (typeof MAP_ID !== 'undefined' && MAP_ID === 0 && !(PROPS || []).some(p => p.type === 'healerhut')) bimgClinic(); });
