@@ -24,7 +24,7 @@ function bimgCut(img){
   g.putImageData(d, 0, 0); return c;
 }
 function bimgLoad(key){
-  const im = new Image(); im.onload = () => { try { BIMG.ready[key] = bimgCut(im); for (const k in propCache) if (/^(vshop|twmonument|healerhut|jobtemple)/.test(k)) delete propCache[k]; } catch (e) {} };
+  const im = new Image(); im.onload = () => { try { BIMG.ready[key] = bimgCut(im); for (const k in propCache) if (/^(vshop|twmonument|healerhut|jobtemple|dgngate)/.test(k)) delete propCache[k]; } catch (e) {} };
   im.onerror = () => {}; im.src = `assets/buildings/${BIMG.files[key]}.png?v=${typeof GAMEV !== 'undefined' && GAMEV ? GAMEV : 260}`;
 }
 if (location.protocol !== 'file:') for (const k in BIMG.files) bimgLoad(k);
@@ -50,14 +50,18 @@ function bimgClinic(){ if (typeof MAP_ID === 'undefined' || MAP_ID !== 0 || (typ
     addProp('healerhut', x, y); }
 EV.on('map', () => setTimeout(bimgClinic, 0)); EV.on('tick', () => { if (typeof MAP_ID !== 'undefined' && MAP_ID === 0 && !(PROPS || []).some(p => p.type === 'healerhut')) bimgClinic(); });
 
-/* ---------- (v262) the dungeon gate «ประตูวิหาร»: the owner's picture in place of the portal behind Gatekeeper Saeng ---------- */
-BIMG.files.temple = 'temple'; if (location.protocol !== 'file:') bimgLoad('temple');
-PROP_TYPES.jobtemple = (seed) => { const pic = BIMG.ready.temple;
-  return pic ? bimgProp(pic, seed, {w:200, h:186, ax:100, ay:174, shadow:[78, 14, 3], collide:40, glow:[0, -60, 80]}) : propImg('portal', 0); };
-function bimgTemple(){ if (typeof MAP_ID === 'undefined' || MAP_ID !== 0 || !BIMG.ready.temple || (typeof DG !== 'undefined' && DG.active)) return;
-  const n = NPCS.find(o => o.id === 'gatekeeper'); if (!n || PROPS.some(p => p.type === 'jobtemple')) return;
-  const pt = PROPS.find(p => p.type === 'portal' && Math.hypot(p.x - n.x, p.y - n.y) < 160), x = pt ? pt.x : n.x, y = pt ? pt.y : n.y - 32;
-  for (let i = PROPS.length - 1; i >= 0; i--){ const p = PROPS[i]; if (p.type !== 'portal' || Math.hypot(p.x - x, p.y - y) > 60) continue;
-    PROPS.splice(i, 1); for (let j = obstacles.length - 1; j >= 0; j--) if (obstacles[j].prop === p) obstacles.splice(j, 1); }
-  addProp('jobtemple', x, y); }
-EV.on('map', () => setTimeout(bimgTemple, 0)); EV.on('tick', () => { if (typeof MAP_ID !== 'undefined' && MAP_ID === 0 && BIMG.ready.temple && !(PROPS || []).some(p => p.type === 'jobtemple')) bimgTemple(); });
+/* ---------- (v262) the owner's pictures that stand behind an NPC: the job-change temple behind Master Vayra (in place of
+   his shrine) and the dungeon gate behind Gatekeeper Saeng (in place of the portal) ---------- */
+const BIMG_SPOTS = [{id:'jobtemple', file:'temple', npc:'job', near:['shrine', 'spirit'], dy:-74, box:{w:200, h:186, ax:100, ay:174, shadow:[78, 14, 3], collide:40, glow:[0, -60, 80]}},
+  {id:'dgngate', file:'dungeon', npc:'gatekeeper', near:['portal'], dy:-32, box:{w:190, h:176, ax:95, ay:164, shadow:[74, 14, 3], collide:36, glow:[0, -50, 80]}}];
+for (const o of BIMG_SPOTS){ BIMG.files[o.id] = o.file; if (location.protocol !== 'file:') bimgLoad(o.id);
+  PROP_TYPES[o.id] = seed => { const pic = BIMG.ready[o.id]; return pic ? bimgProp(pic, seed, o.box) : makeProp({w:4, h:4, ax:2, ay:2, seed, paint(){}}); }; }
+function bimgSpots(){ if (typeof MAP_ID === 'undefined' || MAP_ID !== 0 || (typeof DG !== 'undefined' && DG.active)) return;
+  for (const o of BIMG_SPOTS){ if (!BIMG.ready[o.id] || PROPS.some(p => p.type === o.id)) continue; const n = NPCS.find(q => q.id === o.npc); if (!n) continue;
+    const old = PROPS.find(p => p.type === o.near[0] && Math.hypot(p.x - n.x, p.y - n.y) < 160), x = old ? old.x : n.x, y = old ? old.y : n.y + o.dy;
+    for (let i = PROPS.length - 1; i >= 0; i--){ const p = PROPS[i]; if (!o.near.includes(p.type) || Math.hypot(p.x - x, p.y - y) > 140) continue;
+      PROPS.splice(i, 1); for (let j = obstacles.length - 1; j >= 0; j--) if (obstacles[j].prop === p) obstacles.splice(j, 1); }
+    addProp(o.id, x, y); } }
+EV.on('map', () => setTimeout(bimgSpots, 0)); EV.on('tick', () => { if (typeof MAP_ID !== 'undefined' && MAP_ID === 0 && BIMG_SPOTS.some(o => BIMG.ready[o.id] && !(PROPS || []).some(p => p.type === o.id))) bimgSpots(); });
+// the owner's buildings count as buildings (an NPC standing in front of one is fine: npccover / townlife checks)
+if (typeof NC_STRUCT !== 'undefined') for (const t of ['healerhut', 'jobtemple', 'dgngate']) NC_STRUCT.add(t);
