@@ -192,9 +192,14 @@ const BOT_DRAW = {
 const HLP_IMG = {};
 for (const k of Object.keys(HELPERS)){ const im = new Image(); im.onload = () => { HLP_IMG[k] = im; delete BOT_PIC[k]; }; im.onerror = () => {}; im.src = `assets/helpers/${k}.png?v=${typeof GAMEV !== 'undefined' && GAMEV ? GAMEV : 274}`; }
 const HLP_SHINE = document.createElement('canvas');
+/* (v274) a helper whose picture the owner sent as an animation plays it: a strip of frames, assets/helpers/<k>_anim.png */
+const HLP_ANIM = {midas:{n:9, dt:.14}}, HLP_FR = {};
+for (const k in HLP_ANIM){ const im = new Image(); im.onload = () => { const n = HLP_ANIM[k].n, w = Math.floor(im.width / n), out = [];
+    for (let i = 0; i < n; i++){ const c = document.createElement('canvas'); c.width = w; c.height = im.height; c.getContext('2d').drawImage(im, i * w, 0, w, im.height, 0, 0, w, im.height); out.push(c); } HLP_FR[k] = out; };
+  im.onerror = () => {}; im.src = `assets/helpers/${k}_anim.png?v=${typeof GAMEV !== 'undefined' && GAMEV ? GAMEV : 274}`; }
 const HLP_IMG_SZ = 24;   // (v274) about half the hero's height: a helper, not a second hero (34 was too big)
 function drawBotImg(g, k, t, opt){
-  const im = HLP_IMG[k], R = HELPERS[k], c = R.c, sz = opt.size || HLP_IMG_SZ, k2 = sz / Math.max(im.width, im.height), w = im.width * k2, h = im.height * k2;
+  const FR = HLP_FR[k], im = FR && !(typeof GFX !== 'undefined' && GFX.preset === 'low') ? FR[Math.floor(t / HLP_ANIM[k].dt) % FR.length] : HLP_IMG[k], R = HELPERS[k], c = R.c, sz = opt.size || HLP_IMG_SZ, k2 = sz / Math.max(im.width, im.height), w = im.width * k2, h = im.height * k2;
   const still = typeof GFX !== 'undefined' && GFX.preset === 'low', ph = (k.charCodeAt(0) || 1) * .7;
   const breathe = still ? 1 : 1 + Math.sin(t * 2.4 + ph) * .035, tilt = still ? 0 : (opt.mv ? .14 * (opt.face || 1) : Math.sin(t * 1.3 + ph) * .07);
   // glow behind, in its own colour, breathing
