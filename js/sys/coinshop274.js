@@ -31,7 +31,8 @@ function cshStrip(){ if (!S || !S.cos) return; let ch = false;
 EV.on('map', cshStrip); { let once = false; EV.on('tick', () => { if (!once && S && S.lvl){ once = true; cshStrip(); } }); }
 /* the wardrobe's words */
 if (typeof renderWardrobe === 'function'){ const _rw = renderWardrobe; renderWardrobe = function(){ const r = _rw.apply(this, arguments);
-    try { const p = document.getElementById('pane-equip'); if (p){ for (const h of p.querySelectorAll('.hint')) if (/ช่างตัดชุด|tailor/.test(h.textContent)) h.textContent = L('เป็นของทั้งบัญชี ทุกตัวละครใช้ได้ · แตะชิ้นไหนก็ลองดูบนตัวละครได้ · ใส่ออกไปข้างนอกต้องซื้อก่อน (ร้านค้าเหรียญ)', 'Shared by your whole account · tap any piece to preview it on your hero · buy it to wear it (Coin Shop)');
+    try { const p = document.getElementById('pane-equip'); if (p){ p.querySelectorAll('.fwfilter,.fwfempty').forEach(x => x.remove()); if (typeof FWF !== 'undefined' && FWF.mode !== 'all'){ FWF.mode = 'all'; if (typeof fwfApply === 'function') fwfApply(); }   // (v274) only owned pieces are listed: no All / Owned / New filter
+ for (const h of p.querySelectorAll('.hint')) if (/ช่างตัดชุด|tailor/.test(h.textContent)) h.innerHTML = `${L('ชุดที่คุณมี · เป็นของทั้งบัญชี ทุกตัวละครใช้ได้ · ดูและซื้อชิ้นใหม่ที่ร้านค้าเหรียญ', 'Your costumes · shared by your whole account · browse and buy new ones in the Coin Shop')} <button class="btn sm" data-cshopen="1">◈ ${L('ร้านค้าเหรียญ', 'Coin Shop')}</button>`;
       for (const b of p.querySelectorAll('.cosit small')) if (b.textContent === L('ยังไม่มี', 'Locked')) b.innerHTML = `<span class="c272">◈ ${(cshDef(b.closest('[data-costry]').dataset.costry).price || {}).c || '—'}</span>`; } } catch (e) {}
     return r; }; }
 
@@ -123,6 +124,7 @@ function cshDraw(){ const cv = document.getElementById('cshPrev'); if (!cv || ty
   try { EQ.tab = 'cos'; EQ.try = CSH.sel || null; EQ.dir = CSH.dir; drawEquipPrev(); } catch (e) {} finally { document.getElementById = gi; EQ.tab = tab; EQ.try = tr; EQ.dir = dir; } }
 setInterval(() => { if (CSH.tab === 'fash' && winOpen('cshop')) cshDraw(); }, 90);   // wings flap, auras glow
 document.addEventListener('click', e => { const r = e.target.closest && e.target.closest('[data-cshrot]'); if (!r) return; CSH.dir = (CSH.dir + +r.dataset.cshrot + SPR.DIRS.length) % SPR.DIRS.length; cshDraw(); });
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-cshopen]'); if (!b) return; e.stopPropagation(); CSH.tab = 'fash'; if (typeof FW !== 'undefined' && FW_TABS.some(x => x[0] === FW.tab)) CSH.sub = FW.tab; openWin('cshop'); WIN_RENDER.cshop(); }, true);
 /* anything bought elsewhere (robots, bag, other windows) refreshes the shop */
 window.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-rentpet],[data-bagx],[data-cosbuy]') && winOpen('cshop')) setTimeout(() => reWin('cshop'), 60); }, true);
 
@@ -182,6 +184,7 @@ html.gr-still #cshBtn i{animation:none}
 #pane-cshop .cshstage canvas{width:150px;height:auto;aspect-ratio:76/92;image-rendering:auto}
 #pane-cshop .cshstage > b{font-size:13px;line-height:1.25;color:#3a2206}#pane-cshop .cshstage small{font-size:11px;color:#7a5a30}#pane-cshop .cshstage .ok{color:#1f8a4e;font-weight:800;font-size:12px}
 #pane-cshop .cshrot{display:flex;gap:30px}#pane-cshop .cshrot .ibtn{width:28px;height:28px;font-size:18px}
+#pane-equip .fwempty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:24px 10px;color:#7a5a30;font-weight:700}
 #pane-cshop .cshit.sel{box-shadow:inset 0 0 0 2.5px #2a8ae8,0 0 10px rgba(80,180,255,.5)}
 @media (max-height:500px){#pane-cshop .cshstage{width:118px;padding:5px}#pane-cshop .cshstage canvas{width:100px}#pane-cshop .cshtabs{width:92px}#pane-cshop .cshtabs button{padding:5px 7px;font-size:12px}#pane-cshop .cshgrid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}#pane-cshop .cshit .cosw{width:48px;height:48px}}`;
   document.head.appendChild(st); }
