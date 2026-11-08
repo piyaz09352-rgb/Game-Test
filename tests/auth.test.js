@@ -62,7 +62,7 @@ test('local: register, log out, wrong password refused, log in again, remember m
     await register(page, { id: 'auth_user', pw: 'secret12' });
     await page.waitForSelector('[data-make]', { timeout: 30000 });
     assert.strictEqual(await page.$('#auBox'), null, 'the panel is gone after registering');
-    assert.deepStrictEqual(await page.evaluate(() => ({ n: ACC.name, c: ACC.coins, p: authHasPw() })), { n: 'auth_user', c: 60, p: true }, 'account made with 10 coins (+50 from the starting-money achievements, once) and a password');
+    assert.deepStrictEqual(await page.evaluate(() => ({ n: ACC.name, c: ACC.coins, p: authHasPw() })), { n: 'auth_user', c: 10, p: true }, 'account made with 10 coins (v272: no starting million, so no wealth achievements, once) and a password');
     assert.ok(!(await stored(page)).includes('secret12'), 'the password is never stored as text');
 
     // log out from the title screen's account bar (Settings no longer has a second log-out button)
@@ -140,7 +140,7 @@ test('firebase mode: waits for the server, registers and logs in through it, fix
     assert.strictEqual(await page.$('[data-auforgot]'), null, 'no forgot-password wipe on a server account');
 
     await register(page, { id: 'online_01', pw: 'secret12' }); await page.waitForSelector('[data-make]', { timeout: 30000 });
-    assert.deepStrictEqual(await page.evaluate(() => ({ n: ACC.name, k: Object.keys(window.__fb.users), c: ACC.coins })), { n: 'online_01', k: ['online_01'], c: 60 });
+    assert.deepStrictEqual(await page.evaluate(() => ({ n: ACC.name, k: Object.keys(window.__fb.users), c: ACC.coins })), { n: 'online_01', k: ['online_01'], c: 10 });
     assert.strictEqual(await page.$('[data-accren]'), null, 'the ID is fixed on a server account');
     await page.evaluate(() => { VAYFB.signOut(); }); await page.waitForSelector('#auBox', { timeout: 15000 });
 

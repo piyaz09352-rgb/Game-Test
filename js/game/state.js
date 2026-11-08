@@ -5,7 +5,7 @@
 function newS(){
   return {v:2,lvl:1,jlvl:1,exp:0,jexp:0,job:'novice',stats:{str:1,agi:1,vit:1,int:1,dex:1,luk:1},
     statPts:48,skPts:0,skills:{},hot:[null,null,null,null,null,null],inv:{redpot:6},cards:{},slots:{weapon:null,armor:null,head:null},
-    refine:0,bia:1000000,hp:40,sp:11,x:1210,y:820,vxv:1,worldT:0,pet:null,map:0,visited:{0:1},gear:{armor:null,head:null,ammo:null,weapon:null,acc:null},look:{sex:'m',hair:0,color:''}};
+    refine:0,bia:500,hp:40,sp:11,x:1210,y:820,vxv:1,worldT:0,pet:null,map:0,visited:{0:1},gear:{armor:null,head:null,ammo:null,weapon:null,acc:null},look:{sex:'m',hair:0,color:''}};
 }
 let S = newS();
 let DER = null;
