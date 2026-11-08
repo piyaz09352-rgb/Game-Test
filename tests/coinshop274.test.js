@@ -30,7 +30,7 @@ test('coin shop: button, prices, no free trial, buying, tabs, top-up closed; tow
       out.itemBuy = [c0 - ACC.coins, (S.inv.coat_fire || 0) - h0];
       document.querySelector('[data-cshtab="bot"]').click(); document.querySelector('[data-rentpet="nexa"][data-rt="0"]').click(); out.botRent = S.helper && S.helper.k;
       return out; });
-    assert.ok(tabs.item >= 10 && tabs.bot === 9 && tabs.svc === 2 && tabs.topup === 6, 'every tab lists its goods ' + JSON.stringify(tabs));
+    assert.ok(tabs.item >= 10 && tabs.bot === 9 && tabs.svc === 1 && tabs.topup === 6, 'every tab lists its goods ' + JSON.stringify(tabs));
     assert.ok(tabs.closed, 'top-up is not open yet'); assert.deepStrictEqual(tabs.itemBuy, [3, 1], 'an oil for 3 coins'); assert.strictEqual(tabs.botRent, 'nexa', 'a robot rented from the shop');
     // the tower: 12 monsters on floor 1, 20 from floor 81, guardians far tougher than their guards
     const tw = await page.evaluate(() => ({c1:twCount(1), c50:twCount(50), c81:twCount(81), g:TW_GUARDS, h:TW_HARD}));

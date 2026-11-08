@@ -8,7 +8,7 @@
      (anything worn on trial is taken off).
    · ของใช้ Items — the coin-only goods (prices272.js: oils, special arrows and stars, Diamond Drill, Refine Ward).
    · หุ่นผู้ช่วย Robots — the nine premium helper robots (beastkeeper.js), rented from anywhere.
-   · บริการ Services — bag slots (bag100.js) and the class unlock price (classswap.js, done with Master Vayra).
+   · บริการ Services — bag slots (bag100.js).
    · เติมเหรียญ Top-up — the coin packs, shown but not open yet (no payment system yet), and the free ways to earn coins. */
 'use strict';
 
@@ -71,12 +71,9 @@ function cshBots(){
 }
 function cshServices(){
   const n = (S.bagX | 0), max = typeof BAGX !== 'undefined' && n >= BAGX.max, fee = typeof BAGX !== 'undefined' ? BAGX.price(n) : 0;
-  const C = typeof csData === 'function' && S.job !== 'novice' ? csData() : null;
   return `<div class="cshgrid svc">
     <div class="cshit"><span class="cshic">🎒</span><b>${L('ขยายกระเป๋า +10 ช่อง', 'Bag +10 slots')}</b><small>${L('ตอนนี้', 'now')} ${typeof bagCap === 'function' ? bagCap() : '—'} ${L('ช่อง · ครั้งต่อไปแพงขึ้น', 'slots · each lot costs more')}</small>
-      <div class="cshp">${max ? `<span class="ok">${L('เต็มที่แล้ว', 'Maxed')}</span>` : cshPr(fee)}</div><div class="cshb">${max ? '' : `<button class="btn sm cgo" data-bagx="1" ${cshCoins() >= fee ? '' : 'disabled'}>${L('ขยาย', 'Enlarge')}</button>`}</div></div>
-    <div class="cshit"><span class="cshic">⚔</span><b>${L('ปลดอาชีพใหม่', 'Unlock a new class')}</b><small>${C && (C.free || 0) > 0 ? L('ยังมีสิทธิ์ปลดฟรี 1 ครั้ง', 'one free unlock left') : L('ปลดได้ที่ครูวายรา นครอาเรน · สลับอาชีพที่ปลดแล้วฟรี', 'with Master Vayra in Aren · switching back is free')}</small>
-      <div class="cshp">${cshPr(typeof csFee === 'function' ? csFee() : 99)}</div><div class="cshb"><button class="btn sm" data-cshgo="job">${L('ไปหาครูวายรา', 'Find Master Vayra')}</button></div></div></div>`;
+      <div class="cshp">${max ? `<span class="ok">${L('เต็มที่แล้ว', 'Maxed')}</span>` : cshPr(fee)}</div><div class="cshb">${max ? '' : `<button class="btn sm cgo" data-bagx="1" ${cshCoins() >= fee ? '' : 'disabled'}>${L('ขยาย', 'Enlarge')}</button>`}</div></div></div>`;
 }
 function cshTopup(){
   return `<div class="cshtop"><b>${L('เติมเหรียญวายรา', 'Top up Vayra Coins')}</b><small>${L('ระบบเติมเหรียญกำลังจะเปิดเร็ว ๆ นี้', 'Top-ups are coming soon')}</small></div>
@@ -113,7 +110,7 @@ document.addEventListener('click', e => {
   else if (d.cshfash) cshBuyFash(d.cshfash);
   else if (d.cshtry){ const id = d.cshtry; EQ.tab = 'cos'; EQ.try = id; const s = fwSlot(id); if (s && typeof FW !== 'undefined') FW.tab = s; openWin('equip'); setTimeout(() => { if (typeof renderEquip === 'function') renderEquip(); }, 0); }
   else if (d.cshitem){ if (typeof coin272Buy === 'function'){ const id = d.cshitem; coin272Buy(id, GEAR[id] ? 'pack' : 'item', +d.n || 1); reWin('cshop'); } }
-  else if (d.cshgo === 'job') toast(L('ครูวายราอยู่กลางลานนครอาเรน · คุยแล้วเลือก «สลับอาชีพ»', 'Master Vayra stands in the middle of Aren · talk to her and pick «Switch class»'));
+  
 });
 /* anything bought elsewhere (robots, bag, other windows) refreshes the shop */
 window.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-rentpet],[data-bagx],[data-cosbuy]') && winOpen('cshop')) setTimeout(() => reWin('cshop'), 60); }, true);
@@ -171,5 +168,5 @@ html.gr-still #cshBtn i{animation:none}
 @media (max-height:500px){#pane-cshop .cshtabs{width:92px}#pane-cshop .cshtabs button{padding:5px 7px;font-size:12px}#pane-cshop .cshgrid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}#pane-cshop .cshit .cosw{width:48px;height:48px}}`;
   document.head.appendChild(st); }
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'cshop', t:['ร้านค้าเหรียญวายรา', 'Vayra Coin Shop'], b:() => L(
-  '<p>ปุ่ม ◈ ร้านค้า ข้างแผนที่เล็ก (หรือเมนู) · แยกหมวด: แฟชั่น (ปีก ส่วนหัว หน้ากาก ชุดเซต พาหนะ ◈30–300 ตามความอลังการ) · ของใช้ (ยาเคลือบ ลูกธนู/ดาวกระจายธาตุพิเศษ สว่านเพชร ยันต์คุ้มครอง) · หุ่นผู้ช่วยพรีเมียม · บริการ (ขยายกระเป๋า ปลดอาชีพ) · เติมเหรียญ (เร็ว ๆ นี้) · ชุดแฟชั่นลองดูได้ในตู้เสื้อผ้า แต่ใส่ออกไปข้างนอกต้องซื้อ</p>',
-  '<p>The ◈ Shop button beside the minimap (or the menu) · sections: Fashion (wings, headpieces, masks, outfits, mounts, ◈30–300 by how grand they are) · Items (oils, special arrows/stars, Diamond Drill, Refine Ward) · premium robots · Services (bag slots, class unlock) · Top up (coming soon) · costumes can be previewed in the wardrobe but must be bought to wear</p>')});
+  '<p>ปุ่ม ◈ ร้านค้า ข้างแผนที่เล็ก (หรือเมนู) · แยกหมวด: แฟชั่น (ปีก ส่วนหัว หน้ากาก ชุดเซต พาหนะ ◈30–300 ตามความอลังการ) · ของใช้ (ยาเคลือบ ลูกธนู/ดาวกระจายธาตุพิเศษ สว่านเพชร ยันต์คุ้มครอง) · หุ่นผู้ช่วยพรีเมียม · บริการ (ขยายกระเป๋า) · เติมเหรียญ (เร็ว ๆ นี้) · ชุดแฟชั่นลองดูได้ในตู้เสื้อผ้า แต่ใส่ออกไปข้างนอกต้องซื้อ</p>',
+  '<p>The ◈ Shop button beside the minimap (or the menu) · sections: Fashion (wings, headpieces, masks, outfits, mounts, ◈30–300 by how grand they are) · Items (oils, special arrows/stars, Diamond Drill, Refine Ward) · premium robots · Services (bag slots) · Top up (coming soon) · costumes can be previewed in the wardrobe but must be bought to wear</p>')});
