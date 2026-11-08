@@ -261,11 +261,12 @@ test('unlocking another class costs Vayra Coins, not Bia', { skip, timeout: 1200
       S.job = 'blade'; S.jlvl = 10; S.skills = {}; derive(); P.x = VSPAWN.x; P.y = VSPAWN.y;
       S.cls = {have:{blade:{job:'blade'}}, free:0}; S.bia = 5e6; ACC.coins = 20;
       csSwitch('rune'); const poor = {job:S.job, bia:S.bia, coins:ACC.coins};
-      ACC.coins = 150; window.sysPrompt = (q, yes) => yes(); csSwitch('rune');
-      return {poor, job:S.job, bia:S.bia, coins:ACC.coins};
+      window.sysPrompt = (q, yes) => yes(); const _ach = window.achCheck; window.achCheck = () => {};   // (v274) no achievement payouts in the middle of the measurement
+      ACC.coins = 150; csSwitch('rune'); const coins = ACC.coins; window.achCheck = _ach;
+      return {poor, job:S.job, bia:S.bia, coins};
     });
     assert.deepStrictEqual(r.poor, {job:'blade', bia:5e6, coins:20}, 'not enough coins: nothing happens');
-    assert.equal(r.job, 'rune'); assert.equal(r.bia, 5e6, 'Bia untouched'); assert.ok(r.coins >= 50 && r.coins < 60, '100 coins spent (an achievement may pay a few back)');
+    assert.equal(r.job, 'rune'); assert.equal(r.bia, 5e6, 'Bia untouched'); assert.ok(r.coins === 51, '99 coins spent ' + JSON.stringify(r));
     assert.deepEqual(errors, []);
   } finally { await close(); }
 });
