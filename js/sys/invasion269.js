@@ -96,11 +96,20 @@ EV.on('kill', m => {
   if (!m.invBoss){ INV.my++; INV.tot++; invSend({k:'kill', n:1}); if (INV.tot === invGoal()) banner(L('⚔ ทัพแตกแล้ว! แม่ทัพกำลังมา…', '⚔ The army breaks! Its warlord is coming…')); return; }
   invSend({k:'dead'}); invReward();
 });
+/* (v272) what other games tell us is checked: each sender's kills and warlord damage are rate-limited (a burst, then
+   about what a real hero can do), the bar counts only what passed, a claimed total is taken once (a late arrival's
+   catch-up) and capped by the time the invasion has run, and the ranking shows only verified counts */
+const INVP = {peers:new Map(), key:null, start:0};
+function invPeer(id){ if (INVP.key !== INV.key){ INVP.key = INV.key; INVP.peers.clear(); INVP.start = Date.now(); }
+  let p = INVP.peers.get(id); if (!p){ p = {k:0, kTok:4, dTok:.3, t:Date.now(), seen:false}; INVP.peers.set(id, p); }
+  const now = Date.now(), dt = (now - p.t) / 1000; p.t = now; p.kTok = Math.min(4, p.kTok + dt / 1.2); p.dTok = Math.min(.3, p.dTok + dt * .06); return p; }
 function onInv(msg){
   const d = msg.data || {}; if (msg.isMe || !INV.key || d.key !== INV.key || d.m !== MAP_ID) return;
-  const tot = clamp(+d.tot || 0, 0, 400); if (tot > INV.tot) INV.tot = tot;
-  if (d.k === 'dmg' && INV.boss && !INV.boss.dead){ const f = clamp(+d.f || 0, 0, .35); INV.boss.hp -= f * INV.boss.maxhp; INV.boss.flash = .08; INV.bossHp = Math.max(0, INV.boss.hp / INV.boss.maxhp); if (INV.boss.hp <= 0) killMob(INV.boss); }
-  else if (d.k === 'dmg' && !INV.boss){ INV.bossHp = clamp(INV.bossHp - clamp(+d.f || 0, 0, .35), .02, 1); }
+  const p = invPeer(String(msg.peer || msg.by || '?'));
+  if (!p.seen){ p.seen = true; const w = invWindow(), mins = w && w.active ? Math.max(0, INV_LEN - w.left) : 0, cap = Math.round(mins * 15 * (invPeers() + 1));   /* at most ~15 a minute for each hero there, since the invasion began */ const tot = clamp(+d.tot || 0, 0, Math.min(400, cap)); if (tot > INV.tot) INV.tot = tot; }   // a late arrival catches up once, within reason
+  if (d.k === 'kill'){ if (p.kTok >= 1){ p.kTok -= 1; p.k++; INV.tot++; } return; }   // counted here, one by one
+  if (d.k === 'dmg' && INV.boss && !INV.boss.dead){ const f = Math.min(clamp(+d.f || 0, 0, .35), p.dTok); p.dTok -= f; INV.boss.hp -= f * INV.boss.maxhp; INV.boss.flash = .08; INV.bossHp = Math.max(0, INV.boss.hp / INV.boss.maxhp); if (INV.boss.hp <= 0) killMob(INV.boss); }
+  else if (d.k === 'dmg' && !INV.boss){ const f = Math.min(clamp(+d.f || 0, 0, .35), p.dTok); p.dTok -= f; INV.bossHp = clamp(INV.bossHp - f, .02, 1); }
   else if (d.k === 'dead' && INV.boss && !INV.boss.dead && INV.boss.hp <= INV.boss.maxhp * .5){ INV.boss.hp = 0; killMob(INV.boss); }
 }
 EV.on('netready', () => { if (typeof NET !== 'undefined' && NET.room && typeof mapOn === 'function') mapOn('inv', onInv); });
@@ -146,7 +155,7 @@ if (typeof wbPres !== 'undefined'){ const _wp = wbPres; wbPres = () => ({..._wp(
 function invRank(){
   const out = [{n:typeof netName === 'function' ? netName() : (S.name || ''), k:INV.my, me:true}];
   if (typeof NET !== 'undefined' && NET.mapRoom && NET.on) for (const p of NET.mapRoom.peers()){ const q = p.presence || {}; if (p.isMe || q.ivk !== INV.key || typeof q.ivn !== 'number') continue;
-    out.push({n:(typeof clean === 'function' ? clean(q.n, 14) : String(q.n || '').slice(0, 14)) || L('นักผจญภัย', 'Adventurer'), k:clamp(q.ivn | 0, 0, 999)}); }
+    const v = INVP.key === INV.key && INVP.peers.get(String(p.peer)); out.push({n:(typeof clean === 'function' ? clean(q.n, 14) : String(q.n || '').slice(0, 14)) || L('นักผจญภัย', 'Adventurer'), k:Math.min(clamp(q.ivn | 0, 0, 999), v ? v.k + 2 : 2)}); }   // never more than we saw them do
   return out.sort((a, b) => b.k - a.k);
 }
 /* the bar's button: straight to the invaded map (free, like the world boss's warp) */
