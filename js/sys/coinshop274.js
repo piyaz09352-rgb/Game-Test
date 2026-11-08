@@ -90,14 +90,12 @@ if (typeof PHI_WIDE !== 'undefined' && !PHI_WIDE.includes('cshop')) PHI_WIDE.pus
 mkWin('cshop', 'ร้านค้าเหรียญ', 'Coin Shop', '', '<path d="M4 7h12l-1 9H5z"/><path d="M7 7a3 3 0 016 0"/><path d="M10 10.5l1.4 1.4-1.4 1.4-1.4-1.4z"/>');
 WIN_RENDER.cshop = function(){
   const pane = el('pane-cshop'); if (!pane || !S) return;
-  const old = pane.querySelector('.cshbody'); if (old) CSH.top[CSH.tab + CSH.sub] = old.scrollTop;
+  const old = pane.querySelector('.cshfr') || pane.querySelector('.cshbody'); if (old) CSH.top[CSH.tab + CSH.sub] = old.scrollTop;   // (v276) on the fashion tab only the list scrolls
   const body = CSH.tab === 'fash' ? cshFashion() : CSH.tab === 'item' ? cshItems() : CSH.tab === 'bot' ? cshBots() : CSH.tab === 'svc' ? cshServices() : cshTopup();
   pane.innerHTML = `<div class="cshw"><nav class="cshtabs">${CSH_TABS.map(([k, th, en, ic]) => `<button class="${k === CSH.tab ? 'on' : ''}${k === 'topup' ? ' tu' : ''}" data-cshtab="${k}"><i>${ic}</i><span>${L(th, en)}</span></button>`).join('')}
       <div class="cshwal"><small>${L('เหรียญของคุณ', 'Your coins')}</small><b>◈ ${fmtN(cshCoins())}</b></div></nav>
-    <div class="cshbody">${body}</div></div>`;
-  const nb = pane.querySelector('.cshbody'); if (nb){ nb.scrollTop = CSH.top[CSH.tab + CSH.sub] || 0;
-    const ui = document.getElementById('ui') || document.body, k = ui.offsetWidth ? ui.getBoundingClientRect().width / ui.offsetWidth : 1, top = nb.getBoundingClientRect().top;
-    nb.style.maxHeight = `${Math.max(160, Math.round((window.innerHeight - top - 22) / k))}px`; }   // fill the window down to the screen's edge (scaled UI on phones)
+    <div class="cshbody${CSH.tab === 'fash' ? ' fash' : ''}">${body}</div></div>`;
+  const nb = pane.querySelector('.cshfr') || pane.querySelector('.cshbody'); if (nb) nb.scrollTop = CSH.top[CSH.tab + CSH.sub] || 0;   /* (v276) the columns fill the window by layout (no measured height: on some phones it stopped short) */
 };
 function cshBuyFash(id){
   const d = cshDef(id); if (!d || !d.price || cosHave(id)) return; const c = d.price.c;
@@ -190,7 +188,22 @@ html.gr-still #cshBtn i{animation:none}
 #pane-cshop .cshrot{display:flex;gap:30px}#pane-cshop .cshrot .ibtn{width:28px;height:28px;font-size:18px}
 #pane-equip .fwempty{display:flex;flex-direction:column;align-items:center;gap:8px;padding:24px 10px;color:#7a5a30;font-weight:700}
 #pane-cshop .cshit.sel{box-shadow:inset 0 0 0 2.5px #2a8ae8,0 0 10px rgba(80,180,255,.5)}
-@media (max-height:500px){#pane-cshop .cshstage{width:118px;padding:5px}#pane-cshop .cshstage canvas{width:100px}#pane-cshop .cshtabs{width:92px}#pane-cshop .cshtabs button{padding:5px 7px;font-size:12px}#pane-cshop .cshgrid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}#pane-cshop .cshit .cosw{width:48px;height:48px}}`;
+/* (v276) balanced: the three columns (tabs · preview · list) run the full height of the window and line up top and bottom; only the list scrolls */
+#pane-cshop{display:flex;flex-direction:column}
+#pane-cshop .cshw{flex:1 1 auto;min-height:0;height:100%;align-items:stretch}
+#pane-cshop .cshbody{max-height:none !important;align-self:stretch}
+#pane-cshop .cshbody.fash{overflow:hidden;display:flex;padding-right:0}
+#pane-cshop .cshbody.fash .cshfw{flex:1;min-height:0;align-items:stretch}
+#pane-cshop .cshbody.fash .cshstage{position:static;justify-content:center;gap:8px}
+#pane-cshop .cshbody.fash .cshfr{overflow-y:auto;overscroll-behavior:contain;padding-right:4px;min-height:0}
+#pane-cshop .cshtabs button{white-space:nowrap;min-height:0}
+#pane-cshop .cshrot .ibtn{width:30px !important;height:30px !important;min-width:0 !important;min-height:0 !important;padding:0 !important;font-size:18px;line-height:1}
+#pane-cshop .cshstage small{line-height:1.35}
+#pane-cshop .cshit{justify-content:space-between}
+#pane-cshop .cshb{width:100%;flex-wrap:nowrap}
+#pane-cshop .cshb .btn{flex:1 1 0;min-width:0 !important;min-height:0 !important;height:30px;padding:0 6px !important;font-size:12.5px}
+#pane-cshop .cshgrid.bots .cshb .btn,#pane-cshop .cshgrid.svc .cshb .btn{height:30px}
+@media (max-height:500px){#pane-cshop .cshstage{width:118px;padding:5px}#pane-cshop .cshstage canvas{width:100px}#pane-cshop .cshtabs{width:92px}#pane-cshop .cshtabs button{padding:5px 7px;font-size:12px}#pane-cshop .cshgrid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}#pane-cshop .cshit .cosw{width:52px;height:52px}#pane-cshop .cshtabs button{font-size:11.5px;gap:4px}#pane-cshop .cshb .btn{height:28px;font-size:12px}#pane-cshop .cshrot .ibtn{width:26px !important;height:26px !important}}`;
   document.head.appendChild(st); }
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'cshop', t:['ร้านค้าเหรียญวายรา', 'Vayra Coin Shop'], b:() => L(
   '<p>ปุ่ม ◈ ร้านค้า ข้างแผนที่เล็ก (หรือเมนู) · แยกหมวด: แฟชั่น (ปีก ส่วนหัว หน้ากาก ชุดเซต พาหนะ ◈30–300 ตามความอลังการ) · ของใช้ (ยาเคลือบ ลูกธนู/ดาวกระจายธาตุพิเศษ สว่านเพชร ยันต์คุ้มครอง) · หุ่นผู้ช่วยพรีเมียม · บริการ (ขยายกระเป๋า) · เติมเหรียญ (เร็ว ๆ นี้) · ชุดแฟชั่นลองดูได้ในตู้เสื้อผ้า แต่ใส่ออกไปข้างนอกต้องซื้อ</p>',
