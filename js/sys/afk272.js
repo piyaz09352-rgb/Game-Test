@@ -5,7 +5,8 @@
    · AUTO SAVES SP: under 15% SP it uses only cheap skills (≤ 12% of max SP) and fights with normal attacks in between,
      so SP comes back while it fights; it drinks an SP potion only under 10% (it was 20%). It never sits to rest by
      default (players who turned sitting on themselves keep it).
-   · CASTERS (INT classes) recover SP faster: +1% of max SP every 2 s, on top of the usual regeneration.
+   · SP COMES BACK WHILE FIGHTING: every class +1.2% of max SP every 2 s in a fight; casters (INT) another +1% at
+     all times — so skills keep flowing without leaning on potions (saving SP alone made Auto kill a quarter slower).
    · SP POTIONS cost a third: Blue Potion 60 Bia, Big Blue Potion 360.
    · MONSTER JUNK from low levels sells for more (drop rates untouched): ×2 below Lv 70, easing to ×1 at Lv 120. */
 'use strict';
@@ -19,9 +20,10 @@ const AFK272 = {low:.15, cheap:.12, potSp:10};   // (tuned: at 30% / 8% kills fe
     const b = S.bot || {}; if (b.basic === false) return r;   // with normal attacks off there is nothing to fall back on
     const sk = SKILLS[r]; if (!sk || botKind(sk) !== 'atk' || S.sp / DER.maxsp >= AFK272.low) return r;
     return sk.sp(skl(r)) <= DER.maxsp * AFK272.cheap ? r : null; }; }
-// casters recover SP faster
-{ let acc = 0; EV.on('tick', dt => { if (PAUSED || !S || !S.lvl || P.dead || !JOBS[S.job] || !/INT/.test(JOBS[S.job].stat || '')) return; acc += dt; if (acc < 2) return; acc = 0;
-    if (S.sp < DER.maxsp) S.sp = Math.min(DER.maxsp, S.sp + Math.max(1, Math.ceil(DER.maxsp * .01))); }); }
+// SP comes back while you fight (every class), and casters recover faster still
+{ let acc = 0; EV.on('tick', dt => { if (PAUSED || !S || !S.lvl || P.dead || !JOBS[S.job]) return; acc += dt; if (acc < 2) return; acc = 0; if (S.sp >= DER.maxsp) return;
+    const caster = /INT/.test(JOBS[S.job].stat || ''), fighting = !!(P.target && !P.target.dead) || (typeof threats === 'function' && threats().length > 0);
+    const k = (fighting ? .012 : 0) + (caster ? .01 : 0); if (k > 0) S.sp = Math.min(DER.maxsp, S.sp + Math.max(1, Math.ceil(DER.maxsp * k))); }); }
 // prices
 if (ITEMS.bluepot){ ITEMS.bluepot.buy = 60; ITEMS.bluepot.sell = Math.min(ITEMS.bluepot.sell || 0, 15); }
 if (ITEMS.bigbluepot){ ITEMS.bigbluepot.buy = 360; ITEMS.bigbluepot.sell = Math.min(ITEMS.bigbluepot.sell || 0, 90); }
