@@ -35,6 +35,9 @@ EV.on('draw', () => {
   const g = ctx, t = performance.now() / 1000; let inside = 0;
   for (const m of mobs){ if (m.dead || !m.def || !m.def.boss || m.vanish) continue;
     const x = sx(m.x), y = sy(m.y), R = BOSS192.aura * PX; if (x < -R || y < -R || x > SW + R || y > SH + R) continue;
+    // (v274) the owner did not want the red circle (ring, ground glow and embers) under bosses: only the red screen edges warn you now
+    if (Math.hypot(m.x - P.x, m.y - P.y) < BOSS192.aura) inside = Math.max(inside, m.enraged ? 1 : .7);
+    continue;
     const pulse = .5 + .5 * Math.sin(t * (m.enraged ? 5 : 2.4)), hot = m.enraged ? 1 : 0;
     g.save(); g.setTransform(DPR, 0, 0, DPR, 0, 0);
     // the ground glow (flattened, like a shadow on the ground)
@@ -59,8 +62,8 @@ EV.on('draw', () => {
     g.fillStyle = v; g.fillRect(0, 0, SW, SH); g.restore(); }
 });
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'boss192', t:['บอส: ต้องรวมปาร์ตี้', 'Bosses: bring a party'], b:() => L(
-  '<p>บอสออกแบบให้สู้กันเป็นปาร์ตี้ 3–5 คน เลือดหนา ตีแรง และเร็วกว่ามอนทั่วไป คนเดียวเลเวลเท่ากันสู้ไม่ไหว</p><p><b>รัศมีมรณะ</b>: วงแดงรอบตัวบอส ยืนในวงจะโดนตีแรงขึ้น และขอบจอเป็นสีแดง</p><p><b>คลั่ง</b>: เมื่อเลือดเหลือน้อย บอสทุกตัวคลั่ง ตีแรงและเร็วขึ้น</p>',
-  '<p>Bosses are built for a party of 3–5: tougher, harder-hitting and faster than ordinary monsters; one hero of the same level cannot win alone</p><p><b>Dread aura</b>: a red ring around the boss; inside it you take more damage and the screen edges glow red</p><p><b>Berserk</b>: when its HP runs low every boss goes berserk, hitting harder and faster</p>')});
+  '<p>บอสออกแบบให้สู้กันเป็นปาร์ตี้ 3–5 คน เลือดหนา ตีแรง และเร็วกว่ามอนทั่วไป คนเดียวเลเวลเท่ากันสู้ไม่ไหว</p><p><b>รัศมีมรณะ</b>: ใกล้ตัวบอส (ขอบจอเป็นสีแดง) ยืนในรัศมีจะโดนตีแรงขึ้น และขอบจอเป็นสีแดง</p><p><b>คลั่ง</b>: เมื่อเลือดเหลือน้อย บอสทุกตัวคลั่ง ตีแรงและเร็วขึ้น</p>',
+  '<p>Bosses are built for a party of 3–5: tougher, harder-hitting and faster than ordinary monsters; one hero of the same level cannot win alone</p><p><b>Dread aura</b>: close to a boss (the screen edges glow red); inside it you take more damage and the screen edges glow red</p><p><b>Berserk</b>: when its HP runs low every boss goes berserk, hitting harder and faster</p>')});
 /* (v207) damage to bosses by class line — the boss report (BOSS=1, after the 12-line rework) showed the boxer killing
    bosses alone in about 2 minutes while the hunter and the summoner managed a third of the average; this evens their
    part in a party fight without touching how they hunt ordinary monsters */
