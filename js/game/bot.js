@@ -214,7 +214,37 @@ function renderBotChip(){
 }
 
 /* ---------- Auto setup window ---------- */
+/* (v274) the owner: the skill set as tables, one per group (heal → SP → buff → attack, the order Auto uses them);
+   ↑↓ move a skill within its own group */
+const BOT_GROUPS = [['heal', 'ฟื้นฟู HP', 'Healing'], ['sp', 'ฟื้นฟู SP', 'SP'], ['buff', 'บัฟ · เรียกสัตว์', 'Buffs · summons'], ['atk', 'โจมตี', 'Attacks']];
+function botTables(b){
+  return BOT_GROUPS.map(([k, th, en]) => { const rows = b.list.filter(e => SKILLS[e.id] && botKind(SKILLS[e.id]) === k); if (!rows.length) return '';
+    const up = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10l4-4 4 4"/></svg>', dn = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6l4 4 4-4"/></svg>';
+    return `<table class="atab atab-${k}"><caption><em class="ak ak-${k}">${L(th, en)}</em> <small>${rows.filter(e => e.on).length}/${rows.length}</small></caption>
+      <thead><tr><th class="c-n">#</th><th class="c-on">${L('ใช้', 'On')}</th><th class="c-sk">${L('สกิล', 'Skill')}</th><th class="c-lv">Lv</th><th class="c-sp">SP</th><th class="c-or">${L('ลำดับ', 'Order')}</th></tr></thead>
+      <tbody>${rows.map((e, i) => { const sk = SKILLS[e.id];
+        return `<tr class="${e.on ? '' : 'off'}"><td class="c-n">${i + 1}</td><td class="c-on"><label class="achk"><input type="checkbox" data-aon="${e.id}" ${e.on ? 'checked' : ''}><i class="sw"></i></label></td>
+          <td class="c-sk"><span class="aico">${skillIcon(e.id)}</span><b>${skName(sk)}</b></td><td class="c-lv">${skl(e.id)}</td><td class="c-sp">${sk.sp(skl(e.id))}</td>
+          <td class="c-or"><button class="ibtn" data-agmove="${e.id}" data-d="-1" ${i ? '' : 'disabled'} aria-label="${L('เลื่อนขึ้น', 'Move up')}">${up}</button><button class="ibtn" data-agmove="${e.id}" data-d="1" ${i < rows.length - 1 ? '' : 'disabled'} aria-label="${L('เลื่อนลง', 'Move down')}">${dn}</button></td></tr>`; }).join('')}</tbody></table>`; }).join('');
+}
+document.addEventListener('click', e => { const t = e.target.closest && e.target.closest('[data-agmove]'); if (!t || t.disabled) return;
+  const b = botSet(), id = t.dataset.agmove, d = +t.dataset.d, i = b.list.findIndex(x => x.id === id); if (i < 0) return; const k = botKind(SKILLS[id]);
+  for (let j = i + d; j >= 0 && j < b.list.length; j += d) if (SKILLS[b.list[j].id] && botKind(SKILLS[b.list[j].id]) === k){ [b.list[i], b.list[j]] = [b.list[j], b.list[i]]; break; }
+  dirty = true; renderAuto(); });
+{ const st = document.createElement('style'); st.textContent = `
+#pane-auto .atab{width:100%;border-collapse:separate;border-spacing:0;margin:6px 0 10px;background:#fffaf0;border-radius:10px;overflow:hidden;box-shadow:inset 0 0 0 1.5px #e3c486;font-size:13px}
+#pane-auto .atab caption{text-align:left;padding:2px 2px 5px;font-weight:800}#pane-auto .atab caption small{color:#8a6a3a;font-weight:700}
+#pane-auto .atab th{background:linear-gradient(#f6e2b4,#ecd096);color:#5a3a10;font-size:11px;font-weight:800;padding:5px 6px;text-align:center;white-space:nowrap}
+#pane-auto .atab td{padding:4px 6px;border-top:1px solid rgba(201,154,58,.25);text-align:center;vertical-align:middle;color:#3a2206}
+#pane-auto .atab tbody tr:nth-child(even) td{background:rgba(246,226,180,.28)}
+#pane-auto .atab tr.off td{opacity:.55}#pane-auto .atab tr.off td.c-on{opacity:1}
+#pane-auto .atab .c-n{width:26px;color:#8a6a3a;font-weight:800}#pane-auto .atab .c-on{width:52px}#pane-auto .atab .c-lv,#pane-auto .atab .c-sp{width:44px;font-variant-numeric:tabular-nums}
+#pane-auto .atab td.c-sk{text-align:left}#pane-auto .atab td.c-sk b{font-weight:700;vertical-align:middle}
+#pane-auto .atab .aico{display:inline-block;width:26px;height:26px;vertical-align:middle;margin-right:6px}#pane-auto .atab .aico svg{width:100%;height:100%}
+#pane-auto .atab .c-or{width:72px;white-space:nowrap}#pane-auto .atab .c-or .ibtn{display:inline-grid}#pane-auto .atab .c-or .ibtn{width:28px;height:28px}
+#pane-auto .atab .achk{display:inline-flex}`; document.head.appendChild(st); }
 function renderAuto(){
+  if (typeof PHI_WIDE !== 'undefined' && !PHI_WIDE.includes('auto')) PHI_WIDE.push('auto');   // (v274) the standard wide window (phi237.js): room for the table
   const pane = document.getElementById('pane-auto'); if (!pane) return;
   const b = botSet();
   const row = (e, i) => { const sk = SKILLS[e.id], k = botKind(sk);
@@ -242,7 +272,7 @@ function renderAuto(){
     <label class="set"><span><b>${L('นั่งเมื่อ SP ต่ำกว่า', 'Sit below SP')}</b><small id="a-sitSp-v">${b.sitSp}%</small></span><input type="range" data-arng="sitSp" min="0" max="90" step="5" value="${b.sitSp}"></label>` : ''}
     <div class="sec">${L('ชุดสกิล · เรียงตามลำดับที่ใช้', 'Skill set · used top to bottom')}</div>
     ${noAtk ? `<p class="awarn">${L('ยังไม่ได้ติ๊กสกิลโจมตี และปิดตีปกติ — Auto จะตีปกติแทน', 'No attack skill ticked and Basic Attack is off — Auto will swing normally')}</p>` : ''}
-    ${b.list.length ? `<div class="alist">${b.list.map(row).join('')}</div>` : `<p class="empty">${L('ยังไม่มีสกิลกดใช้ · ลงแต้มในหน้าต่างสกิล (S) ก่อน', 'No active skills yet · learn some in the Skill window (S)')}</p>`}
+    ${b.list.length ? botTables(b) : `<p class="empty">${L('ยังไม่มีสกิลกดใช้ · ลงแต้มในหน้าต่างสกิล (S) ก่อน', 'No active skills yet · learn some in the Skill window (S)')}</p>`}
     <p class="hint">${L('Auto ฟื้นก่อน → Buff → สกิลโจมตีตัวแรกที่พร้อม', 'Auto heals first → buffs → the first ready attack skill')}</p>
     <p class="hint">${L('เปิด/ปิด Auto ที่ปุ่ม Auto บนแถบล่าง (B)', 'Turn Auto on/off with the Auto button on the bar (B)')}</p>`;
 }
