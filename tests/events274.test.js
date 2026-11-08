@@ -14,6 +14,7 @@ test('treasure goblin and golden hour', { skip, timeout: 120000 }, async () => {
       S.lvl = 60; derive(); S.hp = DER.maxhp;
       const key = 'test-gob'; GOB.forced = {key, until:Date.now() + 2 * 6e4}; const id = gobMap(key); warpTo(id); adv(1.5);
       const g = mobs.find(m => m.type === 'tgoblin' && !m.dead), out = {spawned:!!g, bar:!!document.querySelector('#evBar274 .gob')};
+      spawnSlots.length = 0; for (const m of mobs) if (m.type !== 'tgoblin' && !m.dead){ m.dead = true; m.vanish = true; }   // only the goblin: the 'never fights back' check must not see another monster's hit
       if (!g) return out;
       const d0 = Math.hypot(g.x - P.x, g.y - P.y); P.x = g.x - 60; P.y = g.y; adv(2); out.ran = Math.hypot(g.x - P.x, g.y - P.y) > 90;
       const hp0 = S.hp; out.neverHits = true;
