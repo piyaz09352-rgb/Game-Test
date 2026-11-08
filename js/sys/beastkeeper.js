@@ -192,8 +192,9 @@ const BOT_DRAW = {
 const HLP_IMG = {};
 for (const k of Object.keys(HELPERS)){ const im = new Image(); im.onload = () => { HLP_IMG[k] = im; delete BOT_PIC[k]; }; im.onerror = () => {}; im.src = `assets/helpers/${k}.png?v=${typeof GAMEV !== 'undefined' && GAMEV ? GAMEV : 274}`; }
 const HLP_SHINE = document.createElement('canvas');
+const HLP_IMG_SZ = 24;   // (v274) about half the hero's height: a helper, not a second hero (34 was too big)
 function drawBotImg(g, k, t, opt){
-  const im = HLP_IMG[k], R = HELPERS[k], c = R.c, sz = opt.size || 34, k2 = sz / Math.max(im.width, im.height), w = im.width * k2, h = im.height * k2;
+  const im = HLP_IMG[k], R = HELPERS[k], c = R.c, sz = opt.size || HLP_IMG_SZ, k2 = sz / Math.max(im.width, im.height), w = im.width * k2, h = im.height * k2;
   const still = typeof GFX !== 'undefined' && GFX.preset === 'low', ph = (k.charCodeAt(0) || 1) * .7;
   const breathe = still ? 1 : 1 + Math.sin(t * 2.4 + ph) * .035, tilt = still ? 0 : (opt.mv ? .14 * (opt.face || 1) : Math.sin(t * 1.3 + ph) * .07);
   // glow behind, in its own colour, breathing
