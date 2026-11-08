@@ -1484,7 +1484,9 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   if (w === 'staff' && P.ring >= 0) dir = nrm([0, 1, .25]);
   // (v211) an axe is held up the haft, not at its very end: the head sits closer to the hands and the haft runs on past the lower hand
   const axeHL = cfg.axe && w === 'sword' ? len * (two ? .8 : .7) : 0;
-  const base = add(hR, mul(dir, w === 'staff' ? -6 : -.8)), tip = axeHL ? add(base, mul(dir, axeHL)) : add(hR, mul(dir, len));
+  // (v274) the owner: a short one-handed rod is held near its end, but a long staff is gripped about the middle of the shaft
+  const midS = w === 'staff' && two && !(P.ring >= 0), stL = len + 6;
+  const base = midS ? add(hR, mul(dir, -stL * .44)) : add(hR, mul(dir, w === 'staff' ? -6 : -.8)), tip = axeHL ? add(base, mul(dir, axeHL)) : midS ? add(hR, mul(dir, stL * .56)) : add(hR, mul(dir, len));
   (cx.wsegs || (cx.wsegs = [])).push(w === 'staff' ? [proj(cx, add(tip, mul(dir, -.4))), proj(cx, add(tip, mul(dir, 3.2)))]   // (v159) a staff glows at its head only, never along the shaft
     : [proj(cx, add(base, mul(dir, kat ? 2 : 1))), proj(cx, tip)]);   // the blade in this frame
   G();
