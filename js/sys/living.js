@@ -17,10 +17,11 @@ const LIVE = (() => {
   const view = (x, y, m = 60) => x > cam.x - m && x < cam.x + VW + m && y > cam.y - m && y < cam.y + VH + m;
 
   /* ---------- swaying plants ---------- */
-  const SWAY = {tree:[.022, 1.05], palm:[.04, .85], bamboo:[.055, 1.25], banana:[.032, 1], himtree:[.024, .95], pine:[.016, 1.15], reed:[.08, 1.6], bush:[.02, 1.35], deadtree:[.008, .7], coral:[.035, .6]};
+  // (v274) the owner: trees must be seen to move — about twice the lean, and on at any frame rate (it is only a transform per prop); only Low graphics keeps them still
+  const SWAY = {tree:[.045, 1.05], palm:[.065, .85], bamboo:[.08, 1.25], banana:[.055, 1], himtree:[.045, .95], pine:[.032, 1.15], reed:[.1, 1.6], bush:[.035, 1.35], deadtree:[.016, .7], coral:[.05, .6], araucaria:[.03, 1.05], frangipani:[.04, 1]};
   const RUSTLE = {bush:1, reed:1, bamboo:1, banana:1};
   function sway(p){
-    const s = SWAY[p.type]; if (!s || !lv()) return 0;
+    const s = SWAY[p.type]; if (!s || (typeof GFX !== 'undefined' && GFX.preset === 'low')) return 0;
     let k = s[0] * wind() * (Math.sin(T * s[1] + p.x * .013 + p.y * .007) * .72 + Math.sin(T * s[1] * 2.3 + p.x * .05) * .28);
     if (RUSTLE[p.type]){
       if (P.moving && Math.abs(P.x - p.x) < 24 && Math.abs(P.y - p.y) < 14) p.rusT = T;
