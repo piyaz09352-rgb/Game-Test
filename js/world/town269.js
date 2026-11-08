@@ -23,6 +23,10 @@ function t269Garden(){
   for (let i = 0; i < T269_BEDS.length; i += 2){ const [x, y] = arnAt(p, T269_BEDS[i], T269_BEDS[i + 1]); obstacles.push({x, y, r:8, t269:true}); }
   for (const [fx, fy] of T269_FOUNT){ const [x, y] = arnAt(p, fx, fy); obstacles.push({x, y, r:22, t269:true}); }
   NAV.grid = null;
+  // (v272) where you wake / arrive in Aren: on the open golden flower in the middle of the garden (it was at the fountain's back edge)
+  if (typeof VSPAWN !== 'undefined'){ const [fx, fy] = arnAt(p, .5, .45); if (!walkable(VSPAWN.x, VSPAWN.y, 12) && walkable(fx, fy, 12)){ VSPAWN.x = Math.round(fx); VSPAWN.y = Math.round(fy); }
+    // the boatman waits beside the spawn (villagenpc.js put him at the old one, at the fountain's edge, where no one could reach him)
+    if (typeof VNPC_AT !== 'undefined'){ const b = NPCS.find(n => n.id === 'boatman'); VNPC_AT.boatman = [VSPAWN.x + 70, VSPAWN.y + 10]; if (b){ b.x = VSPAWN.x + 70; b.y = VSPAWN.y + 10; } } }
   // nobody stands on a bed or in the fountain
   const free = e => { if (walkable(e.x, e.y, 10)) return; for (let t = 1; t < 60; t++){ const a = t * 2.4, d = 6 + t * 3, x = e.x + Math.cos(a) * d, y = e.y + Math.sin(a) * d * .8; if (walkable(x, y, 10)){ e.x = x; e.y = y; return; } } };
   for (const n of NPCS) free(n);
