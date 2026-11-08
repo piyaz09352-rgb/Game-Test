@@ -90,7 +90,7 @@ function g10Detail(id, o = {}){
   const base = g10Chips(it.base ? baseText(id) : gearStatText(st)), opts = g10Chips(optText(id));
   const n = typeof sockN === 'function' && EQ_SOCKET.includes(it.slot) ? sockN(id) : 0, cs = n ? sockCards(id) : [];
   const desc = it.desc || b.desc ? L(...((it.desc || b.desc) instanceof Array ? (it.desc || b.desc) : [it.desc || b.desc, it.desc || b.desc])) : '';
-  return `<div class="gdx r${r}" style="--rc:${R.c}">
+  return `<div class="gdx r${r}" data-gs="${typeof gr270Slot === 'function' ? gr270Slot(it) || '' : ''}" style="--rc:${R.c}">
     <div class="gdx-band"><span>${L(R.th, R.en)}</span>${it.rf ? `<em>+${it.rf}</em>` : ''}</div>
     <div class="gdx-top"><span class="gdx-ic">${itemIcon(id)}</span><div class="gdx-id"><b class="rar r${r}">${escH(nm(it))}${it.rf ? ` <em class="eqrf">+${it.rf}</em>` : ''}</b>
       <div class="gdx-tags"><span class="gdx-tag">${L(...(G10_SLOT[sl] || [sl, sl]))}</span>${wt ? `<span class="gdx-tag">${wt}</span>` : ''}${hands ? `<span class="gdx-tag">${hands}</span>` : ''}${it.lv ? `<span class="gdx-tag${lvOk ? '' : ' bad'}">Lv ${it.lv}</span>` : ''}${line}</div></div></div>
