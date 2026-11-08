@@ -91,7 +91,7 @@ function botPick(t){
     if (!e.on) continue; const sk = SKILLS[e.id];
     if (botKind(sk) !== 'buff' || !botReady(e.id, keep)) continue;
     if (sk.type === 'petcall'){ if (S.pet && t && !(P.petBuff > 0)) return e.id; continue; }
-    if (sk.type === 'bond'){ if (S.bound && !SUMMONS.some(s => s.beast === 'bound')) return e.id; continue; }
+    if (sk.type === 'bond'){ if (S.bound && !SUMMONS.some(s => s.beast === 'bound') && !(typeof bondRest === 'function' && bondRest() > 0) && !P.cds[e.id]) return e.id; continue; }   // (v274) not while it rests
     if (sk.type === 'conjure' || sk.type === 'summon'){
       // a summoned beast: out and not nearly over → wait; gone (died or ran out) → call it again right away
       const live = SUMMONS.filter(s => (sk.type === 'summon' ? s.kind === 'tiger' : s.kind === 'beast' && s.beast === sk.beast) && !s.dead && s.dur - s.t > 0);
