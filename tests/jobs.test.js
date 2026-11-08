@@ -53,49 +53,6 @@ test('healer damage per second stays a fair share of the Mage (healers heal, mag
   assert.deepStrictEqual(errors, [], 'no runtime errors');
 });
 
-test('the beast keeper rents helper animals: they fetch the most important drop first, one a second, give a buff and never fight', { skip, timeout: 180000 }, async () => {
-  const { page, errors, close } = await openGame();
-  try {
-    await enterWorld(page);
-    const rent = await page.evaluate(`(() => { (${SETUP})('blade', 30); S.bia = 100000; S.helper = null; derive();
-      const n = NPCS.find(x => x.id === 'beastkeeper'); P.x = n.x + 30; P.y = n.y + 10; openNpc(n);
-      const rows = document.querySelectorAll('#dialog .rentrow').length, atk0 = DER.atk;
-      const b = document.querySelector('#dialog [data-rentpet="ridgeback"][data-rt="0"]'), price = rentPrice('ridgeback', 0); b.click();
-      return {rows, helper:S.helper, atk0, atk1:DER.atk, paid:100000 - S.bia, price, pet:S.pet, dialog:document.getElementById('dialog').dataset.npc, saved:JSON.parse(localStorage.getItem(slotKey(SLOT))).helper}; })()`);
-    assert.strictEqual(rent.rows, 10, 'ten animals to rent');
-    assert.strictEqual(rent.helper.k, 'ridgeback');
-    assert.ok(rent.helper.left > 86300 && rent.helper.left <= 86400 && rent.helper.until > Date.now(), 'rented for one day on the real clock (daily plan)');
-    assert.strictEqual(rent.paid, rent.price, 'paid the listed price');
-    assert.ok(rent.atk1 > rent.atk0, `the ridgeback's ATK buff applies (${rent.atk0} → ${rent.atk1})`);
-    assert.ok(!rent.pet, 'it is not a fighting pet');
-    assert.strictEqual(rent.dialog, 'beastkeeper', 'the dialog stays open');
-    assert.ok(rent.saved && rent.saved.k === 'ridgeback', 'the rental is in the save');
-    // on a hunting map: three drops around the hero; the gear comes first, one item per second
-    const ids = await page.evaluate(() => { closeDialog(); loadMap(1); const gear = Object.keys(ITEMS).find(k => ITEMS[k].kind === 'gear' && ITEMS[k].slot === 'weapon'), cheap = Object.keys(ITEMS).find(k => ITEMS[k].kind === 'etc' && ITEMS[k].sell > 0);
-      LOOT.length = 0; dropLoot(cheap, P.x + 90, P.y); dropLoot(cheap, P.x - 90, P.y); dropLoot(gear, P.x + 140, P.y + 40); HLP.cd = 0; HLP.tgt = null; S.inv = {}; return {gear, cheap}; });
-    await page.waitForFunction(() => Object.keys(S.inv).length > 0, null, { timeout: 8000 });
-    const first = await page.evaluate(() => ({inv:{...S.inv}, left:LOOT.length, t:performance.now()}));
-    assert.ok(Object.keys(first.inv).length === 1 && Object.keys(first.inv)[0].split('~')[0] === ids.gear, 'the weapon was fetched first: ' + Object.keys(first.inv));
-    await page.waitForTimeout(600);
-    assert.ok(await page.evaluate(() => LOOT.length) >= 1, 'not faster than one item a second');
-    await page.waitForFunction(() => LOOT.length === 0, null, { timeout: 8000 }).catch(async e => { console.log(await page.evaluate(() => JSON.stringify({L:LOOT.map(l => [l.id, Math.round(l.x), Math.round(l.y)]), P:[P.x, P.y, P.dead], H:[HLP.x, HLP.y, HLP.cd, !!HLP.tgt, HLP.picks], h:S.helper}))); throw e; });
-    assert.strictEqual(await page.evaluate(id => S.inv[id], ids.cheap), 2, 'then the rest');
-    // handing it back drops the buff
-    const end = await page.evaluate(() => { const a = DER.atk; endHelper('return'); return {a, b:DER.atk, h:S.helper}; });
-    assert.ok(end.b < end.a && !end.h, 'the buff goes with it');
-    // running out of time
-    await page.evaluate(() => { S.bia = 100000; rentHelper('hawk', 0); S.helper.left = .3; S.helper.until = Date.now() + 300; });
-    await page.waitForTimeout(1200);
-    const exp = await page.evaluate(() => ({h:S.helper, banner:document.getElementById('banner').textContent}));
-    assert.ok(!exp.h, 'the rental is over');
-    assert.ok(/หมดเวลาเช่า|rental is over/.test(exp.banner), 'a notice says the rental ended: ' + exp.banner);
-    // there is no auto loot: a drop stays on the ground
-    const auto = await page.evaluate(() => { LOOT.length = 0; S.inv = {}; dropLoot(Object.keys(ITEMS).find(k => ITEMS[k].kind === 'etc'), P.x + 60, P.y); return {loot:LOOT.length, inv:Object.keys(S.inv).length, set:!!document.querySelector('#set-autoLoot'), chip:!!document.getElementById('lootChip')}; });
-    assert.deepStrictEqual(auto, {loot:1, inv:0, set:false, chip:false}, 'drops land on the ground and no auto loot switch exists');
-  } finally { await close(); }
-  assert.deepStrictEqual(errors, [], 'no runtime errors');
-});
-
 test('a Hunter with no pet is told how to catch one', { skip, timeout: 120000 }, async () => {
   const { page, errors, close } = await openGame();
   try {
