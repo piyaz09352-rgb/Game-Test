@@ -211,6 +211,7 @@ function twzOct(c, a = TWM_RX, b = TWM_RY){ const k = TWZ_K;
   return [[c.x - a * (1 - k), c.y - b], [c.x + a * (1 - k), c.y - b], [c.x + a, c.y - b * (1 - k)], [c.x + a, c.y + b * (1 - k)], [c.x + a * (1 - k), c.y + b], [c.x - a * (1 - k), c.y + b], [c.x - a, c.y + b * (1 - k)], [c.x - a, c.y - b * (1 - k)]]; }
 function twzInOct(x, y, m = 0){ const c = twmC(), a = TWM_RX - m, b = TWM_RY - m * .66, dx = Math.abs(x - c.x), dy = Math.abs(y - c.y);
   if (dx < 95 - m && y > c.y - TWM_RY - 95 + m * .5 && y <= c.y) return true;   // (v268) the steps up to the gate
+  if (dx < 64 - m && y > c.y - TWM_RY - 140 + m * .5 && y <= c.y - TWM_RY - 95 + m * .5) return true;   // (v271) and on into the doorway itself (the door's width)
   return dx <= a && dy <= b && dx / a + dy / b <= 2 - TWZ_K; }
 const twzPath = (g, pts) => { g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.closePath(); };
 function twzHall(){
@@ -315,8 +316,8 @@ function twzBuild(){
   // the edge: stones you cannot pass all round the platform
   const edge = twzOct(c, TWM_RX + 26, TWM_RY + 18);
   for (let i = 0; i < 8; i++){ const p = edge[i], q = edge[(i + 1) % 8], n = Math.ceil(Math.hypot(q[0] - p[0], q[1] - p[1]) / 26);
-    for (let k = 0; k < n; k++) obstacles.push({x:p[0] + (q[0] - p[0]) * k / n, y:p[1] + (q[1] - p[1]) * k / n, r:30, twEdge:true}); }
-  for (let k = -3; k <= 3; k++) obstacles.push({x:st.x + k * 34, y:st.y - 70, r:24, twEdge:true});   // the gate wall
+    for (let k = 0; k < n; k++){ const ox = p[0] + (q[0] - p[0]) * k / n, oy = p[1] + (q[1] - p[1]) * k / n; if (oy < c.y - TWM_RY && Math.abs(ox - c.x) < 125) continue; obstacles.push({x:ox, y:oy, r:30, twEdge:true}); } }   // (v271) a gap for the steps
+  for (let k = -3; k <= 3; k++) obstacles.push({x:st.x + k * 34, y:st.y - 50, r:22, twEdge:true});   // the gate wall, behind the door's sill
 }
 /* square pillars banded with gold; braziers on square pedestals; barrels; crates */
 PROP_TYPES.twpillar = (seed, v = 0) => { const T0 = TWM_TIERS[v % TWM_TIERS.length];

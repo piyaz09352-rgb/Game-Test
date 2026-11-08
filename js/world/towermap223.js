@@ -29,7 +29,8 @@ const twmOn = () => typeof TW !== 'undefined' && TW.active && typeof DG !== 'und
 const twmTierOf = f => (f >= 100 ? 5 : f > 80 ? 4 : f > 60 ? 3 : f > 40 ? 2 : f > 20 ? 1 : 0);   // (v259) the owner's zones
 const twmT = () => TWM_TIERS[twmTierOf(TW.f)];
 const twmC = () => ({x:W / 2, y:H * .615});   // (v264) the centre of the picture's floor
-const twmStairs = () => { const c = twmC(); return {x:c.x, y:c.y - TWM_RY - 70}; };   // (v268) on the gate's steps in the picture, right under the glowing door
+const twmStairs = () => { const c = twmC(); return {x:c.x, y:c.y - TWM_RY - 125}; };   // (v271) at the glowing door itself: its threshold, at the top of the steps (picture 836, 209 of 1672×941)
+const twmDoor = () => { const s = twmStairs(); return {x:s.x, y:s.y - 70}; };             // the middle of the doorway's light
 const twmEntry = () => { const c = twmC(); return {x:c.x, y:c.y + TWM_RY - 90}; };
 const twmIn = (x, y, m = 0) => { if (typeof twzInOct === 'function') return twzInOct(x, y, m); const c = twmC(); return Math.hypot((x - c.x) / (TWM_RX - m), (y - c.y) / (TWM_RY - m * .66)) < 1; };
 
@@ -160,7 +161,9 @@ function twmBuild(){
 { const _sp = twSpawn; twSpawn = function(){ const c = twmC(), px = P.x, py = P.y; P.x = c.x; P.y = c.y; try { return _sp.apply(this, arguments); } finally { P.x = px; P.y = py; } }; }
 // a cleared floor: the stairs light up and wait for you (they open by themselves after a while)
 { const _tc = twClear; twClear = function(){ const r = _tc.apply(this, arguments); TWM.open = true; TW.restT = Math.max(TW.restT, 9); TWM.climbT = 0; return r; }; }
-function twmClimb(){ TWM.open = false; TW.restT = 0; const e = twmEntry(); P.x = e.x; P.y = e.y; P.tx = null; P.target = null; P.nav = null;
+function twmClimb(){ TWM.open = false; TW.restT = 0; const d = twmDoor(); if (typeof VFX !== 'undefined' && VFX.play) try { VFX.play('blink', {x:P.x, y:P.y, x2:d.x, y2:d.y}); } catch (e) {}
+  const e = twmEntry(); P.x = e.x; P.y = e.y; P.tx = null; P.target = null; P.nav = null; P.dir = 4;
+  if (typeof VFX !== 'undefined' && VFX.play) try { VFX.play('mapArrive', {x:P.x, y:P.y}); } catch (e) {}   // (v271) you step through the door and come up the stairs of the next hall
   SFX.play('warp'); }   // (v264) no fade: the owner did not want the screen to blink between floors
 EV.on('tick', dt => {
   if (!twmOn()) { TWM.open = false; return; }
@@ -169,17 +172,17 @@ EV.on('tick', dt => {
   if (typeof DG3 !== 'undefined' && DG3.boonOpen) return;
   const s = twmStairs();
   { const d = el('dialog'); if (d && !d.hidden && d.dataset.npc === 'tl_chandra') return; }   // (v229) Chandra is telling a chapter: the stairs wait, and Auto does not walk off
-  if (Math.hypot(P.x - s.x, P.y - s.y) < 56){ twmClimb(); return; }
+  if (Math.hypot(P.x - s.x, (P.y - s.y) * 1.4) < 30){ twmClimb(); return; }   // (v271) on the door's sill itself, not partway up the steps
   if (TW.restT <= .05){ TWM.open = false; const e = twmEntry(); P.x = e.x; P.y = e.y; return; }   // the stairs carried you up anyway
-  if (typeof BOT !== 'undefined' && BOT.on && !(BOT.pause > 0) && !P.dead){ P.tx = s.x; P.ty = s.y + 20; if (!P.ride){ P.ride = true; if (typeof renderHotbar === 'function') renderHotbar(); } }   // Auto takes the stairs
+  if (typeof BOT !== 'undefined' && BOT.on && !(BOT.pause > 0) && !P.dead){ P.tx = s.x; P.ty = s.y; if (!P.ride){ P.ride = true; if (typeof renderHotbar === 'function') renderHotbar(); } }   // Auto takes the stairs
 });
 // the open stairs glowing
 { const _u = LIVE.drawUnder; LIVE.drawUnder = function(g, ...a){ const r = _u.call(this, g, ...a); if (!twmOn()) return r;
     const T0 = twmT(), c = twmC(), x = c.x - cam.x, y = c.y - cam.y;
     // (v269) the floor number is shown big on the minimap only (js/sys/mobspace269.js), not on the floor
     if (TWM.open && TW.phase === 'rest'){ const s = twmStairs(), sx = s.x - cam.x, sy = s.y - cam.y, p = .6 + Math.sin(T * 4) * .25;
-      g.save(); const gr = g.createRadialGradient(sx, sy - 60, 4, sx, sy - 60, 120); gr.addColorStop(0, `rgba(${T0.glow},${.75 * p})`); gr.addColorStop(1, `rgba(${T0.glow},0)`); g.fillStyle = gr; g.fillRect(sx - 130, sy - 190, 260, 260);
-      g.globalAlpha = p; g.fillStyle = '#fff6c8'; g.beginPath(); g.ellipse(sx, sy, 48, 16, 0, 0, 7); g.fill(); g.restore(); }
+      g.save(); const gr = g.createRadialGradient(sx, sy - 70, 4, sx, sy - 70, 105); gr.addColorStop(0, `rgba(${T0.glow},${.75 * p})`); gr.addColorStop(1, `rgba(${T0.glow},0)`); g.fillStyle = gr; g.fillRect(sx - 115, sy - 180, 230, 230);
+      g.globalAlpha = p; g.fillStyle = '#fff6c8'; g.beginPath(); g.ellipse(sx, sy, 40, 12, 0, 0, 7); g.fill(); g.restore(); }   // the door's light, and a bright sill to step on
     return r; }; }
 EV.on('draw', () => { if (!twmOn() || !TWM.open || TW.phase !== 'rest' || P.dead) return; const s = twmStairs(), z = typeof TAG_Z === 'function' ? TAG_Z() : 1, x = clamp(sx(s.x), 120 * z, SW - 120 * z), y = clamp(sy(s.y - 170), 90 * z, SH - 220 * z) + Math.sin(T * 4) * 4 * z;
   const t = L(`▲ ขึ้นชั้น ${TW.f} · ${Math.ceil(TW.restT)}`, `▲ Up to floor ${TW.f} · ${Math.ceil(TW.restT)}`); ctx.save(); ctx.font = `800 ${Math.round(13 * z)}px Sarabun,"Noto Sans Thai",sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';

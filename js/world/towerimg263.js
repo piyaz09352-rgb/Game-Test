@@ -31,7 +31,9 @@ if (typeof twzBuild === 'function'){ const _b = twzBuild; twzBuild = function(){
     // the edge: stones you cannot pass all round the floor, and the gate wall
     const edge = twzOct(c, TWM_RX + 26, TWM_RY + 18);
     for (let i = 0; i < 8; i++){ const p = edge[i], q = edge[(i + 1) % 8], n = Math.ceil(Math.hypot(q[0] - p[0], q[1] - p[1]) / 26);
-      for (let k = 0; k < n; k++) obstacles.push({x:p[0] + (q[0] - p[0]) * k / n, y:p[1] + (q[1] - p[1]) * k / n, r:30, twEdge:true}); }
+      for (let k = 0; k < n; k++){ const ox = p[0] + (q[0] - p[0]) * k / n, oy = p[1] + (q[1] - p[1]) * k / n;
+        if (oy < c.y - TWM_RY && Math.abs(ox - c.x) < 125) continue;   // (v271) a gap for the steps up to the door: the edge used to wall them off, so nobody could walk to the door
+        obstacles.push({x:ox, y:oy, r:30, twEdge:true}); } }
     for (let k = -3; k <= 3; k++) obstacles.push({x:st.x + k * 34, y:st.y - 48, r:22, twEdge:true}); }; }
 // the picture is lit already: no zone dimming, and the painted gate's shimmer stands aside
 if (typeof twlLight === 'function'){ const _l = twlLight; twlLight = function(){ if (TIMG.floor) return; return _l.apply(this, arguments); }; }
