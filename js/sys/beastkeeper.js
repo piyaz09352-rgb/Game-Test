@@ -199,9 +199,9 @@ function drawBotImg(g, k, t, opt){
   const breathe = still ? 1 : 1 + Math.sin(t * 2.4 + ph) * .035, tilt = still ? 0 : (opt.mv ? .14 * (opt.face || 1) : Math.sin(t * 1.3 + ph) * .07);
   // glow behind, in its own colour, breathing
   g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(0, 0, 2, 0, 0, sz * .85); gr.addColorStop(0, c[2]); gr.addColorStop(1, 'rgba(0,0,0,0)');
-  g.globalAlpha = .28 + (still ? 0 : Math.sin(t * 3 + ph) * .12); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, sz * .85, 0, 7); g.fill(); g.restore();
+  g.globalAlpha = .5 + (still ? 0 : Math.sin(t * 3 + ph) * .15); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, sz * 1.05, 0, 7); g.fill(); g.restore();   // (v274) brighter: the owner could not pick them out
   // the robot: sway, tilt, breathe, face its way
-  g.save(); g.rotate(tilt); g.scale(breathe * (opt.face < 0 ? -1 : 1), breathe); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(im, -w / 2, -h / 2, w, h);
+  g.save(); g.rotate(tilt); g.scale(breathe * (opt.face < 0 ? -1 : 1), breathe); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.shadowColor = c[2]; g.shadowBlur = still ? 4 : 7 + Math.sin(t * 3 + ph) * 3; g.drawImage(im, -w / 2, -h / 2, w, h); g.shadowBlur = 0;   // a glowing outline in its colour
   // a shine sweeping across it every ~3.4 s (only over the robot itself)
   const cyc = (t + ph) % 3.4; if (!still && cyc < .7){ const W2 = Math.ceil(w) + 2, H2 = Math.ceil(h) + 2; if (HLP_SHINE.width !== W2 || HLP_SHINE.height !== H2){ HLP_SHINE.width = W2; HLP_SHINE.height = H2; }
     const sg = HLP_SHINE.getContext('2d'); sg.clearRect(0, 0, W2, H2); sg.globalCompositeOperation = 'source-over'; sg.drawImage(im, 1, 1, w, h); sg.globalCompositeOperation = 'source-atop';
@@ -218,7 +218,8 @@ function drawBotImg(g, k, t, opt){
 function drawBot(g, k, t, opt = {}){
   const R = HELPERS[k]; if (!R) return; const f = BOT_DRAW[R.shape] || BOT_DRAW.cube, c = R.c;
   if (HLP_IMG[k]) drawBotImg(g, k, t, opt);
-  else { g.save(); if (opt.face < 0) g.scale(-1, 1); f(g, t, c, opt.mv); g.restore(); }
+  else { g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(0, 0, 2, 0, 0, 24); gr.addColorStop(0, c[2]); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.globalAlpha = .45 + Math.sin(t * 3) * .12; g.fillStyle = gr; g.beginPath(); g.arc(0, 0, 24, 0, 7); g.fill(); g.restore();
+    g.save(); if (opt.face < 0) g.scale(-1, 1); g.shadowColor = c[2]; g.shadowBlur = 6; f(g, t, c, opt.mv); g.restore(); }
   if (opt.zap > 0){ g.save(); g.globalAlpha = opt.zap / .35; g.strokeStyle = c[2]; g.lineWidth = 1.5; g.beginPath(); g.arc(0, 0, 14 + (1 - opt.zap / .35) * 10, 0, 7); g.stroke(); g.restore(); }
 }
 /* a hover beam under it, then the robot bobbing in the air */
@@ -227,6 +228,10 @@ function drawHelperW(g){
   const x = HLP.x - cam.x, y = HLP.y - cam.y; if (x < -60 || x > VW + 60 || y < -80 || y > VH + 40) return;
   const hov = 20 + Math.sin(HLP.t * 3.2) * 3;
   shadowW(g, x, y, 8);
+  { const still = typeof GFX !== 'undefined' && GFX.preset === 'low', pu = still ? .5 : .5 + Math.sin(HLP.t * 3) * .5;   // (v274) an aura ring on the ground, in the robot's colour
+    g.save(); g.globalCompositeOperation = 'lighter'; const ag = g.createRadialGradient(x, y, 2, x, y, 20); ag.addColorStop(0, R.c[2]); ag.addColorStop(1, 'rgba(0,0,0,0)');
+    g.globalAlpha = .35 + pu * .2; g.fillStyle = ag; g.beginPath(); g.ellipse(x, y, 20, 7.5, 0, 0, 7); g.fill();
+    g.globalAlpha = .55 + pu * .35; g.strokeStyle = R.c[2]; g.lineWidth = 1.3; g.setLineDash([4, 3]); g.lineDashOffset = still ? 0 : -HLP.t * 14; g.beginPath(); g.ellipse(x, y, 15 + pu * 2, 5.6 + pu * .8, 0, 0, 7); g.stroke(); g.setLineDash([]); g.restore(); }
   g.save(); g.globalAlpha = .28; const gr = g.createLinearGradient(x, y - hov, x, y); gr.addColorStop(0, R.c[2]); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr;
   g.beginPath(); g.moveTo(x - 3, y - hov + 6); g.lineTo(x + 3, y - hov + 6); g.lineTo(x + 7, y); g.lineTo(x - 7, y); g.closePath(); g.fill(); g.restore();
   g.save(); g.translate(x, y - hov); drawBot(g, h.k, HLP.t, {face:HLP.face, mv:HLP.moving, zap:HLP.zap || 0}); g.restore();

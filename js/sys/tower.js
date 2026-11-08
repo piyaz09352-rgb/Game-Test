@@ -85,6 +85,11 @@ function twHard(m){ if (MOB[m.type] && MOB[m.type].boss) return;   // guardians:
 EV.on('tick', () => { if (typeof TW === 'undefined' || !TW.active || TW.phase !== 'fight') return;
   for (const m of mobs) if (m.tw === TW.f && m.def && m.def.boss && !m.dead && !m.twCalm){ m.twCalm = true;
     if (m.hp >= m.maxhp){ m.aggro = false; m.def = {...m.def, aggro:false}; m.hx = m.x; m.hy = m.y; m.tx = null; m.wait = 0; } } });
+/* (v274) the owner: hit one guardian and the others come for you together (they used to stand by) */
+{ const _ad = applyDamage; applyDamage = function(m){ const r = _ad.apply(this, arguments);
+    if (m && m.tw && m.def && m.def.boss && typeof TW !== 'undefined' && TW.active && !P.dead)
+      for (const o of mobs) if (o !== m && o.tw === m.tw && !o.dead && o.def && o.def.boss && !o.aggro){ o.aggro = true; o.wait = 0; o.tx = null; }
+    return r; }; }
 function twSpot(i, n, r0){
   const a = i / n * Math.PI * 2 + Math.random() * .5, d = r0 + Math.random() * 90; let x = P.x + Math.cos(a) * d, y = P.y + Math.sin(a) * d * .7;
   for (let k = 0; k < 24 && (!walkable(x, y, 14) || x < 60 || y < 60 || x > W - 60 || y > H - 60); k++){ x = clamp(P.x + rand(-320, 320), 80, W - 80); y = clamp(P.y + rand(-220, 220), 80, H - 80); }
