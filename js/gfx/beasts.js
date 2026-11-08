@@ -241,7 +241,7 @@ const BEAST = (() => {
     const SH = mat(key, 'shell', s.shell), LG = mat(key, 'leg', s.leg) ?? SH, AC = mat(key, 'acc', s.acc) ?? SH, EY = s.eyeGlow ? emis(key, 'eye', s.eyeGlow) : M.slimeE;
     const kind = s.kind || 'crab', sz = s.size ?? 1, DKB = mat(key, 'bugdark', s.tipCol || '#1e1814');
     if (kind === 'hornet' || kind === 'wasp' || kind === 'bee') return flyer(key, s, kind, SH, LG, AC, EY, DKB, sz);
-    if (kind === 'beetle') return beetle(key, s, SH, LG, AC, EY, DKB, sz);
+    if (kind === 'beetle' || kind === 'ant') return beetle(key, s, SH, LG, AC, EY, DKB, sz, kind === 'ant');
     return (cx, act, f, n) => {
       const o = motion(act, f, n), by = (kind === 'spider' ? 7 : 5) * sz;
       fallPre(cx, o, by);
@@ -347,7 +347,8 @@ const BEAST = (() => {
      spurs) comes down to the ground, a short foot (tarsus) with a claw; front legs reach forward, hind legs back, and
      they walk in the insect tripod (front and back on one side with the middle on the other). The giant water bug gets
      its grasping forelegs, a flat body and paddle hind legs. */
-  function beetle(key, s, SH, LG, AC, EY, DKB, sz){
+  function beetle(key, s, SH, LG, AC, EY, DKB, sz, ant){
+    if (ant) return antOf(key, s, SH, LG, AC, EY, DKB, sz);
     const EL = SH, wb = key === 'waterbug', LK = clamp(s.legLen ?? 1, .85, 1.15), EYE = s.eyeGlow ? EY : DKB;
     return (cx, act, f, n) => {
       const o = motion(act, f, n), walk = act === 'walk', by = wb ? 3 : 3.8, fl = wb ? .62 : 1;
@@ -382,6 +383,36 @@ const BEAST = (() => {
       if (s.horn){ cx.gid = 30; const h0 = add(hd, [0, 1.2 * sz, .6 * sz]), h1 = add(h0, [0, 4 * sz, 2.4 * sz]), h2 = add(h1, [0, 1.6 * sz, -1.4 * sz]); cap(cx, h0, h1, 1.3 * sz, .8 * sz, AC, {}); cap(cx, h1, h2, .8 * sz, .2, AC, {}); }   // a rhinoceros beetle's horn
       if (s.spines){ for (let i = 0; i < 4; i++){ cx.gid = 31 + i; const b = T([0, by + 1.3 * fl + 4.2 * fl, -6 + i * 2.6]); ell(cx, b, .8 * sz, .7 * sz, AC, {}); } }   // a row of knobs down the seam
       if (s.crown){ cx.gid = 36; const b = add(hd, [0, 1.6 * sz, 0]); frustum(cx, b, b[1] + 2.4 * sz, b[1], 1.6 * sz, 2.2 * sz, M.gold, {tex:(nn, kk) => (kk > .8 ? {m:M.gem} : undefined)}); }
+      cx.pre = null;
+    };
+  }
+
+  /* (v276) an ant, from life: a big head with strong jaws and elbowed antennae (a long first joint, then a bent whip),
+     a long narrow thorax carrying the six legs, a small knob of a waist (the petiole) and a round banded abdomen raised
+     a little; legs longer than a beetle's but jointed (thick thigh, knee, shin, a foot with a hook), walking in a tripod */
+  function antOf(key, s, SH, LG, AC, EY, DKB, sz){
+    const EYE = s.eyeGlow ? EY : DKB;
+    return (cx, act, f, n) => {
+      const o = motion(act, f, n), walk = act === 'walk', by = 4.4, atk = act === 'attack';
+      fallPre(cx, o, by);
+      const T = p => [p[0] * sz, (p[1] + o.bob * .25) * sz, p[2] * sz + o.lun];
+      for (let i = 0; i < 3; i++) for (const sd of [-1, 1]){ cx.gid = 1 + i * 2 + (sd > 0 ? 1 : 0);
+        const ph = ((i + (sd > 0 ? 1 : 0)) % 2) * Math.PI, sw = walk ? Math.sin(o.ph * 2 + ph) : Math.sin(o.ph) * .12, lift = walk ? Math.max(0, Math.cos(o.ph * 2 + ph)) * 1.3 : 0;
+        const z = [2.6, 1.2, -.2][i], dz = [2.4, .2, -2.4][i], fz = [4.6, -.2, -5.4][i];
+        const cox = T([sd * 1.3, by - .9, z]), kn = T([sd * 5.2, by + 1.6 + lift * .5, z + dz + sw * .9]), ft = T([sd * 7.6, .45 + lift, z + fz + sw * 1.7]);
+        cap(cx, cox, kn, .82, .62, LG, {tex:nn => (nn[1] > .5 ? {t:1} : undefined)}); ell(cx, kn, .6 * sz, .58 * sz, LG, {tex:() => ({t:2})});
+        cap(cx, kn, ft, .55, .36, LG, {}); const toe = add(ft, [sd * .5 * sz, 0, (i === 2 ? -1.2 : 1.2) * sz]); cap(cx, ft, toe, .3, .14, DKB, {}); }
+      // the abdomen (gaster), raised a little behind the waist, with dark bands
+      cx.gid = 20; ell(cx, T([0, by + 1.4, -6.4]), 3.9 * sz, 3.4 * sz, SH, {rz:4.6 * sz, tex:nn => (nn[1] > .75 && nn[0] < .2 ? {t:0} : Math.abs(Math.sin(nn[2] * 7)) < .18 && nn[1] > -.2 ? {m:AC, t:2} : undefined)});
+      cx.gid = 21; ell(cx, T([0, by + .6, -2]), 1.1 * sz, 1.4 * sz, SH, {rz:1 * sz});   // the waist knob (petiole)
+      cx.gid = 22; cap(cx, T([0, by + .5, -.6]), T([0, by + .9, 3.4]), 1.9, 1.6, SH, {tex:nn => (nn[1] > .6 ? {t:0} : undefined)});   // the long thorax
+      const hd = T([0, by + 1, 6.4]); cx.gid = 23; ell(cx, hd, 2.9 * sz, 2.6 * sz, SH, {rz:2.8 * sz, tex:nn => (nn[1] > .7 ? {t:0} : undefined)});
+      for (const sd of [-1, 1]){ cx.gid = 24 + (sd > 0 ? 1 : 0); ell(cx, add(hd, [sd * 2.1 * sz, .5 * sz, .6 * sz]), .7 * sz, .85 * sz, EYE, {tex:nn => (nn[1] > .4 ? {t:0} : {t:1})});
+        cx.gid = 26 + (sd > 0 ? 1 : 0); const op = atk ? [.2, 1, -.3, .4][f] : .25, j0 = add(hd, [sd * 1 * sz, -.9 * sz, 2.2 * sz]), j1 = add(j0, [sd * (.8 + op) * sz, -.1, 1.8 * sz]);
+        cap(cx, j0, j1, .62, .36, DKB, {}); cap(cx, j1, add(j1, [-sd * 1.1 * sz, -.1, .7 * sz]), .36, .1, DKB, {});   // the jaws
+        cx.gid = 28 + (sd > 0 ? 1 : 0); const a0 = add(hd, [sd * .8 * sz, 1.4 * sz, 2 * sz]), el = add(a0, [sd * 1.2 * sz, 3.4 * sz, .4 * sz]), at = add(el, [sd * (2.2 + Math.sin(o.ph * 2 + sd) * .4) * sz, -.4 * sz, 3.4 * sz]);
+        cap(cx, a0, el, .3, .26, DKB, {}); cap(cx, el, at, .26, .2, DKB, {}); }
+      if (s.crown){ cx.gid = 36; const b = add(hd, [0, 2.2 * sz, 0]); frustum(cx, b, b[1] + 2.4 * sz, b[1], 1.6 * sz, 2.2 * sz, M.gold, {tex:(nn, kk) => (kk > .8 ? {m:M.gem} : undefined)}); }
       cx.pre = null;
     };
   }
@@ -590,6 +621,7 @@ const BEAST = (() => {
     bovine:{Lb:16, rc:7.8, rh:7.2, leg:9.6, lt:2.5, neck:[2.6, 5], hr:4.6, ml:4, mr:[3, 2.6], ear:'side', tail:[10, .9, .5], dip:.2, dew:1},
     boar:  {Lb:14, rc:7.2, rh:5.8, leg:6.4, lt:1.9, neck:[1.2, 4.2], hr:4.8, ml:4.8, mr:[3, 2.2], ear:'small', tail:[5, .7, .4], dip:-.3, ridge:1},
     lizard:{Lb:11, rc:3.6, rh:3.4, leg:3.4, lt:1.05, neck:[.6, 2.6], hr:2.6, ml:3, mr:[1.7, 1.05], ear:'none', tail:[16, 2.2, .45], dip:0, sprawl:1, flat:1},
+    rat:   {Lb:9, rc:3.9, rh:4.7, leg:4.6, lt:1.05, neck:[.8, 3.0], hr:2.9, ml:3.3, mr:[1.35, .7], ear:'round', tail:[15, .62, .28], dip:-.9, rat:1},   // (v276) a rat: arched back, big rump, pointed snout, round ears, long bare tail
     croc:  {Lb:13, rc:4.9, rh:4.7, leg:3.4, lt:1.5, neck:[.3, 3.2], hr:3.4, ml:7.5, mr:[2.3, 1.45], ear:'none', tail:[15, 3.5, .7], dip:0, sprawl:1, flat:1, scutes:1},
     elephant:{Lb:13.5, rc:6.3, rh:6.1, leg:12.8, lt:2.55, neck:[1.6, 4.4], hr:5.6, ml:0, mr:[2.6, 1.2], ear:'elephant', tail:[7, .7, .45], dip:.5, trunk:1},
     // dinosaurs (data/world4.js): a two-legged hunter with a level tail; a long-necked giant on pillar legs; a frilled
@@ -599,7 +631,7 @@ const BEAST = (() => {
     ceratops:{Lb:14, rc:7, rh:7.2, leg:7.4, lt:2.5, neck:[1, 4.6], hr:4.9, ml:3.2, mr:[2.4, 1.9], ear:'none', tail:[10, 2.6, .5], dip:0, pillar:1, dino:1},
     stego:{Lb:15, rc:6.8, rh:8, leg:8, lt:2.4, neck:[-.5, 4.4], hr:2.9, ml:2.6, mr:[1.6, 1.2], ear:'none', tail:[13, 2.8, .5], dip:-.6, flat:1, pillar:1, dino:1}
   };
-  const famOf = s => ({cat:'cat', dog:'dog', bear:'bear', deer:s.horns === 'spike' ? 'goat' : 'deer', horse:'horse', bovine:'bovine', boar:'boar', lizard:'lizard', croc:'croc', elephant:'elephant', theropod:'theropod', sauropod:'sauropod', ceratops:'ceratops', stego:'stego'})[s.head || 'boar'];
+  const famOf = s => ({cat:'cat', dog:'dog', bear:'bear', deer:s.horns === 'spike' ? 'goat' : 'deer', horse:'horse', bovine:'bovine', boar:'boar', lizard:'lizard', croc:'croc', rat:'rat', elephant:'elephant', theropod:'theropod', sauropod:'sauropod', ceratops:'ceratops', stego:'stego'})[s.head || 'boar'];
   const h3 = (a, b, c) => { const v = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453; return v - Math.floor(v); };
   function quad2(key, s){
     const fam = famOf(s), F = FAM[fam];
@@ -609,6 +641,7 @@ const BEAST = (() => {
       EY = s.eyeGlow ? emis(key, 'eye', s.eyeGlow) : M.slimeE, HO = s.hoof ? (mat(key, 'hoof', '#2a2420')) : null,
       WG = mat(key, 'wing', s.wing), FT = mat(key, 'fin', s.fishTail),
       PL = mat(key, 'plate', s.plates), SL = mat(key, 'sail', s.sail), FR = mat(key, 'frill', s.frill);   // dinosaur parts (opt-in)
+    const EARIN = mat(key, 'earin', s.earIn || '#d8a09a');   // (v276) a rat's bare ears and tail
     // no two species alike: each key nudges its own proportions a little (length, legs, head, tail)
     const kh = [...key].reduce((a, c) => a * 31 + c.charCodeAt(0) | 0, 7), J = i => 1 + (h3(kh % 997, i, 9) - .5) * .16;
     const len = (s.len ?? 1) * J(1), legK = (s.leg ?? 1) * J(2), gir = s.girth ?? 1, tailK = J(4);
@@ -678,14 +711,14 @@ const BEAST = (() => {
           const elbow = add(top, rotX([0, -l1, .25], sw * .7)), foot = add(elbow, rotX([0, -l2 + lift, 0], sw * 1.05));
           cap(cx, top, elbow, lt * 1.25, lt * .95, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'leg', t * .5)});
           cap(cx, elbow, foot, lt * .9, lt * .7, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'leg', .5 + t * .5)});
-          ell(cx, add(foot, [0, .35, .5]), lt * (cat || fam === 'bear' ? 1.05 : .78), lt * .6, HO || (fam === 'bear' ? DK : SK), {tex:nn => (HO ? undefined : coat(nn, .99, 'leg'))});
+          ell(cx, add(foot, [0, .35, .5]), lt * (cat || fam === 'bear' ? 1.05 : .78), lt * .6, HO || (F.rat ? EARIN : fam === 'bear' ? DK : SK), {tex:nn => (HO || F.rat ? undefined : coat(nn, .99, 'leg'))});
         } else {
           const top = T([sd * w, yH - rh * .1, zh + rh * .2]), h = yH - rh * .1, l1 = h * .46, l2 = h * .3, l3 = h - l1 - l2 - .5;
           const knee = add(top, rotX([0, -l1, l1 * .45], sw * .6)), hock = add(knee, rotX([0, -l2, -l2 * .75], sw * .6)), foot = add(hock, rotX([0, -l3 + lift, .2], sw * .9));
           cap(cx, top, knee, lt * 1.6, lt * 1.0, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'leg', t * .4)});   // the thigh
           cap(cx, knee, hock, lt * 1.0, lt * .72, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'leg', .4 + t * .3)});
           cap(cx, hock, foot, lt * .72, lt * .66, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'leg', .7 + t * .3)});
-          ell(cx, add(foot, [0, .35, .5]), lt * (cat || fam === 'bear' ? 1 : .76), lt * .6, HO || (fam === 'bear' ? DK : SK), {tex:nn => (HO ? undefined : coat(nn, .99, 'leg'))});
+          ell(cx, add(foot, [0, .35, .5]), lt * (cat || fam === 'bear' ? 1 : .76), lt * .6, HO || (F.rat ? EARIN : fam === 'bear' ? DK : SK), {tex:nn => (HO || F.rat ? undefined : coat(nn, .99, 'leg'))});
         }
       }
       if (F.biped){ for (const sd of [-1, 1]){ cx.gid = 26 + (sd > 0 ? 1 : 0); const sw = walk ? Math.sin(ph + (sd > 0 ? Math.PI : 0)) * .3 : o.sw * .3;   // a theropod's small fore arms
@@ -720,7 +753,7 @@ const BEAST = (() => {
         for (let i = 1; i <= segs; i++){ const k = i / segs, sway = Math.sin(ph + k * 2.2) * (walk ? 1.2 : .7) * k;
           const droop = cat ? (s.tailUp ? 5 : -2 + k * k * 5) : fam === 'dog' ? (s.tailUp ? 4 : -1) : sprawl ? -(yH - 1) / k * Math.min(1, k * 1.6) : F.dino ? -yH * .35 * k : -tl * .7;
           const p1 = add(add(hip, [0, rh * .45, -rh * .8]), [sprawl ? Math.sin(ph * (walk ? 1 : .5) + k * 3) * 2.2 * k : sway, droop * k - (cat ? tl * .45 * Math.sin(k * 1.6) : 0), -tl * k * (cat ? .75 : sprawl || F.dino ? .95 : .45)]);
-          cap(cx, p0, p1, (t0 + (t1 - t0) * (k - 1 / segs)) * gir, (t0 + (t1 - t0) * k) * gir, i === segs && (s.tuft || fam === 'bovine') ? (MN || DK) : SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'tail', (i - 1 + t) / segs)});
+          cap(cx, p0, p1, (t0 + (t1 - t0) * (k - 1 / segs)) * gir, (t0 + (t1 - t0) * k) * gir, F.rat ? EARIN : i === segs && (s.tuft || fam === 'bovine') ? (MN || DK) : SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'tail', (i - 1 + t) / segs)});
           if (fam === 'croc'){ const rr = (t0 + (t1 - t0) * k) * gir; for (let j = 0; j < 2; j++){ const q = lerp3(p0, p1, .25 + j * .5); for (const sd of (k < .55 ? [-1, 1] : [0])) ell(cx, add(q, [sd * rr * .45, rr * .95, 0]), .6 * (1.2 - k * .6), (1.1 - k * .5) * gir, ST || DK, {rz:.7}); } }   // (v274) the tail's double crest, a single one toward the tip
           p0 = p1; }
         if (s.tuft || fam === 'bovine' || ele){ ell(cx, p0, (ele ? .9 : 1.4) * gir, (ele ? 1.3 : 1.8) * gir, MN || DK); }
@@ -758,6 +791,7 @@ const BEAST = (() => {
         else if (F.ear === 'leaf') cap(cx, add(e0, [0, -.4, 0]), add(e0, [sd * hr * .85, hr * .25, -.8]), hr * .26, hr * .16, SK, {tex:nn => (nn[2] > .3 ? {m:BE} : undefined)});
         else if (F.ear === 'horse') cap(cx, e0, add(e0, [sd * .3, hr * .7, .2]), hr * .22, .25, SK, {});
         else if (F.ear === 'elephant') ell(cx, add(hd, [sd * hr * .95, -.4, -hr * .95]), hr * .95, hr * 1.15, SK, {rz:.45, tex:nn => (nn[0] * sd < -.2 ? {m:BE, dt:1} : Math.abs(Math.sin(nn[1] * 8)) < .12 ? {dt:1} : undefined)});
+        else if (F.ear === 'round') ell(cx, add(e0, [sd * .45, hr * .3, -.2]), hr * .44, hr * .48, SK, {rz:.45, tex:nn => (nn[2] > .25 && Math.hypot(nn[0], nn[1]) < .7 ? {m:EARIN, t:1} : undefined)});   // (v276) a rat's thin round ear, pink inside
         else if (F.ear === 'none'){}
         else if (F.ear === 'side') cap(cx, add(e0, [0, -.8, 0]), add(e0, [sd * hr * .9, -.6, -.4]), hr * .25, hr * .18, SK, {});
         else cap(cx, e0, add(e0, [sd * .5, hr * .5, -.6]), hr * .24, .2, SK, {});
@@ -766,6 +800,7 @@ const BEAST = (() => {
       // horns, antlers, tusks
       if (s.horns === 'tri'){ for (const sd of [-1, 1]){ G(60 + sd); cap(cx, add(hd, [sd * hr * .35, hr * .6, hr * .1]), add(hd, [sd * hr * .5, hr * 1.2, hr * 1.4 + 3]), 1, .25, AC, {}); }   // two brow horns
         if (!ele){ G(62); cap(cx, add(m1, [0, F.mr[1] * .5, -1]), add(m1, [0, F.mr[1] + 2.2, .3]), .8, .2, AC, {}); } }   // and a nose horn
+        if (F.rat){ G(63); for (const sd of [-1, 1]) for (const w of [-.3, .25]) cap(cx, add(m1, [sd * .6, .2, -.4]), add(m1, [sd * 3.2, .2 + w * 1.4, -1.2 + w]), .14, .06, DK, {}); }   // whiskers
       else if (s.horns){ for (const sd of [-1, 1]){ G(60 + sd);
         if (s.horns === 'spike'){ const a0 = add(hd, [sd * hr * .3, hr * .75, -hr * .1]), a1 = add(a0, [sd * .3, hr * .9, -hr * .55]), a2 = add(a1, [sd * .1, hr * .25, -hr * .5]); cap(cx, a0, a1, .75, .45, AC, {}); cap(cx, a1, a2, .45, .15, AC, {}); }
         else if (s.horns === 'buffalo'){ const a0 = add(hd, [sd * hr * .45, hr * .55, -.6]), a1 = add(hd, [sd * hr * 1.7, hr * .9, -2.6]), a2 = add(hd, [sd * hr * 1.5, hr * 1.7, -4.4]); cap(cx, a0, a1, 1.3 * gir, .9 * gir, AC, {}); cap(cx, a1, a2, .9 * gir, .3, AC, {}); }
