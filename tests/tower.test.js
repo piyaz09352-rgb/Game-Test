@@ -25,7 +25,9 @@ test('tower: climb floors, guardian on floor 5, leave, best floor and checkpoint
       await page.waitForFunction(() => TWM.open || TW.phase === 'fight', null, { timeout: 15000 }); await page.evaluate(() => { if (TWM.open) twmClimb(); });   // (v273) walk through the door
     }
     await page.waitForFunction(() => TW.f === 5 && TW.phase === 'fight', null, { timeout: 15000 });
-    const g = await page.evaluate(() => ({boss:mobs.some(m => m.tw && !m.dead && m.def.boss), lab:questTracker().includes('หอคอย') || questTracker().includes('Tower')}));
+    await page.waitForTimeout(1500);
+    const g = await page.evaluate(() => ({boss:mobs.some(m => m.tw && !m.dead && m.def.boss), calm:mobs.filter(m => m.tw && !m.dead && m.def.boss).every(m => !m.aggro), lab:questTracker().includes('หอคอย') || questTracker().includes('Tower')}));
+    assert.ok(g.calm, '(v274) the guardian waits at its place until it is hit');
     assert.ok(g.boss, 'floor 5 brings a guardian'); assert.ok(g.lab, 'the quest card shows the climb');
     await killAll();
     await page.waitForFunction(() => TW.f === 6 && TW.phase === 'rest', null, { timeout: 15000 });

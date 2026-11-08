@@ -80,6 +80,11 @@ const twCount = f => clamp(12 + Math.floor((f - 1) / 10), 12, 20);
 function twHard(m){ if (MOB[m.type] && MOB[m.type].boss) return;   // guardians: towerbal224.js measures them against an ordinary monster and applies bhp / batk there
   const kh = TW_HARD.hp, ka = TW_HARD.atk;
   m.def = {...m.def, hp:Math.round(m.def.hp * kh), atk:[Math.round(m.def.atk[0] * ka), Math.round(m.def.atk[1] * ka)]}; m.maxhp = m.hp = m.def.hp; }
+/* (v274) the owner: a guardian must not rush you the moment the floor opens — let the hero catch a breath after the
+   last floor. It stands at its place (no sight-aggro) until someone hits it; its guards still come by distance. */
+EV.on('tick', () => { if (typeof TW === 'undefined' || !TW.active || TW.phase !== 'fight') return;
+  for (const m of mobs) if (m.tw === TW.f && m.def && m.def.boss && !m.dead && !m.twCalm){ m.twCalm = true;
+    if (m.hp >= m.maxhp){ m.aggro = false; m.def = {...m.def, aggro:false}; m.hx = m.x; m.hy = m.y; m.tx = null; m.wait = 0; } } });
 function twSpot(i, n, r0){
   const a = i / n * Math.PI * 2 + Math.random() * .5, d = r0 + Math.random() * 90; let x = P.x + Math.cos(a) * d, y = P.y + Math.sin(a) * d * .7;
   for (let k = 0; k < 24 && (!walkable(x, y, 14) || x < 60 || y < 60 || x > W - 60 || y > H - 60); k++){ x = clamp(P.x + rand(-320, 320), 80, W - 80); y = clamp(P.y + rand(-220, 220), 80, H - 80); }
