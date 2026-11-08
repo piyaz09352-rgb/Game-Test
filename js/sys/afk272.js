@@ -2,14 +2,14 @@
    The owner: most players leave Auto on and barely play by hand, and nobody wants to sit and rest. The income report
    (docs/INCOME.md) showed Auto drinking a Blue Potion every time SP fell under 20% — at Lv 15 about 700 an hour,
    costing several times what the hunt earned. Now:
-   · AUTO SAVES SP: under 30% SP it uses only cheap skills (≤ 8% of max SP) and fights with normal attacks in between,
+   · AUTO SAVES SP: under 15% SP it uses only cheap skills (≤ 12% of max SP) and fights with normal attacks in between,
      so SP comes back while it fights; it drinks an SP potion only under 10% (it was 20%). It never sits to rest by
      default (players who turned sitting on themselves keep it).
    · CASTERS (INT classes) recover SP faster: +1% of max SP every 2 s, on top of the usual regeneration.
    · SP POTIONS cost a third: Blue Potion 60 Bia, Big Blue Potion 360.
    · MONSTER JUNK from low levels sells for more (drop rates untouched): ×2 below Lv 70, easing to ×1 at Lv 120. */
 'use strict';
-const AFK272 = {low:.3, cheap:.08, potSp:10};
+const AFK272 = {low:.15, cheap:.12, potSp:10};   // (tuned: at 30% / 8% kills fell by a third and fights grew long enough to cost more HP potions)
 // Auto's defaults: no sitting, SP potions at 10% (a save still on the old defaults moves over once)
 { const _bs = botSet; botSet = function(){ const b = _bs.apply(this, arguments);
     if (!b.v272){ b.v272 = 1; if (b.sit === true && b.sitHp === 50 && b.sitSp === 15) b.sit = false; if (b.potSp === 20) b.potSp = AFK272.potSp; }
