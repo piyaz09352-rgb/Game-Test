@@ -43,3 +43,10 @@ if (typeof makeElite === 'function'){ const _me = makeElite; makeElite = functio
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'family', t:['ครอบครัวมอนสเตอร์', 'Monster families'], b:() => L(
   '<p>หัวหน้าฝูง (★) ในแผนที่ล่ามาพร้อมครอบครัว: บางทีมีคู่ (พ่อ/แม่ ตัวใหญ่กว่า แข็งแรงกว่า EXP และดรอปดีกว่า) · ลูก 1–2 ตัว ตัวเล็ก อ่อนแอ เดินตาม · ตีตัวไหนก็ตาม ทั้งครอบครัวจะเข้ามาช่วยกัน</p>',
   '<p>Pack leaders (★) on the hunting maps come with their families: sometimes a mate (father or mother, bigger and tougher, better EXP and drops) · one or two young, small and weak, following along · hit any of them and the whole family comes for you</p>')});
+/* online: the room's host tells everyone who is father, mother or young (world2.js mobEx field, after a '|') */
+if (typeof mobEx === 'function' && typeof mobExApply === 'function'){
+  const _ex = mobEx, _ap = mobExApply, code = {father:'f', mother:'m', young:'y'}, role = {f:'father', m:'mother', y:'young'};
+  mobEx = function(m){ const base = _ex.apply(this, arguments); return m && code[m.famRole] ? `${base}|${code[m.famRole]}` : base; };
+  mobExApply = function(m, s){ const [base, fr] = String(s || '').split('|'); const r = _ap.call(this, m, base);
+    const R = role[fr] && FAM_ROLE[role[fr]]; if (m && R && m.famRole !== role[fr]){ m.famRole = role[fr]; m.famSz = R.sz; m.tagTxt = [R.th, R.en]; }
+    return r; }; }
