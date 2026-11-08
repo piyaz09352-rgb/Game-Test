@@ -193,7 +193,7 @@ const HLP_IMG = {};
 for (const k of Object.keys(HELPERS)){ const im = new Image(); im.onload = () => { HLP_IMG[k] = im; delete BOT_PIC[k]; }; im.onerror = () => {}; im.src = `assets/helpers/${k}.png?v=${typeof GAMEV !== 'undefined' && GAMEV ? GAMEV : 274}`; }
 const HLP_SHINE = document.createElement('canvas');
 /* (v274) a helper whose picture the owner sent as an animation plays it: a strip of frames, assets/helpers/<k>_anim.png */
-const HLP_ANIM = {midas:{n:9, dt:.14}}, HLP_FR = {};
+const HLP_ANIM = {midas:{n:9, dt:.14}, pulse:{n:16, dt:.1}}, HLP_FR = {};
 for (const k in HLP_ANIM){ const im = new Image(); im.onload = () => { const n = HLP_ANIM[k].n, w = Math.floor(im.width / n), out = [];
     for (let i = 0; i < n; i++){ const c = document.createElement('canvas'); c.width = w; c.height = im.height; c.getContext('2d').drawImage(im, i * w, 0, w, im.height, 0, 0, w, im.height); out.push(c); } HLP_FR[k] = out; };
   im.onerror = () => {}; im.src = `assets/helpers/${k}_anim.png?v=${typeof GAMEV !== 'undefined' && GAMEV ? GAMEV : 274}`; }
