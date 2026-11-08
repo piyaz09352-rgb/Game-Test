@@ -35,8 +35,12 @@ function pre269Paint(){
     if (px < cap) pre269Queue([...new Set(PRE269.far)], hub ? [['idle', 0, 1]] : PRE269_FAR); PRE269.far = []; PRE269.farOn = true;
   }
   if (!PRE269.todo.length) return;
+  // (v276) never more than about a quarter of the time: after a slow paint (a phone) wait three times as long before the next,
+  // so the game keeps answering taps while monsters are painted (one frame each display frame froze phones after a warp)
+  if (performance.now() < (PRE269.rest || 0)) return;
   const t0 = performance.now(), ms = frame271Budget(PRE269.farOn ? 1.5 : t0 - PRE269.t0 < 2500 ? 10 : 4);   // a bigger share just after arriving (less on a slow device)
   while (PRE269.todo.length && performance.now() - t0 < ms){ const [k, act, dir, nf] = PRE269.todo[0], sh = SHEETS[k];
     if (!sh || SPR.prime(sh, [act], ms - (performance.now() - t0), dir, nf)) PRE269.todo.shift(); }
+  const took = performance.now() - t0; PRE269.rest = took > 12 ? performance.now() + took * 3 : 0;
 }
 { const loop = () => { try { pre269Paint(); } catch (e) {} requestAnimationFrame(loop); }; requestAnimationFrame(loop); }

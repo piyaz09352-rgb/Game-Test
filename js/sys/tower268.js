@@ -29,10 +29,12 @@ if (_t267Pick) t267Pick = function(){ const q = T268.q; if (q && typeof TW !== '
 /* paint their pictures: a good share of each frame while resting, a little while fighting */
 function t268Paint(){
   if (typeof TW === 'undefined' || !TW.active || !T268.todo || !T268.todo.length || typeof SPR === 'undefined' || !SPR.prime) return;
+  if (performance.now() < (T268.rest || 0)) return;   // (v276) at most about a quarter of the time on a slow device (see preload269)
   const t0 = performance.now();
   let ms = TW.phase === 'rest' ? 14 : 3; if (typeof frame271Budget === 'function') ms = frame271Budget(ms);   // (v271) less on a slow device
   while (T268.todo.length && performance.now() - t0 < ms){ const [k, act, dir, nf] = T268.todo[0], sh = SHEETS[k];
     if (!sh || SPR.prime(sh, [act], ms - (performance.now() - t0), dir, nf)) T268.todo.shift(); }
+  const took = performance.now() - t0; T268.rest = took > 12 ? performance.now() + took * 3 : 0;
 }
 // on the display's own clock (not the game tick): a fast-forwarded game never stalls on it
 { const loop = () => { try { t268Paint(); } catch (e) {} requestAnimationFrame(loop); }; requestAnimationFrame(loop); }
