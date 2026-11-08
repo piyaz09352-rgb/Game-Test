@@ -24,7 +24,7 @@ const GR270_SVG = {
   ammo:'<path d="M21 2l-1 5-2-2L6 17l1 3-2 2-1-3-3-1 2-2 3 1L18 5l-2-2zM14 2l-1 4-1.5-1.5L4 12 3 11l7.5-7.5L9 2z"/>'
 };
 const gr270Uri = k => `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='black'>${GR270_SVG[k]}</svg>`)}")`;
-const gr270Slot = it => (it && (it.kind === 'ammo' ? 'ammo' : it.slot === 'acc2' ? 'acc' : it.slot)) || null;
+function gr270Slot(it){ return (it && (it.kind === 'ammo' ? 'ammo' : it.slot === 'acc2' ? 'acc' : it.slot)) || null; }
 /* tag the cells: rarity class and kind */
 function gr270Tag(root){
   const q = (root && root.querySelectorAll ? root : document).querySelectorAll('.bslot[data-bagsel],.bslot[data-mksel],.bslot[data-tsel]');
