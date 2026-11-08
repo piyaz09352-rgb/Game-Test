@@ -8,6 +8,7 @@
    · THE WAR COMMANDER: when the bar is full the invaders' commander appears — one HP bar shared by everyone on the map, tougher the more heroes there are
      (damage travels as a share of its HP, like the world boss).
    · While it lasts, half the map's own monsters stand aside and the region boss waits (as for the world boss).
+   · RANKING: the bar shows the top three helpers on the map; the top one (with others there) gets +2 Vayra Coins and +50% Bia.
    · REWARD for everyone who helped (3 invaders or 1% of the commander, or anyone fighting alone): Bia by level,
      3 Vayra Coins, 30% a piece of gear (Rare or better is likelier). One reward per invasion. If the hour runs out
      first, the army withdraws. */
@@ -108,9 +109,12 @@ function invReward(){
   const ok = INV.my >= 3 || INV.myDmg >= .01 || invPeers() === 0;
   if (!ok){ banner(L('ทัพผู้รุกรานพ่ายแพ้! แต่คุณช่วยไม่ถึงเกณฑ์รับรางวัล', 'The invasion is beaten! You did not help enough for a reward')); return; }
   const Lv = clamp(S.lvl, 1, 300), bia = Lv * 220; S.bia += bia; if (typeof coinAdd === 'function') coinAdd(3, L('การรุกราน', 'invasion'));
+  const R = invRank(), top = R.length > 1 && R[0].me && R[0].k > (R[1] ? R[1].k : 0);   // (v271) the one who helped most (with others there) gets a little more
+  if (top && typeof coinAdd === 'function'){ coinAdd(2, L('ผู้ช่วยอันดับ 1', 'top helper')); S.bia += Math.round(bia * .5); }
   let gear = '';
   if (Math.random() < .3 && typeof GEAR_LIST !== 'undefined'){ const pool = GEAR_LIST.filter(g => g[1] !== 'ammo' && g[4] <= Lv && g[4] >= Lv - 30 && (typeof lineOk !== 'function' || lineOk(g[6])));
     if (pool.length){ const id = makeInst(pool[Math.floor(Math.random() * pool.length)][0], rollRarity('elite')); addItem(id, 1); gear = nm(ITEMS[id]); } }
+  if (top) log(L(`🥇 คุณช่วยมากที่สุดในการรุกรานครั้งนี้ (${INV.my} ตัว) · เหรียญวายรา +2 · เบี้ยเพิ่ม 50%`, `🥇 You helped most in this invasion (${INV.my}) · +2 Vayra Coins · +50% Bia`), 'g');
   banner(L(`🏆 ขับไล่ผู้รุกรานสำเร็จ! +${bia.toLocaleString()} เบี้ย · เหรียญวายรา +3${gear ? ' · ' + gear : ''}`, `🏆 The invasion is driven back! +${bia.toLocaleString()} Bia · +3 Vayra Coins${gear ? ' · ' + gear : ''}`));
   log(L(`การรุกราน: ล้มผู้รุกราน ${INV.my} ตัว · ได้ ${bia.toLocaleString()} เบี้ย${gear ? ' และ ' + gear : ''}`, `Invasion: ${INV.my} invaders defeated · ${bia.toLocaleString()} Bia${gear ? ' and ' + gear : ''}`), 'g');
   if (typeof bump === 'function') bump('invasions'); dirty = true; if (typeof save === 'function') save();
@@ -120,7 +124,7 @@ function invBar(w){
   let b = INV.bar; if (!b){ const host = document.getElementById('wrap'); if (!host) return; b = INV.bar = document.createElement('div'); b.id = 'invBar'; host.appendChild(b);
     const st = document.createElement('style'); st.textContent = `#invBar{position:absolute;top:calc(env(safe-area-inset-top,0px) + 6px);left:50%;transform:translateX(-50%);z-index:30;pointer-events:none;max-width:min(520px,60vw);
       padding:4px 12px 5px;border-radius:10px;background:rgba(40,10,10,.78);border:1px solid rgba(255,120,90,.8);color:#ffe6dc;font:700 clamp(10px,1.5vw,14px)/1.25 Sarabun,"Noto Sans Thai",sans-serif;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)}
-      #invBar[hidden]{display:none}#invBar .ibgo{pointer-events:auto;margin-left:8px;padding:1px 10px;border-radius:999px;border:1px solid #ffd27a;background:linear-gradient(#ffcf6a,#e08a20);color:#3a1a04;font:800 clamp(10px,1.4vw,13px)/1.4 Sarabun,"Noto Sans Thai",sans-serif;cursor:pointer;box-shadow:0 2px 0 #8a4a0a}#invBar .ibgo:active{transform:translateY(1px)}#invBar .ib{display:block;height:5px;margin-top:3px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}#invBar .ib i{display:block;height:100%;background:linear-gradient(90deg,#ff7a4a,#ffd060)}`;
+      #invBar[hidden]{display:none}#invBar .ibrk{display:flex;justify-content:center;gap:10px;margin-top:2px;font-size:.88em;font-weight:700;color:#ffe8c0}#invBar .ibrk i{font-style:normal;white-space:nowrap}#invBar .ibrk i.me{color:#fff36a}#invBar .ibgo{pointer-events:auto;margin-left:8px;padding:1px 10px;border-radius:999px;border:1px solid #ffd27a;background:linear-gradient(#ffcf6a,#e08a20);color:#3a1a04;font:800 clamp(10px,1.4vw,13px)/1.4 Sarabun,"Noto Sans Thai",sans-serif;cursor:pointer;box-shadow:0 2px 0 #8a4a0a}#invBar .ibgo:active{transform:translateY(1px)}#invBar .ib{display:block;height:5px;margin-top:3px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}#invBar .ib i{display:block;height:100%;background:linear-gradient(90deg,#ff7a4a,#ffd060)}`;
     document.head.appendChild(st); }
   const fmt = m => `${Math.floor(m)}:${String(Math.floor((m % 1) * 60)).padStart(2, '0')}`;
   let txt = '', pct = -1;
@@ -132,8 +136,17 @@ function invBar(w){
   else if (INV.boss && !INV.boss.dead){ txt = L(`⚔ แม่ทัพผู้รุกราน · ${fmt(w.left)}`, `⚔ Invading Warlord · ${fmt(w.left)}`); pct = INV.boss.hp / INV.boss.maxhp; }
   else { const g = invGoal(); txt = L(`⚔ การรุกราน · ทัพ ${Math.min(INV.tot, g)}/${g} · ของคุณ ${INV.my} · ${fmt(w.left)}`, `⚔ Invasion · army ${Math.min(INV.tot, g)}/${g} · yours ${INV.my} · ${fmt(w.left)}`); pct = Math.min(1, INV.tot / g); }
   const go = w && !INV.done[w.key] && MAP_ID !== id && id >= 0 ? ` <button class="ibgo" data-invgo>${L(w.active ? 'ไปช่วย' : 'ไปรอ', w.active ? 'Join' : 'Go')}</button>` : '';
-  const html = `${escH(txt)}${go}${pct >= 0 ? `<span class="ib"><i style="width:${Math.round(pct * 100)}%"></i></span>` : ''}`;
+  let rk = ''; if (w && w.active && MAP_ID === id && !INV.done[w.key]){ const R = invRank(); if (R.length > 1) rk = `<span class="ibrk">${R.slice(0, 3).map((r, i) => `<i class="${r.me ? 'me' : ''}">${['🥇', '🥈', '🥉'][i]} ${escH(r.n)} ${r.k}</i>`).join('')}</span>`; }
+  const html = `${escH(txt)}${go}${rk}${pct >= 0 ? `<span class="ib"><i style="width:${Math.round(pct * 100)}%"></i></span>` : ''}`;
   if (b.hidden) b.hidden = false; if (b._h !== html){ b._h = html; b.innerHTML = html; }
+}
+/* (v271) who helps most: my count travels in my presence, the bar shows the top three */
+if (typeof wbPres !== 'undefined'){ const _wp = wbPres; wbPres = () => ({..._wp(), ivk:INV.key && MAP_ID === invMap(INV.key) ? INV.key : null, ivn:INV.key ? INV.my : null}); }
+function invRank(){
+  const out = [{n:typeof netName === 'function' ? netName() : (S.name || ''), k:INV.my, me:true}];
+  if (typeof NET !== 'undefined' && NET.mapRoom && NET.on) for (const p of NET.mapRoom.peers()){ const q = p.presence || {}; if (p.isMe || q.ivk !== INV.key || typeof q.ivn !== 'number') continue;
+    out.push({n:(typeof clean === 'function' ? clean(q.n, 14) : String(q.n || '').slice(0, 14)) || L('นักผจญภัย', 'Adventurer'), k:clamp(q.ivn | 0, 0, 999)}); }
+  return out.sort((a, b) => b.k - a.k);
 }
 /* the bar's button: straight to the invaded map (free, like the world boss's warp) */
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-invgo]'); if (!b) return; const w = invWindow(); if (!w) return; const id = invMap(w.key); if (id < 0 || id === MAP_ID) return;
