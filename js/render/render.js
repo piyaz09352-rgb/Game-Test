@@ -159,7 +159,7 @@ function drawMobW(g, m){
   if (m.dead) g.globalAlpha = m.vanish ? Math.max(0, 1 - m.deadT * 2) : (m.deadT > .8 ? Math.max(0, 1 - (m.deadT - .8) * 2.5) : 1);
   else if (T - m.born < .4) g.globalAlpha = (T - m.born) / .4;
   shadowW(g, x, y, (m.type === 'lantern' ? 6 : m.def.r * .95) * (lift ? Math.max(.4, 1 - lift / 160) : 1));
-  if (fz || m.def.boss){ const bz = m.def.boss ? m.def.bsz || (typeof BOSS_SZ !== 'undefined' ? BOSS_SZ : 1) : 1, k = bz * (fz ? 1 + ((fz.phase || 1) - 1) * .04 + (fz.berserk > 0 ? .05 : 0) : 1); g.translate(x, y - lift); { const br = !m.dead && act === 'idle' ? Math.sin(T * 1.9 / Math.sqrt(bz) + (m.id || 0)) : 0; g.scale(k * (1 - br * .01), k * (1 + br * .022)); }   /* (v117) a big chest breathes slowly */
+  if (fz || m.def.boss){ const bz = m.def.boss ? m.def.bsz || (typeof BOSS_SZ !== 'undefined' ? BOSS_SZ : 1) : 1, k = bz * (fz ? 1 + ((fz.phase || 1) - 1) * .04 + (fz.berserk > 0 ? .05 : 0) : 1); g.translate(x, y - lift); { const br = !m.dead && act === 'idle' ? Math.sin(T * 1.9 / Math.sqrt(bz) + (m.id || 0)) : 0; const sq = fz && fz.sq; g.scale(k * (1 - br * .01) * (sq ? sq[0] : 1), k * (1 + br * .022) * (sq ? sq[1] : 1)); }   /* (v117) a big chest breathes slowly · (v276) squash and stretch in a leap */
     SPR.draw(g, SHEETS[m.type], act, m.dir || 0, t, 0, 0);
     if (fz && (fz.phase >= 3 || fz.berserk > 0)){ g.globalCompositeOperation = 'lighter'; g.globalAlpha = fz.berserk > 0 ? .26 : .14; /* (v117) a steady glow, no pulsing */ SPR.draw(g, SHEETS[m.type], act, m.dir || 0, t, 0, 0); } }
   else if (m.elite){ g.translate(x, y); g.scale(1.3, 1.3); SPR.draw(g, SHEETS[m.type], act, m.dir || 0, t, 0, 0);

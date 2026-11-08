@@ -165,7 +165,7 @@ EV.on('kill', m => {
     NPCMEM('boss', nm(d));
   }
 });
-EV.on('tick', () => { for (const m of mobs){ const F = m.fz; if (!F || m.dead) continue; if (F.berserk > 0 && !m._rpc){ m._rpc = true; F.rampages = (F.rampages || 0) + 1; tip('rampage'); if (typeof AMB !== 'undefined') AMB.roar(m); } if (!(F.berserk > 0)) m._rpc = false;
+EV.on('tick', () => { for (const m of mobs){ const F = m.fz; if (!F || m.dead || F.hop) continue; if (F.berserk > 0 && !m._rpc){ m._rpc = true; F.rampages = (F.rampages || 0) + 1; tip('rampage'); if (typeof AMB !== 'undefined') AMB.roar(m); } if (!(F.berserk > 0)) m._rpc = false;
   if (F.phase >= 2 && !m._tp2){ m._tp2 = true; tip('bossPhase'); } if (F.phase !== m._rph){ if (m._rph && typeof AMB !== 'undefined') AMB.roar(m); m._rph = F.phase; }
   if (F.act && F.act.id !== m._lact){ m._lact = F.act.id; if (F.act.id === 'burrow' || F.act.id === 'soar') tip('burrow'); if (F.act.id === 'breath' || F.act.id === 'miasma') tip('breath'); } if (!F.act) m._lact = null;
   if (m.aggro && !m._agr){ m._agr = true; if (typeof AMB !== 'undefined') AMB.roar(m); } if (!m.aggro) m._agr = false; } });
@@ -232,8 +232,8 @@ const TIPS = {
   silence:['ติดใบ้!', 'Silenced!', 'ใช้สกิลไม่ได้ชั่วคราว ตีปกติยังได้ · ยาเขียวแก้ได้', 'No skills for a while, basic attacks still work · a Green Potion cures it'],
   bossPhase:['บอสเข้าระยะใหม่!', 'The boss changed phase!', 'ทุกระยะบอสจะแรงขึ้นและมีท่าใหม่ · ดูวงสีแดงบนพื้นแล้วกด "กลิ้ง" หลบ', 'Each phase it hits harder and learns new moves · watch for red circles and Dodge-roll out'],
   rampage:['บอสอาละวาด!', 'Rampage!', 'แถบความคลั่งเต็ม 7 วิต่อจากนี้บอสเร็วและแรงมาก · ถอยห่างหรือป้องกันไว้ · ฆ่าตอนอาละวาดได้รางวัลพิเศษ', 'For 7 seconds it is very fast and strong · back off or guard · slaying it now pays extra'],
-  burrow:['บอสหายไป!', 'It vanished!', 'บอสมุดดินหรือบินขึ้นฟ้า ตีไม่เข้า · เมื่อวงแดงขึ้นใต้เท้า รีบกลิ้งออก', 'It dug under or took to the sky and cannot be hit · when a red circle appears under you, roll away'],
-  breath:['ระวังกรวยพ่น!', 'Breath attack!', 'อยู่นอกกรวยสีแดง หรือออกจากหมอกพิษให้เร็ว · ติดสถานะตามธาตุของบอส', 'Stay out of the red cone or the poison cloud · it carries the boss\'s element'],
+  burrow:['บอสหายไป!', 'It vanished!', 'บอสมุดดิน หายเข้าหมอก หรือบินขึ้นฟ้า ตีไม่เข้า · เมื่อวงแดงขึ้นใต้เท้า รีบกลิ้งออก', 'It dug under or took to the sky and cannot be hit · when a red circle appears under you, roll away'],
+  breath:['ระวังลมหายใจบอส!', 'Breath attack!', 'บอสเงยหัวรวมพลังที่ปาก แล้วพ่นเป็นสาย อย่ายืนในสายที่พ่นออกมา หรือออกจากหมอกพิษให้เร็ว · ติดสถานะตามธาตุของบอส', 'It rears back and gathers power at its mouth, then pours out a stream: stay out of the stream, or out of the poison mist · you suffer its element\'s ailment'],
   elite:['หัวหน้าฝูง!', 'An alpha!', 'มอนตัวใหญ่สีทอง HP ×4 ใช้สกิลและปลุกฝูงได้ · ฆ่าได้ EXP ×3 และมีโอกาสได้อุปกรณ์', 'A big golden monster with ×4 HP, skills and a pack call · worth ×3 EXP and often gear'],
   hunt:['ห่วงโซ่อาหาร', 'The food chain', 'สัตว์นักล่าไล่จับเหยื่อได้เอง · กลางคืนสัตว์กลางวันจะหลับ เดินผ่านเงียบๆ ได้', 'Hunters chase and catch prey on their own · at night day creatures sleep, you can sneak by'],
   wx_rain:['ฝนตก', 'Rain', 'เวทไฟอ่อนลง 20% · เวทน้ำแรงขึ้น 15%', 'Fire −20% · water +15%'],

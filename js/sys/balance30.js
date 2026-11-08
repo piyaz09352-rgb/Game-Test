@@ -93,10 +93,7 @@ function mskCast(m, id){
   else if (s.kind === 'melee') later(.4, () => { if (mskOk(m) && Math.hypot(P.x - m.x, P.y - m.y) < s.r + 20 && !P.roll) mskHit(m, s, s.mul); });
   else if (s.kind === 'circle'){ const x = s.atPlayer ? P.x : m.x, y = s.atPlayer ? P.y : m.y; VFX.play('warnCircle', {x, y, r:s.area, t:.9});
     later(.9, () => { if (!mskOk(m)) return; VFX.play(s.magic ? 'boom' : 'quake', {x, y, r:s.area}); if (inHit(x, y, s.area) && !P.roll) mskHit(m, s, s.mul); }); }
-  else if (s.kind === 'leap'){ const x0 = m.x, y0 = m.y, tx = P.x, ty = P.y; VFX.play('warnLine', {x:x0, y:y0, ux:(tx - x0) / (Math.hypot(tx - x0, ty - y0) || 1), uy:(ty - y0) / (Math.hypot(tx - x0, ty - y0) || 1), len:Math.hypot(tx - x0, ty - y0), w:30, t:.6});
-    later(.6, () => { if (!mskOk(m)) return; VFX.play('blink', {x:m.x, y:m.y, x2:tx, y2:ty}); const dl = Math.hypot(tx - x0, ty - y0) || 1, land = Math.min(dl, (m.def.r || 12) + 12 + (typeof MSP_GAP !== 'undefined' ? MSP_GAP * .6 : 8));   // (v269) lands in front of the hero, never on top
-      m.x = tx - (tx - x0) / dl * land; m.y = ty - (ty - y0) / dl * land; if (typeof pushOut === 'function') pushOut(m, m.def.r * .6);
-      if (Math.hypot(P.x - m.x, P.y - m.y) < land + 14 && !P.roll) mskHit(m, s, s.mul); }); }
+  else if (s.kind === 'leap') mskLeap(m, s);   // (v276) a real jump, not a warning line and a blink
   else if (s.kind === 'heal'){ const who = [m, ...near(s.r)].filter(o => o.hp < o.maxhp).sort((a, b) => a.hp / a.maxhp - b.hp / b.maxhp)[0] || m;
     later(.5, () => { if (!mskOk(m) || who.dead) return; const h = Math.round(who.maxhp * s.heal); who.hp = Math.min(who.maxhp, who.hp + h); VFX.play('heal', {x:who.x, y:who.y}); addText(who.x, who.y - (MOB_H[who.type] || 30) - 4, `+${fmtN(h)}`, '#9cffb0', 13); }); }
   else if (s.kind === 'rally') later(.4, () => { for (const o of [m, ...near(s.r)]){ o.rallyT = T + s.dur; o.aggro = true; } VFX.play('roar', {x:m.x, y:m.y}); });
@@ -160,3 +157,31 @@ for (const k in MOB){ const d = MOB[k]; if (!d || d.boss || !d.lvl || k === 'dum
     return r; }; }
 EV.on('tick', dt => { for (const m of mobs) if (!m.dead && m.def && m.def.trait === 'regen' && m.hp < m.maxhp){ m.rgAcc = (m.rgAcc || 0) + m.maxhp * .008 * dt; if (m.rgAcc >= 1){ const h = Math.floor(m.rgAcc); m.rgAcc -= h; m.hp = Math.min(m.maxhp, m.hp + h); } } });
 if (typeof tsChips === 'function'){ const _ts = tsChips; tsChips = function(m){ const out = _ts.apply(this, arguments), t = m && m.def && m.def.trait; if (t && MTRAIT[t]) out.unshift([L(MTRAIT[t][0], MTRAIT[t][1]), MTRAIT[t][2]]); return out; }; }
+
+/* (v276) a monster's pounce or dive as a real jump (the owner: the line-and-blink looked cheap): it crouches low for a
+   moment, springs up in an arc — stretched as it rises and falls, its shadow left on the ground — and lands just in
+   front of you in a puff of dust, hitting if you are still there. Birds swoop in a flatter, faster arc. */
+const MSK_HOPS = [];
+function mskLeap(m, s){
+  if (m.fz && !m.fz.hop) return;   // bosses have their own leap
+  const bird = typeof SPECIES_ARCH !== 'undefined' && SPECIES_ARCH[m.type] === 'bird', r = m.def.r || 12;
+  m.fz = {z:0, sq:[1, 1], phase:1, rings:[], hop:true};
+  MSK_HOPS.push({m, s, t:0, st:'crouch', cw:bird ? .22 : .32, dur:bird ? .36 : .46, h:bird ? 18 + r * .8 : 26 + r * 1.3, bird});
+}
+EV.on('tick', dt => {
+  for (let i = MSK_HOPS.length - 1; i >= 0; i--){ const h = MSK_HOPS[i], m = h.m, F = m.fz; h.t += dt;
+    const done = () => { if (m.fz && m.fz.hop) m.fz = null; MSK_HOPS.splice(i, 1); };
+    if (m.dead || !F || !F.hop || !mskOk(m)){ done(); continue; }
+    if (h.st === 'crouch'){ const k = Math.min(1, h.t / h.cw); F.sq = [1 + .18 * k, 1 - .24 * k]; m.dir = SPR.dirFromVec(P.x - m.x, P.y - m.y); m.tx = m.x; m.ty = m.y;
+      if (h.t >= h.cw){ const dl = Math.hypot(P.x - m.x, P.y - m.y) || 1, land = Math.min(dl, (m.def.r || 12) + 12 + (typeof MSP_GAP !== 'undefined' ? MSP_GAP * .6 : 8));   // lands in front of the hero, never on top
+        h.x0 = m.x; h.y0 = m.y; h.tx = P.x - (P.x - m.x) / dl * land; h.ty = P.y - (P.y - m.y) / dl * land; h.land = land; h.st = 'air'; h.t = 0; VFX.play('dustPuff', {x:m.x, y:m.y}); }
+      continue; }
+    if (h.st === 'air'){ const k = Math.min(1, h.t / h.dur), e = h.bird ? k * k : k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      m.x = h.x0 + (h.tx - h.x0) * e; m.y = h.y0 + (h.ty - h.y0) * e; m.tx = m.x; m.ty = m.y; m.moved = true;
+      F.z = h.bird ? (1 - k) * h.h + Math.sin(k * Math.PI) * h.h * .3 : Math.sin(k * Math.PI) * h.h; const c = Math.abs(Math.cos(k * Math.PI)); F.sq = [1 - .1 * c, 1 + .16 * c];
+      if (k >= 1){ F.z = 0; F.sq = [1.26, .74]; h.st = 'land'; h.t = 0; if (typeof pushOut === 'function') pushOut(m, m.def.r * .6);
+        VFX.play('dustPuff', {x:m.x - 8, y:m.y}); VFX.play('dustPuff', {x:m.x + 8, y:m.y}); VFX.play(h.bird ? 'clawHit' : 'slashHit', {x:P.x, y:P.y - 20});
+        if (Math.hypot(P.x - m.x, P.y - m.y) < h.land + 14 && !P.roll) mskHit(m, h.s, h.s.mul); }
+      continue; }
+    const k = Math.min(1, h.t / .22); F.sq = [1.26 - .26 * k, .74 + .26 * k]; if (k >= 1) done(); }
+});
