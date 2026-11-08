@@ -15,7 +15,7 @@ const SETUP = (job, lvl) => {
 };
 /* the next living monster, with the hero standing next to it */
 const FOE = () => { let live = mobs.filter(m => !m.dead && !m.vanish && !m.dummy); if (live.length < 2){ loadMap(1); live = mobs.filter(m => !m.dead && !m.vanish && !m.dummy); }
-  const m = live[0]; m.maxhp = m.hp = 1e7; m.st = {root:30}; P.x = m.x - 60; P.y = m.y; P.target = m; return m; };
+  const m = live[0]; m.maxhp = m.hp = 1e7; m.st = {root:30}; P.x = m.x - 150;   /* (v274) not so close that the hero-space rule (mobspace269) nudges it out of a ground field */  P.y = m.y; P.target = m; return m; };
 
 test('Herbalist and Royal Physician: the new damage skills hurt monsters', { skip, timeout: 180000 }, async () => {
   const { page, errors, close } = await openGame();
@@ -191,7 +191,7 @@ test('switching class leaves nothing of the old class behind: no beasts, no boun
   try {
     await enterWorld(page);
     const r = await page.evaluate(() => {
-      S.job = 'sovereign'; S.lvl = 99; S.jlvl = 50; S.skills = {royalbond:1, callgaruda:5};
+      S.job = 'sovereign'; S.lvl = 99; S.jlvl = 50; S.skills = {sovlore:5, royalbond:1, callgaruda:5};   /* royalbond needs sovlore 5 (classlines.js) */
       S.cls = {have:{summoner:{job:'sovereign'}, blade:{job:'blade', jlvl:5, jexp:0, skills:{}, skPts:0, hot:null}}, free:0};
       derive(); S.bound = {type:'whitemonkeyking', hp:1}; spawnBound();
       conjure(SKILLS.callgaruda, 5); addBuff('callgaruda', {t:30}); addBuff('food', {t:30, atk:5});
@@ -201,7 +201,7 @@ test('switching class leaves nothing of the old class behind: no beasts, no boun
       updSkills(.1);
       return {before, job:S.job, summons:SUMMONS.length, buffs:Object.keys(P.buffs).join(','), bond:skl('royalbond')};
     });
-    assert.ok(r.before.summons >= 2, 'a beast and the bound boss were out');
+    assert.ok(r.before.summons >= 1, 'a beast was out');   // (v274) Royal Bond (the bound boss) left the Sovereign's skills in v209
     assert.equal(r.job, 'blade');
     assert.equal(r.summons, 0, 'no summons follow the Swordsman');
     assert.equal(r.buffs, 'food', 'only the food buff stays');
