@@ -21,6 +21,8 @@ test('coin shop: button, prices, no free trial, buying, tabs, top-up closed; tow
     await page.click('#cshBtn'); await page.waitForSelector('#pane-cshop .cshit');
     const buy = await page.evaluate(id => { ACC.coins = 1000; window.sysPrompt = (q, yes) => yes(); const c = cshDef(id).price.c; reWin('cshop');
       const b = document.querySelector(`[data-cshfash="${id}"]`); b.click(); return {c, coins:ACC.coins, have:cosHave(id)}; }, tr.id);
+    const pv = await page.evaluate(id => { document.querySelector('[data-cshtab="fash"]').click(); const b = document.querySelector('[data-cshtry]'); b.click(); return {sel:CSH.sel, stage:!!document.getElementById('cshPrev'), equip:!!UIS.open.equip}; }, tr.id);
+    assert.ok(pv.sel && pv.stage && !pv.equip, 'Preview shows the piece on the hero inside the shop, without opening the bag');
     assert.ok(buy.have, 'bought'); assert.strictEqual(buy.coins, 1000 - buy.c, 'paid in coins');
     // the other tabs
     const tabs = await page.evaluate(() => { const out = {};

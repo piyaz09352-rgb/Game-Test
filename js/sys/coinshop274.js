@@ -44,12 +44,15 @@ const cshPr = c => `<b class="c272">◈ ${fmtN(c)}</b>`;
 function cshFashion(){
   const subs = FW_TABS, ids = fwIds(CSH.sub).filter(id => { const d = cshDef(id); return d && d.price && d.price.c; }).sort((a, b) => cshDef(a).price.c - cshDef(b).price.c);
   const own = ids.filter(cosHave).length;
-  return `<div class="cshsub">${subs.map(([k, th, en]) => `<button class="${k === CSH.sub ? 'on' : ''}" data-cshsub="${k}">${L(th, en)}</button>`).join('')}<span class="ct">${L('มีแล้ว', 'owned')} ${own}/${ids.length}</span></div>
+  const sel = CSH.sel && cshDef(CSH.sel) ? CSH.sel : null, sd = sel && cshDef(sel);
+  const stage = `<div class="cshstage"><canvas id="cshPrev"></canvas><div class="cshrot"><button class="ibtn" data-cshrot="-1" aria-label="${L('หมุนซ้าย', 'Turn left')}">‹</button><button class="ibtn" data-cshrot="1" aria-label="${L('หมุนขวา', 'Turn right')}">›</button></div>
+    ${sel ? `<b>${itemName2(sel)}</b>${cosHave(sel) ? `<span class="ok">✓ ${L('มีแล้ว', 'Owned')}</span>` : `${cshPr(sd.price.c)}<button class="btn sm cgo" data-cshfash="${sel}" ${cshCoins() >= sd.price.c ? '' : 'disabled'}>${L('ซื้อ', 'Buy')}</button>`}` : `<small>${L('กด «ลองดู» เพื่อดูบนตัวละคร', 'Tap «Preview» to see it on your hero')}</small>`}</div>`;
+  return `<div class="cshfw">${stage}<div class="cshfr"><div class="cshsub">${subs.map(([k, th, en]) => `<button class="${k === CSH.sub ? 'on' : ''}" data-cshsub="${k}">${L(th, en)}</button>`).join('')}<span class="ct">${L('มีแล้ว', 'owned')} ${own}/${ids.length}</span></div>
     <div class="cshgrid">${ids.map(id => { const d = cshDef(id), have = cosHave(id), c = d.price.c;
-      return `<div class="cshit${have ? ' own' : ''}"><i class="cosw" data-cth="${id}" style="--c1:${fwSwatch(id, 0)};--c2:${fwSwatch(id, 1)}"></i><b>${itemName2(id)}</b>
+      return `<div class="cshit${have ? ' own' : ''}${CSH.sel === id ? ' sel' : ''}"><i class="cosw" data-cth="${id}" style="--c1:${fwSwatch(id, 0)};--c2:${fwSwatch(id, 1)}"></i><b>${itemName2(id)}</b>
         <div class="cshp">${have ? `<span class="ok">✓ ${L('มีแล้ว', 'Owned')}</span>` : cshPr(c)}</div>
         <div class="cshb"><button class="btn sm" data-cshtry="${id}">${L('ลองดู', 'Preview')}</button>${have ? '' : `<button class="btn sm cgo" data-cshfash="${id}" ${cshCoins() >= c ? '' : 'disabled'}>${L('ซื้อ', 'Buy')}</button>`}</div></div>`; }).join('')}</div>
-    <p class="hint">${L('ชุดแฟชั่นไม่เปลี่ยนค่าพลัง · เป็นของทั้งบัญชี · «ลองดู» เปิดตู้เสื้อผ้าให้เห็นบนตัวละคร · ชุดเทศกาลแลกได้เฉพาะช่วงเทศกาล', 'Costumes never change stats · shared by the whole account · «Preview» shows it on your hero in the wardrobe · festival pieces only during their festival')}</p>`;
+    <p class="hint">${L('ชุดแฟชั่นไม่เปลี่ยนค่าพลัง · เป็นของทั้งบัญชี · «ลองดู» แสดงบนตัวละครทางซ้าย · ซื้อแล้วสวมได้ในตู้เสื้อผ้า (Q) · ชุดเทศกาลแลกได้เฉพาะช่วงเทศกาล', 'Costumes never change stats · shared by the whole account · «Preview» shows it on your hero at the left · wear what you buy from the wardrobe (Q) · festival pieces only during their festival')}</p></div></div>`;
 }
 function cshItems(){
   const ids = Object.keys(typeof COIN272 !== 'undefined' ? COIN272 : {}).filter(id => ITEMS[id] || GEAR[id]);
@@ -108,10 +111,18 @@ document.addEventListener('click', e => {
   if (d.cshtab){ CSH.tab = d.cshtab; reWin('cshop'); }
   else if (d.cshsub){ CSH.sub = d.cshsub; reWin('cshop'); }
   else if (d.cshfash) cshBuyFash(d.cshfash);
-  else if (d.cshtry){ const id = d.cshtry; EQ.tab = 'cos'; EQ.try = id; const s = fwSlot(id); if (s && typeof FW !== 'undefined') FW.tab = s; openWin('equip'); setTimeout(() => { if (typeof renderEquip === 'function') renderEquip(); }, 0); }
+  else if (d.cshtry){ CSH.sel = d.cshtry; reWin('cshop'); }
   else if (d.cshitem){ if (typeof coin272Buy === 'function'){ const id = d.cshitem; coin272Buy(id, GEAR[id] ? 'pack' : 'item', +d.n || 1); reWin('cshop'); } }
   
 });
+/* the preview stage: the wardrobe's own drawing (drawEquipPrev) pointed at the shop's canvas for a moment */
+CSH.dir = 0;
+function cshDraw(){ const cv = document.getElementById('cshPrev'); if (!cv || typeof drawEquipPrev !== 'function') return;
+  const gi = document.getElementById, tab = EQ.tab, tr = EQ.try, dir = EQ.dir;
+  document.getElementById = function(id){ return id === 'eqPrev' ? cv : gi.call(document, id); };
+  try { EQ.tab = 'cos'; EQ.try = CSH.sel || null; EQ.dir = CSH.dir; drawEquipPrev(); } catch (e) {} finally { document.getElementById = gi; EQ.tab = tab; EQ.try = tr; EQ.dir = dir; } }
+setInterval(() => { if (CSH.tab === 'fash' && winOpen('cshop')) cshDraw(); }, 90);   // wings flap, auras glow
+document.addEventListener('click', e => { const r = e.target.closest && e.target.closest('[data-cshrot]'); if (!r) return; CSH.dir = (CSH.dir + +r.dataset.cshrot + SPR.DIRS.length) % SPR.DIRS.length; cshDraw(); });
 /* anything bought elsewhere (robots, bag, other windows) refreshes the shop */
 window.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-rentpet],[data-bagx],[data-cosbuy]') && winOpen('cshop')) setTimeout(() => reWin('cshop'), 60); }, true);
 
@@ -165,7 +176,14 @@ html.gr-still #cshBtn i{animation:none}
 #pane-cshop .cshgem{font-size:34px;line-height:1;color:#2a8ae8;text-shadow:0 0 10px rgba(80,180,255,.7)}
 #pane-cshop .pack.t3 .cshgem,#pane-cshop .pack.t4 .cshgem{color:#a050e8;text-shadow:0 0 12px rgba(180,100,255,.75)}#pane-cshop .pack.t5 .cshgem{color:#e8a020;text-shadow:0 0 14px rgba(255,200,80,.9)}
 #pane-cshop .bonus{color:#d0501a;font-weight:800}
-@media (max-height:500px){#pane-cshop .cshtabs{width:92px}#pane-cshop .cshtabs button{padding:5px 7px;font-size:12px}#pane-cshop .cshgrid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}#pane-cshop .cshit .cosw{width:48px;height:48px}}`;
+#pane-cshop .cshfw{display:flex;gap:10px;align-items:flex-start}#pane-cshop .cshfr{flex:1;min-width:0}
+#pane-cshop .cshstage{position:sticky;top:0;flex:none;width:170px;display:flex;flex-direction:column;align-items:center;gap:5px;padding:8px;border-radius:14px;text-align:center;
+  background:radial-gradient(circle at 50% 38%,#fff6dc,#f3dfb0 60%,#e2c48a);box-shadow:inset 0 0 0 1.5px #d4b47a}
+#pane-cshop .cshstage canvas{width:150px;height:auto;aspect-ratio:76/92;image-rendering:auto}
+#pane-cshop .cshstage > b{font-size:13px;line-height:1.25;color:#3a2206}#pane-cshop .cshstage small{font-size:11px;color:#7a5a30}#pane-cshop .cshstage .ok{color:#1f8a4e;font-weight:800;font-size:12px}
+#pane-cshop .cshrot{display:flex;gap:30px}#pane-cshop .cshrot .ibtn{width:28px;height:28px;font-size:18px}
+#pane-cshop .cshit.sel{box-shadow:inset 0 0 0 2.5px #2a8ae8,0 0 10px rgba(80,180,255,.5)}
+@media (max-height:500px){#pane-cshop .cshstage{width:118px;padding:5px}#pane-cshop .cshstage canvas{width:100px}#pane-cshop .cshtabs{width:92px}#pane-cshop .cshtabs button{padding:5px 7px;font-size:12px}#pane-cshop .cshgrid{grid-template-columns:repeat(auto-fill,minmax(128px,1fr))}#pane-cshop .cshit .cosw{width:48px;height:48px}}`;
   document.head.appendChild(st); }
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'cshop', t:['ร้านค้าเหรียญวายรา', 'Vayra Coin Shop'], b:() => L(
   '<p>ปุ่ม ◈ ร้านค้า ข้างแผนที่เล็ก (หรือเมนู) · แยกหมวด: แฟชั่น (ปีก ส่วนหัว หน้ากาก ชุดเซต พาหนะ ◈30–300 ตามความอลังการ) · ของใช้ (ยาเคลือบ ลูกธนู/ดาวกระจายธาตุพิเศษ สว่านเพชร ยันต์คุ้มครอง) · หุ่นผู้ช่วยพรีเมียม · บริการ (ขยายกระเป๋า) · เติมเหรียญ (เร็ว ๆ นี้) · ชุดแฟชั่นลองดูได้ในตู้เสื้อผ้า แต่ใส่ออกไปข้างนอกต้องซื้อ</p>',
