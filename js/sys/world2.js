@@ -128,7 +128,8 @@ const PREY = /hare|deer|serow|fowl|squirrel|frog|rat|gecko|shrimp|crab|egret|gru
       if (m.preyOf && !m.preyOf.dead && m.preyOf.hunt === m){ const p = m.preyOf, dx = m.x - p.x, dy = m.y - p.y, l = Math.hypot(dx, dy) || 1;
         moveTo(m, m.x + dx / l * 40, m.y + dy / l * 40, d.speed * 1.15, dt); m.moving = true; m.dir = SPR.dirFromVec(dx, dy); pushOut(m, d.r * .6); return true; }
       // day creatures sleep at night (you can sneak by)
-      if (isNight() && !d.night && !m.elite && !m.hitT0 && dist(m, P) > 70){ m.moving = false; m.sleeping = true; m.atkT += dt; return true; }
+      // (v274) only about three in ten doze (the owner saw whole maps standing frozen at night); the rest roam as by day
+      if (isNight() && !d.night && !m.elite && !m.hitT0 && ((m.id | 0) % 10) < 3 && dist(m, P) > 70){ m.moving = false; m.sleeping = true; m.atkT += dt; return true; }
       if (m.sleeping){ m.sleeping = false; if (typeof emote === 'function') emote(m, 'alert'); }
     }
   });
