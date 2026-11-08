@@ -13,6 +13,7 @@ async function openGame({ width = 1280, height = 720, path = '', ctx = {} } = {}
   page.on('pageerror', e => errors.push('pageerror: ' + (e.stack || e.message)));
   page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|net::ERR_/.test(m.text())) errors.push('console.error: ' + m.text()); });
   await page.route(u => !u.href.startsWith(url), r => r.abort());   // offline: no Firebase, no web fonts
+  await page.addInitScript(() => { window.__VTEST__ = 1; });   // (v272) the hourly world boss / invasion do not turn up by the real clock in a test (a test can still force one)
   await page.goto(url + path);
   await page.waitForFunction(() => !!window.__vay, null, { timeout: 60000 });
   const close = async () => { await browser.close(); srv.close(); };

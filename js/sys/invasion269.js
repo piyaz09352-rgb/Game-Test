@@ -17,6 +17,7 @@ const INV_MIN = 45, INV_LEN = 10, INV_WARN = 5, INV_GOAL = 40, INV_PER = 25;
 const INV = {key:null, map:-1, tot:0, my:0, myDmg:0, acc:0, sendT:0, spawnT:0, boss:null, warned:{}, done:{}, bar:null, bossHp:1};
 function invWindow(){
   if (INV.forced && Date.now() < INV.forced.until) return {key:INV.forced.key, active:true, left:(INV.forced.until - Date.now()) / 6e4};
+  if (globalThis.__VTEST__) return null;   // (v272) automated tests: only a forced invasion
   const c = thaiClock(), now = c.m + c.s / 60, key = `${dayKey()}-${c.h}`;
   if (now >= INV_MIN && now < INV_MIN + INV_LEN) return {key, active:true, left:INV_MIN + INV_LEN - now};
   if (now >= INV_MIN - INV_WARN && now < INV_MIN) return {key, active:false, soon:INV_MIN - now};
