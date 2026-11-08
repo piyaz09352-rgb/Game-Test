@@ -68,9 +68,11 @@ function w3Tint(hex, hue, k, seed, force = 0){ const [h, s0, l0] = w3Hsl(hex); i
   const dh = ((hue - h + 540) % 360) - 180, nh = h + dh * k + (seed % 40 - 20), ns = clamp(s * (.85 + (seed % 7) * .06) + .08, 0, 1);
   return w3Hex(nh, ns, clamp(l + ((seed >> 3) % 9 - 4) * .02, .06, .94)); }
 function w3Look(look, hue, seed, force = 0){
+  const nat = look.head === 'croc';   // (v274) crocodiles get a real crocodile's colours (olive hide, cream belly, dark bands), only a little tinted by the region (teal or mint ones from the lava-drake template looked like toys)
+  if (nat){ look = {...look, skin:'#4f5a33', belly:'#d6cc98', stripe:'#2a3019'}; delete look.eyeGlow; }
   const o = {}; let i = 0;
   for (const k in look){ const v = look[k];
-    if (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v)){ o[k] = w3Tint(v, hue + (force ? i * 47 : 0), force ? .55 : i++ % 3 === 2 ? .45 : .75, (seed + i * 37) & 255, force); if (force) i++; }
+    if (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v)){ o[k] = w3Tint(v, hue + (force ? i * 47 : 0), nat ? .18 : force ? .55 : i++ % 3 === 2 ? .45 : .75, (seed + i * 37) & 255, nat ? 0 : force); if (nat) i++; if (force) i++; }
     else if (typeof v === 'number' && /^(len|size|girth|leg|thick|neckLen|legLen|bulk|beakLen|rise)$/.test(k)) o[k] = +(v * (.88 + ((seed + k.length * 13) % 25) / 100)).toFixed(2);
     else o[k] = Array.isArray(v) ? v.slice() : v; }
   return o;

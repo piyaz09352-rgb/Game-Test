@@ -518,6 +518,11 @@ const BEAST = (() => {
     const coat = (nn, t, part) => {
       const ang = Math.atan2(nn[0], nn[1]);
       if (part !== 'leg' && part !== 'tail' && nn[1] < -.42 && BE !== SK) return {m:BE};                       // pale underside
+      if (fam === 'croc' && part !== 'leg'){                                                                     // (v274) a crocodile's hide: dark crossbands and square scales, not a smooth loaf
+        if ((part === 'torso' || part === 'tail') && nn[1] > .05 && Math.sin(t * Math.PI * (part === 'tail' ? 7 : 5) + Math.sin(ang * 2) * .4) > .86) return {m:ST || DK};
+        const su = t * (part === 'tail' ? 30 : part === 'head' ? 14 : 24), sv = (ang + Math.PI) * (part === 'tail' ? 3.2 : 4.6);
+        if (Math.abs(su - Math.round(su)) < .09 || Math.abs(sv - Math.round(sv)) < .08) return {dt:1};
+        if (h3(Math.floor(su), Math.floor(sv), 11) > .86) return {dt:1}; }
       if (CV && part === 'torso' && t > .8 && nn[2] > .25 && nn[1] > -.15 && nn[1] < .6 && Math.abs(Math.abs(nn[0]) - (.6 - nn[1]) * .55) < .12) return {m:CV};   // the bear's chest crescent
       if (tiger && part !== 'head' || tiger && part === 'head' && nn[1] > .2){                                  // tiger stripes: narrow, forked, around the body
         const f = part === 'tail' ? 9 : part === 'leg' ? 5 : part === 'neck' ? 4 : 7.5, w = Math.sin((t + Math.sin(ang * 3 + t * 9) * .035) * Math.PI * f * 2);
@@ -545,7 +550,7 @@ const BEAST = (() => {
       let tt = y > .55 ? 0 : y > -.15 ? 1 : y > -.6 ? 2 : 3; tt = Math.max(0, Math.min(3, tt + (r.dt || 0))); if (DARKS.has(r.m) && tt < 2) tt = 2; return {m:r.m, t:tt}; };
     return (cx, act, f, n) => {
       const o = motion(act, f, n), walk = act === 'walk', ph = o.ph;
-      const yF = LL + rc * .55, yH = LL * .96 + rh * .5, by = (yF + yH) / 2;
+      const CR = fam === 'croc', yF = CR ? LL * .8 + rc * .3 : LL + rc * .55, yH = CR ? LL * .78 + rh * .28 : LL * .96 + rh * .5, by = (yF + yH) / 2;   // (v274) a crocodile's belly sits low, near the ground
       fallPre(cx, o, by);
       const T = p => [p[0], p[1] + o.bob * .6, p[2] + o.lun];
       const zc = Lb * .5, zh = -Lb * .5;
@@ -588,14 +593,18 @@ const BEAST = (() => {
       // torso: hips → waist → chest, one smooth chain
       // (v157) real torsos are deeper than they are wide: a back row and a belly row of smaller spheres instead of one
       // round barrel (which made bears, buffalo and elephants look like balloons); the back dips a little at the waist
-      { const k = .74, dy = .3, ch = (rh + rc) * .47, up = (p, r) => add(p, [0, r * dy, 0]), dn = (p, r) => add(p, [0, -r * dy, 0]);
+      if (CR){ const ch = (rh + rc) * .47, k = .66, sx = .44, L = (p, r) => add(p, [-r * sx, 0, 0]), R = (p, r) => add(p, [r * sx, 0, 0]);   // (v274) a crocodile is wide and flat, not a deep round loaf: two rows side by side
+        for (const [A, B, r0, r1, t0] of [[hip, mid, rh, ch, 0], [mid, chest, ch, rc, .5]]){ cx.gid = t0 ? 2 : 1;
+          for (const S of [L, R]) cap(cx, S(A, r0), S(B, r1), r0 * k, r1 * k, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'torso', t0 + t * .5)});
+          cap(cx, add(A, [0, r0 * .12, 0]), add(B, [0, r1 * .12, 0]), r0 * k * .92, r1 * k * .92, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'torso', t0 + t * .5)}); } }
+      else { const k = .74, dy = .3, ch = (rh + rc) * .47, up = (p, r) => add(p, [0, r * dy, 0]), dn = (p, r) => add(p, [0, -r * dy, 0]);
         cx.gid = 1; cap(cx, up(hip, rh), up(add(mid, [0, -F.dip * .4, 0]), ch), rh * k, ch * k, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'torso', t * .5)});
         cap(cx, dn(hip, rh), dn(mid, ch), rh * k * .96, ch * k * 1.02, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'torso', t * .5)});
         cx.gid = 2; cap(cx, up(add(mid, [0, -F.dip * .4, 0]), ch), up(chest, rc), ch * k, rc * k, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'torso', .5 + t * .5)});
         cap(cx, dn(mid, ch), dn(chest, rc), ch * k * 1.02, rc * k * .98, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'torso', .5 + t * .5)}); }
       if (F.hump){ cx.gid = 3; ell(cx, add(chest, [0, rc * .55, -rc * .5]), rc * .8, rc * .55, SK, {tex:nn => coat(nn, .8, 'torso')}); }
       if (F.dew){ cx.gid = 3; cap(cx, add(chest, [0, -rc * .3, rc * .5]), add(chest, [0, -rc * .95, rc * .35]), rc * .38, rc * .2, SK, {}); }   // the dewlap of cattle
-      if (F.scutes){ cx.gid = 4; for (let i = 0; i < 9; i++){ const k = i / 8, p = lerp3(hip, chest, k); for (const sd of [-1, 1]) ell(cx, add(p, [sd * .9, (k < .5 ? rh : rc) * .92, 0]), .7, .55, ST || DK, {}); } }
+      if (F.scutes){ cx.gid = 4; for (let i = 0; i < 13; i++){ const k = i / 12, p = lerp3(hip, chest, k), top = (k < .5 ? rh : rc) * (CR ? .72 : .9); for (const sd of [-1, 0, 1]) ell(cx, add(p, [sd * 1.25, top + (sd ? 0 : .25), 0]), sd ? .8 : .7, sd ? .62 : .72, CR ? SK : ST || DK, {rz:.9, tex:nn => (nn[1] > .55 ? {t:1} : nn[1] > 0 ? {t:2} : {t:3})}); } }   // (v274) three rows of raised bony plates
       if (F.ridge || s.ruff == null && MN && fam === 'boar'){ cx.gid = 4; for (let i = 0; i < 7; i++){ const k = i / 6, p = lerp3(hip, chest, .2 + k * .8); cap(cx, add(p, [0, (k < .5 ? rh : rc) * .85, 0]), add(p, [0, (k < .5 ? rh : rc) * .85 + 1.6 + k * 1.2, -.8]), .9, .3, MN || DK, {}); } }
       if (PL){ for (let i = 0; i < 7; i++){ const k = i / 6, p = lerp3(hip, chest, -.1 + k * 1.05), h = (2.2 + (1 - Math.abs(k - .45) * 1.8) * 3.6) * gir; cx.gid = 80 + i;   // stegosaur plates, staggered
         ell(cx, add(p, [(i % 2 ? .8 : -.8) * gir, (k < .5 ? rh : rc) * .8 + h * .55, 0]), .9 * gir, h, PL, {rz:h * 1.05, tex:nn => (Math.abs(nn[1]) > .82 ? {dt:1} : undefined)}); } }
@@ -610,7 +619,9 @@ const BEAST = (() => {
         for (let i = 1; i <= segs; i++){ const k = i / segs, sway = Math.sin(ph + k * 2.2) * (walk ? 1.2 : .7) * k;
           const droop = cat ? (s.tailUp ? 5 : -2 + k * k * 5) : fam === 'dog' ? (s.tailUp ? 4 : -1) : sprawl ? -(yH - 1) / k * Math.min(1, k * 1.6) : F.dino ? -yH * .35 * k : -tl * .7;
           const p1 = add(add(hip, [0, rh * .45, -rh * .8]), [sprawl ? Math.sin(ph * (walk ? 1 : .5) + k * 3) * 2.2 * k : sway, droop * k - (cat ? tl * .45 * Math.sin(k * 1.6) : 0), -tl * k * (cat ? .75 : sprawl || F.dino ? .95 : .45)]);
-          cap(cx, p0, p1, (t0 + (t1 - t0) * (k - 1 / segs)) * gir, (t0 + (t1 - t0) * k) * gir, i === segs && (s.tuft || fam === 'bovine') ? (MN || DK) : SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'tail', (i - 1 + t) / segs)}); p0 = p1; }
+          cap(cx, p0, p1, (t0 + (t1 - t0) * (k - 1 / segs)) * gir, (t0 + (t1 - t0) * k) * gir, i === segs && (s.tuft || fam === 'bovine') ? (MN || DK) : SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'tail', (i - 1 + t) / segs)});
+          if (fam === 'croc'){ const rr = (t0 + (t1 - t0) * k) * gir; for (let j = 0; j < 2; j++){ const q = lerp3(p0, p1, .25 + j * .5); for (const sd of (k < .55 ? [-1, 1] : [0])) ell(cx, add(q, [sd * rr * .45, rr * .95, 0]), .6 * (1.2 - k * .6), (1.1 - k * .5) * gir, ST || DK, {rz:.7}); } }   // (v274) the tail's double crest, a single one toward the tip
+          p0 = p1; }
         if (s.tuft || fam === 'bovine' || ele){ ell(cx, p0, (ele ? .9 : 1.4) * gir, (ele ? 1.3 : 1.8) * gir, MN || DK); }
         if (s.club){ ell(cx, p0, 2.8 * gir, 2 * gir, AC, {rz:2.6 * gir, tex:nn => (Math.sin(nn[0] * 11) * Math.sin(nn[2] * 9) > .5 ? {dt:1} : undefined)}); }   // an ankylosaur's tail club
         if (FT){ for (const sd of [-1, 1]) cap(cx, p0, add(p0, [sd * 3.6 * gir, 1.2, -3.2 * gir]), 1.6 * gir, .5, FT, {tex:nn => (Math.sin(nn[0] * 14) > .5 ? {dt:1} : undefined)}); } }   // a fish's tail fin
@@ -631,8 +642,9 @@ const BEAST = (() => {
         for (let i = 1; i <= 7; i++){ const k = i / 7, p1 = add(hd, [Math.sin(ph + k * 2) * k * .8, -hr * .25 - k * 13 * (1 - curl * .8) + k * k * (3 + curl * 12), hr * .75 + k * 2.6 + k * k * (1.5 + curl * 3) + o.lun * .2]);
           G(40 + i); cap(cx, p0, p1, (2.3 - k * 1.3) * Math.sqrt(gir), (2.3 - (k + 1 / 7) * 1.3) * Math.sqrt(gir), SK, {tex:(nn, lo, q, t) => (Math.sin((k + t / 7) * 70) > .6 ? {dt:1} : undefined)}); p0 = p1; } }
       else {
-        G(10); cap(cx, m0, m1, F.mr[0] * Math.sqrt(gir), F.mr[1] * Math.sqrt(gir), MZ, {tex:(nn, lo, q, t) => (fam === 'croc' && Math.abs(nn[1] + .05) < .1 && t > .1 ? {m:M.white, t:1} : F.flat && Math.abs(nn[1] + .05) < .07 ? {m:DK} : nn[1] < -.55 && t > .5 ? {dt:1} : t > .3 && nn[1] > .3 && MZ !== SK ? {m:SK} : undefined)});
+        G(10); cap(cx, m0, m1, F.mr[0] * Math.sqrt(gir), F.mr[1] * Math.sqrt(gir), MZ, {tex:(nn, lo, q, t) => (fam === 'croc' && Math.abs(nn[1] + .05) < .1 && t > .1 && Math.sin(t * 46) > -.1 ? {m:M.white, t:1} : fam === 'croc' && Math.abs(nn[1] + .05) < .1 ? {m:DK} : F.flat && Math.abs(nn[1] + .05) < .07 ? {m:DK} : nn[1] < -.55 && t > .5 ? {dt:1} : t > .3 && nn[1] > .3 && MZ !== SK ? {m:SK} : undefined)});
         if (F.flat){ for (const sd of [-1, 1]) ell(cx, add(m1, [sd * F.mr[1] * .35, F.mr[1] * .6, F.mr[1] * .2]), .3, .25, NO); }
+        if (fam === 'croc'){ G(13); for (const sd of [-1, 1]) ell(cx, add(hd, [sd * hr * .42, hr * .55, -hr * .05]), hr * .3, hr * .26, SK, {tex:nn => (nn[2] > .15 && nn[1] > -.1 && nn[1] < .7 ? {m:EY, t:0} : coat(nn, .45, 'head'))}); ell(cx, add(m1, [0, F.mr[1] * .5, F.mr[1] * .15]), F.mr[1] * .55, F.mr[1] * .35, SK, {}); }   // (v274) raised eyes on top of the head, a knob at the snout's tip
         else ell(cx, add(m1, [0, F.mr[1] * .35, F.mr[1] * .55]), F.mr[1] * (fam === 'boar' ? .95 : .62), F.mr[1] * (fam === 'boar' ? .8 : .45), NO);
         if (act === 'attack' && f === 2){ G(11); ell(cx, add(m1, [0, -F.mr[1] * .8, 0]), F.mr[1] * .7, F.mr[1] * .35, M.mouth); } }
       // ears
