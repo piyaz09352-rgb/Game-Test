@@ -43,3 +43,18 @@ test('helper robots: free and rented, pick-up speed, EXP bonus, old rentals refu
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no runtime errors');
 });
+
+test('the tutorial sends newcomers to take a free helper robot', { skip, timeout: 120000 }, async () => {
+  const { page, errors, close } = await openGame({ width: 1366, height: 768 });
+  try {
+    await enterWorld(page);
+    const r = await page.evaluate(async () => { const i = TUT.findIndex(s => s.npc === 'beastkeeper'); S.helper = null; S.helperFree = null; tutGo(i); await new Promise(r => setTimeout(r, 300));
+      const box = document.getElementById('tutBox'), out = {i, go:!!box.querySelector('[data-tutgo]')};
+      box.querySelector('[data-tutgo]').click(); for (let k = 0; k < 250 && !(el('dialog') && !el('dialog').hidden && el('dialog').dataset.npc === 'beastkeeper'); k++) advance(.1, false);
+      out.reached = el('dialog').dataset.npc === 'beastkeeper' && !el('dialog').hidden;
+      document.querySelector('#dialog [data-botfree="chip"]').click(); advance(.2, false); out.next = S.tut.i === i + 1; return out; });
+    assert.ok(r.i > 0 && r.go, 'a tutorial step with a «take me there» button');
+    assert.ok(r.reached, 'it walks you to Uncle Boonma'); assert.ok(r.next, 'taking a free robot finishes the step');
+  } finally { await close(); }
+  assert.deepStrictEqual(errors, [], 'no runtime errors');
+});
