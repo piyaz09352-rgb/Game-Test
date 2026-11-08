@@ -279,7 +279,7 @@ function villageGround(g){   // called inside buildTerrain() with the village tr
   for (let i = 0; i < 1600; i++){ const a = R() * 6.283, d = ARC.ring + (R() - .5) * 44, x = cx + Math.cos(a) * d, y = cy + Math.sin(a) * d;
     g.fillStyle = R() < .5 ? 'rgba(100,70,40,.4)' : 'rgba(240,210,160,.3)'; g.beginPath(); g.ellipse(x, y, .8 + R() * 1.4, .6 + R(), R() * 3, 0, 7); g.fill(); }
   // swept patches in front of the shops
-  for (const [, type, , x, y] of VPLAN){ if (type === 'storymat') continue; g.fillStyle = 'rgba(232,206,150,.55)'; g.beginPath(); g.ellipse(X(x), y + 26, 58, 22, 0, 0, 7); g.fill(); }
+  // (v274) the owner had the swept patches (light ellipses in front of each shop) taken away
   // the court round the temple: a round paved plaza in the middle
   disc(150, 'rgba(196,160,108,.55)');
   g.strokeStyle = 'rgba(140,100,60,.35)'; g.lineWidth = 2; g.beginPath(); g.arc(cx, cy, 150, 0, 7); g.stroke();

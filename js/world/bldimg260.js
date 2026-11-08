@@ -44,8 +44,9 @@ function bimgClinic(){ if (typeof MAP_ID === 'undefined' || MAP_ID !== 0 || (typ
     const n = NPCS.find(o => o.id === 'healer_oon'); if (!n || PROPS.some(p => p.type === 'healerhut')) return;
     const x = n.x, y = n.y - 26;
     // clear trees, bushes and small things where the clinic stands (buildings stay)
-    const keep = new Set(['vshop', 'sala', 'armytent', 'house', 'shrine', 'tbld', 'tland', 'lamp']);
-    for (let i = PROPS.length - 1; i >= 0; i--){ const p = PROPS[i]; if (keep.has(p.type)) continue; const im = propImg(p.type, p.variant), half = (im.w || 40) / 2;
+    const keep = new Set(['vshop', 'armytent', 'house', 'shrine', 'tbld', 'tland', 'lamp']);   // (v274) the old pavilion (sala) behind the clinic goes: the owner saw two buildings
+    for (let i = PROPS.length - 1; i >= 0; i--){ const p = PROPS[i]; if (keep.has(p.type)) continue;
+      if (p.type === 'sala' && Math.hypot(p.x - x, p.y - y) < 120){ PROPS.splice(i, 1); for (let j = obstacles.length - 1; j >= 0; j--) if (obstacles[j].prop === p) obstacles.splice(j, 1); continue; } const im = propImg(p.type, p.variant), half = (im.w || 40) / 2;
       if (Math.abs(p.x - x) < 70 + half && p.y > y - 130 && p.y - (im.ay || 40) < y + 6){ PROPS.splice(i, 1); for (let j = obstacles.length - 1; j >= 0; j--) if (obstacles[j].prop === p) obstacles.splice(j, 1); } }
     addProp('healerhut', x, y); }
 EV.on('map', () => setTimeout(bimgClinic, 0)); EV.on('tick', () => { if (typeof MAP_ID !== 'undefined' && MAP_ID === 0 && !(PROPS || []).some(p => p.type === 'healerhut')) bimgClinic(); });
