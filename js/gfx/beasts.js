@@ -241,6 +241,7 @@ const BEAST = (() => {
     const SH = mat(key, 'shell', s.shell), LG = mat(key, 'leg', s.leg) ?? SH, AC = mat(key, 'acc', s.acc) ?? SH, EY = s.eyeGlow ? emis(key, 'eye', s.eyeGlow) : M.slimeE;
     const kind = s.kind || 'crab', sz = s.size ?? 1, DKB = mat(key, 'bugdark', s.tipCol || '#1e1814');
     if (kind === 'hornet' || kind === 'wasp' || kind === 'bee') return flyer(key, s, kind, SH, LG, AC, EY, DKB, sz);
+    if (kind === 'beetle') return beetle(key, s, SH, LG, AC, EY, DKB, sz);
     return (cx, act, f, n) => {
       const o = motion(act, f, n), by = (kind === 'spider' ? 7 : 5) * sz;
       fallPre(cx, o, by);
@@ -335,6 +336,52 @@ const BEAST = (() => {
       for (const sd of [-1, 1]) for (const [fore, zb, len] of [[1, 2.6, 10], [0, 1.2, 7]]){ cx.gid = 50 + (sd > 0 ? 1 : 0) + (fore ? 2 : 0);
         const base = T([sd * 1.4, H + 2.8, zb]), tip = add(base, [sd * len * .8 * sz, up * len * .3 * sz + .8 * sz, -len * .5 * sz]);   // spread out to the side, not up like ears
         for (const [dw, r1] of [[0, 1.05], [-.12, .9], [.1, .85], [-.22, .6]]){ const t2 = add(tip, [0, dw * len * .5 * sz, dw * len * sz]); cap(cx, base, t2, .3 * sz, r1 * sz, WG, {step:.4, tex:(nn, lo, q, t) => (t > .25 && (Math.abs(nn[1]) < .1 || Math.abs(t - .7) < .03) ? {m:VN} : undefined)}); } }
+      cx.pre = null;
+    };
+  }
+
+  /* ---------------- (v274) beetles from life: the owner found the old stick legs unnatural ----------------
+     a low, heavy body: small head with jaws and short clubbed antennae, a domed shield (pronotum), and the hard wing
+     cases (elytra) over the abdomen, meeting in a straight seam down the back, glossy and finely grooved. Six short,
+     thick legs jointed at the knee: the thigh (femur) goes out and up from under the body, the shin (tibia, with small
+     spurs) comes down to the ground, a short foot (tarsus) with a claw; front legs reach forward, hind legs back, and
+     they walk in the insect tripod (front and back on one side with the middle on the other). The giant water bug gets
+     its grasping forelegs, a flat body and paddle hind legs. */
+  function beetle(key, s, SH, LG, AC, EY, DKB, sz){
+    const EL = SH, wb = key === 'waterbug', LK = clamp(s.legLen ?? 1, .85, 1.15), EYE = s.eyeGlow ? EY : DKB;
+    return (cx, act, f, n) => {
+      const o = motion(act, f, n), walk = act === 'walk', by = wb ? 3 : 3.8, fl = wb ? .62 : 1;
+      fallPre(cx, o, by);
+      const T = p => [p[0] * sz, (p[1] + o.bob * .25) * sz, p[2] * sz + o.lun];
+      // legs: far side first is handled by depth; tripod gait
+      for (let i = 0; i < 3; i++) for (const sd of [-1, 1]){ cx.gid = 1 + i * 2 + (sd > 0 ? 1 : 0);
+        const ph = ((i + (sd > 0 ? 1 : 0)) % 2) * Math.PI, sw = walk ? Math.sin(o.ph * 2 + ph) : Math.sin(o.ph) * .15, lift = walk ? Math.max(0, Math.cos(o.ph * 2 + ph)) * 1.2 : 0;
+        const z = [4, 1.4, -1.4][i], dz = [2.2, 0, -2.4][i], fz = [3.6, -.4, -4.6][i];
+        const cox = T([sd * 2.4, by - 1, z]);
+        if (wb && i === 0){   // a water bug's front legs: thick grasping arms folded forward, the shin closing on the thigh
+          const kn = T([sd * 3.8, by + .8, z + 3.4]), cl = T([sd * 2.6, by - .6 + (act === 'attack' ? [0, 1, -1, 0][f] : 0), z + 6.4]);
+          cap(cx, cox, kn, 1.2, 1.05, LG, {}); cap(cx, kn, cl, .8, .4, LG, {}); cap(cx, cl, add(cl, [-sd * .6 * sz, -.4 * sz, .8 * sz]), .35, .12, DKB, {}); continue; }
+        const kn = T([sd * 5.4 * LK, by + .7 + lift * .5, z + dz + sw * .9]), ft = T([sd * 7.2 * LK, .45 + lift, z + fz + sw * 1.6]);
+        cap(cx, cox, kn, 1.1, .9, LG, {tex:nn => (nn[1] > .5 ? {t:1} : undefined)});   // the thick thigh, catching the light on top
+        ell(cx, kn, .78 * sz, .72 * sz, LG, {tex:() => ({t:2})});                        // the knee
+        if (wb && i === 2){ ell(cx, lerp3(kn, ft, .55), 1 * sz, .35 * sz, LG, {rz:2.6 * sz}); cap(cx, kn, ft, .7, .5, LG, {}); continue; }   // a swimming paddle
+        cap(cx, kn, ft, .72, .48, LG, {});
+        for (const k of [.4, .75]){ const q = lerp3(kn, ft, k); cap(cx, q, add(q, [sd * .7 * sz, .2 * sz, -.3 * sz]), .22, .06, DKB, {}); }   // spurs on the shin
+        const toe = add(ft, [sd * .5 * sz, 0, (i === 2 ? -1.2 : 1.2) * sz]); cap(cx, ft, toe, .38, .2, DKB, {}); cap(cx, toe, add(toe, [sd * .35 * sz, -.2, (i === 2 ? -.5 : .5) * sz]), .18, .06, DKB, {}); }
+      // the wing cases over the abdomen: a straight seam, fine grooves, a glossy top
+      cx.gid = 20; ell(cx, T([0, by + 1.3 * fl, -2.8]), 6.2 * sz, 4.4 * fl * sz, EL, {rz:7.6 * sz, tex:nn => (Math.abs(nn[0]) < .035 && nn[1] > -.1 ? {m:DKB, t:2} : nn[1] > .82 && Math.abs(nn[0] - .25) < .18 ? {t:0} : Math.abs(Math.sin(nn[0] * 26)) < .12 && nn[1] > .1 ? {dt:1} : nn[1] < -.35 ? {m:LG, t:3} : undefined)});
+      // the shield behind the head
+      cx.gid = 21; ell(cx, T([0, by + 1.2 * fl, 4.4]), 4.7 * sz, 3.1 * fl * sz, SH, {rz:3.2 * sz, tex:nn => (nn[1] > .78 && nn[0] < .1 ? {t:0} : nn[2] < -.55 ? {m:DKB, t:2} : AC !== SH && nn[1] > .3 && Math.abs(nn[0]) < .12 ? {m:AC} : undefined)});
+      // the head: eyes at the sides, jaws, short elbowed antennae with a club
+      const hd = T([0, by + .5 * fl, 7.6]); cx.gid = 22; ell(cx, hd, 2.6 * sz, 1.9 * fl * sz, SH, {rz:2.1 * sz, tex:nn => (nn[1] > .3 ? {dt:1} : undefined)});
+      for (const sd of [-1, 1]){ cx.gid = 23 + (sd > 0 ? 1 : 0); ell(cx, add(hd, [sd * 2 * sz, .3 * sz, .3 * sz]), .8 * sz, .9 * sz, EYE, {tex:nn => (nn[1] > .4 ? {t:0} : {t:1})});
+        cx.gid = 25 + (sd > 0 ? 1 : 0); const op = act === 'attack' ? [.2, .9, -.3, .4][f] : .2, j0 = add(hd, [sd * 1 * sz, -.6 * sz, 1.6 * sz]), j1 = add(j0, [sd * (.6 + op) * sz, -.1, 1.6 * sz]);
+        cap(cx, j0, j1, .6, .35, DKB, {}); cap(cx, j1, add(j1, [-sd * .9 * sz, -.1, .8 * sz]), .35, .1, DKB, {});   // a curved jaw
+        if (!wb){ cx.gid = 27 + (sd > 0 ? 1 : 0); const a0 = add(hd, [sd * 1.5 * sz, .6 * sz, 1.4 * sz]), a1 = add(a0, [sd * 1.4 * sz, .5 * sz, 1.6 * sz]), a2 = add(a1, [sd * 1.2 * sz, 1.1 * sz, .9 * sz]);
+          cap(cx, a0, a1, .26, .22, DKB, {}); cap(cx, a1, a2, .22, .2, DKB, {}); ell(cx, a2, .55 * sz, .5 * sz, DKB, {}); } }
+      if (s.horn){ cx.gid = 30; const h0 = add(hd, [0, 1.2 * sz, .6 * sz]), h1 = add(h0, [0, 4 * sz, 2.4 * sz]), h2 = add(h1, [0, 1.6 * sz, -1.4 * sz]); cap(cx, h0, h1, 1.3 * sz, .8 * sz, AC, {}); cap(cx, h1, h2, .8 * sz, .2, AC, {}); }   // a rhinoceros beetle's horn
+      if (s.spines){ for (let i = 0; i < 4; i++){ cx.gid = 31 + i; const b = T([0, by + 1.3 * fl + 4.2 * fl, -6 + i * 2.6]); ell(cx, b, .8 * sz, .7 * sz, AC, {}); } }   // a row of knobs down the seam
+      if (s.crown){ cx.gid = 36; const b = add(hd, [0, 1.6 * sz, 0]); frustum(cx, b, b[1] + 2.4 * sz, b[1], 1.6 * sz, 2.2 * sz, M.gold, {tex:(nn, kk) => (kk > .8 ? {m:M.gem} : undefined)}); }
       cx.pre = null;
     };
   }
