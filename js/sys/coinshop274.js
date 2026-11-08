@@ -134,7 +134,11 @@ function cshPlace(){ const b = document.getElementById('cshBtn'), m = document.g
   const show = S && S.job && !(typeof sq272Busy === 'function' && sq272Busy()) && !(typeof PHOTO !== 'undefined' && PHOTO.on); b.hidden = !show; if (!show || !m) return;
   const ui = document.getElementById('ui') || document.body, r = m.getBoundingClientRect(), ur = ui.getBoundingClientRect(), k = ui.offsetWidth ? ur.width / ui.offsetWidth : 1;   // the UI may be scaled (phones)
   const mw = r.width / k, z = clamp(mw / 175, .72, 1);   // as tall as a third of the minimap card, about
-  b.style.setProperty('--z', z.toFixed(2)); b.style.left = `${Math.round((r.left - ur.left) / k - 62 * z - 8)}px`; b.style.top = `${Math.round((r.top - ur.top) / k)}px`;
+  b.style.setProperty('--z', z.toFixed(2)); let x = (r.left - ur.left) / k - 62 * z - 8, y = (r.top - ur.top) / k;
+  /* (v274) on touch screens the folded menu sits just left of the minimap: never on top of it — go under it, right edges lined up */
+  const rl = document.getElementById('rail'); if (rl && rl.offsetParent !== null){ const q = rl.getBoundingClientRect(), qx0 = (q.left - ur.left) / k, qx1 = (q.right - ur.left) / k, qy0 = (q.top - ur.top) / k, qy1 = (q.bottom - ur.top) / k;
+    if (x < qx1 && x + 62 * z > qx0 && y < qy1 && y + 62 * z > qy0 && qy1 < (r.bottom - ur.top) / k){ x = qx1 - 62 * z; y = qy1 + 10; } }
+  b.style.left = `${Math.round(x)}px`; b.style.top = `${Math.round(y)}px`;
   const n = document.getElementById('cshBtnN'), v = fmtN(cshCoins()); if (n && n.textContent !== v) n.textContent = v; }
 setInterval(() => { try { cshPlace(); } catch (e) {} }, 500); window.addEventListener('resize', () => setTimeout(cshPlace, 50));
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('#cshBtn'); if (!b) return; e.stopPropagation(); if (winOpen('cshop')) closeWin('cshop'); else { openWin('cshop'); WIN_RENDER.cshop(); } }, true);
