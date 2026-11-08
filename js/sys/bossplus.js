@@ -67,7 +67,7 @@ function bpKit(id){
   else if (a === 'quad') kit.push(...(lk.head === 'cat' || lk.head === 'dog' || lk.head === 'bear' ? ['pounce', 'rend'] : ['stampede', 'trample']));
   else if (a === 'bird') kit.push('feather', 'gust');
   else if (a === 'serpent') kit.push('torrent', 'venom');
-  else if (a === 'bug') kit.push('web', 'venom');
+  else if (a === 'bug') kit.push(/^(hornet|wasp|bee)$/.test(lk.kind || '') ? 'gust' : 'web', 'venom');   // (v274) a hornet or bee queen beats up a gale with her wings instead of spinning webs
   else if (a === 'squat') kit.push('shell', 'torrent');
   else if (a === 'floater') kit.push('shadowstep', 'boltvolley');
   else if (a === 'slime') kit.push('split', 'acid');

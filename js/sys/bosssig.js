@@ -19,7 +19,7 @@ const SIG = {
   aikhiam:['หางฟาดน้ำวน', 'Whirlpool Tail', 'vortex', '90,170,220'],
   marketmatron:['ตะกร้าผีสาป', 'Cursed Basket', 'curse', '170,120,255'],
   dvarapala:['กระบองถล่มธรณี', 'Earthshaker Club', 'quake', '230,180,110'],
-  cavematriarch:['ใยมรณะ', 'Web of Death', 'web', '230,230,240'],
+  cavematriarch:['พุ่งเหล็กในมรณะ', 'Death Sting Dive', 'pounce', '255,190,90'],
   saming:['เงาสมิงตะครุบ', 'Saming\'s Phantom Pounce', 'pounce', '255,170,60'],
   elderpop:['คำสาปปอบ', 'Curse of the Pop', 'curse', '150,255,140'],
   khankhak:['ฝนพญาคันคาก', 'Rain of the Toad King', 'meteor', '120,200,255'],
@@ -40,7 +40,7 @@ const SIG = {
   ashwolfking:['เขี้ยวเถ้าตะครุบ', 'Ash Fang Pounce', 'pounce', '200,190,180'],
   agnilord:['อัคนีพิโรธ', 'Wrath of Agni', 'meteor', '255,90,30'],
   iceturtlelord:['ธารน้ำแข็งคลืบคลาน', 'Creeping Glacier', 'quake', '170,230,255'],
-  frostqueen:['ใยเยือกแข็ง', 'Frozen Web', 'web', '190,235,255'],
+  frostqueen:['ฝูงผึ้งน้ำแข็ง', 'Ice Swarm', 'meteor', '190,235,255'],
   mammothking:['ช้างศึกถล่มน้ำแข็ง', 'Mammoth Avalanche', 'quake', '210,235,255'],
   snowking:['พายุหิมะราชา', 'The Snow King\'s Blizzard', 'pillars', '220,245,255'],
   asuraking:['อสูรวัชระ', 'Vajra of the Asura', 'pillars', '255,80,120']

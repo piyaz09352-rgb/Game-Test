@@ -47,7 +47,7 @@ const W3_NOUN = {
   'quad:bear':['หมี', 'Bear'], 'quad:bovine':['กระทิง', 'Gaur'], 'quad:cat':['เสือ', 'Cat'], 'quad:croc':['จระเข้', 'Crocodile'], 'quad:deer':['กวาง', 'Stag'], 'quad:dog':['หมาป่า', 'Wolf'],
   'quad:elephant':['ช้าง', 'Elephant'], 'quad:horse':['ม้า', 'Steed'], 'quad:lizard':['ตะกวด', 'Lizard'], 'quad:-':['สัตว์ร้าย', 'Beast'],
   'bird:fan':['ไก่ฟ้า', 'Pheasant'], 'bird:long':['นกหางยาว', 'Longtail'], 'bird:short':['นกน้อย', 'Finch'], 'bird:-':['เหยี่ยว', 'Hawk'],
-  'bug:beetle':['ด้วง', 'Beetle'], 'bug:crab':['ปู', 'Crab'], 'bug:scorpion':['แมงป่อง', 'Scorpion'], 'bug:shrimp':['กุ้ง', 'Shrimp'], 'bug:spider':['แมงมุม', 'Spider'], 'bug:-':['แมลง', 'Bug'],
+  'bug:beetle':['ด้วง', 'Beetle'], 'bug:crab':['ปู', 'Crab'], 'bug:scorpion':['แมงป่อง', 'Scorpion'], 'bug:shrimp':['กุ้ง', 'Shrimp'], 'bug:spider':['แมงมุม', 'Spider'], 'bug:hornet':['ต่อ', 'Hornet'], 'bug:wasp':['แตน', 'Wasp'], 'bug:bee':['ผึ้ง', 'Bee'], 'bug:-':['แมลง', 'Bug'],
   'floater:jar':['ผีไห', 'Jar Spirit'], 'floater:krasue':['กระสือ', 'Krasue'], 'floater:lantern':['โคมผี', 'Lantern'], 'floater:mask':['หน้ากากผี', 'Mask'], 'floater:pearl':['ภูตมุก', 'Pearl Spirit'],
   'floater:squid':['หมึกลอยฟ้า', 'Sky Squid'], 'floater:star':['ภูตดาว', 'Star Wisp'], 'floater:vortex':['วังวน', 'Vortex'], 'floater:wisp':['ภูต', 'Wisp'], 'floater:-':['วิญญาณ', 'Spirit'],
   'human:bow':['นักธนู', 'Archer'], 'human:staff':['หมอผี', 'Shaman'], 'human:sword':['นักรบ', 'Warrior'], 'human:-':['อสูร', 'Fiend'],
@@ -113,7 +113,7 @@ function WORLD_MORE(){
     for (const pass of [0, 1]) for (const t of pool){ if (mobsOut.length >= quota) break; const s = SP[t], sub = w3Sub(s[4], s[5]); if (pass === 0 && seen.has(sub)) continue; if (mobsOut.some(m => m.t === t)) continue; seen.add(sub); mobsOut.push({t, s}); }
     const ids = mobsOut.map(({t, s}, i) => {
       const [, , , , arch, look, el0, race, size, x] = s, seed = w3Hash(key + t), [nth, nen] = w3Noun(arch, look);
-      let sid = `${key}_${nen.toLowerCase().replace(/[^a-z]/g, '')}`; while (used.has(sid)) sid += 'x'; used.add(sid);
+      let sid = `${key}_${['hornet', 'wasp', 'bee'].includes(look.kind) ? 'spider' : nen.toLowerCase().replace(/[^a-z]/g, '')}`;   /* (v274) the spiders became hornets and wasps: their ids stay, so saves and quests still find them */ while (used.has(sid)) sid += 'x'; used.add(sid);
       const elm = i % 5 < 3 ? elem : el0, xx = {...x}; if (i % 4 === 0) xx.aggro = true; delete xx.night;
       let vth = '', ven = '', vi = 0; while (usedNm.has(`${aen} ${ven}${nen}`)){ [vth, ven] = W3_VAR[vi++ % W3_VAR.length]; ven += ' '; } usedNm.add(`${aen} ${ven}${nen}`);
       SPECIES.push([sid, `${nth}${vth}${ath}`, `${aen} ${ven}${nen}`, 0, arch, w3Unique(arch, look, hue, seed), elm, race, size, xx]);

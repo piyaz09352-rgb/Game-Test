@@ -8,7 +8,7 @@
 'use strict';
 
 const DUNGEONS = [
-  {id:'cave', base:6, min:10, th:'ถ้ำเงาเชียงดาว', en:'Shadow Caves of Chiang Dao', d:['ค้างคาวและแมงมุมในถ้ำมืด ราชินีแมงมุมรออยู่ลึกสุด', 'Bats and spiders in the dark; the Spider Matriarch waits at the bottom']},
+  {id:'cave', base:6, min:10, th:'ถ้ำเงาเชียงดาว', en:'Shadow Caves of Chiang Dao', d:['ค้างคาวและฝูงต่อในถ้ำมืด นางพญาต่อรออยู่ลึกสุด', 'Bats and hornets in the dark; the Hornet Queen waits at the bottom']},
   {id:'badan', base:17, min:40, th:'วังบาดาลนาคา', en:'Naga Underpalace', d:['วังใต้บาดาลที่นาคราชกริ้วโกรธ', 'The palace beneath the earth where the Naga King rages']},
   {id:'meru', base:20, min:80, th:'หอคอยอสูรเขาพระสุเมรุ', en:'Asura Spire of Mount Meru', d:['ด่านสุดท้ายก่อนถึงราชาอสูร', 'The last trial before the Asura King']}];
 DUNGEONS.forEach(d => { d.name = d.th; });

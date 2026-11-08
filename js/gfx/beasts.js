@@ -240,6 +240,7 @@ const BEAST = (() => {
   function bug(key, s){
     const SH = mat(key, 'shell', s.shell), LG = mat(key, 'leg', s.leg) ?? SH, AC = mat(key, 'acc', s.acc) ?? SH, EY = s.eyeGlow ? emis(key, 'eye', s.eyeGlow) : M.slimeE;
     const kind = s.kind || 'crab', sz = s.size ?? 1, DKB = mat(key, 'bugdark', s.tipCol || '#1e1814');
+    if (kind === 'hornet' || kind === 'wasp' || kind === 'bee') return flyer(key, s, kind, SH, LG, AC, EY, DKB, sz);
     return (cx, act, f, n) => {
       const o = motion(act, f, n), by = (kind === 'spider' ? 7 : 5) * sz;
       fallPre(cx, o, by);
@@ -281,6 +282,59 @@ const BEAST = (() => {
           cx.gid = 64 + sd; ell(cx, T([sd * (9 + up * 6), by / sz + 8 + up * 6, -6]), 4.2 * sz, .5 * sz, mat(key, 'membrane', '#e8e0d0'), {rz:7 * sz}); } }
       if (s.spines){ for (let i = 0; i < 5; i++){ cx.gid = 66 + i; const b = T([0, by / sz + (kind === 'spider' ? 7.5 : 5), -7 + i * 3]); cap(cx, b, add(b, [0, (4.5 - Math.abs(i - 2)) * sz, -1.2 * sz]), 1.1 * sz, .2, AC, {}); } }
       if (s.shellHouse){ cx.gid = 50; ell(cx, T([0, by / sz + 6, -4]), 8, 8, mat(key, 'house', s.shellHouse), {tex:nn => (Math.sin(Math.atan2(nn[0], nn[2]) * 4 + nn[1] * 6) > .5 ? {dt:1} : undefined)}); }
+      cx.pre = null;
+    };
+  }
+
+  /* ---------------- (v274) hornet / wasp / bee: the owner's call, replacing the spiders ----------------
+     drawn from the insect's real anatomy: a head with big kidney-shaped compound eyes, jaws and elbowed antennae;
+     a round thorax carrying two pairs of wings (the fore wing longer) and three pairs of jointed legs (femur, tibia,
+     tarsus — the hind pair longest) hanging under it as it hovers; a wasp's narrow waist (a bee's is thick and furry);
+     a banded abdomen in segments that curls under to sting. The wings beat every frame, the body hovers and bobs. */
+  function flyer(key, s, kind, SH, LG, AC, EY, DKB, sz){
+    const WG = ramp(`${key}_wingm`, s.wingCol || '#c8dce8', {noEdge:true}), VN = mat(key, 'wingvein', s.veinCol || '#8a7a5a'), bee = kind === 'bee', hor = kind === 'hornet';
+    const EYE = s.eyeGlow ? EY : mat(key, 'cmpeye', s.eyeCol || (hor ? '#3a1a10' : '#1e1a20')), PO = bee ? mat(key, 'pollen', '#f0a830') : null;
+    const ab = bee ? [3.6, 4.3, 4.1, 3.3, 2.1] : hor ? [3.0, 3.9, 3.8, 3.0, 1.7] : [2.4, 3.3, 3.2, 2.5, 1.3];   // abdomen segment radii, waist to tip
+    return (cx, act, f, n) => {
+      const o = motion(act, f, n), atk = act === 'attack', H = 14 + Math.sin(o.ph * 2) * 1.2;
+      fallPre(cx, o, H);
+      const T = p => [p[0] * sz, (p[1] + o.bob * .4) * sz, p[2] * sz + o.lun];
+      const fuzz = (nn, k) => (h3(Math.floor((nn[0] + 2) * 11), Math.floor((nn[1] + 2) * 11) + k, 3) > .7 ? {dt:1} : undefined);
+      // legs (under the body, far pairs first)
+      for (let i = 2; i >= 0; i--) for (const sd of [-1, 1]){ cx.gid = 1 + i * 2 + (sd > 0 ? 1 : 0);
+        // in flight the legs are folded: the femur out and forward, the tibia back under the body; only the hind pair hangs lower
+        const sw = Math.sin(o.ph * 2 + i * 1.3 + (sd > 0 ? 1 : 0)) * .35, z0 = 3.2 - i * 1.4, L = i === 2 ? 1 : i === 1 ? .7 : .55;
+        const hip = T([sd * 1.6, H - 2.3, z0]), knee = T([sd * (3 + i * .3), H - 3.6 + sw * .3, z0 + 1.2 - i * .9]);
+        const ankle = T([sd * (3.2 + i * .4), H - 3.6 - 3.4 * L, z0 - .8 - i * 1.5 + sw]), foot = T([sd * (3.4 + i * .4), H - 3.6 - 3.4 * L - 1.2, z0 - 1.6 - i * 1.6 + sw]);
+        cap(cx, hip, knee, .85, .62, LG, {tex:nn => (nn[1] > .4 ? {t:1} : undefined)}); ell(cx, knee, .62 * sz, .62 * sz, DKB, {});   // femur and the knee joint
+        cap(cx, knee, ankle, .55, bee && i === 2 ? .95 : .42, LG, {});
+        if (PO && i === 2) ell(cx, lerp3(knee, ankle, .65), 1.2 * sz, 1.5 * sz, PO, {rz:1 * sz});   // a bee's pollen basket
+        cap(cx, ankle, foot, .36, .2, DKB, {}); }
+      // the abdomen: banded segments from the waist back, drooping a little, curling under to sting
+      const curl = atk ? [0, .35, 1, .3][f] : .08 + Math.sin(o.ph) * .05;
+      let prev = T([0, H - .4, bee ? -1.6 : -2.8]);
+      if (!bee){ cx.gid = 20; cap(cx, T([0, H - .2, -1.4]), prev, .7, .6, SH, {}); }   // the narrow waist (petiole)
+      const segs = []; for (let i = 0; i < 5; i++){ const k = (i + 1) / 5, a = curl * k * 1.6;
+        const p = add(prev, [0, -Math.sin(a) * 2.2 * sz - .35 * sz, -Math.cos(a) * (bee ? 1.9 : 2.3) * sz]); segs.push([p, ab[i]]); prev = p; }
+      for (let i = 0; i < 5; i++){ const [p, r] = segs[i]; cx.gid = 21 + i;
+        ell(cx, p, r * sz, r * .92 * sz, SH, {rz:r * .8 * sz, tex:nn => (nn[2] < -.25 + (i === 4 ? -.5 : 0) ? {m:AC, t:nn[1] > .4 ? 1 : 2} : bee ? fuzz(nn, i) : (nn[1] > .55 ? {t:0} : undefined))}); }
+      { const [tip] = segs[4], dir = curl > .5 ? [0, -1.6, .4] : [0, -.6, -1.8]; cx.gid = 27; cap(cx, tip, add(tip, dir.map(v => v * sz)), .45 * sz, .08, DKB, {}); }   // the sting
+      // the thorax
+      cx.gid = 30; ell(cx, T([0, H, 1.8]), 3.5 * sz, 3.3 * sz, bee ? AC : SH, {rz:3.6 * sz, tex:nn => (bee ? fuzz(nn, 9) : hor && nn[1] > .3 && Math.abs(nn[0]) < .35 ? {m:AC, t:2} : !bee && nn[1] > .2 && Math.abs(Math.abs(nn[0]) - .55) < .08 ? {m:AC} : undefined)});
+      if (bee){ cx.gid = 31; ell(cx, T([0, H + .6, 3.2]), 3.2 * sz, 2.6 * sz, SH, {rz:2.4 * sz, tex:nn => fuzz(nn, 4)}); }   // the bee's furry collar
+      // the head: compound eyes, jaws, elbowed antennae
+      const hd = T([0, H + .7, 6.3]); cx.gid = 40;
+      ell(cx, hd, 3.1 * sz, 2.9 * sz, SH, {rz:2.4 * sz, tex:nn => (nn[2] > .3 && nn[1] < .1 && Math.abs(nn[0]) < .4 ? {m:hor ? SH : AC, t:1} : undefined)});
+      for (const sd of [-1, 1]){ cx.gid = 41 + (sd > 0 ? 1 : 0); ell(cx, add(hd, [sd * 2.2 * sz, .4 * sz, .3 * sz]), 1.25 * sz, 2.3 * sz, EYE, {rz:1.5 * sz, tex:nn => (nn[1] > .5 && nn[2] > 0 ? {t:0} : {t:1})});
+        cx.gid = 43 + (sd > 0 ? 1 : 0); const j0 = add(hd, [sd * .9 * sz, -2 * sz, 1.6 * sz]), op = atk ? [.2, .8, -.2, .3][f] : .15; cap(cx, j0, add(j0, [sd * (.4 + op) * sz, -1 * sz, 1.2 * sz]), .55 * sz, .2 * sz, DKB, {});
+        cx.gid = 45 + (sd > 0 ? 1 : 0); const a0 = add(hd, [sd * .8 * sz, 1.9 * sz, 1.9 * sz]), el = add(a0, [sd * .5 * sz, 2.6 * sz, .6 * sz]), at = add(el, [sd * (2 + Math.sin(o.ph * 2 + sd) * .4) * sz, .8 * sz, 3.2 * sz]);
+        cap(cx, a0, el, .38 * sz, .3 * sz, DKB, {}); cap(cx, el, at, .3 * sz, .22 * sz, DKB, {}); }
+      if (s.crown){ cx.gid = 48; const b = add(hd, [0, 2.6 * sz, -.3 * sz]); frustum(cx, b, b[1] + 2.6 * sz, b[1], 1.8 * sz, 2.4 * sz, M.gold, {tex:(nn, kk) => (kk > .8 ? {m:M.gem} : undefined)}); }
+      // two pairs of wings, beating: up on even frames, down on odd (a blur of two wing positions reads as buzzing)
+      const up = atk ? (f % 2 ? -1 : 1) : (f % 2 ? -.8 : 1);
+      for (const sd of [-1, 1]) for (const [fore, zb, len] of [[1, 2.6, 10], [0, 1.2, 7]]){ cx.gid = 50 + (sd > 0 ? 1 : 0) + (fore ? 2 : 0);
+        const base = T([sd * 1.4, H + 2.8, zb]), tip = add(base, [sd * len * .8 * sz, up * len * .3 * sz + .8 * sz, -len * .5 * sz]);   // spread out to the side, not up like ears
+        for (const [dw, r1] of [[0, 1.05], [-.12, .9], [.1, .85], [-.22, .6]]){ const t2 = add(tip, [0, dw * len * .5 * sz, dw * len * sz]); cap(cx, base, t2, .3 * sz, r1 * sz, WG, {step:.4, tex:(nn, lo, q, t) => (t > .25 && (Math.abs(nn[1]) < .1 || Math.abs(t - .7) < .03) ? {m:VN} : undefined)}); } }
       cx.pre = null;
     };
   }

@@ -11,7 +11,7 @@ const BOSS_LINES = {
   aikhiam:[['ไอ้เคี่ยมฟาดหางจนน้ำแตกกระจาย: "แม่น้ำนี้ไม่มีใครข้ามได้!"', 'Ai Khiam lashes its tail: "No one crosses my river!"'], ['ไอ้เคี่ยมจมหายลงใต้สายน้ำ…', 'Ai Khiam sinks beneath the current…']],
   marketmatron:[['นางพรายแม่ค้าหัวเราะคิกคัก: "ของดีราคาถูก… แลกด้วยชีวิตเจ้า!"', 'The Wraith Matron cackles: "Bargain prices… paid with your life!"'], ['"ตลาด… วายแล้ว…"', '"The market… is closed…"']],
   dvarapala:[['ทวารบาลยักษ์ศิลาสะเทือนทั้งวัด: "ผู้ใดล่วงล้ำเขตศักดิ์สิทธิ์!"', 'The Stone Dvarapala shakes the temple: "Who trespasses on holy ground!"'], ['ศิลาร้าว… ทวารบาลหลับใหลอีกครั้ง', 'The stone cracks… the guardian sleeps again']],
-  cavematriarch:[['พญาแมงมุมถ้ำมืดพ่นใย: "ลูก ๆ ของข้า ออกมา!"', 'The Cave Matriarch spits silk: "My children, come out!"'], ['ใยขาดผึง… ถ้ำมืดเงียบงัน', 'The web snaps… the dark cave falls silent']],
+  cavematriarch:[['นางพญาต่อถ้ำมืดกระพือปีกเสียงหึ่งก้อง: "ลูก ๆ ของข้า ออกมาจากรัง!"', 'The Hornet Queen\'s wings drone through the cave: "My children, out of the nest!"'], ['ปีกหยุดกระพือ… ถ้ำมืดเงียบงัน', 'The wings fall still… the dark cave goes silent.']],
   saming:[['เสือสมิงคำรามกึกก้องดอย: "เนื้อมนุษย์… หอมนัก!"', 'Saming roars across the highlands: "Human flesh… how sweet!"'], ['"มนตร์สมิง… เสื่อมแล้ว…"', '"The werething spell… is broken…"']],
   elderpop:[['ผีปอบเฒ่าแสยะยิ้ม: "ตับเจ้า… ข้าขอนะ"', 'Elder Pop grins: "Your liver… I\'ll take it"'], ['ผีปอบเฒ่าสลายเป็นควันดำ', 'Elder Pop dissolves into black smoke']],
   khankhak:[['พญาคันคากร้องอ๊บก้องฟ้า: "ฝนจงตก ฟ้าจงร้อง!"', 'Phaya Khankhak croaks to the sky: "Let rain fall, let thunder roar!"'], ['"ข้าแพ้… แต่ฝนยังต้องตก"', '"I fall… but the rain must still come"']],
@@ -32,7 +32,7 @@ const BOSS_LINES = {
   ashwolfking:[['ราชาหมาป่าเถ้าหอนเรียกฝูง: "ฝูงข้า! ล่ามัน!"', 'The Ash Wolf King howls: "My pack! Hunt it down!"'], ['เสียงหอนสุดท้ายจางหายในเถ้าถ่าน', 'The last howl fades into the ashes']],
   agnilord:[['จอมเวทอัคนีลอยเหนือปล่องไฟ: "เผาให้มอดไหม้!"', 'Agni rises over the crater: "Burn to cinders!"'], ['"ไฟ… ไม่มีวันดับ…"', '"The fire… never dies…"']],
   iceturtlelord:[['พญาเต่าน้ำแข็งกระทืบจนน้ำแข็งแตก: "เย็นยะเยือก… เหมือนหัวใจข้า"', 'The Ice Turtle Lord stomps the ice: "Cold… like my heart"'], ['พญาเต่าน้ำแข็งหลับไปใต้ทะเลสาบ', 'The Ice Turtle Lord sleeps beneath the lake']],
-  frostqueen:[['ราชินีแมงมุมน้ำแข็งถักใยเยือกแข็ง: "ติดอยู่ในใยข้าชั่วนิรันดร์!"', 'The Frost Spider Queen weaves frozen silk: "Caught in my web forever!"'], ['ใยน้ำแข็งแตกละเอียดเป็นเกล็ดหิมะ', 'The ice web shatters into snowflakes']],
+  frostqueen:[['ราชินีผึ้งน้ำแข็งเรียกฝูงผึ้งผลึก: "ไม่มีใครแตะรวงของข้าได้!"', 'The Frost Bee Queen calls her crystal swarm: "None shall touch my comb!"'], ['เสียงหึ่งของฝูงผึ้งเงียบลง… ถ้ำนิรันดร์เย็นยะเยือก', 'The swarm\'s hum dies away… the eternal cave is cold and still.']],
   mammothking:[['พญาช้างแมมมอธชูงาคู่: "ธารน้ำแข็งพันปีจะทับเจ้า!"', 'The Mammoth King raises his tusks: "A thousand years of ice will crush you!"'], ['พญาช้างแมมมอธทรุดลงบนหิมะ', 'The Mammoth King sinks into the snow']],
   snowking:[['พญาหิมะเรียกพายุ: "ฤดูหนาวไม่มีวันสิ้นสุด!"', 'The Snow King calls a storm: "Winter never ends!"'], ['"ฤดูใบไม้ผลิ… มาถึงแล้วสินะ"', '"So… spring has come"']],
   asuraking:[['ราชาอสูรไวราแผดเสียง: "สวรรค์จะต้องเป็นของข้า!"', 'Vaira roars: "Heaven shall be mine!"'], ['"ประตูสวรรค์… ไม่ใช่ของข้า…"', '"The gate of heaven… was never mine…"']]

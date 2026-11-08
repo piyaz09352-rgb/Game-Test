@@ -64,6 +64,7 @@ function mskFor(k){
     serpent:['spit', 'coil'], floater:['nova', 'hex']}[a] || ['rend'];
   const byWeapon = {sword:['rend', 'slam'], bow:['snare', 'volley'], staff:['bolt', 'mend'], fist:['slam', 'pounce']}[wp];
   out.push(...(byWeapon || byBody));
+  if (a === 'bug' && typeof SPECIES !== 'undefined'){ const r = SPECIES.find(x => x[0] === k); if (r && /^(hornet|wasp|bee)$/.test(r[5].kind || '')) out[0] = 'dive'; }   // (v274) hornets and wasps fly: they dive and sting, no webs
   const lv = d.lvl || 1, i = Object.keys(MOB).indexOf(k);
   if (race === 'undead' || race === 'demon') out[1] = i % 2 ? 'hex' : 'hush';
   else if (race === 'angel') out[1] = 'mend';
