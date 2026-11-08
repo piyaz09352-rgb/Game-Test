@@ -35,7 +35,9 @@ function gr270Tag(root){
   for (const s of (root && root.querySelectorAll ? root : document).querySelectorAll('.eqsl')){ const m = /eqsl-(\w+)/.exec(s.className); if (m && s.dataset.gs !== m[1]) s.dataset.gs = m[1] === 'acc2' ? 'acc' : m[1]; }
 }
 { let pend = false; const run = () => { pend = false; try { gr270Tag(document); } catch (e) {} };
-  new MutationObserver(() => { if (!pend){ pend = true; requestAnimationFrame(run); } }).observe(document.documentElement, {childList:true, subtree:true}); }
+  // (v271) at most a few times a second, and only for changes that can hold item cells (the HUD and chat change every frame)
+  const rel = m => { const t = m.target; return t && t.nodeType === 1 && !t.closest('#invBar,#chatLog,.chatlist,#hud,#goal,#syschat,.dmgnum'); };
+  new MutationObserver(ms => { if (pend || !ms.some(rel)) return; pend = true; requestAnimationFrame(run); }).observe(document.getElementById('ui') || document.documentElement, {childList:true, subtree:true}); }
 
 /* the looks */
 { const P = 'html body', B = `${P} #ui#ui.ui .bslot.grx.grx`, E = `${P} #ui.ui .eqsl`, R = [
@@ -152,7 +154,9 @@ function gr270Dress(root){
     c.insertAdjacentHTML('afterbegin', '<gr-x class="grbig"></gr-x><gr-x class="grcorner a"></gr-x><gr-x class="grcorner b"></gr-x>');
     const s = c.querySelector('.gdx-band span'); if (s) s.dataset.stars = '★'.repeat(r + 1); }
 }
-{ let pend = false; new MutationObserver(() => { if (pend) return; pend = true; requestAnimationFrame(() => { pend = false; try { gr270Dress(document); } catch (e) {} }); }).observe(document.documentElement, {childList:true, subtree:true}); }
+{ let pend = false; new MutationObserver(() => { if (pend) return; pend = true; requestAnimationFrame(() => { pend = false; try { gr270Dress(document); } catch (e) {} }); }).observe(document.getElementById('ui') || document.documentElement, {childList:true, subtree:true}); }
 /* follow the graphics preset (Low = still frames) */
 { const still = () => { try { document.documentElement.classList.toggle('gr-still', typeof GFX !== 'undefined' && GFX.preset === 'low'); } catch (e) {} };
   still(); setInterval(still, 1500); }
+// item cards shown outside the UI root (a floating tip) are picked up by a slow pass
+setInterval(() => { try { if (document.querySelector('.gdx[data-gs]:not(:has(> .grbig))')) gr270Dress(document); } catch (e) {} }, 700);

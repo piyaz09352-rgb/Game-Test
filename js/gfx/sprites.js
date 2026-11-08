@@ -1927,7 +1927,7 @@ let MOB_PAD = globalThis.SPR_MOB_PAD ?? .3;
 // render scale: sprites are rasterised at K pixels per world unit, then drawn back at world size
 const kOf = (kind, key) => {   // sprites are rasterised at the quality preset's density (see GFX)
   // (v268) bosses are drawn 1.6–2.6× their sheet: rasterise them that much denser, or they show as coarse blocks
-  const m = kind === 'mob' && typeof MOB !== 'undefined' && MOB[key]; return m && m.boss ? GFX.k * Math.min(2, Math.max(1.4, m.bsz || 1.8)) : GFX.k; };
+  const m = kind === 'mob' && typeof MOB !== 'undefined' && MOB[key]; return m && m.boss ? GFX.k * (GFX.budget >= 40e6 ? 1.4 : GFX.budget >= 20e6 ? 1.2 : 1) : GFX.k; };   // (v271) a boss is sharper only as far as the picture cache allows: at 1.8× one boss's strips (×3.2 pixels) filled the cache and everything was painted again and again
 function newCanvas(w, h){ if (typeof OffscreenCanvas !== 'undefined' && !globalThis.__SPR_DOM) return new OffscreenCanvas(w, h); const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
 function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
   if (kind === 'char'){

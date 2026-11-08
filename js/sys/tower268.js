@@ -30,7 +30,7 @@ if (_t267Pick) t267Pick = function(){ const q = T268.q; if (q && typeof TW !== '
 function t268Paint(){
   if (typeof TW === 'undefined' || !TW.active || !T268.todo || !T268.todo.length || typeof SPR === 'undefined' || !SPR.prime) return;
   const t0 = performance.now();
-  let ms = TW.phase === 'rest' ? 14 : 3;
+  let ms = TW.phase === 'rest' ? 14 : 3; if (typeof frame271Budget === 'function') ms = frame271Budget(ms);   // (v271) less on a slow device
   while (T268.todo.length && performance.now() - t0 < ms){ const [k, act, dir, nf] = T268.todo[0], sh = SHEETS[k];
     if (!sh || SPR.prime(sh, [act], ms - (performance.now() - t0), dir, nf)) T268.todo.shift(); }
 }

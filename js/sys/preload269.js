@@ -6,6 +6,9 @@
    The tower keeps its own painter (tower268). */
 'use strict';
 const PRE269 = {todo:[], seen:new Set(), t0:0};
+/* (v271) how long the display's frames take on this device: the painters take less when the device is already slow */
+const FRAME271 = globalThis.FRAME271 || (globalThis.FRAME271 = (() => { const o = {ema:16, last:0}; const f = now => { if (o.last) o.ema += (Math.min(100, now - o.last) - o.ema) * .08; o.last = now; requestAnimationFrame(f); }; requestAnimationFrame(f); return o; })());
+const frame271Budget = ms => FRAME271.ema > 30 ? Math.max(.8, ms * .15) : FRAME271.ema > 22 ? Math.max(1, ms * .3) : FRAME271.ema > 18 ? ms * .6 : ms;
 function pre269Queue(kinds, passes, front){
   const add = [];
   for (const p of passes) for (const k of kinds){ const id = k + '|' + p.join(','); if (PRE269.seen.has(id) || typeof SHEETS === 'undefined' || !SHEETS || !SHEETS[k]) continue; PRE269.seen.add(id); add.push([k, ...p]); }
@@ -16,7 +19,7 @@ const PRE269_FAR = [['idle', 0, 1], ['idle', -1, 99], ['walk', -1, 99]];
 const pre269Kinds = mp => mp ? [...new Set([...(mp.mobs || []), ...(mp.boss ? [mp.boss] : [])])].filter(k => typeof MOB !== 'undefined' && MOB[k]) : [];
 function pre269Map(id){
   const mp = MAPS[id]; if (!mp) return;
-  PRE269.todo = []; PRE269.seen.clear(); PRE269.t0 = performance.now(); PRE269.far = [];
+  PRE269.todo = []; PRE269.seen.clear(); PRE269.t0 = performance.now(); PRE269.far = []; PRE269.farOn = false;
   pre269Queue(pre269Kinds(mp), PRE269_NEAR);
   for (const d in mp.links || {}){ const to = MAPS[mp.links[d]]; if (to) PRE269.far.push(...pre269Kinds(to)); }
 }
@@ -28,10 +31,11 @@ function pre269Paint(){
   if (typeof mobs !== 'undefined') for (const m of mobs){ if (!m || m.dead || !m.type) continue; const id = m.type + '|idle,0,1'; if (!PRE269.seen.has(id)) pre269Queue([m.type], PRE269_NEAR, true); }
   if (!PRE269.todo.length && PRE269.far && PRE269.far.length){
     const px = SPR.STATS ? SPR.STATS.px : 0, cap = typeof GFX !== 'undefined' && GFX.budget ? GFX.budget * .7 : Infinity;
-    if (px < cap) pre269Queue([...new Set(PRE269.far)], PRE269_FAR); PRE269.far = [];
+    const hub = MAP_ID === 0 || (typeof isTown === 'function' && isTown(MAP_ID));   // (v271) in a town only one standing frame each: you are shopping, not fighting
+    if (px < cap) pre269Queue([...new Set(PRE269.far)], hub ? [['idle', 0, 1]] : PRE269_FAR); PRE269.far = []; PRE269.farOn = true;
   }
   if (!PRE269.todo.length) return;
-  const t0 = performance.now(), ms = t0 - PRE269.t0 < 2500 ? 10 : 4;   // a bigger share just after arriving
+  const t0 = performance.now(), ms = frame271Budget(PRE269.farOn ? 1.5 : t0 - PRE269.t0 < 2500 ? 10 : 4);   // a bigger share just after arriving (less on a slow device)
   while (PRE269.todo.length && performance.now() - t0 < ms){ const [k, act, dir, nf] = PRE269.todo[0], sh = SHEETS[k];
     if (!sh || SPR.prime(sh, [act], ms - (performance.now() - t0), dir, nf)) PRE269.todo.shift(); }
 }
