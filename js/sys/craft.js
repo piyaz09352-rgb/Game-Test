@@ -90,7 +90,7 @@ WIN_RENDER.craft = function(){
       : `<p class="empty">${L('ยังไม่มีอุปกรณ์', 'No equipment yet')}</p>`;
   }
   pane.innerHTML = `<div class="wktabs">${tabs.map(([k, th, en]) => `<button class="wktab${CRAFT.tab === k ? ' on' : ''}" data-ctab="${k}"><span>${L(th, en)}</span></button>`).join('')}</div>
-    ${CRAFT.tab === 'gear' || CRAFT.tab === 'use' ? `<label class="wkq">${tabIcon('eye')}<input id="crQ" placeholder="${L('ค้นหาสูตร…', 'Search recipes…')}" value="${escH(CRAFT.q)}" autocomplete="off"></label>` : ''}${body}${CRAFT.tab === 'use' ? `<p class="hint">${L('ยาฟื้นฟูและยันต์ ให้หมอเพ็งที่ตลาดกลางปรุงให้ · ยาบำรุงก็ที่นั่น', 'Potions and talismans: Herbalist Pheng at the central market brews them, and tonics too')}</p>` : ''}`;
+    ${CRAFT.tab === 'gear' || CRAFT.tab === 'use' ? `<label class="wkq">${tabIcon('eye')}<input id="crQ" placeholder="${L('ค้นหาสูตร…', 'Search recipes…')}" value="${escH(CRAFT.q)}" autocomplete="off"></label>` : ''}${body}${CRAFT.tab === 'use' ? `<p class="hint">${L('ยาฟื้นฟู ให้หมอเพ็งที่ตลาดกลางปรุงให้ · ยาบำรุงก็ที่นั่น', 'Potions: Herbalist Pheng at the central market brews them, and tonics too')}</p>` : ''}`;
   const q = el('crQ'); if (q){ q.addEventListener('input', () => { CRAFT.q = q.value.toLowerCase(); const p = q.selectionStart; WIN_RENDER.craft(); const n = el('crQ'); n.focus(); n.setSelectionRange(p, p); }); q.addEventListener('keydown', e => e.stopPropagation()); }
 };
 document.addEventListener('click', e => {

@@ -25,6 +25,7 @@ test('tower: 100 floors, Lv 3f monsters, the top ends the climb as a win', { ski
         if (typeof TWF !== 'undefined' && TWF.chests) TWF.chests.length = 0;
         const dl = el('dialog'); if (dl && !dl.hidden && typeof closeDialog === 'function') closeDialog(); else if (dl && !dl.hidden) dl.hidden = true;
         if (typeof DG3 !== 'undefined') DG3.boonOpen = false;
+        if (typeof TWM !== 'undefined' && TWM.open && TW.phase === 'rest') twmClimb();   // (v273) the next floor waits for the door
         advance(.1, false); await new Promise(r => setTimeout(r, 0)); }
       return {active:TW.active, end:TW.end, f:TW.f, best:twSt().best, inDg:DG.active}; });
     assert.ok(!end.active && end.end && end.end.why === 'top', 'the climb ended at the top ' + JSON.stringify(end));

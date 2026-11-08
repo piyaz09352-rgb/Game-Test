@@ -14,21 +14,22 @@ test('tower: climb floors, guardian on floor 5, leave, best floor and checkpoint
     assert.ok(r0.ok && r0.dg && r0.tw, 'a run starts inside the dungeon instance');
     assert.ok(/^dg-tw/.test(r0.room), 'a private room of its own');
     await page.waitForFunction(() => TW.phase === 'fight' && mobs.some(m => m.tw && !m.dead), null, { timeout: 15000 });
-    const lv1 = await page.evaluate(() => mobs.find(m => m.tw && !m.dead).def.lvl);
-    assert.strictEqual(lv1, 6, 'floor 1 monsters are Lv 6');
+    const lv1 = await page.evaluate(() => [mobs.find(m => m.tw && !m.dead).def.lvl, twLvC(1)]);
+    assert.ok(lv1[0] >= lv1[1] && lv1[0] <= lv1[1] + 1, `floor 1 monsters are Lv ${lv1[1]} (an elite +1): ${lv1[0]}`);
     // clear floors 1..4 by hand
     const killAll = () => page.evaluate(() => { for (const m of mobs) if (m.dg && !m.dead){ m.hp = 0; m.dead = true; } S.hp = DER.maxhp; if (typeof TWF !== 'undefined' && TWF.kind === 'survive' && TWF.f === TW.f) TW.t = .5; });   // (v226) a survive floor ends when its time is up
     for (let f = 1; f <= 4; f++){
       await page.waitForFunction(n => TW.f === n && TW.phase === 'fight', f, { timeout: 15000 });
       await killAll();
       await page.waitForFunction(n => TW.f === n + 1, f, { timeout: 15000 });
+      await page.waitForFunction(() => TWM.open || TW.phase === 'fight', null, { timeout: 15000 }); await page.evaluate(() => { if (TWM.open) twmClimb(); });   // (v273) walk through the door
     }
     await page.waitForFunction(() => TW.f === 5 && TW.phase === 'fight', null, { timeout: 15000 });
     const g = await page.evaluate(() => ({boss:mobs.some(m => m.tw && !m.dead && m.def.boss), lab:questTracker().includes('หอคอย') || questTracker().includes('Tower')}));
     assert.ok(g.boss, 'floor 5 brings a guardian'); assert.ok(g.lab, 'the quest card shows the climb');
     await killAll();
     await page.waitForFunction(() => TW.f === 6 && TW.phase === 'rest', null, { timeout: 15000 });
-    await page.evaluate(() => { TW.restT = Math.min(TW.restT, .2); });   // (v235) no blessing: the stairs open, skip the wait
+    await page.evaluate(() => { if (TWM.open) twmClimb(); else TW.restT = Math.min(TW.restT, .2); });   // (v273) the next floor waits for the door: step through it   // (v235) no blessing: the stairs open, skip the wait
     await page.waitForFunction(() => TW.f === 6 && TW.phase === 'fight', null, { timeout: 20000 });
     const mid = await page.evaluate(() => ({best:S.tower.best, boons:Object.keys(P.buffs).filter(k => k.startsWith('dgb_')).length}));
     assert.strictEqual(mid.best, 5, 'the best floor is kept'); assert.strictEqual(mid.boons, 0, 'no blessing in the tower (v235)');

@@ -56,7 +56,6 @@ function openNpc(n){
         return `<div class="srow"><span class="ic">${itemIcon(k)}</span><div class="nm"><b>${nm(ITEMS[k])} <span class="ct">×${S.inv[k]}</span></b><small class="${r >= 1.1 ? 'up' : r <= .9 ? 'down' : ''}">${r >= 1 ? '▲' : '▼'} ${Math.round(r * 100)}% · ${L('ชิ้นละ', 'each')} ${pr.toLocaleString()} ${CUR()}</small></div>
         <button class="btn sm" data-sellid="${k}" data-n="1">×1</button><button class="btn sm" data-sellid="${k}" data-n="all">${L('ทั้งหมด', 'All')}</button></div>`; }).join('')
       : `<p class="hint">${L('ยังไม่มีของสะสมจะขาย', 'No loot to sell yet')}</p>`}</div>
-      <div class="sec">${L('ของใช้เดินทาง', 'Travel supplies')}</div><div class="shop"><div class="srow"><span class="ic">${itemIcon('talisman')}</span><div class="nm"><b>${nm(ITEMS.talisman)}</b><small>${itemDesc('talisman')} · ${L('มี', 'have')} ${(S.inv.talisman || 0).toLocaleString()}</small></div><span class="pr">${ITEMS.talisman.buy.toLocaleString()}</span>${qtyBox('talisman', 'item')}</div></div>
 `;
   } else if (n.id === 'armorer'){
     say = L('เกราะ หมวก กางเกง รองเท้า โล่ ต่างหู แว่น หน้ากาก ลูกธนู ของดีทั้งนั้น ใส่แล้วกด Q ดูในหน้าต่างอุปกรณ์ได้เลย', 'Armour, helmets, arrows, all good work. Wear them from the Equipment window (Q).');
@@ -84,7 +83,7 @@ function openNpc(n){
         <span class="pr">${gr.buy.toLocaleString()}<small> /${L('ห่อ', 'pack')}</small></span>${qtyBox(id, 'pack')}</div>`; };
     say = L('มาแล้วเหรอหลาน ยาหม้อใหม่เพิ่งต้มเสร็จ ร้านป้าขายแต่ยากับโพชั่นนะ จะเอากี่ขวดก็บอกมา', 'Back again, dear? A fresh pot of medicine just finished brewing. I sell only medicine and potions: tell me how many bottles you need.');
     body = `<div class="sec">${L('ซื้อ', 'Buy')}</div><div class="shop">${row('redpot', '#ff7b6b')}${row('orangepot', '#ffa04a')}${row('whitepot', '#f0f0f0')}${row('elixirpot', '#ffd36a')}${row('divinepot', '#ff9ad8')}${row('bluepot', '#7fb4ff')}${row('bigbluepot', '#4a7aff')}${row('skypot', '#5aa8ff')}${ITEMS.greenpot ? row('greenpot', '#7fe08a') : ''}${ITEMS.sizepot ? row('sizepot', '#a868f0') : ''}${ITEMS.garudafeather ? row('garudafeather', '#ffc83a') : ''}</div>
-      <p class="hint">${L('ร้านยาขายแต่ยาและโพชั่น · ยันต์กลับบ้านอยู่ที่เถ้าแก่ฮง ตลาดกลาง · ลูกธนูและอุปกรณ์อยู่ที่ช่างตีเหล็กเพชร', 'Potions only · the Return Talisman is at Thaokae Hong\'s market · arrows and gear at Blacksmith Phet')}</p></div>`;
+      <p class="hint">${L('ร้านยาขายแต่ยาและโพชั่น · ยาเคลือบอาวุธซื้อด้วยเหรียญวายรา · ลูกธนูและอุปกรณ์อยู่ที่ช่างตีเหล็กเพชร · กลับเมืองฟรีที่ผู้เฝ้าศาลทุกแคมป์', 'Potions only · weapon oils cost Vayra Coins · arrows and gear at Blacksmith Phet · go home free at any camp\'s Shrine Keeper')}</p></div>`;
   }
   // quests: Master Vayra gives chapter 0, every shrine keeper gives its map's chapter and bounty
   if (n.id === 'job' || n.id === 'warp'){ const qd = questDialog(n); if (n.id === 'warp'){ body = qd.h + body; if (qd.say) say = qd.say; } else { body += qd.h; if (qd.say && (jobChangeBlock() || !JOBS[S.job].next)) say = qd.say; } }

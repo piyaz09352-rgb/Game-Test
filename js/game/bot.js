@@ -159,7 +159,11 @@ function updBot(dt){
     }
   }
   // out of potions and hurt → back to the village
-  if (hp < BOT_CFG.retreatHp && !hpPot && MAP_ID !== 0 && S.inv.talisman && P.itemCd <= 0 && !threats().length){ useItem('talisman'); return; }
+  // (v273) no Return Talisman any more: walk to this map's Shrine Keeper and warp home for free
+  if (hp < BOT_CFG.retreatHp && !hpPot && MAP_ID !== 0){ const k = NPCS.find(x => x.id === 'warp');
+    if (k && !threats().length){ BOT.state = 'retreat'; if (P.sit) P.sit = false; P.target = null; P.pending = null;
+      if (Math.hypot(k.x - P.x, k.y - P.y) < 70){ warpTo(0); return; }
+      if (!P.ride){ P.ride = true; renderHotbar(); } P.tx = k.x; P.ty = k.y + 40; renderBotChip(); return; } }
   if (hp < BOT_CFG.retreatHp && !hpPot && MAP_ID === 0 && !inVillage(P)){
     BOT.state = 'retreat'; if (P.sit) P.sit = false;
     P.target = null; P.pending = null; if (!P.ride && th.length === 0){ P.ride = true; renderHotbar(); }

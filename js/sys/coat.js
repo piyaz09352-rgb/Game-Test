@@ -81,4 +81,4 @@ if (typeof LIVE !== 'undefined' && LIVE.drawOver && typeof rfNear === 'function'
     return r; }; }
 
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'coat', t:['ยาเคลือบธาตุ', 'Weapon oils'], b:() => `<p>${L('ทาอาวุธให้เป็นธาตุนั้น 10 นาที (เวลาจริง) · โจมตีปกติ ลูกธนู ดาวกระจาย และสกิลที่ไม่มีธาตุของตัวเองเปลี่ยนเป็นธาตุนั้น · สกิลที่มีธาตุอยู่แล้วคงธาตุเดิม · ทาใหม่แทนอันเก่า', 'Coats the weapon in an element for 10 minutes (real time) · normal attacks, arrows, stars and skills without an element of their own take it · skills with their own element keep it · a new coat replaces the old one')}</p>
-  <p>${COAT_EL.map(e => `${nm(ITEMS['coat_' + e])} ${COAT_PRICE[e].toLocaleString()}`).join(' · ')} ${L('เบี้ย ที่ร้านยาป้าบัวคำ · มอนธาตุนั้นดรอปได้ (บอส 15%)', 'Bia at the potion shop · monsters of that element drop them (bosses 15%)')}</p>`});
+  <p>${COAT_EL.map(e => `${nm(ITEMS['coat_' + e])} ◈ ${typeof COIN272 !== 'undefined' ? COIN272['coat_' + e] : COAT_PRICE[e]}`).join(' · ')} ${L('เหรียญวายรา ที่ร้านยาป้าบัวคำ · มอนธาตุนั้นดรอปได้ (บอส 15%)', 'Vayra Coins at the potion shop · monsters of that element drop them (bosses 15%)')}</p>`});

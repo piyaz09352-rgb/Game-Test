@@ -59,7 +59,7 @@ const QUESTS = STORY_ORDER.map((m, i) => {
     title:[`บทที่ ${i}: ${mp.name}`, `Chapter ${i}: ${mp.en}`], story:STORY[m],
     goals:[{k:'kill', t:a, n}, {k:'kill', t:b, n}, {k:'item', t:mat, n:5}, {k:'boss', t:mp.boss, n:1}],
     reward:{bia:500 + mp.lv[0] * 150, exp:Math.round(nextBase(Math.max(1, mp.lv[0])) * .8), jexp:Math.round(nextJob(Math.min(40, Math.max(1, Math.round(mp.lv[0] / 4)))) * 2),
-      items:[[mp.lv[0] < 30 ? 'redpot' : mp.lv[0] < 70 ? 'orangepot' : mp.lv[0] < 130 ? 'whitepot' : 'elixirpot', 10], ['bluepot', 5], ['talisman', 2]], shard:i}};
+      items:[[mp.lv[0] < 30 ? 'redpot' : mp.lv[0] < 70 ? 'orangepot' : mp.lv[0] < 130 ? 'whitepot' : 'elixirpot', 10], ['bluepot', 5], ['redpot', 10]], shard:i}};
 });
 ITEMS.shard = {name:'ศิลาผนึกวายรา', en:'Vayra Seal Shard', kind:'key', desc:[`เศษศิลาผนึกโบราณ รวบรวมให้ครบ ${MAPS.length} ชิ้น`, `A shard of the ancient seal. Gather all ${MAPS.length}.`]};
 

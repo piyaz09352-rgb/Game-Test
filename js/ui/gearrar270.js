@@ -127,6 +127,15 @@ ${P} .gdx.r0[data-gs] .gdx-band span,${P} #ui#ui .gdx.r0[data-gs] .gdx-band span
 ${P} .gdx[data-gs] .gdx-band span::after,${P} #ui#ui .gdx[data-gs] .gdx-band span::after{content:attr(data-stars) !important;margin-left:8px;font-size:12px;color:#ffe680 !important;-webkit-text-fill-color:#ffe680 !important;opacity:1 !important;letter-spacing:2px;
   text-shadow:0 0 2px #7a4a00,0 0 8px rgba(255,220,120,.95) !important;vertical-align:0 !important}
 ${P} .gdx.r0[data-gs] .gdx-band{background:linear-gradient(90deg,#5a3a18,#a87a44 30%,#e8c890 50%,#a87a44 70%,#5a3a18) !important}
+/* (v273) the owner: the card must be symmetric — stars on both sides of the rarity word, the word in the middle, the big
+   type picture centred behind the card, the refine level pinned to the right edge, the footer clear of the corner marks */
+${P} .gdx[data-gs] .gdx-band{justify-content:center !important;text-align:center}
+${P} .gdx[data-gs] .gdx-band em{position:absolute;right:10px;top:50%;transform:translateY(-50%)}
+${P} .gdx[data-gs] .gdx-band span::before,${P} #ui#ui .gdx[data-gs] .gdx-band span::before{content:attr(data-stars) !important;margin:0 8px 0 0 !important;font-size:12px !important;color:#ffe680 !important;-webkit-text-fill-color:#ffe680 !important;opacity:1 !important;letter-spacing:2px;
+  text-shadow:0 0 2px #7a4a00,0 0 8px rgba(255,220,120,.95) !important;vertical-align:0 !important}
+${P} .gdx[data-gs] .gdx-band span::after,${P} #ui#ui .gdx[data-gs] .gdx-band span::after{margin:0 0 0 8px !important}
+${P} .gdx[data-gs] > .grbig{left:50% !important;right:auto !important;top:50% !important;transform:translate(-50%,-50%);width:150px;height:150px;opacity:.08}
+${P} .gdx[data-gs] .gdx-foot{padding-left:16px !important;padding-right:16px !important}
 /* the light theme's pass (sunread.js) marks dark see-through boxes .slt and whitens them: not these */
 ${B} > .grbadge,${B} > .grbadge.slt{background:radial-gradient(circle at 40% 35%,color-mix(in srgb,var(--g1) 60%,#fff),var(--g1) 45%,var(--g2)) !important;border:0 !important}
 ${B}.gr2 > .grgem,${B}.gr2 > .grgem.slt{background:linear-gradient(135deg,#fff,#c78bff 50%,#4a1690) !important}
