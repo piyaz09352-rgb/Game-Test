@@ -19,7 +19,7 @@ function fdIndex(){
   return (FND.idx = {where, drops});
 }
 const fdMaps = k => [...new Set((fdIndex().where[k] || []))].sort((a, b) => (MAPS[a].lv || [0])[0] - (MAPS[b].lv || [0])[0]);
-const fdSources = id => (fdIndex().drops[id] || []).filter(([k]) => fdMaps(k).length).sort((a, b) => MOB[a[0]].lvl - MOB[b[0]].lvl);
+const fdSources = id => { const m = new Map(); for (const [k, ch] of fdIndex().drops[id] || []) if (fdMaps(k).length) m.set(k, Math.max(m.get(k) || 0, ch || 0)); return [...m].sort((a, b) => MOB[a[0]].lvl - MOB[b[0]].lvl); };   // (v272) one row a monster (a drop listed twice showed it twice)
 const fdBlocked = () => (typeof DG !== 'undefined' && DG.active) || (typeof TW !== 'undefined' && TW.active) || (typeof SIEGE_MAP !== 'undefined' && MAP_ID === SIEGE_MAP);
 const fdName = id => (ITEMS[id] ? nm(ITEMS[id]) : typeof CARDS !== 'undefined' && CARDS[id] && typeof cardTitle === 'function' ? cardTitle(id) : id);
 /* search an item, a monster or a boss by its Thai or English name */
