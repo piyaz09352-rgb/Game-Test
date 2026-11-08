@@ -7,7 +7,7 @@
    tougher for each party member. It keeps its moves, its warnings and its berserk at 30%.
    Auto also fights the guardian inside the tower (it keeps away from bosses everywhere else, as before). */
 'use strict';
-const TWB = {hp:6, atk:1.3, def:1.2};
+const TWB = {hp:6, atk:1.3, def:1.2};   // (tower235.js sets the final values)
 /* (v255) the 100-floor tower: tools/tower-report.js showed heroes of Lv 200–300 stopped by guardians 20–27 levels
    under their own (low floors were fine, about their own level). A guardian's HP and hits ease off from floor 30 to
    the top (×1 → ×TWB_TOP), so the last floors stay hard but a strong Lv 300 can reach the top. */

@@ -23,7 +23,7 @@ const TW255_TOP = .6, tw255Atk = f => f <= 50 ? 1 : 1 - (1 - TW255_TOP) * Math.m
    fights all at once takes far longer to clear up high and buries the hero. Tower monsters lose HP from floor 40, down
    to ×TW256_HP at floor 100, so a high hall takes about as long as a low one (guardians too: towerbal224 eases less). */
 const TW256_HP = .45, tw256Hp = f => f <= 40 ? 1 : 1 - (1 - TW256_HP) * Math.min(1, (f - 40) / 35);   // full by floor 75
-if (typeof TWB !== 'undefined'){ TWB.hp = 6; TWB.atk = 1.3; }   // guardians as in v224 (on top of the +10% / +5% every tower monster has): 7× / 1.35× stopped the melee lines at the first guardian
+if (typeof TWB !== 'undefined'){ const H = typeof TW_HARD !== 'undefined' ? TW_HARD : {bhp:1, batk:1}; TWB.hp = 6 * H.bhp; TWB.atk = 1.3 * H.batk; }   /* (v274) the owner: guardians HP ×5 and hits ×2.5 (tower.js TW_HARD) */   // guardians as in v224 (on top of the +10% / +5% every tower monster has): 7× / 1.35× stopped the melee lines at the first guardian
 { const _m = twMob; twMob = function(){ const m = _m.apply(this, arguments);
     if (m && m.def){ m.def = {...m.def, hp:Math.round(m.def.hp * TW235.hp * tw256Hp(arguments[3] | 0)), atk:m.def.atk.map(v => Math.max(1, Math.round(v * TW235.atk * tw255Atk(arguments[3] | 0))))}; m.maxhp = m.hp = m.def.hp; }
     return m; }; }

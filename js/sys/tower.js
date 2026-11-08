@@ -14,7 +14,7 @@
    treat it as a dungeon. One check per frame while inside; nothing runs outside. */
 'use strict';
 
-const TW_MIN = 10, TW_T = 75, TW_TB = 105;
+const TW_MIN = 10, TW_T = 180, TW_TB = 240;   // (v274) more and tougher monsters: more time (was 75 / 105)
 const TW = {active:false, entering:false, f:1, f0:1, t:0, phase:'idle', restT:0, theme:0, spawned:false, gain:{z:0, coin:0, gear:0}, hazT:8, sub:null, rows:[], startF:1, end:null};
 /* (v255) the tower has 100 floors (the owner's call): floor f has Lv 3f monsters (Lv 30 at floor 10, 150 at 50, 300 at
    the top), so the whole climb spans the hero's whole life; clearing floor 100 ends the run as a win */
@@ -73,6 +73,13 @@ function twScale(m, f){
   const ov = twOver(f); if (!ov) return; const kh = Math.pow(1.07, ov), ka = Math.pow(1.03, ov);
   m.def = {...m.def, hp:Math.round(m.def.hp * kh), atk:[Math.round(m.def.atk[0] * ka), Math.round(m.def.atk[1] * ka)], def:Math.round(m.def.def * (1 + ov * .01))}; m.maxhp = m.hp = m.def.hp;
 }
+/* (v274) the owner: the tower was too easy and too empty — 12 monsters on floor 1, two more every 20 floors up to 20
+   (floor 81+), six guards round a guardian; monsters HP ×2 and hit ×1.5, guardians HP ×5 and hit ×2.5 */
+const TW_HARD = {hp:2, atk:1.5, bhp:5, batk:2.5}, TW_GUARDS = 6;
+const twCount = f => clamp(12 + Math.floor((f - 1) / 10), 12, 20);
+function twHard(m){ if (MOB[m.type] && MOB[m.type].boss) return;   // guardians: towerbal224.js measures them against an ordinary monster and applies bhp / batk there
+  const kh = TW_HARD.hp, ka = TW_HARD.atk;
+  m.def = {...m.def, hp:Math.round(m.def.hp * kh), atk:[Math.round(m.def.atk[0] * ka), Math.round(m.def.atk[1] * ka)]}; m.maxhp = m.hp = m.def.hp; }
 function twSpot(i, n, r0){
   const a = i / n * Math.PI * 2 + Math.random() * .5, d = r0 + Math.random() * 90; let x = P.x + Math.cos(a) * d, y = P.y + Math.sin(a) * d * .7;
   for (let k = 0; k < 24 && (!walkable(x, y, 14) || x < 60 || y < 60 || x > W - 60 || y > H - 60); k++){ x = clamp(P.x + rand(-320, 320), 80, W - 80); y = clamp(P.y + rand(-220, 220), 80, H - 80); }
@@ -80,17 +87,17 @@ function twSpot(i, n, r0){
 }
 function twMob(type, x, y, f){
   const code = twLvC(f) * 10 + clamp(DG.pc | 0 || 1, 1, 5), m = spawnMob(type, x, y, {zone:typeof MAPZ !== 'undefined' ? MAPZ : undefined});
-  m.dgc = code; m.def = dgDef(type, code); m.maxhp = m.hp = m.def.hp; m.dg = true; m.tw = f; m.split = true; m.aggro = true; twScale(m, f); return m;
+  m.dgc = code; m.def = dgDef(type, code); m.maxhp = m.hp = m.def.hp; m.dg = true; m.tw = f; m.split = true; m.aggro = true; twScale(m, f); twHard(m); return m;
 }
 function twSpawn(){
   const f = TW.f, mp = MAPS[TW.theme], kinds = mp.mobs.filter(t => MOB[t] && !MOB[t].night && !MOB[t].boss); if (!kinds.length) return;
   if (twBoss(f)){
     const [bx, by] = twSpot(0, 1, 200), g = twMob(mp.boss, bx, by, f); g.bcd = 3; g.roamT = 99; VFX.play('bossArrive', {x:bx, y:by});
     if (typeof DG3 !== 'undefined') DG3.phase = 0;
-    for (let i = 0; i < 2; i++){ const [x, y] = twSpot(i, 2, 170), m = twMob(kinds[i % kinds.length], x, y, f); if (twElite(f) && typeof dgElite === 'function') dgElite(m, L('หัวหน้า', '')); }
+    for (let i = 0; i < TW_GUARDS; i++){ const [x, y] = twSpot(i, TW_GUARDS, 170), m = twMob(kinds[i % kinds.length], x, y, f); if (twElite(f) && typeof dgElite === 'function') dgElite(m, L('หัวหน้า', '')); }
     banner(L(`ชั้น ${f} · ♛ ผู้พิทักษ์ ${nm(MOB[mp.boss])}`, `Floor ${f} · ♛ Guardian ${nm(MOB[mp.boss])}`));
   } else {
-    const n = 5 + Math.min(6, Math.floor(f / 8));
+    const n = twCount(f);
     for (let i = 0; i < n; i++){ const [x, y] = twSpot(i, n, 150); twMob(kinds[(i + f) % kinds.length], x, y, f); VFX.play('bossSummon', {x, y}); }
     banner(L(`ชั้น ${f} · มอน Lv ${twLvC(f)}`, `Floor ${f} · monsters Lv ${twLvC(f)}`)); SFX.play('quest');
   }
