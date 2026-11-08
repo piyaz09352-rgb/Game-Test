@@ -1,19 +1,19 @@
 /* VAYRATHEN — js/sys/invasion269.js — (v269) การรุกราน · the hourly invasion, fought together
-   Every hour at :45 (Thailand time), for 10 minutes, an army invades one hunting map — the same map for everyone (a
+   Every hour at :45 (Thailand time), for 15 minutes (v274), an army invades one hunting map — the same map for everyone (a
    hash of the hour), announced 5 minutes before. Everyone on that map fights it together:
    · INVADERS (⚔ red tag) keep coming round each player (up to 3 at a time, +2 for each other player there, at most 8), matched to your level, and march on you.
    · A «ไปช่วย» button on the bar warps you there for free (not from a dungeon or the tower).
    · ONE SHARED BAR: every invader anyone on the map defeats fills it (kills travel as room events, and every
-     message carries the total, so a late arrival catches up). The goal grows with the players there (40, +25 each).
+     message carries the total, so a late arrival catches up). (v274) The goal is 300.
    · THE WAR COMMANDER: when the bar is full the invaders' commander appears — one HP bar shared by everyone on the map, tougher the more heroes there are
      (damage travels as a share of its HP, like the world boss).
    · While it lasts, half the map's own monsters stand aside and the region boss waits (as for the world boss).
    · RANKING: the bar shows the top three helpers on the map; the top one (with others there) gets +2 Vayra Coins and +50% Bia.
-   · REWARD for everyone who helped (3 invaders or 1% of the commander, or anyone fighting alone): Bia by level,
-     3 Vayra Coins, 30% a piece of gear (Rare or better is likelier). One reward per invasion. If the hour runs out
-     first, the army withdraws. */
+   · REWARD for everyone who helped (3 invaders or 1% of the commander, or anyone fighting alone): see invReward (v274:
+     much bigger) · one reward per invasion · if the 15 minutes run out first, the army withdraws and pays a share.
+   · (v274) the owner: 300 invaders (the same goal however many come), 15 minutes, more of them at once. */
 'use strict';
-const INV_MIN = 45, INV_LEN = 10, INV_WARN = 5, INV_GOAL = 40, INV_PER = 25;
+const INV_MIN = 45, INV_LEN = 15, INV_WARN = 5, INV_GOAL = 300, INV_PER = 0;   // (v274) the owner: 300 invaders, 15 minutes
 const INV = {key:null, map:-1, tot:0, my:0, myDmg:0, acc:0, sendT:0, spawnT:0, boss:null, warned:{}, done:{}, bar:null, bossHp:1};
 function invWindow(){
   if (INV.forced && Date.now() < INV.forced.until) return {key:INV.forced.key, active:true, left:(INV.forced.until - Date.now()) / 6e4};
@@ -32,7 +32,7 @@ function invMap(key){
   return ids.length ? ids[(h >>> 0) % ids.length] : -1;
 }
 const invPeers = () => (typeof NET !== 'undefined' && NET.mapRoom && NET.on ? NET.mapRoom.peers().filter(p => !p.isMe).length : 0);
-const invGoal = () => Math.min(200, INV_GOAL + INV_PER * invPeers());
+const invGoal = () => INV_GOAL;
 const invHere = w => w && w.active && MAP_ID === invMap(w.key) && !(typeof DG !== 'undefined' && DG.active) && !(typeof TW !== 'undefined' && TW.active);
 /* level-matched monsters: the map's own kinds, with the strength of an ordinary monster of your level */
 let INV_REF = null;
@@ -72,14 +72,14 @@ EV.on('tick', dt => {
   if (w && !w.active && !INV.warned[w.key]){ const id = invMap(w.key); if (id >= 0){ INV.warned[w.key] = 1;
     banner(L(`⚔ กองทัพผู้รุกรานจะบุก${nm(MAPS[id])}ในอีก ${Math.ceil(w.soon)} นาที!`, `⚔ An army will invade ${nm(MAPS[id])} in ${Math.ceil(w.soon)} min!`));
     log(L(`การรุกราน: ${nm(MAPS[id])} · ร่วมกันล้มทัพและแม่ทัพ รับเบี้ย เหรียญวายรา และลุ้นอุปกรณ์`, `Invasion: ${nm(MAPS[id])} · defeat the army and its warlord together for Bia, Vayra Coins and a chance at gear`), 'r'); } }
-  if (!w || !w.active || w.key !== INV.key){ if (INV.key && (!w || w.key !== INV.key)){ if (mobs.some(m => m.inv === INV.key && !m.dead) && !INV.done[INV.key]) banner(L('กองทัพผู้รุกรานถอยทัพไปแล้ว…', 'The invaders withdraw…')); invClear(); INV.key = null; }
+  if (!w || !w.active || w.key !== INV.key){ if (INV.key && (!w || w.key !== INV.key)){ if (!INV.done[INV.key]) invPartial(); invClear(); INV.key = null; }
     if (w && w.active && !INV.key){ INV.key = w.key; INV.tot = 0; INV.my = 0; INV.myDmg = 0; INV.bossHp = 1; } }
   invBar(w);
   if (!invHere(w) || P.dead || INV.done[w.key]) { if (!invHere(w)) for (const m of mobs) if (m.inv && !m.dead && MAP_ID !== invMap(w ? w.key : '')){ m.dead = true; m.deadT = 0; } return; }
   // an invader that cannot reach you (stuck far off for a while) falls back and another comes
   for (const m of mobs) if (m.inv && !m.dead && !m.invBoss){ if (Math.hypot(m.x - P.x, m.y - P.y) > 560) m.farT = (m.farT || 0) + dt; else m.farT = 0; if (m.farT > 12){ m.dead = true; m.deadT = 0; } }
   const full = INV.tot >= invGoal();
-  if (!full){ if ((INV.spawnT -= dt) <= 0){ INV.spawnT = 1.4; if (mobs.filter(m => m.inv && !m.dead && !m.invBoss).length < Math.min(8, 3 + 2 * invPeers())) invSpawnOne(); } }
+  if (!full){ if ((INV.spawnT -= dt) <= 0){ INV.spawnT = .7; if (mobs.filter(m => m.inv && !m.dead && !m.invBoss).length < Math.min(24, 8 + 4 * invPeers())) invSpawnOne(); } }   // (v274) a real army: up to 8 round you (+4 for each other hero, 24 at most)
   else if (!INV.boss || (INV.boss.dead && !INV.done[w.key]) || !mobs.includes(INV.boss)){ if (!INV.boss || !mobs.includes(INV.boss)) invSpawnBoss(); }
   if (INV.boss && !INV.boss.dead && INV.acc > 0 && (INV.sendT -= dt) <= 0){ INV.sendT = .5; invSend({k:'dmg', f:+INV.acc.toFixed(5)}); INV.acc = 0; }
 });
@@ -113,21 +113,55 @@ function onInv(msg){
   else if (d.k === 'dead' && INV.boss && !INV.boss.dead && INV.boss.hp <= INV.boss.maxhp * .5){ INV.boss.hp = 0; killMob(INV.boss); }
 }
 EV.on('netready', () => { if (typeof NET !== 'undefined' && NET.room && typeof mapOn === 'function') mapOn('inv', onInv); });
+/* (v274) the owner wants players to take part: a win pays far more than before.
+   · Vayra Coins 5–15 by how much you helped (invaders and warlord damage), +5 / +3 / +2 for the top three helpers
+   · a gear chest: one piece of your level, Rare or better (Epic or better for the top helper)
+   · EXP and Job EXP +30% for 30 minutes
+   · wins are counted: 5 → title «ผู้พิทักษ์แผ่นดิน», 20 → «วีรชนต้านทัพ» and the Guardian Wings, 50 → «จอมทัพพิทักษ์วายรา»
+     and the Golden Warlord Wings (only from invasions)
+   If the 15 minutes run out first, the army withdraws and everyone who helped gets a share of the Bia and coins by how
+   much of the army was beaten (no chest, no buff, no win counted). */
+const INV_WINGS = {inv_wing:['w_seraph', 'ปีกผู้พิทักษ์แผ่นดิน', 'Guardian Wings', ['#fff4d8', '#e0402a', '#5a0a08'], '#ffd27a', '255,90,60', 'ember'],
+  inv_wing2:['w_phoenix', 'ปีกจอมทัพทองคำ', 'Golden Warlord Wings', ['#fffbe0', '#ffc830', '#a05a00'], '#fff0a0', '255,210,90', 'sparkle']};
+for (const id in INV_WINGS){ const [b, th, en, c, edge, glow, fx] = INV_WINGS[id]; if (typeof WINGS !== 'undefined' && WINGS[b] && !WINGS[id]){ WINGS[id] = {...WINGS[b], set:null, th, en, c, edge, glow, fx, src:'inv'}; delete WINGS[id].price; } }
+const INV_TITLES = [[5, 'inv_t1', 'ผู้พิทักษ์แผ่นดิน', 'Guardian of the Land', null], [20, 'inv_t2', 'วีรชนต้านทัพ', 'Hero of the Line', 'inv_wing'], [50, 'inv_t3', 'จอมทัพพิทักษ์วายรา', 'Warlord-Guardian of Vayra', 'inv_wing2']];
+const invWins = () => (S && S.invWins) | 0;
+if (typeof ACH !== 'undefined' && typeof ACH_BY !== 'undefined') for (const [n, id, th, en] of INV_TITLES){ if (ACH_BY[id]) continue;
+  const a = {id, cat:'world', tier:n >= 50 ? 3 : n >= 20 ? 2 : 1, th, en, dth:`ชนะการรุกราน ${n} ครั้ง`, den:`Win ${n} invasions`, prog:() => [Math.min(n, invWins()), n], coin:0, title:[th, en]}; ACH.push(a); ACH_BY[id] = a; }
+BUFF_TH.invexp = ['พลังผู้พิทักษ์ EXP/JOB +30%', 'Guardian zeal EXP/JOB +30%']; BUFF_CAP.invexp = ['EXP+30%', 'EXP+30%']; BUFF_IC.invexp = ['#ffb070', '<path d="M10 2l2.4 5 5.6.8-4 3.9.9 5.5L10 14.6 5.1 17.2l.9-5.5-4-3.9 5.6-.8z"/>'];
+{ const _ge = gainExp; gainExp = function(b, j){ if (P && P.buffs && P.buffs.invexp && P.buffs.invexp.t > 0){ b = Math.round(b * 1.3); j = Math.round((j || 0) * 1.3); } return _ge.call(this, b, j); }; }
+function invChest(Lv, minR){ if (typeof GEAR_LIST === 'undefined') return '';
+  const pool = GEAR_LIST.filter(g => g[1] !== 'ammo' && g[4] <= Lv && g[4] >= Lv - 30 && (typeof lineOk !== 'function' || lineOk(g[6]))); if (!pool.length) return '';
+  const id = makeInst(pool[Math.floor(Math.random() * pool.length)][0], Math.max(minR, rollRarity('boss'))); addItem(id, 1); return nm(ITEMS[id]); }
 function invReward(){
   const key = INV.key; if (!key || INV.done[key]) return; INV.done[key] = 1; S.invDone = S.invDone || {}; if (S.invDone[key]) return; S.invDone[key] = 1;
   for (const m of mobs) if (m.inv === key && !m.dead && !m.invBoss){ m.dead = true; m.deadT = 0; } INV.boss = null;
   const ok = INV.my >= 3 || INV.myDmg >= .01 || invPeers() === 0;
   if (!ok){ banner(L('ทัพผู้รุกรานพ่ายแพ้! แต่คุณช่วยไม่ถึงเกณฑ์รับรางวัล', 'The invasion is beaten! You did not help enough for a reward')); return; }
-  const Lv = clamp(S.lvl, 1, 300), bia = Lv * 220; S.bia += bia; if (typeof coinAdd === 'function') coinAdd(3, L('การรุกราน', 'invasion'));
-  const R = invRank(), top = R.length > 1 && R[0].me && R[0].k > (R[1] ? R[1].k : 0);   // (v271) the one who helped most (with others there) gets a little more
-  if (top && typeof coinAdd === 'function'){ coinAdd(2, L('ผู้ช่วยอันดับ 1', 'top helper')); S.bia += Math.round(bia * .5); }
-  let gear = '';
-  if (Math.random() < .3 && typeof GEAR_LIST !== 'undefined'){ const pool = GEAR_LIST.filter(g => g[1] !== 'ammo' && g[4] <= Lv && g[4] >= Lv - 30 && (typeof lineOk !== 'function' || lineOk(g[6])));
-    if (pool.length){ const id = makeInst(pool[Math.floor(Math.random() * pool.length)][0], rollRarity('elite')); addItem(id, 1); gear = nm(ITEMS[id]); } }
-  if (top) log(L(`🥇 คุณช่วยมากที่สุดในการรุกรานครั้งนี้ (${INV.my} ตัว) · เหรียญวายรา +2 · เบี้ยเพิ่ม 50%`, `🥇 You helped most in this invasion (${INV.my}) · +2 Vayra Coins · +50% Bia`), 'g');
-  banner(L(`🏆 ขับไล่ผู้รุกรานสำเร็จ! +${bia.toLocaleString()} เบี้ย · เหรียญวายรา +3${gear ? ' · ' + gear : ''}`, `🏆 The invasion is driven back! +${bia.toLocaleString()} Bia · +3 Vayra Coins${gear ? ' · ' + gear : ''}`));
-  log(L(`การรุกราน: ล้มผู้รุกราน ${INV.my} ตัว · ได้ ${bia.toLocaleString()} เบี้ย${gear ? ' และ ' + gear : ''}`, `Invasion: ${INV.my} invaders defeated · ${bia.toLocaleString()} Bia${gear ? ' and ' + gear : ''}`), 'g');
+  const Lv = clamp(S.lvl, 1, 300), R = invRank(), rank = R.length > 1 ? R.findIndex(r => r.me) : -1;
+  const bia = Lv * 400 * (rank === 0 ? 1.5 : 1); S.bia += bia;
+  const coins = 5 + Math.min(10, Math.floor(INV.my / 20 + INV.myDmg * 10)) + (rank >= 0 && rank < 3 ? [5, 3, 2][rank] : 0);
+  if (typeof coinAdd === 'function') coinAdd(coins, L('การรุกราน', 'invasion'));
+  const gear = invChest(Lv, rank === 0 ? 2 : 1);
+  addBuff('invexp', {t:1800});
+  S.invWins = invWins() + 1; let extra = '';
+  for (const [n, , th, en, wing] of INV_TITLES) if (S.invWins === n){ extra = L(`ฉายาใหม่ «${th}»`, `New title «${en}»`); if (wing && typeof ACC !== 'undefined'){ (ACC.wardrobe = ACC.wardrobe || {})[wing] = 1; if (typeof accSave === 'function') accSave(true); extra += L(` · ${WINGS[wing].th} (ตู้เสื้อผ้า)`, ` · ${WINGS[wing].en} (wardrobe)`); } }
+  if (typeof achCheck === 'function') setTimeout(achCheck, 0);
+  if (rank >= 0 && rank < 3) log(L(`${['🥇', '🥈', '🥉'][rank]} คุณช่วยมากเป็นอันดับ ${rank + 1} (${INV.my} ตัว) · เหรียญพิเศษ +${[5, 3, 2][rank]}${rank === 0 ? ' · เบี้ยเพิ่ม 50% · หีบระดับล้ำค่าขึ้นไป' : ''}`, `${['🥇', '🥈', '🥉'][rank]} You were helper no. ${rank + 1} (${INV.my}) · +${[5, 3, 2][rank]} bonus coins${rank === 0 ? ' · +50% Bia · an Epic-or-better chest' : ''}`), 'g');
+  banner(L(`🏆 ขับไล่ผู้รุกรานสำเร็จ! +${fmtN(bia)} เบี้ย · ◈ ${coins} · ${gear || 'หีบอุปกรณ์'} · EXP/JOB +30% 30 นาที${extra ? ' · ' + extra : ''}`, `🏆 The invasion is driven back! +${fmtN(bia)} Bia · ◈ ${coins} · ${gear || 'gear chest'} · EXP/JOB +30% for 30 min${extra ? ' · ' + extra : ''}`));
+  log(L(`การรุกราน: ล้มผู้รุกราน ${INV.my} ตัว · ${fmtN(bia)} เบี้ย · เหรียญวายรา ${coins}${gear ? ' · ' + gear : ''} · ชนะแล้ว ${S.invWins} ครั้ง`, `Invasion: ${INV.my} invaders · ${fmtN(bia)} Bia · ${coins} Vayra Coins${gear ? ' · ' + gear : ''} · ${S.invWins} wins`), 'g');
+  if (typeof sfx272 === 'function') try { sfx272('fanfare'); } catch (e) {}
   if (typeof bump === 'function') bump('invasions'); dirty = true; if (typeof save === 'function') save();
+}
+/* time ran out: a share by how much of the army fell, for those who helped */
+function invPartial(){
+  const key = INV.key; if (!key || INV.done[key]) return; INV.done[key] = 1; S.invDone = S.invDone || {}; if (S.invDone[key]) return; S.invDone[key] = 1;
+  if (INV.my < 3 && INV.myDmg < .01){ if (INV.tot > 0) banner(L('กองทัพผู้รุกรานถอยทัพไปแล้ว…', 'The invaders withdraw…')); return; }
+  const f = clamp(INV.tot / invGoal(), 0, 1) * (INV.boss || INV.tot >= invGoal() ? 1 : .8), Lv = clamp(S.lvl, 1, 300), bia = Math.round(Lv * 400 * f * .6), coins = Math.max(1, Math.round(5 * f));
+  S.bia += bia; if (typeof coinAdd === 'function') coinAdd(coins, L('การรุกราน (หมดเวลา)', 'invasion (time up)'));
+  banner(L(`⌛ หมดเวลา! ทัพถอยไป · ตีได้ ${Math.round(f * 100)}% · +${fmtN(bia)} เบี้ย · ◈ ${coins}`, `⌛ Time up! The army withdraws · ${Math.round(f * 100)}% beaten · +${fmtN(bia)} Bia · ◈ ${coins}`));
+  log(L(`การรุกราน (หมดเวลา): ทัพแตก ${INV.tot}/${invGoal()} · ของคุณ ${INV.my} ตัว · ${fmtN(bia)} เบี้ย · เหรียญ ${coins} (ชนะเพื่อรับหีบอุปกรณ์ บัฟ EXP และนับครั้งฉายา)`, `Invasion (time up): ${INV.tot}/${invGoal()} beaten · yours ${INV.my} · ${fmtN(bia)} Bia · ${coins} coins (win for the chest, the EXP buff and a title count)`), 'g');
+  dirty = true; if (typeof save === 'function') save();
 }
 /* the bar at the top of the screen */
 function invBar(w){
@@ -164,5 +198,5 @@ document.addEventListener('click', e => { const b = e.target.closest && e.target
   if (typeof TW !== 'undefined' && TW.active){ toast(L('ออกจากหอคอยก่อนนะ', 'Leave the tower first')); return; }
   warpTo(id); dirty = true; });
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'invasion', t:['การรุกราน', 'Invasions'], b:() => L(
-  `<p>ทุกชั่วโมงนาทีที่ ${INV_MIN} (เวลาไทย) กองทัพผู้รุกรานบุกแผนที่ล่าหนึ่งแห่ง (ทุกคนเห็นแผนที่เดียวกัน) นาน ${INV_LEN} นาที · มีประกาศก่อน ${INV_WARN} นาที · ผู้รุกราน (ป้ายแดง ⚔) แข็งแรงตามเลเวลของคุณ · ทุกคนในแผนที่ช่วยกันเติมแถบทัพ (${INV_GOAL} ตัว +${INV_PER} ต่อผู้เล่นที่อยู่ด้วย) ครบแล้วแม่ทัพปรากฏ HP ใช้ร่วมกันทุกคน · ล้มแม่ทัพได้: เบี้ยตามเลเวล เหรียญวายรา 3 และลุ้นอุปกรณ์ 30% (ต้องล้มผู้รุกราน 3 ตัว หรือตีแม่ทัพ 1% ขึ้นไป)</p>`,
-  `<p>Every hour at :${INV_MIN} (Thai time) an army invades one hunting map (the same for everyone) for ${INV_LEN} minutes, announced ${INV_WARN} minutes before · invaders (red ⚔ tag) match your level · everyone on the map fills one shared bar (${INV_GOAL}, +${INV_PER} per extra player), then the warlord appears with one HP bar for all · beat it for Bia by level, 3 Vayra Coins and a 30% chance at gear (help with 3 invaders or 1% of the warlord)</p>`)});
+  `<p>ทุกชั่วโมงนาทีที่ ${INV_MIN} (เวลาไทย) กองทัพผู้รุกรานบุกแผนที่ล่าหนึ่งแห่ง (ทุกคนเห็นแผนที่เดียวกัน) นาน ${INV_LEN} นาที · ประกาศก่อน ${INV_WARN} นาที · ปุ่ม «ไปช่วย» บนแถบวาร์ปไปฟรี · ทุกคนช่วยกันล้มทัพ ${INV_GOAL} ตัว แล้วแม่ทัพจะออกมา · ชนะ: เบี้ยตามเลเวล เหรียญวายรา 5–15 ตามที่ช่วย (อันดับ 1–3 ได้เพิ่ม 5/3/2) หีบอุปกรณ์ระดับหายากขึ้นไป (อันดับ 1 ล้ำค่าขึ้นไป) และ EXP/JOB +30% 30 นาที · ชนะครบ 5 / 20 / 50 ครั้งได้ฉายาผู้พิทักษ์ และปีกที่มีเฉพาะการรุกราน · หมดเวลาก่อน: ได้เบี้ยและเหรียญตามส่วนที่ทัพแตก</p>`,
+  `<p>Every hour at :${INV_MIN} (Thai time) an army invades one hunting map (the same for everyone) for ${INV_LEN} minutes, announced ${INV_WARN} minutes before · the «Join» button warps you there free · beat ${INV_GOAL} invaders together, then the warlord comes · a win: Bia by level, 5–15 Vayra Coins by how much you helped (+5/+3/+2 for the top three), a Rare-or-better gear chest (Epic or better for the top helper) and EXP/JOB +30% for 30 minutes · 5 / 20 / 50 wins earn guardian titles and wings found only here · if time runs out: a share of Bia and coins by how much of the army fell</p>`)});

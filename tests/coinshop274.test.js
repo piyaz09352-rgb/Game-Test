@@ -11,7 +11,7 @@ test('coin shop: button, prices, no free trial, buying, tabs, top-up closed; tow
   try {
     await enterWorld(page);
     await page.waitForFunction(() => { const b = document.getElementById('cshBtn'); return b && !b.hidden; }, null, { timeout: 10000 });
-    const pr = await page.evaluate(() => { const p = CSH_FASH().map(id => cshDef(id)).filter(d => d.src !== 'free' && d.src !== 'event' && d.src !== 'tower').map(d => d.price && d.price.c);
+    const pr = await page.evaluate(() => { const p = CSH_FASH().map(id => cshDef(id)).filter(d => d.src !== 'free' && d.src !== 'event' && d.src !== 'tower' && d.src !== 'inv').map(d => d.price && d.price.c);
       return {all:p.every(c => c >= 30 && c <= 300), n:p.length, trial:COS_TRIAL.on}; });
     assert.ok(pr.all && pr.n > 200, 'every fashion piece has a coin price in 30–300'); assert.ok(!pr.trial, 'no free trial');
     // an unbought piece cannot be worn; the strip takes off what is not owned

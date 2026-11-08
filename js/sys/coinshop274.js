@@ -16,10 +16,10 @@
 const CSH_FASH = () => [...Object.keys(WINGS), ...Object.keys(typeof XMOUNT !== 'undefined' ? XMOUNT : {}), ...Object.keys(COSTUME).filter(k => ['top', 'head', 'mask'].includes(COSTUME[k].slot))];
 const cshDef = id => COSTUME[id] || WINGS[id] || XCOS[id];
 { const sc = c => clamp(Math.round((30 + (c - 35) * 270 / 185) / 10) * 10, 30, 300), bySlot = {};
-  for (const id of CSH_FASH()){ const d = cshDef(id); if (!d || d.src === 'free' || d.src === 'event' || d.src === 'tower') continue;
+  for (const id of CSH_FASH()){ const d = cshDef(id); if (!d || d.src === 'free' || d.src === 'event' || d.src === 'tower' || d.src === 'inv') continue;
     const c0 = d.price && d.price.c ? d.price.c : d.tprice || 0; if (!c0) continue; d.price = {c:sc(c0)}; if (d.tprice) d.tprice = d.price.c; (bySlot[fwSlot(id)] = bySlot[fwSlot(id)] || []).push(d.price.c); }
   const med = s => { const a = (bySlot[s] || [150]).slice().sort((x, y) => x - y); return a[a.length >> 1]; };
-  for (const id of CSH_FASH()){ const d = cshDef(id); if (!d || d.src === 'free' || d.src === 'event' || d.src === 'tower' || d.price) continue;
+  for (const id of CSH_FASH()){ const d = cshDef(id); if (!d || d.src === 'free' || d.src === 'event' || d.src === 'tower' || d.src === 'inv' || d.price) continue;
     d.price = {c:clamp(Math.round(med(fwSlot(id)) * 1.15 / 10) * 10, 30, 300)}; }   // reward pieces: a little above their slot's middle
 }
 /* ---------- no more free trial: preview only ---------- */
