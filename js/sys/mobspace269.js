@@ -45,6 +45,9 @@ const MSP_GAP = 22;   // ≈ two body-widths between the monster's edge and the 
       if (ed < minD){ const ux = ex / ed, uy = ey / ed;
         for (const a of [0, .6, -.6, 1.2, -1.2, 1.8, -1.8]){ const c = Math.cos(a), sn = Math.sin(a), nx = P.x + (ux * c - uy * sn) * minD, ny = P.y + (ux * sn + uy * c) * minD; if (walkable(nx, ny, (d.r || 12) * .5)){ m.x = nx; m.y = ny; break; } } } }
     return out; }; }
+// the hero's melee reaches across that gap: short-reach classes (claws, fists, daggers: 24) would otherwise never land a hit
+const MSP_REACH = Math.ceil(12 + MSP_GAP * .6 + 8);
+{ const _dv = derive; derive = function(){ const r = _dv.apply(this, arguments); if (typeof DER !== 'undefined' && DER.range > 0 && DER.range < 100) DER.range += MSP_REACH - 24; return r; }; }   // melee only (+10: 24 → 34, 30 → 40), each class keeps its own edge
 // melee strikes from the gap (their reach grows to it)
 for (const k in MOB){ const d = MOB[k]; if (!d || d.range || !d.r) continue; d.reach = Math.max(d.reach || d.r + 12, d.r + 12 + MSP_GAP); }
 
@@ -56,16 +59,28 @@ for (const k in MOB){ const d = MOB[k]; if (!d || d.range || !d.r) continue; d.r
     for (const k of kinds.filter(shooty).concat(kinds)){ if (ranged >= 2) break; const d = MOB[k]; if (d.range > 0) continue;
       d.range = 130 + ((d.lvl || 1) % 4) * 10; d.shot = d.shot || SHOT[d.elem] || 'dark'; d.reach = undefined; ranged++; } } }
 
-/* ---------- the floor number, big on the minimap (no longer carved on the floor) ---------- */
+/* ---------- the tower on the minimap: the floor number big, and every monster easy to see ---------- */
 { const _d = drawMini; drawMini = function(){ _d.apply(this, arguments);
     try { if (typeof TW === 'undefined' || !TW.active || el('mapCard').classList.contains('folded')) return;
       const mm = el('minimap'), g = mm.getContext('2d'), w = mm.width, h = mm.height, u = w / 170, t = typeof twmTierOf === 'function' ? twmTierOf(TW.f) : 0;
-      const col = (typeof TWZ268 !== 'undefined' && TWZ268.Z[t] && TWZ268.Z[t].crys) || '255,220,140', n = String(TW.f);
-      g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.textBaseline = 'alphabetic'; g.textAlign = 'left'; g.lineJoin = 'round';
-      g.font = `900 ${Math.round(34 * u)}px Georgia,"Times New Roman",serif`; const nw = g.measureText(n).width;
-      g.font = `800 ${Math.round(9 * u)}px Sarabun,"Noto Sans Thai",sans-serif`; const lab = L('ชั้น', 'FLOOR'), lw = g.measureText(lab).width;
-      const bw = Math.max(nw, lw) + 12 * u, bh = 44 * u, x0 = 4 * u, y0 = 4 * u;
-      g.fillStyle = 'rgba(10,8,20,.62)'; g.beginPath(); g.roundRect ? g.roundRect(x0, y0, bw, bh, 6 * u) : g.rect(x0, y0, bw, bh); g.fill(); g.strokeStyle = `rgba(${col},.85)`; g.lineWidth = 1.2 * u; g.stroke();
-      g.fillStyle = `rgb(${col})`; g.fillText(lab, x0 + (bw - lw) / 2, y0 + 11 * u);
-      g.font = `900 ${Math.round(34 * u)}px Georgia,"Times New Roman",serif`; g.lineWidth = 3 * u; g.strokeStyle = 'rgba(0,0,0,.85)'; g.strokeText(n, x0 + (bw - nw) / 2, y0 + bh - 5 * u);
-      g.fillStyle = '#fff6dc'; g.fillText(n, x0 + (bw - nw) / 2, y0 + bh - 5 * u); g.restore(); } catch (e) {} }; }
+      const css = w / (mm.getBoundingClientRect().width || w);   // canvas pixels per screen pixel: a phone's small map still gets readable sizes
+      const col = (typeof TWZ268 !== 'undefined' && TWZ268.Z[t] && TWZ268.Z[t].crys) || '255,220,140', n = String(TW.f), kx = w / W, ky = h / H;
+      g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.lineJoin = 'round';
+      // monsters: a red dot with a dark rim (a boss a gold one, pulsing), big enough to spot on the hall's purple floor
+      const left = mobs.filter(m => !m.dead && m.tw);
+      for (const m of left){ const boss = m.def && m.def.boss, r = Math.max((boss ? 4.2 : 2.4) * u, (boss ? 5 : 3) * css) * (boss ? 1 + Math.sin(T * 6) * .12 : 1), x = m.x * kx, y = m.y * ky;
+        g.fillStyle = boss ? '#ffd23a' : m.aggro ? '#ff4a3a' : '#ff8a6a'; g.strokeStyle = 'rgba(20,6,6,.9)'; g.lineWidth = Math.max(1.2 * u, 1.2 * css); g.beginPath(); g.arc(x, y, r, 0, 7); g.fill(); g.stroke(); }
+      // the floor badge: «ชั้น», the number, and how many are left
+      const fN = Math.max(34 * u, 18 * css), fL = Math.max(9 * u, 9 * css), fC = Math.max(8 * u, 8 * css);
+      g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+      g.font = `900 ${Math.round(fN)}px Georgia,"Times New Roman",serif`; const nw = g.measureText(n).width;
+      g.font = `800 ${Math.round(fL)}px Sarabun,"Noto Sans Thai",sans-serif`; const lab = L('ชั้น', 'FLOOR'), lw = g.measureText(lab).width;
+      const cnt = TW.phase === 'fight' ? L(`เหลือ ${left.length}`, `${left.length} left`) : '';
+      g.font = `700 ${Math.round(fC)}px Sarabun,"Noto Sans Thai",sans-serif`; const cw = cnt ? g.measureText(cnt).width : 0;
+      const pad = Math.max(6 * u, 5 * css), bw = Math.max(nw, lw, cw) + pad * 2, bh = fL * 1.25 + fN * .95 + (cnt ? fC * 1.3 : 0) + pad * .6, x0 = Math.max(4 * u, 3 * css), y0 = x0;
+      g.fillStyle = 'rgba(10,8,20,.66)'; g.beginPath(); g.roundRect ? g.roundRect(x0, y0, bw, bh, 6 * u) : g.rect(x0, y0, bw, bh); g.fill(); g.strokeStyle = `rgba(${col},.85)`; g.lineWidth = Math.max(1.2 * u, css); g.stroke();
+      let y = y0 + fL * 1.1;
+      g.font = `800 ${Math.round(fL)}px Sarabun,"Noto Sans Thai",sans-serif`; g.fillStyle = `rgb(${col})`; g.fillText(lab, x0 + (bw - lw) / 2, y);
+      y += fN * .9; g.font = `900 ${Math.round(fN)}px Georgia,"Times New Roman",serif`; g.lineWidth = Math.max(3 * u, 2.4 * css); g.strokeStyle = 'rgba(0,0,0,.85)'; g.strokeText(n, x0 + (bw - nw) / 2, y); g.fillStyle = '#fff6dc'; g.fillText(n, x0 + (bw - nw) / 2, y);
+      if (cnt){ y += fC * 1.25; g.font = `700 ${Math.round(fC)}px Sarabun,"Noto Sans Thai",sans-serif`; g.fillStyle = left.length ? '#ffb0a0' : '#9ff0c8'; g.fillText(cnt, x0 + (bw - cw) / 2, y); }
+      g.restore(); } catch (e) {} }; }
