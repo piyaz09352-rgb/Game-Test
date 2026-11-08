@@ -28,7 +28,11 @@
 { let f0 = -1, t0 = 0; EV.on('tick', dt => { if (typeof TW === 'undefined' || !TW.active || TW.phase !== 'fight' || P.dead) { f0 = -1; return; }
     if (f0 !== TW.f){ f0 = TW.f; t0 = 0; } t0 += dt;
     const left = mobs.filter(m => m.tw === TW.f && !m.dead); if (!left.length || (left.length > 3 && t0 < 25)) return;
-    for (const m of left) if (!m.aggro){ m.aggro = true; m.wait = 0; } }); }
+    for (const m of left){ if (!m.aggro){ m.aggro = true; m.wait = 0; }
+      // (v271) one that still cannot get to you (stuck behind the hall's edge) steps in after a while, so a floor never runs out on a straggler
+      if (Math.hypot(m.x - P.x, m.y - P.y) > 300) m.farT = (m.farT || 0) + dt; else m.farT = 0;
+      if (m.farT > 8){ m.farT = 0; for (let k = 0; k < 24; k++){ const a = Math.random() * 6.283, d = 150 + Math.random() * 100, x = P.x + Math.cos(a) * d, y = P.y + Math.sin(a) * d * .7;
+          if (walkable(x, y, (m.def.r || 12) * .6)){ if (typeof VFX !== 'undefined' && VFX.play) try { VFX.play('blink', {x:m.x, y:m.y, x2:x, y2:y}); } catch (e) {} m.x = m.hx = x; m.y = m.hy = y; break; } } } } }); }
 { const _ad = applyDamage; applyDamage = function(m){ const was = m && m.aggro; const r = _ad.apply(this, arguments);
     if (m && m.tw && !was && !m.dead) for (const o of mobs) if (o !== m && o.tw === m.tw && !o.dead && !o.aggro && Math.hypot(o.x - m.x, o.y - m.y) < 160) o.aggro = true;
     return r; }; }

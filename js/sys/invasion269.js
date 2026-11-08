@@ -2,6 +2,7 @@
    Every hour at :45 (Thailand time), for 10 minutes, an army invades one hunting map — the same map for everyone (a
    hash of the hour), announced 5 minutes before. Everyone on that map fights it together:
    · INVADERS (⚔ red tag) keep coming round each player (up to 3 at a time, +2 for each other player there, at most 8), matched to your level, and march on you.
+   · A «ไปช่วย» button on the bar warps you there for free (not from a dungeon or the tower).
    · ONE SHARED BAR: every invader anyone on the map defeats fills it (kills travel as room events, and every
      message carries the total, so a late arrival catches up). The goal grows with the players there (40, +25 each).
    · THE WAR COMMANDER: when the bar is full the invaders' commander appears — one HP bar shared by everyone on the map, tougher the more heroes there are
@@ -119,7 +120,7 @@ function invBar(w){
   let b = INV.bar; if (!b){ const host = document.getElementById('wrap'); if (!host) return; b = INV.bar = document.createElement('div'); b.id = 'invBar'; host.appendChild(b);
     const st = document.createElement('style'); st.textContent = `#invBar{position:absolute;top:calc(env(safe-area-inset-top,0px) + 6px);left:50%;transform:translateX(-50%);z-index:30;pointer-events:none;max-width:min(520px,60vw);
       padding:4px 12px 5px;border-radius:10px;background:rgba(40,10,10,.78);border:1px solid rgba(255,120,90,.8);color:#ffe6dc;font:700 clamp(10px,1.5vw,14px)/1.25 Sarabun,"Noto Sans Thai",sans-serif;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.35)}
-      #invBar[hidden]{display:none}#invBar .ib{display:block;height:5px;margin-top:3px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}#invBar .ib i{display:block;height:100%;background:linear-gradient(90deg,#ff7a4a,#ffd060)}`;
+      #invBar[hidden]{display:none}#invBar .ibgo{pointer-events:auto;margin-left:8px;padding:1px 10px;border-radius:999px;border:1px solid #ffd27a;background:linear-gradient(#ffcf6a,#e08a20);color:#3a1a04;font:800 clamp(10px,1.4vw,13px)/1.4 Sarabun,"Noto Sans Thai",sans-serif;cursor:pointer;box-shadow:0 2px 0 #8a4a0a}#invBar .ibgo:active{transform:translateY(1px)}#invBar .ib{display:block;height:5px;margin-top:3px;border-radius:3px;background:rgba(255,255,255,.18);overflow:hidden}#invBar .ib i{display:block;height:100%;background:linear-gradient(90deg,#ff7a4a,#ffd060)}`;
     document.head.appendChild(st); }
   const fmt = m => `${Math.floor(m)}:${String(Math.floor((m % 1) * 60)).padStart(2, '0')}`;
   let txt = '', pct = -1;
@@ -130,9 +131,15 @@ function invBar(w){
   else if (MAP_ID !== id) txt = L(`⚔ กำลังมีการรุกรานที่${where} · เหลือ ${fmt(w.left)}`, `⚔ Invasion under way at ${where} · ${fmt(w.left)} left`);
   else if (INV.boss && !INV.boss.dead){ txt = L(`⚔ แม่ทัพผู้รุกราน · ${fmt(w.left)}`, `⚔ Invading Warlord · ${fmt(w.left)}`); pct = INV.boss.hp / INV.boss.maxhp; }
   else { const g = invGoal(); txt = L(`⚔ การรุกราน · ทัพ ${Math.min(INV.tot, g)}/${g} · ของคุณ ${INV.my} · ${fmt(w.left)}`, `⚔ Invasion · army ${Math.min(INV.tot, g)}/${g} · yours ${INV.my} · ${fmt(w.left)}`); pct = Math.min(1, INV.tot / g); }
-  const html = `${escH(txt)}${pct >= 0 ? `<span class="ib"><i style="width:${Math.round(pct * 100)}%"></i></span>` : ''}`;
+  const go = w && !INV.done[w.key] && MAP_ID !== id && id >= 0 ? ` <button class="ibgo" data-invgo>${L(w.active ? 'ไปช่วย' : 'ไปรอ', w.active ? 'Join' : 'Go')}</button>` : '';
+  const html = `${escH(txt)}${go}${pct >= 0 ? `<span class="ib"><i style="width:${Math.round(pct * 100)}%"></i></span>` : ''}`;
   if (b.hidden) b.hidden = false; if (b._h !== html){ b._h = html; b.innerHTML = html; }
 }
+/* the bar's button: straight to the invaded map (free, like the world boss's warp) */
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-invgo]'); if (!b) return; const w = invWindow(); if (!w) return; const id = invMap(w.key); if (id < 0 || id === MAP_ID) return;
+  if (typeof DG !== 'undefined' && DG.active){ toast(L('ออกจากดันเจียนก่อนนะ', 'Leave the dungeon first')); return; }
+  if (typeof TW !== 'undefined' && TW.active){ toast(L('ออกจากหอคอยก่อนนะ', 'Leave the tower first')); return; }
+  warpTo(id); dirty = true; });
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'invasion', t:['การรุกราน', 'Invasions'], b:() => L(
   `<p>ทุกชั่วโมงนาทีที่ ${INV_MIN} (เวลาไทย) กองทัพผู้รุกรานบุกแผนที่ล่าหนึ่งแห่ง (ทุกคนเห็นแผนที่เดียวกัน) นาน ${INV_LEN} นาที · มีประกาศก่อน ${INV_WARN} นาที · ผู้รุกราน (ป้ายแดง ⚔) แข็งแรงตามเลเวลของคุณ · ทุกคนในแผนที่ช่วยกันเติมแถบทัพ (${INV_GOAL} ตัว +${INV_PER} ต่อผู้เล่นที่อยู่ด้วย) ครบแล้วแม่ทัพปรากฏ HP ใช้ร่วมกันทุกคน · ล้มแม่ทัพได้: เบี้ยตามเลเวล เหรียญวายรา 3 และลุ้นอุปกรณ์ 30% (ต้องล้มผู้รุกราน 3 ตัว หรือตีแม่ทัพ 1% ขึ้นไป)</p>`,
   `<p>Every hour at :${INV_MIN} (Thai time) an army invades one hunting map (the same for everyone) for ${INV_LEN} minutes, announced ${INV_WARN} minutes before · invaders (red ⚔ tag) match your level · everyone on the map fills one shared bar (${INV_GOAL}, +${INV_PER} per extra player), then the warlord appears with one HP bar for all · beat it for Bia by level, 3 Vayra Coins and a 30% chance at gear (help with 3 invaders or 1% of the warlord)</p>`)});

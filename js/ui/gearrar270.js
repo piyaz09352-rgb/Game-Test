@@ -132,6 +132,9 @@ ${B}.gr3 > .grgem,${B}.gr3 > .grgem.slt{background:linear-gradient(135deg,#fffbe
 ${B} > .grrays,${B} > .grrays.slt{background:var(--rays) !important}
 ${P} .gdx[data-gs] > .grbig,${P} .gdx[data-gs] > .grbig.slt{background:var(--g1) !important}
 ${P} .gdx[data-gs] > .grcorner,${P} .gdx[data-gs] > .grcorner.slt{background:none !important}
+/* the Low graphics setting: frames keep their colours and patterns, but nothing turns or pulses */
+html.gr-still body #ui#ui.ui .bslot.grx.grx,html.gr-still body #ui#ui.ui .bslot.grx.grx > *,html.gr-still body #ui#ui.ui .eqsl .eqbox,html.gr-still body #ui#ui.ui .eqsl .eqbox::before,html.gr-still body .gdx,html.gr-still body .gdx *,html.gr-still body .gdx *::before{animation:none !important}
+html.gr-still body #ui#ui.ui .bslot.grx.grx > .grspk{opacity:.8}
 @media (prefers-reduced-motion:reduce){${B},${B} > *,${E} .eqbox,${E} .eqbox::before,${P} .gdx,${P} .gdx *,${P} .gdx *::before{animation:none !important}}
 `;
   const st = document.createElement('style'); st.id = 'gr270css'; st.textContent = css;
@@ -150,3 +153,6 @@ function gr270Dress(root){
     const s = c.querySelector('.gdx-band span'); if (s) s.dataset.stars = '★'.repeat(r + 1); }
 }
 { let pend = false; new MutationObserver(() => { if (pend) return; pend = true; requestAnimationFrame(() => { pend = false; try { gr270Dress(document); } catch (e) {} }); }).observe(document.documentElement, {childList:true, subtree:true}); }
+/* follow the graphics preset (Low = still frames) */
+{ const still = () => { try { document.documentElement.classList.toggle('gr-still', typeof GFX !== 'undefined' && GFX.preset === 'low'); } catch (e) {} };
+  still(); setInterval(still, 1500); }

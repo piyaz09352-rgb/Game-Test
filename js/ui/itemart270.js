@@ -120,7 +120,7 @@ function ia270GearDups(){
 { const _pk = iaPick; iaPick = function(id){
     const it0 = ITEMS[id]; if (!it0 || it0.kind !== 'gear') return _pk.apply(this, arguments);
     const bid = it0.base && it0.base !== id && ITEMS[it0.base] ? it0.base : id, d = ia270GearDups(); if (!d.has(bid)) return _pk.apply(this, arguments);
-    const r = _pk.apply(this, arguments), p = r.p, it = ITEMS[bid], m = /^w_([a-z]+?)(\d+)$/.exec(bid);
+    const r = _pk.apply(this, arguments), p = r.p, it = ITEMS[bid], km = {k_merchant_w:'w_axe1', k_tradelord_w:'w_gaxe4', k_tycoon_w:'w_gaxe8'}[bid], m = /^w_([a-z]+?)(\d+)$/.exec(km || bid);   // the merchant line's own axes look like axes
     let [defs, body] = r.art, glow = r.glow, shaped = false;
     if (m && it.slot === 'weapon'){ const kind = m[1], t = +m[2], c = ia270Tc(t), gld = t === 0 ? '#8a5a34' : t >= 6 ? c[0] : '#f2c444';
       if (IA270_W[kind]){ defs = lg(p + 'b', [c[0], c[1], c[2]], 0, 0, 1, 1); body = IA270_W[kind](p, c, gld); shaped = true; glow = c[1];
@@ -128,7 +128,7 @@ function ia270GearDups(){
       else if (t > 5){ const c2 = ia270Tc(t); defs = defs.replace(/stop-color="[^"]+"/g, (() => { let i = 0; return () => `stop-color="${c2[Math.min(2, i++)]}"`; })()); glow = c2[1]; shaped = true; } }
     // what is still a twin of something else: its own hue and rune
     const twin = !shaped || ['bsword', 'bow', 'fist', 'glove', 'claw', 'staff', 'sword', 'dagger', 'shuriken'].includes(m && m[1]) && !/^w_/.test(bid);
-    if (!shaped || /^k_/.test(bid)){ const i = d.get(bid) || 0, h = (typeof iaHash === 'function' ? iaHash(bid) : i);
+    if (!shaped || (/^k_/.test(bid) && !km)){ const i = d.get(bid) || 0, h = (typeof iaHash === 'function' ? iaHash(bid) : i);
       if (i > 0){ defs += `<filter id="${p}hr"><feColorMatrix type="hueRotate" values="${(i * 47 + h % 30) % 360}"/></filter>`; body = `<g filter="url(#${p}hr)">${body}</g>`; }
       const acc = ['#fff0b0', '#bfe8ff', '#ffc8e0', '#d8ffc0'][i % 4], gl = IA270_GLYPH[i % IA270_GLYPH.length];
       body += `<g transform="translate(26.5 4.5)"><circle cx="4.5" cy="4.5" r="4.6" fill="#1c120e" stroke="${acc}" stroke-width=".9"/><g transform="translate(1.6 1.6) scale(.58)"><path d="${gl}" fill="${acc}" stroke="${acc}" stroke-width=".7" stroke-linejoin="round" fill-opacity=".85"/></g></g>`; }
