@@ -17,7 +17,7 @@ test('helper robots: free and rented, pick-up speed, EXP bonus, old rentals refu
       const d = document.getElementById('dialog'); const free = d.querySelectorAll('[data-botfree]').length, paid = new Set([...d.querySelectorAll('[data-rentpet]')].map(b => b.dataset.rentpet)).size;
       d.querySelector('[data-botfree="byte"]').click(); const h1 = {...S.helper};
       const atk0 = DER.atk; d.querySelector('[data-rentpet="titan"][data-rt="0"]').click();
-      return {free, paid, h1, h2:{...S.helper}, coins:ACC.coins, atk0, atk1:DER.atk, pics:[...document.querySelectorAll('#dialog .botic img')].every(i => i.src.startsWith('data:image/png')), names:Object.keys(HELPERS)}; });
+      return {free, paid, h1, h2:{...S.helper}, coins:ACC.coins, atk0, atk1:DER.atk, pics:[...document.querySelectorAll('#dialog .botic img')].every(i => (i.src.startsWith('data:image/png') || /assets\/helpers\/\w+\.png/.test(i.src))), names:Object.keys(HELPERS)}; });
     assert.strictEqual(shop.free, 3, 'three free robots'); assert.strictEqual(shop.paid, 9, 'nine to rent');
     assert.ok(!shop.names.some(k => ['ridgeback', 'hare', 'hawk', 'elephant'].includes(k)), 'no old animals left');
     assert.deepStrictEqual(shop.h1, {k:'byte', free:1}, 'the free one is taken');

@@ -186,9 +186,38 @@ const BOT_DRAW = {
     g.strokeStyle = c[1]; g.lineWidth = 1; g.beginPath(); g.ellipse(0, 0, 13.8, 13.8, 0, 0, 7); g.stroke(); for (let i = 0; i < 8; i++){ const a = t * .8 + i * .785; g.fillStyle = i % 2 ? c[2] : c[0]; g.fillRect(Math.cos(a) * 12 - 1, Math.sin(a) * 12 - 1, 2, 2); }
     g.fillStyle = botMetal(g, -5, -5, 5, 5, ['#fffbe6', c[2]]); g.beginPath(); g.arc(0, 0, 5, 0, 7); g.fill(); g.fillStyle = '#3a2400'; g.beginPath(); g.ellipse(Math.sin(t * .9) * 1.4, 0, 1.4, 3, 0, 0, 7); g.fill(); }
 };
+/* (v274) the owner's own pictures (assets/helpers/<id>.png) take the place of the drawn robots, brought to life:
+   a soft glow in the robot's colour that breathes, a slow sway and tilt into its flight, a breathing scale, sparkles
+   twinkling round it and a shine that sweeps across it every few seconds. A robot with no picture keeps its drawing. */
+const HLP_IMG = {};
+for (const k of Object.keys(HELPERS)){ const im = new Image(); im.onload = () => { HLP_IMG[k] = im; delete BOT_PIC[k]; }; im.onerror = () => {}; im.src = `assets/helpers/${k}.png?v=${typeof GAMEV !== 'undefined' && GAMEV ? GAMEV : 274}`; }
+const HLP_SHINE = document.createElement('canvas');
+function drawBotImg(g, k, t, opt){
+  const im = HLP_IMG[k], R = HELPERS[k], c = R.c, sz = opt.size || 34, k2 = sz / Math.max(im.width, im.height), w = im.width * k2, h = im.height * k2;
+  const still = typeof GFX !== 'undefined' && GFX.preset === 'low', ph = (k.charCodeAt(0) || 1) * .7;
+  const breathe = still ? 1 : 1 + Math.sin(t * 2.4 + ph) * .035, tilt = still ? 0 : (opt.mv ? .14 * (opt.face || 1) : Math.sin(t * 1.3 + ph) * .07);
+  // glow behind, in its own colour, breathing
+  g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(0, 0, 2, 0, 0, sz * .85); gr.addColorStop(0, c[2]); gr.addColorStop(1, 'rgba(0,0,0,0)');
+  g.globalAlpha = .28 + (still ? 0 : Math.sin(t * 3 + ph) * .12); g.fillStyle = gr; g.beginPath(); g.arc(0, 0, sz * .85, 0, 7); g.fill(); g.restore();
+  // the robot: sway, tilt, breathe, face its way
+  g.save(); g.rotate(tilt); g.scale(breathe * (opt.face < 0 ? -1 : 1), breathe); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(im, -w / 2, -h / 2, w, h);
+  // a shine sweeping across it every ~3.4 s (only over the robot itself)
+  const cyc = (t + ph) % 3.4; if (!still && cyc < .7){ const W2 = Math.ceil(w) + 2, H2 = Math.ceil(h) + 2; if (HLP_SHINE.width !== W2 || HLP_SHINE.height !== H2){ HLP_SHINE.width = W2; HLP_SHINE.height = H2; }
+    const sg = HLP_SHINE.getContext('2d'); sg.clearRect(0, 0, W2, H2); sg.globalCompositeOperation = 'source-over'; sg.drawImage(im, 1, 1, w, h); sg.globalCompositeOperation = 'source-atop';
+    const px = -W2 * .4 + (cyc / .7) * W2 * 1.8, lg = sg.createLinearGradient(px - 12, 0, px + 12, H2); lg.addColorStop(0, 'rgba(255,255,255,0)'); lg.addColorStop(.5, 'rgba(255,255,255,.85)'); lg.addColorStop(1, 'rgba(255,255,255,0)');
+    sg.fillStyle = lg; sg.fillRect(0, 0, W2, H2); g.globalCompositeOperation = 'lighter'; g.globalAlpha = .55; g.drawImage(HLP_SHINE, -w / 2 - 1, -h / 2 - 1); }
+  g.restore();
+  // sparkles twinkling round it
+  if (!still){ g.save(); g.globalCompositeOperation = 'lighter';
+    for (let i = 0; i < 5; i++){ const a = i * 1.257 + t * .5 + ph, r = sz * (.55 + .12 * Math.sin(t * 1.7 + i)), tw = Math.max(0, Math.sin(t * 3.1 + i * 2.3 + ph)), sx = Math.cos(a) * r, sy = Math.sin(a) * r * .75, s2 = 1 + tw * 2.2;
+      if (tw < .05) continue; g.globalAlpha = tw; g.fillStyle = i % 2 ? '#ffffff' : c[2]; g.beginPath(); g.moveTo(sx, sy - s2); g.lineTo(sx + s2 * .3, sy); g.lineTo(sx, sy + s2); g.lineTo(sx - s2 * .3, sy); g.closePath(); g.fill();
+      g.beginPath(); g.moveTo(sx - s2, sy); g.lineTo(sx, sy + s2 * .3); g.lineTo(sx + s2, sy); g.lineTo(sx, sy - s2 * .3); g.closePath(); g.fill(); }
+    g.restore(); }
+}
 function drawBot(g, k, t, opt = {}){
   const R = HELPERS[k]; if (!R) return; const f = BOT_DRAW[R.shape] || BOT_DRAW.cube, c = R.c;
-  g.save(); if (opt.face < 0) g.scale(-1, 1); f(g, t, c, opt.mv); g.restore();
+  if (HLP_IMG[k]) drawBotImg(g, k, t, opt);
+  else { g.save(); if (opt.face < 0) g.scale(-1, 1); f(g, t, c, opt.mv); g.restore(); }
   if (opt.zap > 0){ g.save(); g.globalAlpha = opt.zap / .35; g.strokeStyle = c[2]; g.lineWidth = 1.5; g.beginPath(); g.arc(0, 0, 14 + (1 - opt.zap / .35) * 10, 0, 7); g.stroke(); g.restore(); }
 }
 /* a hover beam under it, then the robot bobbing in the air */
@@ -206,7 +235,9 @@ function drawHelperW(g){
 { const _ents = LIVE.ents; LIVE.ents = function(list, g){ _ents(list, g); if (helperOf() && !P.dead) list.push({y:HLP.y, f:() => drawHelperW(g)}); }; }
 /* a still picture for the shop (cached) */
 const BOT_PIC = {};
-function botPic(k){ if (BOT_PIC[k]) return BOT_PIC[k]; const cv = document.createElement('canvas'); cv.width = cv.height = 96; const g = cv.getContext('2d');
+function botPic(k){ if (BOT_PIC[k]) return BOT_PIC[k];
+  if (HLP_IMG[k]) return (BOT_PIC[k] = HLP_IMG[k].src);   // the owner's picture as it is (the shop makes it float and glow)
+  const cv = document.createElement('canvas'); cv.width = cv.height = 96; const g = cv.getContext('2d');
   g.translate(48, 50); g.scale(2.6, 2.6); try { drawBot(g, k, 1.1, {}); } catch (e) {} return (BOT_PIC[k] = cv.toDataURL()); }
 
 /* ---------- capture gear: four tiers sold by Boonma ----------
@@ -267,7 +298,7 @@ document.addEventListener('click', e => {
   else endHelper('return');
   const n = NPCS.find(x => x.id === 'beastkeeper'); if (n && !el('dialog').hidden && el('dialog').dataset.npc === 'beastkeeper') NPC_OPEN.beastkeeper(n);
 });
-{ const st = document.createElement('style'); st.textContent = '.hlpbuff{color:#9ff0c8;font-weight:700}.botic{background:radial-gradient(circle at 50% 45%,#2a3a58,#0c1424) !important;border-radius:12px;box-shadow:inset 0 0 0 1.5px rgba(120,200,255,.45),0 0 8px rgba(80,180,255,.35)}.botic img{width:100%;height:100%;object-fit:contain}.rentbtns .btn.cgo{background:linear-gradient(#5ab8ff,#2a6fd0) !important;color:#fff !important;border-color:#1d4f9a !important}.rentbtns .btn.cgo small{color:#e4f4ff !important}.rentbtns .btn.cgo:disabled{filter:grayscale(.6) brightness(.85)}'; document.head.appendChild(st); }
+{ const st = document.createElement('style'); st.textContent = '@keyframes botFloat{0%,100%{transform:translateY(1px) rotate(-2deg)}50%{transform:translateY(-3px) rotate(2deg)}}@keyframes botGlow{0%,100%{filter:drop-shadow(0 0 3px rgba(120,210,255,.55))}50%{filter:drop-shadow(0 0 8px rgba(160,230,255,.95))}}.botic img{animation:botFloat 2.6s ease-in-out infinite,botGlow 1.9s ease-in-out infinite;transform-origin:50% 60%}html.gr-still .botic img{animation:none}.hlpbuff{color:#9ff0c8;font-weight:700}.botic{background:radial-gradient(circle at 50% 45%,#2a3a58,#0c1424) !important;border-radius:12px;box-shadow:inset 0 0 0 1.5px rgba(120,200,255,.45),0 0 8px rgba(80,180,255,.35)}.botic img{width:100%;height:100%;object-fit:contain}.rentbtns .btn.cgo{background:linear-gradient(#5ab8ff,#2a6fd0) !important;color:#fff !important;border-color:#1d4f9a !important}.rentbtns .btn.cgo small{color:#e4f4ff !important}.rentbtns .btn.cgo:disabled{filter:grayscale(.6) brightness(.85)}'; document.head.appendChild(st); }
 
 /* ---------- the guide for hunters with no fighting pet ---------- */
 const PET_HINT = () => L('ยังไม่มีสัตว์คู่ใจ? จับเอง: ตีมอนให้ HP เหลือไม่เกิน 30% เข้าใกล้แล้วกด T (ปุ่ม จับ)', 'No pet yet? Catch one: bring a monster under 30% HP, get close and press T (Catch)');
