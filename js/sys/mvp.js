@@ -129,7 +129,8 @@ function mvpDropsHTML(id, mapId){
   if (lvl >= 150 && typeof csetDrop === 'function') row.push(chip('<span class="mvpdg">★</span>', L('ชิ้นส่วนชุดประจำสายของคุณ', 'Your class set piece'), '6%'));
   if (ITEMS.drill_d) row.push(chip(itemIcon('drill_d'), escH(nm(ITEMS.drill_d)), '12%'));
   if (d.card && CARDS[d.card]){ const c = CARDS[d.card]; row.push(chip('<span class="mvpdg cd">🂠</span>', escH(nm(c)), pc(d.cardRate || 0), escH(L(c.desc[0], c.desc[1])))); }
-  row.push(chip('<span class="mvpdg"><i class="biaI"></i></span>', L('เงินรางวัล MVP 3,000 เบี้ย', 'MVP reward 3,000 Bia'), L('แน่นอน', 'Always')));
+  { const mv = (typeof ECON !== 'undefined' ? ECON.mvpBia : 1500).toLocaleString(); row.push(chip('<span class="mvpdg"><i class="biaI"></i></span>', L(`เงินรางวัล MVP ${mv} เบี้ย`, `MVP reward ${mv} Bia`), L('แน่นอน', 'Always'))); }
+  if (typeof BCOIN !== 'undefined') row.push(chip('<span class="mvpdg">◈</span>', L(`เหรียญวายรา ${lvl >= 150 ? '3–5' : '1–2'}`, `${lvl >= 150 ? '3–5' : '1–2'} Vayra Coins`), L('ทุกคนที่ช่วยตี', 'every helper'), L('วันละไม่เกิน 30 · บอสต่ำกว่าเรา 20 เลเวลไม่ให้', 'up to 30 a day · none from a boss 20+ levels below you')));
   return `<div class="mvpdrop">${row.join('')}</div>`;
 }
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-mvpdrop]'); if (!b) return; MVP.open = MVP.open === b.dataset.mvpdrop ? null : b.dataset.mvpdrop; WIN_RENDER.mvp(); });
