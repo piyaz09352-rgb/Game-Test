@@ -98,14 +98,13 @@ if (typeof drawMobW === 'function'){ const _dm = drawMobW; drawMobW = function(g
 if (typeof LIVE !== 'undefined'){ const _u = LIVE.drawUnder;
   LIVE.drawUnder = function(g, ...a){ const r = _u.call(this, g, ...a);
     for (const m of mobs){ const s = m.sig; if (!s || m.dead) continue; const k = Math.min(1, s.t / Math.max(.3, s.dur - .25)), col = s.s.col, pulse = .35 + Math.sin(T * 16) * .12;
-      const mark = (x, y, rx, ry) => { g.save(); g.fillStyle = `rgba(${col},${.12 + k * .2})`; g.strokeStyle = `rgba(255,60,40,${pulse + k * .3})`; g.lineWidth = 2;
-        g.beginPath(); g.ellipse(x - cam.x, y - cam.y, rx, ry, 0, 0, 7); g.fill(); g.stroke();
-        g.fillStyle = `rgba(255,70,50,${.25 + k * .3})`; g.beginPath(); g.ellipse(x - cam.x, y - cam.y, rx * k, ry * k, 0, 0, 7); g.fill(); g.restore(); };
-      if (s.kind === 'meteor' || s.kind === 'pillars') for (const [x, y] of s.spots) mark(x, y, 36, 22);
+      // (v278) the ground warns (telegraph278.js): cracks where it will burst, a growing shadow where something falls
+      const mark = (x, y, rx, ry, kind) => teleCircle(g, x - cam.x, y - cam.y, rx, k, {kind, col, sq:ry / rx});
+      if (s.kind === 'meteor' || s.kind === 'pillars') for (const [x, y] of s.spots) mark(x, y, 36, 22, 'fall');
       else if (s.kind === 'web' || s.kind === 'curse') mark(s.x, s.y, 46, 28);
       else if (s.kind === 'vortex') mark(m.x, m.y, 85, 52);
-      else if (s.kind === 'quake'){ for (const at of [.5, 1.1, 1.7]) if (s.t < at){ const rr = 60 + (at - .5) * 110; g.save(); g.strokeStyle = `rgba(255,60,40,${.3 + pulse * .4})`; g.lineWidth = 3; g.beginPath(); g.ellipse(m.x - cam.x, m.y - cam.y, rr, rr * .62, 0, 0, 7); g.stroke(); g.restore(); } }
-      else if (s.kind === 'wave' && s.t < 1){ g.save(); g.translate(m.x - cam.x, m.y - cam.y); g.rotate(Math.atan2(s.uy, s.ux)); g.fillStyle = `rgba(255,60,40,${.15 + k * .25})`; g.strokeStyle = `rgba(255,60,40,${pulse + .2})`; g.lineWidth = 2; g.fillRect(0, -34, 380, 68); g.strokeRect(0, -34, 380, 68); g.fillStyle = `rgba(${col},.35)`; g.fillRect(0, -34, 380 * k, 68); g.restore(); }
+      else if (s.kind === 'quake'){ for (const at of [.5, 1.1, 1.7]) if (s.t < at){ const rr = 60 + (at - .5) * 110; teleCircle(g, m.x - cam.x, m.y - cam.y, rr, Math.min(1, s.t / at), {col, sq:.6}); break; } }
+      else if (s.kind === 'wave' && s.t < 1) teleLine(g, m.x - cam.x, m.y - cam.y, s.ux, s.uy, s.len || 380, 60, k, {col});
       else if (s.kind === 'pounce' && s.t < .7) mark(P.x, P.y, 40, 24);
     }
     return r; };

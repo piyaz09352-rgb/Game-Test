@@ -139,7 +139,7 @@ function bpGrandCast(m, id){
   const at = bpAt(), R = 210, fx = {g_solar:'cataclysm', g_deluge:'frostsea', g_tempest:'tempest', g_quake:'earthfall', g_judge:'wrath', g_abyss:'meteor'}[id];
   bpSay(m, id, true); if (typeof bossShout === 'function') bossShout(m, 'fury', L(...BP.name[id])); else banner(L(`☄ ${m.def.name}: ${BP.name[id][0]}!`, `☄ ${m.def.en}: ${BP.name[id][1]}!`)); SFX.play('roar'); VFX.play('enrage', {m});
   VFX.play('warnCircle', {x:at.x, y:at.y, r:R, t:2});
-  for (let i = 0; i < 4; i++){ const x = at.x + rand(-R * .55, R * .55), y = at.y + rand(-R * .35, R * .35); VFX.play('warnCircle', {x, y, r:60, t:2 + i * .3}); later(2 + i * .3, () => { if (!m.dead && inHit(x, y, 60) && !P.roll) mobAttack(m, .8, true); }); }
+  for (let i = 0; i < 4; i++){ const x = at.x + rand(-R * .55, R * .55), y = at.y + rand(-R * .35, R * .35); VFX.play('warnCircle', {x, y, r:60, t:2 + i * .3, kind:'fall'}); later(2 + i * .3, () => { if (!m.dead && inHit(x, y, 60) && !P.roll) mobAttack(m, .8, true); }); }
   later(2, () => { if (m.dead) return; VFX.play(fx, {x:at.x, y:at.y, r:R, hits:4, every:.3, lv:10, elem:m.def.elem}); VFX.shake(8); SFX.play('boom');
     if (id === 'g_deluge' && typeof DELUGE_START === 'function') DELUGE_START(at.x, at.y, R);
     for (let i = 0; i < 4; i++) later(i * .3, () => { if (!m.dead && inHit(at.x, at.y, R) && !P.roll){ mobAttack(m, .9, true);

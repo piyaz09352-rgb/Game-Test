@@ -206,3 +206,26 @@ function sigDraw(g, layer){
 EV.on('tick', () => { if (SIGFX.list.length) SIGFX.list = SIGFX.list.filter(f => T - f.t0 < f.dur); });
 { const _u = LIVE.drawUnder; LIVE.drawUnder = function(g, ...a){ const r = _u.call(this, g, ...a); sigDraw(g, 'under'); return r; }; }
 { const _o = LIVE.drawOver; LIVE.drawOver = function(g, ...a){ const r = _o.call(this, g, ...a); sigDraw(g, 'over'); return r; }; }
+
+/* (v278) the skills' own effects, no longer shared: within a class no two skills play the same base effect any more
+   (the ninja's three jutsu became fire, water and kunai; the astrologer's gravity a dark star; the boxer's knee clinch
+   and nak muay, the dog folk's howl and guard bark, the physician's elixir and revive each their own), and the effects
+   many skills across classes share — the golden shield, the ram wai yantra, the barrier, healing, the charge, the blade
+   storm, the elixir — take each skill's own colours: its element's, or a colour of its own when it has none. The first
+   skill to own an effect keeps its classic gold. */
+const SIG_FXFIX = {gravity:'darkStar', revive:'heal', nakmuay:'waveslash', howl:'barrier', katon:'fire', suiton:'ice', quickslash:'kunai', fuuton:'dart'};
+for (const [id, fx] of Object.entries(SIG_FXFIX)) if (SKILLS[id] && SKILLS[id].type !== 'passive') SKILLS[id].fx = fx;
+const SIG_TINTABLE = ['goldshield', 'ramwai', 'barrier', 'heal', 'charge', 'bladestorm', 'elixir'];
+const SIG_OWN = [['255,120,170', '255,215,235'], ['120,200,255', '220,245,255'], ['170,120,255', '235,215,255'], ['110,230,170', '220,255,235'], ['255,150,70', '255,225,180'], ['90,220,230', '215,250,255'], ['255,90,90', '255,210,200'], ['200,230,90', '245,255,210']];
+const SIG_TINT = {};
+{ const order = []; for (const j of Object.values(JOBS)) for (const id of (j.skills || [])) if (!order.includes(id)) order.push(id); for (const id in SKILLS) if (!order.includes(id)) order.push(id);
+  const first = {};
+  for (const id of order){ const sk = SKILLS[id]; if (!sk || sk.type === 'passive') continue; const fx = sk.fx || (sk.type === 'heal' ? 'heal' : null); if (!SIG_TINTABLE.includes(fx)) continue;
+    if (!first[fx]){ first[fx] = id; continue; }
+    const pal = sk.elem && sk.elem !== 'neutral' && SIG_PAL[sk.elem] ? [SIG_PAL[sk.elem][0], SIG_PAL[sk.elem][1]] : SIG_OWN[sigH(id) % SIG_OWN.length];
+    SIG_TINT[id] = {c1:`rgba(${pal[0]},1)`, c2:`rgba(${pal[1]},1)`}; } }
+let SIG_CUR = null;
+{ const _f = fireSkill; fireSkill = function(id){ const prev = SIG_CUR; SIG_CUR = id; try { return _f.apply(this, arguments); } finally { SIG_CUR = prev; } }; }
+{ const _p = VFX.play; VFX.play = function(key, o){ const tn = SIG_CUR && SIG_TINT[SIG_CUR];
+    if (tn && o && typeof o === 'object' && (key === (SKILLS[SIG_CUR].fx || 'heal'))) o = {...o, c1:tn.c1, c2:tn.c2};
+    return _p.call(this, key, o); }; }

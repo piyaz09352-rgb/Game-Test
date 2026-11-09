@@ -126,6 +126,9 @@ function w3Small(arch, look, seed, x, sid){
   if (lk.size) lk.size = +(.9 + ((seed >>> 11) % 5) * .08).toFixed(2);
   return {arch:pick.arch, race:pick.race, size:pick.size, look:lk, shot:ranged ? 'dart' : null};
 }
+/* (v278) five people of the old roads became animals; the regions still choose their templates as before (so every
+   regional creature, its id and the quests that name it stay the same) */
+const W3_WAS = {khmerghost:['human', {weapon:'sword'}], moatkappa:['human', {}], icefisher:['human', {weapon:'staff'}], frostknight:['human', {weapon:'sword'}], koboldscale:['human', {weapon:'sword'}]};
 function WORLD_MORE(){
   if (MAPS.length > 31) return;
   const SP = {}; SPECIES.forEach(s => { SP[s[0]] = s; }); const BS = {}; BOSSES.forEach(b => { BS[b[0]] = b; });
@@ -135,9 +138,9 @@ function WORLD_MORE(){
     const id = MAPS.length, quota = 10 + (mi >= 25 ? 1 : 0), pool = roadPool[road].slice(), seen = new Set(), mobsOut = [];
     // ten templates: different kinds first, in a mixed order unique to the region
     pool.sort((a, b) => w3Hash(key + a) - w3Hash(key + b));
-    for (const pass of [0, 1]) for (const t of pool){ if (mobsOut.length >= quota) break; const s = SP[t], sub = w3Sub(s[4], s[5]); if (pass === 0 && seen.has(sub)) continue; if (mobsOut.some(m => m.t === t)) continue; seen.add(sub); mobsOut.push({t, s}); }
+    for (const pass of [0, 1]) for (const t of pool){ if (mobsOut.length >= quota) break; const s = SP[t], o0 = W3_WAS[t], sub = o0 ? w3Sub(o0[0], o0[1]) : w3Sub(s[4], s[5]); if (pass === 0 && seen.has(sub)) continue; if (mobsOut.some(m => m.t === t)) continue; seen.add(sub); mobsOut.push({t, s}); }
     const ids = mobsOut.map(({t, s}, i) => {
-      let [, , , , arch, look, el0, race, size, x] = s; const seed = w3Hash(key + t), [, idEn] = w3Noun(arch, look);
+      let [, , , , arch, look, el0, race, size, x] = s; const seed = w3Hash(key + t), was = W3_WAS[t], [, idEn] = was ? w3Noun(was[0], was[1]) : w3Noun(arch, look);
       const sm = w3Small(arch, look, seed, x, `${key}_${idEn.toLowerCase().replace(/[^a-z]/g, '')}`); if (sm){ arch = sm.arch; look = sm.look; race = sm.race; size = sm.size; x = {...x}; if (sm.shot) x.shot = sm.shot; else { delete x.range; delete x.shot; } }
       const [nth, nen] = w3Noun(arch, look);
       let sid = `${key}_${['hornet', 'wasp', 'bee'].includes(look.kind) ? 'spider' : idEn.toLowerCase().replace(/[^a-z]/g, '')}`;   /* the id keeps the old creature's name */   /* (v274) the spiders became hornets and wasps: their ids stay, so saves and quests still find them */ while (used.has(sid)) sid += 'x'; used.add(sid);

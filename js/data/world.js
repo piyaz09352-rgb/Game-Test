@@ -100,7 +100,7 @@ const SPECIES = [
   ['stonenaga', 'นาคหินเจ็ดเศียร', 'Seven-headed Stone Naga', 90, 'serpent', {skin:'#9a948a', belly:'#7a756c', hood:'#a8a298', heads:7, spread:2.6, len:1.2, rise:10, thick:1.1, eyeGlow:'#7ae0ff'}, 'earth', 'formless', 'l', {k:{def:2, hp:1.3}, range:130, shot:'ice'}],
   ['khmerlion', 'สิงห์ขอม', 'Khmer Lion', 86, 'quad', {skin:'#c08870', belly:'#9a6a50', mane:'#9a6a50', ruff:true, head:'cat', tuft:true, eyeGlow:'#ffd36a', girth:1.1}, 'earth', 'formless', 'm', {k:{def:1.8}}],
   ['stoneapsara', 'อัปสราศิลา', 'Stone Apsara', 88, 'human', {skin:'#b0a898', top:'#a0988a', pants:'#a0988a', hair:'#8a8274', hat:'lomphok', hatCol:'#c8b48a', skirt:true, skirtTrim:'gold', iris:'irisGr'}, 'holy', 'formless', 'm', {range:130, shot:'holy'}],
-  ['khmerghost', 'ทหารขอมผี', 'Ghost Khmer Warrior', 87, 'human', {skin:'#8a9aa0', top:'#8a9aa0', sleeve:false, pants:'#6a4a2a', skirt:true, skirtTrim:'gold', hair:'#2a2a2a', hat:'band', hatCol:'#c8a040', weapon:'sword', iris:'irisBl'}, 'shadow', 'undead', 'm', {aggro:true}],
+  ['khmerghost', 'หมาจิ้งจอกปราสาทหิน', 'Sanctuary Jackal', 87, 'quad', {skin:'#8a6a44', belly:'#d8c4a0', stripe:'#3a2a1a', head:'dog', len:1, leg:1.05, girth:.85}, 'shadow', 'brute', 'm', {aggro:true}],
   ['carvedmonkey', 'ลิงหินแกะสลัก', 'Carved Stone Monkey', 85, 'human', {skin:'#9a948a', top:'#8a8478', pants:'#8a8478', hair:'#7a746a', tail:'#9a948a', sleeve:false, short:true}, 'earth', 'formless', 's', {k:{def:1.8, spd:10}}],
   ['sanctuarybat', 'ค้างคาวปราสาท', 'Sanctuary Bat', 89, 'bird', {body:'#6a4a2a', wing:'#4a3420', bat:true, ears:1.2, noseLeaf:'#a86a4a', eyeGlow:'#ffd36a'}, 'shadow', 'brute', 's', {aggro:true, k:{spd:18}}],
   // 11 ชายฝั่งอันดามัน
@@ -182,7 +182,7 @@ const SPECIES = [
   /* v27: folk creatures of the old capital (กรุงเก่าอโยธยา) */
   ['ayutyaksha', 'ยักษ์เฝ้ากรุงเก่า', 'Old Capital Yaksha', 113, 'human', {skin:'#3a8a6a', top:'#c8a040', pants:'#8a2a2a', hair:'#1a1a1a', hat:'lomphok', hatCol:'#e3b04b', fangs:true, weapon:'sword', necklace:true, iris:'irisGr', body:'brute'}, 'earth', 'demon', 'l', {aggro:true, k:{hp:1.3}}],
   ['krahangluang', 'กระหังกรุงเก่า', 'Old Capital Krahang', 116, 'human', {skin:'#6a5a4a', top:'#2a2a24', pants:'#3a2a1a', hair:'#141210', wings:'#c8a060', kradong:true, pestle:true, fangs:true, beard:true, size:1.35, body:'gaunt'}, 'wind', 'undead', 'm', {aggro:true}],
-  ['moatkappa', 'กัปปะคูเมือง', 'Moat Kappa', 109, 'human', {skin:'#5a9a5a', top:'#5a9a5a', pants:'#4a7a4a', hair:'#1a3a2a', shell:'#6a5a2a', beak:'#d8b040', dish:'#c8d0c0', sleeve:false, iris:'irisGd', size:1.35}, 'water', 'fish', 's', {}],
+  ['moatkappa', 'ตะพาบคูเมือง', 'Moat Softshell Turtle', 109, 'squat', {skin:'#6a7a5a', shell:'#5a6a48', belly:'#e8e0c8', kind:'turtle', scute:'#7a8a68', headStripe:'#c8c0a0', size:1.25}, 'water', 'fish', 's', {}],
   ['nangtani', 'ผีนางตานี', 'Lady Tani', 117, 'human', {skin:'#d8e8c8', top:'#5a9a3a', pants:'#3a6a2a', hair:'#0a140a', longHair:true, leaves:'#6aa83a', iris:'irisGr', body:'man', size:1.3}, 'earth', 'undead', 'm', {aggro:true}]
 ];
 
@@ -304,7 +304,7 @@ SPECIES.push(
   // 26 ทะเลสาบน้ำแข็ง
   ['frosttoad', 'คางคกน้ำแข็ง', 'Frost Toad', 0, 'squat', {skin:'#7ab0d8', belly:'#e8f4ff', stripe:'#c8e0f0', kind:'toad'}, 'water', 'fish', 's', {}],
   ['snowfox', 'จิ้งจอกหิมะ', 'Snow Fox', 0, 'quad', {skin:'#f4f8ff', belly:'#ffffff', head:'dog', len:.9, eyeGlow:'#7ae0ff', tuft:true}, 'water', 'brute', 's', {aggro:true, k:{spd:16}}],
-  ['icefisher', 'ผีชาวประมงน้ำแข็ง', 'Frozen Fisher', 0, 'human', {skin:'#c8dce8', top:'#3a5a7a', pants:'#2a3a5a', hair:'#e8f0f8', hat:'ngob', weapon:'staff', beard:true, iris:'irisBl'}, 'water', 'undead', 'm', {}],
+  ['icefisher', 'นกกระเต็นน้ำแข็ง', 'Ice Kingfisher', 0, 'bird', {body:'#4a8ac8', wing:'#2a5a9a', belly:'#f0f4f8', beak:'#2a2a2a', tail:'short', beakLen:1.5, size:.9}, 'water', 'brute', 'm', {}],
   ['frostjelly', 'เจลลี่น้ำแข็ง', 'Frost Jelly', 0, 'slime', {col:'#a8e0ff', emissive:true, spikes:true, topCol:'#e8f8ff'}, 'water', 'formless', 's', {range:110, shot:'ice'}],
   ['snowowl', 'นกเค้าหิมะ', 'Snow Owl', 0, 'bird', {body:'#f4f8ff', wing:'#d8e4f0', belly:'#ffffff', bars:'#5a5a64', beak:'#3a3a3a', tail:'short'}, 'wind', 'brute', 's', {range:130, shot:'ice'}],
   ['icecrab', 'ปูน้ำแข็ง', 'Ice Crab', 0, 'bug', {shell:'#7ab0e0', leg:'#5a8ac0', acc:'#e8f8ff', kind:'crab', bigClaw:true}, 'water', 'fish', 'm', {k:{def:1.8}}],
@@ -323,7 +323,7 @@ SPECIES.push(
   ['iceslime', 'เมือกน้ำแข็งใส', 'Clear Ice Ooze', 0, 'slime', {col:'#e8f8ff', topCol:'#a8d8f0'}, 'water', 'formless', 's', {}],
   ['icewyrm', 'นาคน้ำแข็ง', 'Ice Wyrm', 0, 'serpent', {skin:'#a8d0f0', belly:'#f4f8ff', hood:'#7ab0e0', len:1.3, rise:12, thick:1.2, eyeGlow:'#7ae0ff'}, 'water', 'dragon', 'l', {k:{hp:1.4}}],
   // 29 ป้อมน้ำแข็งพญาหิมะ
-  ['frostknight', 'อัศวินน้ำแข็ง', 'Frost Knight', 0, 'human', {skin:'#a8c8e0', top:'#4a6a8a', pants:'#2a3a5a', hair:'#e8f0f8', hat:'lomphok', hatCol:'#c8e0f0', weapon:'sword', cape:'#3a5a8a', iris:'irisBl'}, 'water', 'human', 'm', {aggro:true, k:{def:1.6}}],
+  ['frostknight', 'หมีขาวป้อมน้ำแข็ง', 'Citadel Polar Bear', 0, 'quad', {skin:'#ecf0f2', muzzle:'#c8ccd0', head:'bear', girth:1.3, len:1.05, shaggy:true}, 'water', 'brute', 'l', {aggro:true, k:{def:1.6}}],
   ['icegargoyle', 'การ์กอยล์น้ำแข็ง', 'Ice Gargoyle', 0, 'bird', {body:'#7a8a9a', wing:'#5a6a7a', bat:true, eyeGlow:'#7ae0ff', size:1.3, horns:'#c8e0f0', snout:true}, 'water', 'formless', 'm', {aggro:true, k:{def:1.8}}],
   ['snowlion', 'สิงโตหิมะแผงคราม', 'Turquoise-maned Snow Lion', 0, 'quad', {skin:'#f4f8ff', belly:'#e8f0f8', mane:'#3ac8b0', ruff:true, head:'cat', tuft:true, shaggy:true}, 'water', 'dragon', 'l', {aggro:true, k:{atk:1.25}}],
   ['frostwraith', 'วิญญาณป้อมน้ำแข็ง', 'Citadel Wraith', 0, 'floater', {col:'#6a8ac8', kind:'wisp', hood:true, spikes:true, dark:'#1a2a4a', glow:'#e8f8ff', tails:5}, 'shadow', 'undead', 's', {range:140, shot:'ice', night:true}],
