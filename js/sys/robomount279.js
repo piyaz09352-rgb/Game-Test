@@ -44,3 +44,23 @@ const roboRide = () => { const M = typeof mountSkin === 'function' ? mountSkin()
 if (typeof eqPreviewSheet === 'function'){ const _ep = eqPreviewSheet;
   eqPreviewSheet = function(){ const id = typeof EQ !== 'undefined' && EQ.tab === 'cos' && EQ.try; const M = id && XMOUNT[id] && XMOUNT[id].robot ? XMOUNT[id] : null;
     return M ? heroSheet(S.job, {...S.gear}, {...(S.look || {}), mnt:M.sprite}) : _ep.apply(this, arguments); }; }
+/* (v282) the coin shop / wardrobe: the preview stage and the picture cards show the hero riding the robot (the robot is
+   part of the hero's sprite, so the old "mount under, hero on top" drawing showed the hero alone) */
+if (typeof drawEquipPrev === 'function'){ const _dp = drawEquipPrev;
+  drawEquipPrev = function(){ const id = typeof EQ !== 'undefined' && EQ.tab === 'cos' && EQ.try; const M = id && XMOUNT[id] && XMOUNT[id].robot ? XMOUNT[id] : null; if (!M) return _dp.apply(this, arguments);
+    const cv = document.getElementById('eqPrev'), sh = heroSheet(S.job, {...S.gear}, {...(S.look || {}), mnt:M.sprite}); if (!cv || !sh) return;
+    const K = sh.K, w = 92, h = 100, fx = w / 2, fy = h - 8; if (cv.width !== w * K || cv.height !== h * K){ cv.width = w * K; cv.height = h * K; }
+    const g = cv.getContext('2d'); g.setTransform(1, 0, 0, 1, 0, 0); g.clearRect(0, 0, cv.width, cv.height); g.setTransform(K * .82, 0, 0, K * .82, fx * K * .18, fy * K * .18);
+    const lift = M.fly ? 8 + Math.sin(T * 3) * 2 : 0;
+    if (M.fly){ g.fillStyle = 'rgba(0,0,0,.22)'; g.beginPath(); g.ellipse(fx, fy, 16, 4.5, 0, 0, 7); g.fill(); }
+    SPR.draw(g, sh, 'rideIdle', EQ.dir, T, fx, fy - lift); }; }
+if (typeof cthRender === 'function'){ const _cr = cthRender;
+  cthRender = function(id){ const M = XMOUNT[id] && XMOUNT[id].robot ? XMOUNT[id] : null; if (!M) return _cr.apply(this, arguments);
+    const c = document.createElement('canvas'); c.width = CTH_W; c.height = CTH_H; const g = c.getContext('2d');
+    const bg = g.createRadialGradient(CTH_W / 2, CTH_H * .55, 4, CTH_W / 2, CTH_H * .55, CTH_W * .75); bg.addColorStop(0, 'rgba(255,214,120,.42)'); bg.addColorStop(1, 'rgba(255,220,150,0)'); g.fillStyle = bg; g.fillRect(0, 0, CTH_W, CTH_H);
+    try { const key = SPR.heroKey(S.job, {weapon:null}, {...(S.look || {}), mnt:M.sprite}), K = 2, img = SPR.renderFrame('char', key, 'rideIdle', 2, 0, K), fs = img.width;   // side on: the whole robot shows
+      const f = document.createElement('canvas'); f.width = img.width; f.height = img.height; f.getContext('2d').putImageData(img, 0, 0);
+      const s = Math.min(CTH_W / (fs / K) * 1.15, 2.1), by = CTH_H - 10 - (M.fly ? 10 : 0);
+      g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.ellipse(CTH_W / 2, CTH_H - 10, 26, 7, 0, 0, 7); g.fill();
+      g.imageSmoothingEnabled = false; g.setTransform(s, 0, 0, s, CTH_W / 2, by); g.drawImage(f, -fs / 2 / K, -SPR.ANCHOR_Y, fs / K, fs / K); } catch (e) { return null; }
+    return c.toDataURL('image/png'); }; }
