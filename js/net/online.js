@@ -112,13 +112,14 @@ function drawGhostsInto(ents, g){
   const list = [...NET.ghosts.values()]; if (list.length > NET_MAP_CAP - 1) list.sort((a, b) => Math.hypot(a.x - P.x, a.y - P.y) - Math.hypot(b.x - P.x, b.y - P.y)).length = NET_MAP_CAP - 1;
   for (const gh of list){
     if (typeof gmHidden === 'function' && gmHidden(gh)) continue;
-    const q = gh.q || {}, job = JOBS[q.j] ? q.j : 'novice', sh = heroSheet(job, ghostGear(q.g), ghostLook(q.lk, q.rf)); if (!sh) continue;
+    const q = gh.q || {}, job = JOBS[q.j] ? q.j : 'novice', rb = q.r && typeof XMOUNT !== 'undefined' && XMOUNT[q.mt] && XMOUNT[q.mt].robot ? XMOUNT[q.mt] : null,
+      sh = heroSheet(job, ghostGear(q.g), rb ? {...(ghostLook(q.lk, q.rf) || {}), mnt:rb.sprite} : ghostLook(q.lk, q.rf)); if (!sh) continue;   // (v281) a robot mount is part of the rider's sprite, for others too
     ents.push({y:gh.y, f:() => {
       const x = gh.x - cam.x, y = gh.y - cam.y; if (x < -60 || x > VW + 60 || y < -80 || y > VH + 40) return;
       const mk = q.r && typeof XMOUNT !== 'undefined' && XMOUNT[q.mt] ? XMOUNT[q.mt] : null, gem = typeof ghostEmo === 'function' ? ghostEmo(q) : null, emv = gem ? emoMotion(gem, T) : {dx:0, dy:0};
-      const act = q.dead ? 'die' : mk ? (mk.kind === 'beast' ? 'sit' : 'idle') : q.r ? (gh.moving ? 'ride' : 'rideIdle') : q.s ? 'sit' : gh.moving ? 'walk' : (sh.index[q.a] && !['die', 'ride', 'rideIdle'].includes(q.a) ? q.a : 'idle');
-      const wg = typeof wingDef === 'function' && typeof q.wg === 'string' && q.wg.length < 40 && wingDef(q.wg) && !q.dead ? q.wg : null, dd = clamp(q.d | 0, 0, 7), wo = {moving:gh.moving, ride:!!q.r && !mk, sit:!!q.s || !!(mk && mk.kind === 'beast')};
-      shadowW(g, x, y, q.r ? 16 : 9); if (SETTINGS.oFx !== false && typeof COS_SETS !== 'undefined' && COS_SETS[q.cset] && !q.dead) drawSetAura(g, q.cset, x, y, T);
+      const act = q.dead ? 'die' : mk && mk.robot ? (gh.moving ? 'ride' : 'rideIdle') : mk ? (mk.kind === 'beast' ? 'sit' : 'idle') : q.r ? (gh.moving ? 'ride' : 'rideIdle') : q.s ? 'sit' : gh.moving ? 'walk' : (sh.index[q.a] && !['die', 'ride', 'rideIdle'].includes(q.a) ? q.a : 'idle');
+      const wg = typeof wingDef === 'function' && typeof q.wg === 'string' && q.wg.length < 40 && wingDef(q.wg) && !q.dead ? q.wg : null, dd = clamp(q.d | 0, 0, 7), wo = {moving:gh.moving, ride:!!q.r && !mk, sit:!!q.s || !!(mk && mk.kind === 'beast' && !mk.robot)};
+      shadowW(g, x, y, q.r ? (mk && mk.fly ? 17 : 16) : 9); if (SETTINGS.oFx !== false && typeof COS_SETS !== 'undefined' && COS_SETS[q.cset] && !q.dead) drawSetAura(g, q.cset, x, y, T);
       if (mk) drawMountX(g, mk, x, y, dd, T, gh.moving, 'under');
       const lift = (mk ? mk.lift + (mk.fly ? mk.fly : 0) : 0) - emv.dy;
       g.save(); g.translate(emv.dx, -lift);
