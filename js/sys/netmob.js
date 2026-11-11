@@ -305,9 +305,12 @@ function nwWp(m, k){ const R = nwRng(nwHash(`${m.nid}|${k}`)), big = m.def.boss,
 /* (v182) a waypoint only changes every few seconds, but it was worked out again for every monster on every frame (a string
    hash, a walkable check and a test against every obstacle on the map, twice): with a hundred monsters online that was
    the biggest cost of a frame and fed the garbage collector. Each monster now keeps its last two waypoints. */
-function nwWpC(m, k){ const hx = m.whx ?? m.hx, hy = m.why ?? m.hy, c = m._wpc || (m._wpc = []), on = obstacles.length;   // (v282) a waypoint worked out before the map finished placing its camp and props is worked out again
-  for (const e of c) if (e.k === k && e.hx === hx && e.hy === hy && e.on === on) return e.p;
-  const p = nwWp(m, k); c.push({k, hx, hy, on, p}); if (c.length > 3) c.shift(); return p; }
+function nwWpC(m, k){ const hx = m.whx ?? m.hx, hy = m.why ?? m.hy, c = m._wpc || (m._wpc = []), on = obstacles.length, now = performance.now();
+  // (v282) a remembered waypoint is worked out again after 2 s, or when the map's obstacles change: one worked out while
+  // the map was still placing its camp and props stayed, and two games put the same boss 200 px apart
+  for (const e of c) if (e.k === k && e.hx === hx && e.hy === hy && e.on === on && now - e.at < 2000) return e.p;
+  for (let i = c.length - 1; i >= 0; i--) if (c[i].k === k) c.splice(i, 1);
+  const p = nwWp(m, k); c.push({k, hx, hy, on, at:now, p}); if (c.length > 3) c.shift(); return p; }
 function nwWander(m, now){ const seg = m.def.boss ? 22000 : 7000;
   if (m._woffN !== m.nid){ m._woffN = m.nid; m._woff = nwF(m.nid); }
   const off = m._woff * seg, k = Math.floor((now + off) / seg), u = ((now + off) % seg) / seg;
