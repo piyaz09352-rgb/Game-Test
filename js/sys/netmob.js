@@ -305,9 +305,9 @@ function nwWp(m, k){ const R = nwRng(nwHash(`${m.nid}|${k}`)), big = m.def.boss,
 /* (v182) a waypoint only changes every few seconds, but it was worked out again for every monster on every frame (a string
    hash, a walkable check and a test against every obstacle on the map, twice): with a hundred monsters online that was
    the biggest cost of a frame and fed the garbage collector. Each monster now keeps its last two waypoints. */
-function nwWpC(m, k){ const hx = m.whx ?? m.hx, hy = m.why ?? m.hy, c = m._wpc || (m._wpc = []);
-  for (const e of c) if (e.k === k && e.hx === hx && e.hy === hy) return e.p;
-  const p = nwWp(m, k); c.push({k, hx, hy, p}); if (c.length > 3) c.shift(); return p; }
+function nwWpC(m, k){ const hx = m.whx ?? m.hx, hy = m.why ?? m.hy, c = m._wpc || (m._wpc = []), on = obstacles.length;   // (v282) a waypoint worked out before the map finished placing its camp and props is worked out again
+  for (const e of c) if (e.k === k && e.hx === hx && e.hy === hy && e.on === on) return e.p;
+  const p = nwWp(m, k); c.push({k, hx, hy, on, p}); if (c.length > 3) c.shift(); return p; }
 function nwWander(m, now){ const seg = m.def.boss ? 22000 : 7000;
   if (m._woffN !== m.nid){ m._woffN = m.nid; m._woff = nwF(m.nid); }
   const off = m._woff * seg, k = Math.floor((now + off) / seg), u = ((now + off) % seg) / seg;
@@ -319,7 +319,9 @@ function nwUpd(m, dt){
   else { const w = nwWander(m, wNow()); tx = w.x; ty = w.y; }
   const dx = tx - m.x, dy = ty - m.y, d = Math.hypot(dx, dy);
   if (fast){ if (d > 240){ m.x = tx; m.y = ty; } else if (d > .5){ const k = Math.min(1, dt * 9); m.x += dx * k; m.y += dy * k; } }
-  else if (d > 400){ m.x = tx; m.y = ty; } else if (d > .5){ const st = Math.min(d, Math.max(60, m.def.speed || 60) * dt * (d > 150 ? 5 : d > 60 ? 1.6 : 1)) /* far off the world path after a chase: hurry back so every game agrees */; m.x += dx / d * st; m.y += dy / d * st; }
+  else if (d > 400){ m.x = tx; m.y = ty; }
+  else if (d > 60){ const k = Math.min(1, dt * 5); m.x += dx * k; m.y += dy * k; }   // (v282) off the world's path: glide back fast, so every game shows it in the same place (a walking catch-up let two games' bosses sit 200 px apart)
+  else if (d > .5){ const st = Math.min(d, Math.max(60, m.def.speed || 60) * dt * (d > 150 ? 5 : d > 60 ? 1.6 : 1)) /* far off the world path after a chase: hurry back so every game agrees */; m.x += dx / d * st; m.y += dy / d * st; }
   m.moving = d > 2; if (m.moving) m.dir = SPR.dirFromVec(dx, dy); else if (fast && m.ndir != null) m.dir = m.ndir;
   m.flash = Math.max(0, m.flash - dt); m.atkT += dt; m.hurtT = Math.max(0, m.hurtT - dt);
   // it notices me: I hold it from now on
@@ -399,7 +401,11 @@ function onTq(msg){ const d = msg.data || {}; if (msg.isMe || d.r !== NET.mapNam
 function onTs(msg){ const d = msg.data || {}; if (msg.isMe || d.r !== NET.mapName || d.n !== NWT.nonce || typeof d.me !== 'string') return;
   const now = Date.now(), rtt = now - NWT.sent; if (rtt < 0 || rtt > 4000 || !isFinite(+d.t)) return;
   const o = clamp(+d.t + rtt / 2 - now, -864e5, 864e5), old = NWT.off.get(d.me);
-  NWT.off.set(d.me, old && old.rtt < rtt * .7 && now - old.at < 60e3 ? old : {o, rtt, at:now}); }
+  // keep a sharper old sample over a noisy new one, unless the clocks have really moved apart since (a device clock set
+  // forward or back): (v282) then the old sample was kept for up to a minute and the two players' world clocks
+  // stayed tens of seconds apart (tests/online.test.js "one world clock" failed now and then)
+  const moved = old && Math.abs(o - old.o) > 1500 + rtt;
+  NWT.off.set(d.me, old && !moved && old.rtt < rtt * .7 && now - old.at < 60e3 ? old : {o, rtt, at:now}); }
 EV.on('map', () => { NWT.next = performance.now() + 300; NWT.mapT = T; NWT.off.clear(); WCLK.n = 0; });   // (v130) ask the others' clocks right after arriving, not up to 8 s later
 EV.on('tick', dt => {
   if (!NET.mapRoom || !NET.room || !NET.on){ NWT.off.clear(); return; }
