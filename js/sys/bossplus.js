@@ -17,7 +17,7 @@
 const BP = {
   tier:lv => (lv >= 200 ? [2.6, 1.65, 1.35] : lv >= 150 ? [2.3, 1.5, 1.25] : lv >= 120 ? [2.1, 1.4, 1.15] : lv >= 80 ? [2, 1.35, 1.1] : lv >= 40 ? [1.8, 1.3, 1.05] : [1.6, 1.25, 1]),   // [HP, hit, skill pace] · tuned with a solo simulation (v27h): ~1–3 min per boss at your level
   name:{bladestorm:['พายุคมดาบ', 'Blade Storm'], warcry:['โห่ร้องศึก', 'War Cry'], boltvolley:['ห่ากระสุนเวท', 'Bolt Volley'], healaura:['รัศมีฟื้นฟู', 'Healing Aura'],
-    pounce:['ตะครุบเหยื่อ', 'Pounce'], rend:['กรงเล็บฉีก', 'Rend'], stampede:['ตะลุยเหยียบ', 'Stampede'], trample:['กระทืบปฐพี', 'Trample'],
+    rend:['กรงเล็บฉีก', 'Rend'], stampede:['ตะลุยเหยียบ', 'Stampede'], trample:['กระทืบปฐพี', 'Trample'],
     feather:['พายุขนนก', 'Feather Storm'], gust:['ลมกรด', 'Gale'], torrent:['ธารน้ำเชี่ยว', 'Torrent'], venom:['พ่นพิษ', 'Venom Spit'], web:['ใยรัด', 'Binding Web'],
     shell:['เกราะหิน', 'Stone Guard'], shadowstep:['ก้าวเงา', 'Shadow Step'], split:['แตกร่าง', 'Split'], acid:['บ่อกรด', 'Acid Pool'], boulder:['ขว้างศิลา', 'Boulder Throw'],
     g_solar:['สุริยาถล่ม', 'Solar Cataclysm'], g_deluge:['มหาอุทกภัย', 'Great Deluge'], g_tempest:['พายุอสนีบาต', 'Thunder Tempest'], g_quake:['ธรณีสูบ', 'Earth Swallow'],
@@ -63,8 +63,8 @@ function bpKit(id){
   else if (!a && /turtle|crab|shell|clam/i.test(en)) kit.push('shell', 'torrent');
   else if (!a && /naga|serpent|snake|eel/i.test(en)) kit.push('torrent', 'venom');
   else if (!a && /bird|garuda|hawk|eagle|crow|raven/i.test(en)) kit.push('feather', 'gust');
-  else if (!a && /tiger|lion|singha|wolf|bear/i.test(en)) kit.push('pounce', 'rend');
-  else if (a === 'quad') kit.push(...(lk.head === 'cat' || lk.head === 'dog' || lk.head === 'bear' ? ['pounce', 'rend'] : ['stampede', 'trample']));
+  else if (!a && /tiger|lion|singha|wolf|bear/i.test(en)) kit.push('trample', 'rend');   // (v283) no pounce
+  else if (a === 'quad') kit.push(...(lk.head === 'cat' || lk.head === 'dog' || lk.head === 'bear' ? ['trample', 'rend'] : ['stampede', 'trample']));
   else if (a === 'bird') kit.push('feather', 'gust');
   else if (a === 'serpent') kit.push('torrent', 'venom');
   else if (a === 'bug') kit.push(/^(hornet|wasp|bee)$/.test(lk.kind || '') ? 'gust' : 'web', 'venom');   // (v274) a hornet or bee queen beats up a gale with her wings instead of spinning webs
@@ -72,7 +72,7 @@ function bpKit(id){
   else if (a === 'floater') kit.push('shadowstep', 'boltvolley');
   else if (a === 'slime') kit.push('split', 'acid');
   else if (a === 'rock') kit.push('boulder', 'shell');
-  else kit.push(d.race === 'undead' ? 'shadowstep' : 'pounce', 'boltvolley');
+  else kit.push(d.race === 'undead' ? 'shadowstep' : 'trample', 'boltvolley');
   // cataclysms: Lv 150+ only, 2–4
   const lv = d.lvl || 1;
   if (lv >= 150){ const n = lv >= 200 ? 4 : lv >= 180 ? 3 : 2, own = BP.grandOf[I.elem || d.elem] || 'g_quake', pool = ['g_solar', 'g_deluge', 'g_tempest', 'g_quake', 'g_judge', 'g_abyss'].filter(g => g !== own);
@@ -80,7 +80,7 @@ function bpKit(id){
   return kit;
 }
 for (const k in MOB){ const d = MOB[k]; if (!d || !d.boss || d.wb || !Array.isArray(d.bossSkills)) continue; const kit = bpKit(k); d.bpKit = kit; for (const s of kit) if (!d.bossSkills.includes(s)) d.bossSkills.push(s); }
-if (typeof NB_MUL !== 'undefined') Object.assign(NB_MUL, {bladestorm:.8, boltvolley:1.1, pounce:1.8, rend:1.4, stampede:2.2, trample:1.6, feather:.9, gust:1.1, torrent:1.7, venom:.8, web:.6, shadowstep:1.6, acid:.35, boulder:1.8,
+if (typeof NB_MUL !== 'undefined') Object.assign(NB_MUL, {bladestorm:.8, boltvolley:1.1, rend:1.4, stampede:2.2, trample:1.6, feather:.9, gust:1.1, torrent:1.7, venom:.8, web:.6, shadowstep:1.6, acid:.35, boulder:1.8,
   g_solar:1, g_deluge:1, g_tempest:1, g_quake:1.2, g_judge:1.1, g_abyss:1});
 
 /* ---------- the moves ---------- */
@@ -99,9 +99,6 @@ function bpCast(m, id){
         later(w - .3, () => { if (!m.dead) VFX.play('mobShot', {x:m.x, y:m.y - MOB_H[m.type] * .6, tx:x, ty:y - 16, t:.3, kind:bpShot(e)}); });
         later(w, () => { if (!m.dead && inHit(x, y, 50)) mobAttack(m, 1, true); }); } return 1.6; }
     case 'healaura': { if (m.hp > m.maxhp * .85) return 0; bpSay(m, id); const h = Math.round(m.maxhp * .04); m.hp = Math.min(m.maxhp, m.hp + h); VFX.play('heal', {x:m.x, y:m.y}); addText(m.x, m.y - MOB_H[m.type] - 8, `+${h.toLocaleString()}`, '#c4ffe0', 16); return 1; }
-    case 'pounce': { bpSay(m, id); const x = at.x, y = at.y; VFX.play('warnCircle', {x, y, r:72, t:.7});
-      later(.7, () => { if (m.dead) return; VFX.play('dustPuff', {x:m.x, y:m.y}); m.x = clamp(x, 40, W - 40); m.y = clamp(y, 60, H - 40); VFX.play('earthsplitBoom', {x, y, r:72}); VFX.shake(4);
-        if (inHit(x, y, 72) && !P.roll){ mobAttack(m, 1.8, true); if (typeof applyMobFx === 'function') applyMobFx(m, 'bleed', 1); } }); return 1.3; }
     case 'rend': case 'torrent': case 'gust': { bpSay(m, id); const dx = at.x - m.x, dy = at.y - m.y, l = Math.hypot(dx, dy) || 1, ux = dx / l, uy = dy / l, len = id === 'rend' ? 150 : id === 'gust' ? 320 : 380, w = id === 'rend' ? 70 : id === 'gust' ? 80 : 50, t = id === 'rend' ? .55 : .8;
       VFX.play('warnLine', {x:m.x, y:m.y, ux, uy, len, w, t});
       later(t, () => { if (m.dead) return; VFX.play(id === 'rend' ? 'clawHit' : 'bossWave', {x:m.x + ux * 60, y:m.y + uy * 60, ux, uy, len, elem:id === 'torrent' ? 'water' : id === 'gust' ? 'wind' : e});

@@ -1,7 +1,7 @@
 /* VAYRATHEN — js/sys/bosssig.js — every boss has its own signature move (ท่าไม้ตาย)
    Every 16–22 s in a fight a boss calls out its move by name and the ground shows where it will land (red marks):
    dodge-roll or step out before it goes off. Eight kinds of move, each boss with its own name and colour:
-     pounce   vanishes and leaps out behind you: a heavy blow and a short stun
+     rush     charges along a warned line on the ground: a heavy blow and a short stun (v283: it used to vanish and leap out behind you)
      meteor   marks five spots around you, then fire (or ice, or stone) falls on them
      wave     a straight line from the boss: a wave or blast sweeps along it and knocks you back
      quake    three rings roll out from the boss one after another
@@ -14,13 +14,13 @@
 
 const SIG = {
   boss:['ฝนเจลลี่ทองคำ', 'Golden Jelly Rain', 'meteor', '255,210,80'],
-  whitemonkeyking:['หนุมานกระโจนเงา', 'Shadow Leap of the Monkey King', 'pounce', '255,240,200'],
+  whitemonkeyking:['หนุมานพุ่งทะยาน', 'Charge of the Monkey King', 'rush', '255,240,200'],
   lotusturtle:['คลื่นบัวหลวง', 'Lotus Tide', 'wave', '120,210,255'],
   aikhiam:['หางฟาดน้ำวน', 'Whirlpool Tail', 'vortex', '90,170,220'],
   marketmatron:['ตะกร้าผีสาป', 'Cursed Basket', 'curse', '170,120,255'],
   dvarapala:['กระบองถล่มธรณี', 'Earthshaker Club', 'quake', '230,180,110'],
-  cavematriarch:['พุ่งเหล็กในมรณะ', 'Death Sting Dive', 'pounce', '255,190,90'],
-  saming:['เงาสมิงตะครุบ', 'Saming\'s Phantom Pounce', 'pounce', '255,170,60'],
+  cavematriarch:['พุ่งเหล็กในมรณะ', 'Death Sting Rush', 'rush', '255,190,90'],
+  saming:['เงาสมิงพุ่งทะยาน', 'Saming\'s Phantom Rush', 'rush', '255,170,60'],
   elderpop:['คำสาปปอบ', 'Curse of the Pop', 'curse', '150,255,140'],
   khankhak:['ฝนพญาคันคาก', 'Rain of the Toad King', 'meteor', '120,200,255'],
   templecolossus:['คำรามสะเทือนเทวาลัย', 'Temple-shaking Roar', 'quake', '240,210,140'],
@@ -37,7 +37,7 @@ const SIG = {
   scorpionking:['พายุทรายแมงป่อง', 'Scorpion Sandstorm', 'web', '230,200,140'],
   redcliffgiant:['หินผาถล่ม', 'Cliff Fall', 'meteor', '220,120,80'],
   firenaga:['ลาวาพญานาค', 'Naga Lava Flood', 'wave', '255,120,40'],
-  ashwolfking:['เขี้ยวเถ้าตะครุบ', 'Ash Fang Pounce', 'pounce', '200,190,180'],
+  ashwolfking:['เขี้ยวเถ้าพุ่งทะยาน', 'Ash Fang Rush', 'rush', '200,190,180'],
   agnilord:['อัคนีพิโรธ', 'Wrath of Agni', 'meteor', '255,90,30'],
   iceturtlelord:['ธารน้ำแข็งคลืบคลาน', 'Creeping Glacier', 'quake', '170,230,255'],
   frostqueen:['ฝูงผึ้งน้ำแข็ง', 'Ice Swarm', 'meteor', '190,235,255'],
@@ -45,7 +45,7 @@ const SIG = {
   snowking:['พายุหิมะราชา', 'The Snow King\'s Blizzard', 'pillars', '220,245,255'],
   asuraking:['อสูรวัชระ', 'Vajra of the Asura', 'pillars', '255,80,120']
 };
-const SIG_ELEM = {fire:'meteor', water:'wave', earth:'quake', wind:'vortex', holy:'pillars', shadow:'curse', poison:'web', neutral:'pounce'};
+const SIG_ELEM = {fire:'meteor', water:'wave', earth:'quake', wind:'vortex', holy:'pillars', shadow:'curse', poison:'web', neutral:'rush'};
 const sigOf = m => { const d = m.def, o = SIG[m.type]; if (o) return {th:o[0], en:o[1], kind:o[2], col:o[3]};
   return {th:'ท่าไม้ตาย', en:'Signature Move', kind:SIG_ELEM[d.elem] || 'quake', col:'255,140,90'}; };
 const SG2 = {marks:[]};
@@ -59,15 +59,18 @@ function sigStart(m){
   else if (s.kind === 'web') M0.dur = 1.1;
   else if (s.kind === 'curse') M0.dur = 1.8;
   else if (s.kind === 'vortex') M0.dur = 2;
-  else M0.dur = 1.2;   // pounce
+  else if (s.kind === 'rush'){ const d = Math.hypot(P.x - m.x, P.y - m.y) || 1; M0.ux = (P.x - m.x) / d; M0.uy = (P.y - m.y) / d; M0.len = Math.max(40, Math.min(420, d - (m.def.r || 20) - 14)); M0.x0 = m.x; M0.y0 = m.y; M0.dur = 1.15; }   // stops in front of the hero, never past them into a wall or a pond
+  else M0.dur = 1.2;
   m.sig = M0; m.busy = Math.max(m.busy || 0, M0.dur + .3); m.charge = null;
   if (typeof bossShout === 'function') bossShout(m, 'rage', L(s.th, s.en)); else banner(L(`${nm(m.def)} · ${s.th}!`, `${m.def.en} · ${s.en}!`)); SFX.play('roar'); VFX.shake(3);
-  if (s.kind === 'pounce'){ m.hiddenSig = true; VFX.play('smokeBomb', {x:m.x, y:m.y}); }
 }
 function sigStep(m, dt){
   const g = m.sig, k0 = g.t; g.t += dt; const t = g.t, s = g.s, d = m.def;
-  if (g.kind === 'pounce'){ if (t >= .7 && k0 < .7){ const bx = P.x - (P.dir != null && P.face ? P.face : 1) * 40, by = P.y + 6; m.x = clamp(bx, 30, W - 30); m.y = clamp(by, 40, H - 30); m.hiddenSig = false; VFX.play('smokeBomb', {x:m.x, y:m.y}); }
-    if (t >= .95 && k0 < .95){ if (sigHit(m, 1.8, m.x, m.y, 70)){ P.stunT = Math.max(P.stunT || 0, 1); VFX.play('stunStars', {}); } VFX.play('slashHit', {x:P.x, y:P.y - 20, gold:true, big:true}); VFX.shake(5); } }
+  if (g.kind === 'rush'){   // (v283) a charge along the warned line, on the ground: no vanish, no leap
+    if (t >= .6 && t < .95){ const k = (t - .6) / .35, e = k * k; m.x = clamp(g.x0 + g.ux * g.len * e, 30, W - 30); m.y = clamp(g.y0 + g.uy * g.len * e, 40, H - 30); m.dir = SPR.dirFromVec(g.ux, g.uy); if (Math.random() < .6) VFX.play('dustPuff', {x:m.x, y:m.y});
+      if (!g.hit){ const px = P.x - g.x0, py = P.y - g.y0, along = px * g.ux + py * g.uy, side = Math.abs(px * g.uy - py * g.ux);
+        if (along > 0 && along <= g.len * e + d.r + 30 && side < 70 && sigHit(m, 1.8, P.x, P.y, 999)){ g.hit = true; P.stunT = Math.max(P.stunT || 0, 1); VFX.play('stunStars', {}); VFX.play('slashHit', {x:P.x, y:P.y - 20, gold:true, big:true}); VFX.shake(5); } } }
+    if (t >= .95 && k0 < .95){ VFX.play('dustPuff', {x:m.x, y:m.y}); if (typeof pushOut === 'function') pushOut(m, d.r * .6); } }
   else if (g.kind === 'meteor' || g.kind === 'pillars'){ if (t >= g.dur - .25 && k0 < g.dur - .25){ let hit = false;
       for (const [x, y] of g.spots){ VFX.play(g.kind === 'meteor' ? 'quake' : 'grand', g.kind === 'meteor' ? {x, y, r:30} : {x, y, p:.6, col:`rgba(${s.col},1)`}); if (!hit && sigHit(m, g.kind === 'meteor' ? 1.4 : 1.5, x, y, 36)) hit = true; }
       VFX.shake(6); } }
@@ -105,7 +108,7 @@ if (typeof LIVE !== 'undefined'){ const _u = LIVE.drawUnder;
       else if (s.kind === 'vortex') mark(m.x, m.y, 85, 52);
       else if (s.kind === 'quake'){ for (const at of [.5, 1.1, 1.7]) if (s.t < at){ const rr = 60 + (at - .5) * 110; teleCircle(g, m.x - cam.x, m.y - cam.y, rr, Math.min(1, s.t / at), {col, sq:.6}); break; } }
       else if (s.kind === 'wave' && s.t < 1) teleLine(g, m.x - cam.x, m.y - cam.y, s.ux, s.uy, s.len || 380, 60, k, {col});
-      else if (s.kind === 'pounce' && s.t < .7) mark(P.x, P.y, 40, 24);
+      else if (s.kind === 'rush' && s.t < .6) teleLine(g, s.x0 - cam.x, s.y0 - cam.y, s.ux, s.uy, s.len, 70, Math.min(1, s.t / .6), {col});
     }
     return r; };
 }

@@ -12,7 +12,7 @@
 
 const FURY = {hp:1.95, atk:[1.1, 1.2, 1.35, 1.55], minHit:[.02, .025, .03, .04], cd:[1, .85, .72, .58]};
 const FURY_PH = [null, null, ['โกรธจัด', 'Wrathful'], ['คลั่ง', 'Frenzied'], ['บ้าคลั่งสุดขีด', 'Berserk Fury']];
-const FURY_SK = {leap:['กระโจนถล่มปฐพี', 'Crushing Leap'], dash:['พุ่งทะลวงต่อเนื่อง', 'Rampage Dash'], burrow:['มุดดินจู่โจม', 'Burrow Ambush'], soar:['ทะยานฟ้าโฉบ', 'Sky Dive'],
+const FURY_SK = {dash:['พุ่งทะลวงต่อเนื่อง', 'Rampage Dash'], burrow:['มุดดินจู่โจม', 'Burrow Ambush'], soar:['ทะยานฟ้าโฉบ', 'Sky Dive'],
   spin:['พายุหมุนสังหาร', 'Death Spin'], ring:['คลื่นกระแทก', 'Shock Rings'], pull:['ดูดกลืนวิญญาณ', 'Soul Vortex'],
   breath:['ลมหายใจมรณะ', 'Deadly Breath'], miasma:['หมอกพิษ', 'Toxic Miasma'], mist:['หายตัวในหมอก', 'Mist Vanish']};
 /* the breath takes the boss's element: fire burns, water chills, shadow curses... (see afflict.js) */
@@ -55,17 +55,17 @@ function furyBerserk(m, F){
 /* ---------- fury moves ---------- */
 /* (v276) only what really digs goes underground (the owner: some bosses should not burrow): snakes and worms, insects,
    crabs and scorpions, stone giants, jellies, frogs and toads, crocodiles, lizards, boars and rats. Ghosts and floating
-   things vanish into a mist instead; fliers soar; everything else gets a different move (a leap or a rampage). */
+   things vanish into a mist instead; fliers soar; everything else rampages along the ground (v283: the leap is gone). */
 function furyDig(m){
   const a = furyArch(m), lk = (typeof BP_INFO !== 'undefined' && BP_INFO[m.type] && BP_INFO[m.type].look) || {}, race = m.def.race;
   if (a === 'bird') return 'soar';
   if (a === 'floater' || race === 'undead' || race === 'ghost' || race === 'spirit') return 'mist';
   if (['serpent', 'bug', 'rock', 'slime', 'squat'].includes(a)) return 'burrow';
   if (a === 'quad' && ['croc', 'lizard', 'boar', 'rat'].includes(lk.head)) return 'burrow';
-  return a === 'human' ? 'dash' : 'leap';
+  return 'dash';   // (v283) no leap: everything that does not dig, mist or soar rampages along the ground
 }
 function furyPick(m, F){
-  const fly = furyArch(m) === 'bird', pool = F.phase >= 2 ? ['leap', 'dash', 'breath', 'miasma'] : ['breath', 'miasma'];
+  const fly = furyArch(m) === 'bird', pool = F.phase >= 2 ? ['dash', 'ring', 'breath', 'miasma'] : ['breath', 'miasma'];   // (v283) the leap left; a ground-shaking ring in its place
   if (F.phase >= 3) pool.push(furyDig(m), 'spin', 'ring');
   if (F.phase >= 4) pool.push('pull', furyDig(m));
   let id = pool[Math.floor(Math.random() * pool.length)];
@@ -80,8 +80,6 @@ function furyStart(m, F, id){
       later(.7, () => { if (m.dead) return; VFX.play('bossField', {x:tx, y:ty, r:72, life:6, elem:'poison'}); SFX.play('boom');
         for (let k = 0; k < 12; k++) later(k * .5, () => { if (m.dead || P.dead) return; if (inHit(tx, ty, 72) && !rollSafe()){ m._fx = 'miasma'; mobAttack(m, .22, true); m._fx = null; } }); });
       F.act = {id, t:0, dur:.9}; break; }
-    case 'leap': { const r = 76 + ph * 8;   // (v276) a real leap: it crouches, springs high, its shadow falls where it will land, and it crashes down
-      F.act = {id, t:0, st:'crouch', cw:.42, dur:.78 - ph * .04, x0:m.x, y0:m.y, tx:m.x, ty:m.y, r, h:95 + ph * 14}; VFX.play('dustPuff', {x:m.x, y:m.y}); break; }
     case 'mist': F.act = {id:'burrow', mist:true, t:0, st:'dig', w:.55, hunt:1.5 + ph * .25}; VFX.play('smokeBomb', {x:m.x, y:m.y}); break;
     case 'dash': F.act = {id, t:0, n:ph + (F.berserk > 0 ? 1 : 0), st:'aim', w:0}; break;
     case 'burrow': case 'soar': F.act = {id, t:0, st:'dig', w:.55, hunt:1.5 + ph * .25}; VFX.play(id === 'soar' ? 'roar' : 'quake', {x:m.x, y:m.y, r:50}); VFX.shake(3); break;
@@ -96,26 +94,6 @@ function furyEnd(m, F){ F.act = null; F.hidden = false; F.z = 0; F.sq = null; }
 function furyStep(m, F, dt){
   const a = F.act, d = m.def; a.t += dt;
   switch (a.id){
-    case 'leap': {
-      if (a.st === 'crouch'){ const k = clamp(a.t / a.cw, 0, 1); F.sq = [1 + .2 * k, 1 - .26 * k];   // gathers itself: low and wide, eyes on you
-        m.dir = SPR.dirFromVec(P.x - m.x, P.y - m.y); m.atkT = 0;
-        if (a.t >= a.cw){ a.st = 'air'; a.t0 = a.t; a.x0 = m.x; a.y0 = m.y; a.tx = clamp(P.x, 40, W - 40); a.ty = clamp(P.y, 60, H - 40); a.trail = [];
-          for (let i = 0; i < 3; i++) VFX.play('dustPuff', {x:m.x + rand(-16, 16), y:m.y + rand(-4, 4)}); VFX.shake(2); if (SFX.swing) SFX.swing('fist'); }
-        return true; }
-      if (a.st === 'air'){ const k = clamp((a.t - a.t0) / a.dur, 0, 1), e = k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-        m.x = a.x0 + (a.tx - a.x0) * e; m.y = a.y0 + (a.ty - a.y0) * e; F.z = Math.sin(k * Math.PI) * a.h; m.moved = true; m.dir = SPR.dirFromVec(a.tx - a.x0, a.ty - a.y0);
-        const st = Math.cos(k * Math.PI); F.sq = [1 - .1 * Math.abs(st), 1 + .16 * Math.abs(st)];   // stretched on the way up and on the way down
-        a.trail.push([m.x, m.y, F.z]); if (a.trail.length > 7) a.trail.shift();
-        if (k >= 1){ F.z = 0; pushOut(m, d.r * .6); a.st = 'land'; a.t0 = a.t; F.sq = [1.32, .66];
-          VFX.play('earthsplitBoom', {x:m.x, y:m.y, r:a.r}); VFX.play('quake', {x:m.x, y:m.y, r:a.r}); VFX.play('roar', {x:m.x, y:m.y, r:a.r * 1.3});
-          for (let i = 0; i < 6; i++){ const an = i / 6 * Math.PI * 2; VFX.play('dustPuff', {x:m.x + Math.cos(an) * a.r * .7, y:m.y + Math.sin(an) * a.r * .4}); }
-          VFX.shake(10); SFX.play('boom'); a.boom = {x:m.x, y:m.y, t:0};
-          if (inHit(m.x, m.y, a.r) && !rollSafe()){ mobAttack(m, 1.9, true); P.stunT = Math.max(P.stunT || 0, .45); const l = Math.hypot(P.x - m.x, P.y - m.y) || 1; P.x = clamp(P.x + (P.x - m.x) / l * 36, 30, W - 30); P.y = clamp(P.y + (P.y - m.y) / l * 24, 40, H - 30); }
-          if (F.phase >= 3) F.rings.push({x:m.x, y:m.y, t:0, hit:false}); }
-        return true; }
-      const k = clamp((a.t - a.t0) / .32, 0, 1); F.sq = [1.32 - .32 * k, .66 + .34 * k];   // squashed by the landing, then it rises
-      if (k >= 1){ F.sq = null; furyEnd(m, F); m.busy = .45; }
-      return true; }
     case 'dash': {
       if (a.st === 'aim'){ if (a.w === 0){ const dx = P.x - m.x, dy = P.y - m.y, l = Math.hypot(dx, dy) || 1; a.ux = dx / l; a.uy = dy / l; a.len = Math.min(320, l + 70); a.hit = false;
           VFX.play('warnLine', {x:m.x, y:m.y, ux:a.ux, uy:a.uy, len:a.len, w:46, t:.45}); m.dir = SPR.dirFromVec(a.ux, a.uy); }
@@ -264,17 +242,6 @@ function furyBreathDraw(m, a, x, y){
   if (st === 'flame' || st === 'shade'){ ctx.globalCompositeOperation = 'source-over'; for (let i = 0; i < 6 * q; i++){ const ph = (T * .9 + i / 6) % 1; ctx.globalAlpha = fade * .25 * (1 - ph); ctx.fillStyle = st === 'flame' ? '#3a3330' : '#2a1a3a'; ctx.beginPath(); ctx.arc(L0 * (.8 + ph * .25), Math.sin(i * 5) * L0 * .2 - ph * 30 * z, (10 + ph * 20) * z, 0, 7); ctx.fill(); } }
   ctx.restore();
 }
-/* (v276) the leap: where it will land, its shadow on the ground darkens and grows as it falls (no painted ring); dust
-   streams behind it in the air; on landing a crater of cracks and a shock ring spread out */
-function furyLeapDraw(m, a){
-  const z = Math.min(2, PX / 2 + .4);
-  if (a.st === 'air'){ const k = clamp((a.t - a.t0) / a.dur, 0, 1), tx = sx(a.tx), ty = sy(a.ty), r = a.r * PX * (.35 + .65 * k);
-    ctx.save(); ctx.fillStyle = `rgba(10,6,4,${.12 + .4 * k})`; ctx.beginPath(); ctx.ellipse(tx, ty, r, r * .42, 0, 0, 7); ctx.fill();
-    ctx.fillStyle = `rgba(10,6,4,${.2 + .3 * k})`; ctx.beginPath(); ctx.ellipse(tx, ty, r * .55, r * .23, 0, 0, 7); ctx.fill();
-    for (let i = 0; i < (a.trail || []).length; i++){ const [px, py, pz] = a.trail[i], kk = i / a.trail.length; ctx.globalAlpha = kk * .35; ctx.fillStyle = '#c8b090'; ctx.beginPath(); ctx.arc(sx(px) + Math.sin(i * 3) * 6 * z, sy(py - pz * .5) + 10 * z, (4 + kk * 7) * z, 0, 7); ctx.fill(); }
-    ctx.restore(); }
-  if (a.boom){ const b = a.boom; b.t += 1 / 60; }
-}
 /* screen overlay: rage bar under the boss's HP bar, shock rings, the spin's whirl and the vortex */
 EV.on('draw', () => {
   for (const m of mobs){ const F = m.fz; if (!F || m.dead || F.hop) continue;   // (F.hop: a small monster's jump borrows the lift, not the fury)
@@ -291,7 +258,6 @@ EV.on('draw', () => {
       ctx.strokeStyle = `rgba(255,240,200,${(1 - k) * .7})`; ctx.lineWidth = 1.5; ctx.stroke(); ctx.restore(); }
     const a = F.act; if (!a) continue;
     if (a.id === 'breath') furyBreathDraw(m, a, x, y);
-    if (a.id === 'leap') furyLeapDraw(m, a);
     if (a.id === 'spin'){ ctx.save(); ctx.translate(x, y - MOB_H[m.type] * PX * .4); ctx.scale(1, .5); for (let i = 0; i < 3; i++){ ctx.strokeStyle = `rgba(255,220,180,${.55 - i * .15})`; ctx.lineWidth = 3 - i; ctx.beginPath(); ctx.arc(0, 0, (m.def.r + 18 + i * 10) * PX, T * 14 + i * 2, T * 14 + i * 2 + 2.4); ctx.stroke(); } ctx.restore(); }
     if (a.id === 'pull'){ ctx.save(); ctx.translate(x, y); ctx.scale(1, .55); for (let i = 0; i < 4; i++){ const k = ((T * .9 + i / 4) % 1), r = (1 - k) * a.r * PX; ctx.strokeStyle = `rgba(190,120,255,${k * .7})`; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(0, 0, r, -T * 4 + i, -T * 4 + i + 4); ctx.stroke(); } ctx.restore(); }
   }

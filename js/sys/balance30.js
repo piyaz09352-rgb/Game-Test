@@ -12,7 +12,7 @@
       and race, each with a short warning (a red circle or the skill's name over its head):
         ranged — spit, feather volley, snare arrow, elemental bolt · magic — bolts that pierce armour and leave burns,
         chills, curses, silence · support — healing and rallying the monsters around it, hardening its own hide ·
-        status — stunning slams, poisoned bites, bleeding claws, webs and coils that root you · movement — pounce and dive.
+        status — stunning slams, poisoned bites, bleeding claws, webs and coils that root you · a maul and a wing gale (v283: no jumps).
       Ranged and caster species keep their distance; brutes charge in. */
 'use strict';
 
@@ -52,19 +52,20 @@ const MSK = {
   frost:{th:'ลมหนาว', en:'Chill', kind:'shot', r:200, cd:9, shot:'ice', mul:.8, magic:true, af:['slow', 4]},
   blind:{th:'ฝุ่นตาพร่า', en:'Blinding Dust', kind:'circle', r:80, cd:12, area:70, mul:.5, af:['blind', 4]},
   // movement
-  pounce:{th:'กระโจน', en:'Pounce', kind:'leap', r:220, cd:9, mul:1.4},
-  dive:{th:'โฉบลง', en:'Dive', kind:'leap', r:240, cd:9, mul:1.3, af:['bleed', 3]}
+  // (v283) the owner: no monster jumps at the hero. The pounce and the dive became ground moves with the same numbers
+  maul:{th:'ตะปบ', en:'Maul', kind:'melee', r:60, cd:9, mul:1.4},
+  gale:{th:'ลมปีกบาด', en:'Wing Gale', kind:'circle', r:90, cd:9, area:70, mul:1.0, af:['bleed', 3]}
 };
 const MSK_ELEM_AF = {fire:['burn', 4], water:['slow', 3], wind:['bleed', 3], earth:['root', 1.2], holy:['blind', 3], shadow:['curse', 4], poison:['poison', 5], undead:['curse', 4], ghost:['silence', 2], neutral:null};
 const MSK_SHOT = {fire:'fire', water:'ice', holy:'holy', wind:'bolt', shadow:'dark', undead:'dark', ghost:'dark', poison:'dart', earth:'dart', neutral:'dark'};
 /* which skills a species gets: from its body (or weapon), then its race */
 function mskFor(k){
   const d = MOB[k]; if (!d || d.boss) return []; const a = d.nature || 'quad', wp = d.natWp, race = d.race, out = [];
-  const byBody = {quad:['pounce', 'rend'], rock:['slam', 'harden'], squat:['slam', 'blind'], slime:['spit', 'mend'], bug:['web', 'bite'], bird:['dive', 'volley'],
+  const byBody = {quad:['maul', 'rend'], rock:['slam', 'harden'], squat:['slam', 'blind'], slime:['spit', 'mend'], bug:['web', 'bite'], bird:['gale', 'volley'],
     serpent:['spit', 'coil'], floater:['nova', 'hex']}[a] || ['rend'];
-  const byWeapon = {sword:['rend', 'slam'], bow:['snare', 'volley'], staff:['bolt', 'mend'], fist:['slam', 'pounce']}[wp];
+  const byWeapon = {sword:['rend', 'slam'], bow:['snare', 'volley'], staff:['bolt', 'mend'], fist:['slam', 'maul']}[wp];
   out.push(...(byWeapon || byBody));
-  if (a === 'bug' && typeof SPECIES !== 'undefined'){ const r = SPECIES.find(x => x[0] === k); if (r && /^(hornet|wasp|bee)$/.test(r[5].kind || '')) out[0] = 'dive'; }   // (v274) hornets and wasps fly: they dive and sting, no webs
+  if (a === 'bug' && typeof SPECIES !== 'undefined'){ const r = SPECIES.find(x => x[0] === k); if (r && /^(hornet|wasp|bee)$/.test(r[5].kind || '')) out[0] = 'bite'; }   // (v274) hornets and wasps sting, no webs · (v283) a sting, not a dive
   const lv = d.lvl || 1, i = Object.keys(MOB).indexOf(k);
   if (race === 'undead' || race === 'demon') out[1] = i % 2 ? 'hex' : 'hush';
   else if (race === 'angel') out[1] = 'mend';
@@ -93,7 +94,6 @@ function mskCast(m, id){
   else if (s.kind === 'melee') later(.4, () => { if (mskOk(m) && Math.hypot(P.x - m.x, P.y - m.y) < s.r + 20 && !P.roll) mskHit(m, s, s.mul); });
   else if (s.kind === 'circle'){ const x = s.atPlayer ? P.x : m.x, y = s.atPlayer ? P.y : m.y; VFX.play('warnCircle', {x, y, r:s.area, t:.9});
     later(.9, () => { if (!mskOk(m)) return; VFX.play(s.magic ? 'boom' : 'quake', {x, y, r:s.area}); if (inHit(x, y, s.area) && !P.roll) mskHit(m, s, s.mul); }); }
-  else if (s.kind === 'leap') mskLeap(m, s);   // (v276) a real jump, not a warning line and a blink
   else if (s.kind === 'heal'){ const who = [m, ...near(s.r)].filter(o => o.hp < o.maxhp).sort((a, b) => a.hp / a.maxhp - b.hp / b.maxhp)[0] || m;
     later(.5, () => { if (!mskOk(m) || who.dead) return; const h = Math.round(who.maxhp * s.heal); who.hp = Math.min(who.maxhp, who.hp + h); VFX.play('heal', {x:who.x, y:who.y}); addText(who.x, who.y - (MOB_H[who.type] || 30) - 4, `+${fmtN(h)}`, '#9cffb0', 13); }); }
   else if (s.kind === 'rally') later(.4, () => { for (const o of [m, ...near(s.r)]){ o.rallyT = T + s.dur; o.aggro = true; } VFX.play('roar', {x:m.x, y:m.y}); });
@@ -158,30 +158,4 @@ for (const k in MOB){ const d = MOB[k]; if (!d || d.boss || !d.lvl || k === 'dum
 EV.on('tick', dt => { for (const m of mobs) if (!m.dead && m.def && m.def.trait === 'regen' && m.hp < m.maxhp){ m.rgAcc = (m.rgAcc || 0) + m.maxhp * .008 * dt; if (m.rgAcc >= 1){ const h = Math.floor(m.rgAcc); m.rgAcc -= h; m.hp = Math.min(m.maxhp, m.hp + h); } } });
 if (typeof tsChips === 'function'){ const _ts = tsChips; tsChips = function(m){ const out = _ts.apply(this, arguments), t = m && m.def && m.def.trait; if (t && MTRAIT[t]) out.unshift([L(MTRAIT[t][0], MTRAIT[t][1]), MTRAIT[t][2]]); return out; }; }
 
-/* (v276) a monster's pounce or dive as a real jump (the owner: the line-and-blink looked cheap): it crouches low for a
-   moment, springs up in an arc — stretched as it rises and falls, its shadow left on the ground — and lands just in
-   front of you in a puff of dust, hitting if you are still there. Birds swoop in a flatter, faster arc. */
-const MSK_HOPS = [];
-function mskLeap(m, s){
-  if (m.fz && !m.fz.hop) return;   // bosses have their own leap
-  const bird = typeof SPECIES_ARCH !== 'undefined' && SPECIES_ARCH[m.type] === 'bird', r = m.def.r || 12;
-  m.fz = {z:0, sq:[1, 1], phase:1, rings:[], hop:true};
-  MSK_HOPS.push({m, s, t:0, st:'crouch', cw:bird ? .22 : .32, dur:bird ? .36 : .46, h:bird ? 18 + r * .8 : 26 + r * 1.3, bird});
-}
-EV.on('tick', dt => {
-  for (let i = MSK_HOPS.length - 1; i >= 0; i--){ const h = MSK_HOPS[i], m = h.m, F = m.fz; h.t += dt;
-    const done = () => { if (m.fz && m.fz.hop) m.fz = null; MSK_HOPS.splice(i, 1); };
-    if (m.dead || !F || !F.hop || !mskOk(m)){ done(); continue; }
-    if (h.st === 'crouch'){ const k = Math.min(1, h.t / h.cw); F.sq = [1 + .18 * k, 1 - .24 * k]; m.dir = SPR.dirFromVec(P.x - m.x, P.y - m.y); m.tx = m.x; m.ty = m.y;
-      if (h.t >= h.cw){ const dl = Math.hypot(P.x - m.x, P.y - m.y) || 1, land = Math.min(dl, (m.def.r || 12) + 12 + (typeof MSP_GAP !== 'undefined' ? MSP_GAP * .6 : 8));   // lands in front of the hero, never on top
-        h.x0 = m.x; h.y0 = m.y; h.tx = P.x - (P.x - m.x) / dl * land; h.ty = P.y - (P.y - m.y) / dl * land; h.land = land; h.st = 'air'; h.t = 0; VFX.play('dustPuff', {x:m.x, y:m.y}); }
-      continue; }
-    if (h.st === 'air'){ const k = Math.min(1, h.t / h.dur), e = h.bird ? k * k : k < .5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
-      m.x = h.x0 + (h.tx - h.x0) * e; m.y = h.y0 + (h.ty - h.y0) * e; m.tx = m.x; m.ty = m.y; m.moved = true;
-      F.z = h.bird ? (1 - k) * h.h + Math.sin(k * Math.PI) * h.h * .3 : Math.sin(k * Math.PI) * h.h; const c = Math.abs(Math.cos(k * Math.PI)); F.sq = [1 - .1 * c, 1 + .16 * c];
-      if (k >= 1){ F.z = 0; F.sq = [1.26, .74]; h.st = 'land'; h.t = 0; if (typeof pushOut === 'function') pushOut(m, m.def.r * .6);
-        VFX.play('dustPuff', {x:m.x - 8, y:m.y}); VFX.play('dustPuff', {x:m.x + 8, y:m.y}); VFX.play(h.bird ? 'clawHit' : 'slashHit', {x:P.x, y:P.y - 20});
-        if (Math.hypot(P.x - m.x, P.y - m.y) < h.land + 14 && !P.roll) mskHit(m, h.s, h.s.mul); }
-      continue; }
-    const k = Math.min(1, h.t / .22); F.sq = [1.26 - .26 * k, .74 + .26 * k]; if (k >= 1) done(); }
-});
+/* (v283) the v276 jump (mskLeap) is gone: the owner did not want monsters leaping at the hero */

@@ -19,7 +19,7 @@
 'use strict';
 const TWSQ = {pool:null, raw:false};
 /* ---------- roles ---------- */
-const TWSQ_ROLE_SK = {melee:['pounce', 'rend', 'slam', 'coil', 'bite', 'dive'], ranged:['spit', 'volley', 'snare', 'bolt', 'web'], caster:['nova', 'hex', 'hush', 'frost', 'blind'], support:['mend', 'rally', 'harden']};
+const TWSQ_ROLE_SK = {melee:['maul', 'rend', 'slam', 'coil', 'bite', 'gale'], ranged:['spit', 'volley', 'snare', 'bolt', 'web'], caster:['nova', 'hex', 'hush', 'frost', 'blind'], support:['mend', 'rally', 'harden']};
 function twsqRole(k){ const d = MOB[k], sk = d.msk || [];
   if (sk.some(s => TWSQ_ROLE_SK.support.includes(s))) return 'support';
   if (sk.some(s => TWSQ_ROLE_SK.caster.includes(s)) && (d.range || 0) > 0) return 'caster';
