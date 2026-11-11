@@ -47,10 +47,12 @@ for (const merge of [false, true]){
       await b.evaluate(() => { nwSig = window.__sig; });
 
       // the region boss comes from the clock: one, the same id, the same place
+      const obsOf = pg => pg.evaluate(() => obstacles.map(o => [Math.round(o.x), Math.round(o.y), Math.round(o.r), Object.keys(o).filter(k => !['x', 'y', 'r'].includes(k)).join('/')].join(':')));
+      const [oa, ob] = [await obsOf(a), await obsOf(b)], obDiff = {a:oa.filter(x => !ob.includes(x)).slice(0, 8), b:ob.filter(x => !oa.includes(x)).slice(0, 8)};
       const [hb, sb] = [await bossOf(a), await bossOf(b)];
       assert.ok(hb && sb, `both see a boss: ${JSON.stringify(hb)} / ${JSON.stringify(sb)}`);
       assert.strictEqual(sb.nid, hb.nid, 'it is the same boss');
-      assert.ok(Math.hypot(hb.x - sb.x, hb.y - sb.y) < 120, `in the same place: ${Math.round(hb.x)},${Math.round(hb.y)} vs ${Math.round(sb.x)},${Math.round(sb.y)} · ${JSON.stringify(hb)} / ${JSON.stringify(sb)}`);
+      assert.ok(Math.hypot(hb.x - sb.x, hb.y - sb.y) < 120, `in the same place: ${Math.round(hb.x)},${Math.round(hb.y)} vs ${Math.round(sb.x)},${Math.round(sb.y)} · ${JSON.stringify(hb)} / ${JSON.stringify(sb)} · obstacles only in one game: ${JSON.stringify(obDiff)}`);
       assert.strictEqual(await b.evaluate(() => mobs.filter(m => !m.dead && m.def.boss && !m.wb).length), 1, 'exactly one boss');
 
       // b hits it: a's boss loses HP too
