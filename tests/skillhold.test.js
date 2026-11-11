@@ -8,6 +8,9 @@ test('skill buttons: hold to change the skill, hold and slide down to toggle Aut
   const { page, errors, close } = await openGame();
   try {
     await enterWorld(page);
+    // (v282) the daily login window opens by itself after 3 s and covers the middle of the hotbar (since the roll button
+    // left, the 4th slot sits under it): this test is about the skill buttons, login.test.js covers that window
+    await page.evaluate(() => { if (typeof LGN !== 'undefined') LGN.auto = true; });
     await page.evaluate(() => { S.job = 'summoner'; S.lvl = 60; S.skills = S.skills || {}; S.skills.callsingha = 5; S.skills.callnaga = 3; S.skills.spiritburst = 3;
       S.hot = ['callsingha', 'callnaga', null, null, null, null]; derive(); S.sp = DER.maxsp; renderHotbar(); });
     const box = async i => { await page.waitForSelector(`#hotbar .hk[data-hot="${i}"]`, { state: 'visible' });
