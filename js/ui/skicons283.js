@@ -104,3 +104,26 @@ function skiReport(){ if (!SKI.built) skiBuild(); const seen = {}, out = [], sho
     const sk = SKILLS[id], el = sk.type === 'heal' ? 'heal' : sk.fx === 'poison' || sk.fx === 'poisonblade' || sk.fx === 'smokeCloud' ? 'poison' : sk.elem || 'neutral', key = SKI.of[id].glyph + '|' + el;
     if (seen[key]) out.push(`${seen[key]} ~ ${id} (${key})`); else seen[key] = id; }
   return out; }
+
+/* (v283) every skill its own tile colour. The owner: "สีสันไม่ดีไม่สวย เอาคนละสี" — most tiles were the same lacquer brown
+   (every skill without an element). Now each skill a player can see gets a colour of its own:
+   · skills without an element walk the colour wheel by the golden angle (137.5°) in class order, so two skills side by
+     side on a hotbar or in a skill tree are always far apart on the wheel;
+   · fire, water, holy … skills keep their element's family, each a small step to either side of it;
+   · light and dark are the same for all (a bright centre, a deep rim) so the set reads as one family. */
+const SKI_HUE = {};
+const skiHsl = (h, s, l) => { h = ((h % 360) + 360) % 360; const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m0 = l - c / 2;
+  const [R, G, B] = h < 60 ? [c, x, 0] : h < 120 ? [x, c, 0] : h < 180 ? [0, c, x] : h < 240 ? [0, x, c] : h < 300 ? [x, 0, c] : [c, 0, x];
+  return '#' + [R, G, B].map(v => Math.round((v + m0) * 255).toString(16).padStart(2, '0')).join(''); };
+const SKI_EL_HUE = {fire:16, water:205, wind:150, earth:36, holy:48, shadow:275, heal:130, poison:85};
+function skiColours(){
+  const order = [...new Set(Object.values(JOBS).flatMap(j => j.skills || []))].filter(id => SKILLS[id]); let n = 0; const perEl = {};
+  for (const id of order){ const sk = SKILLS[id], el = sk.type === 'heal' ? 'heal' : sk.fx === 'poison' || sk.fx === 'poisonblade' || sk.fx === 'smokeCloud' ? 'poison' : sk.elem || 'neutral';
+    let h; if (SKI_EL_HUE[el] != null){ const k = perEl[el] = (perEl[el] || 0) + 1, step = [0, 14, -14, 28, -28, 7, -7, 21, -21][(k - 1) % 9]; h = SKI_EL_HUE[el] + step; }
+    else h = (n++ * 137.508) % 360;
+    SKI_HUE[id] = h; ICON_EL['sk_' + id] = [skiHsl(h, .85, .72), skiHsl(h, .62, .22)]; }
+}
+{ const _iv2 = iconSvg;
+  iconSvg = function(glyph, el){ if (!SKI.built) skiBuild(); if (!SKI.owner){ SKI.owner = {}; for (const id in SKI.of){ const sk = SKILLS[id]; const e = sk.type === 'heal' ? 'heal' : sk.fx === 'poison' || sk.fx === 'poisonblade' || sk.fx === 'smokeCloud' ? 'poison' : sk.elem || 'neutral'; SKI.owner[SKI.of[id].glyph + '|' + e] = id; } skiColours(); }
+    const id = SKI.owner[glyph + '|' + (/^neutralS\d+$/.test(el) ? 'neutral' : el)];
+    return _iv2.call(this, glyph, id && ICON_EL['sk_' + id] ? 'sk_' + id : el); }; }

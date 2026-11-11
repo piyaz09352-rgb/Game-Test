@@ -222,16 +222,7 @@ function bossHunt(m, dt, dp, rooted){
   m.flee = dp > 200 ? (m.flee || 0) + dt : Math.max(0, (m.flee || 0) - dt * .6);
   if (m.flee > 1.5 && !m.furyMsg){ m.furyMsg = true; addText(m.x, m.y - MOB_H[m.type] - 30, L('คลั่ง! ไล่ล่า', 'Frenzy! Hunting you'), '#ff7a5a', 15); SFX.play('roar'); VFX.play('enrage', {m}); }
   if (m.flee < .2) m.furyMsg = false;
-  m.leapCd = (m.leapCd ?? 4) - dt;
-  if (m.leapT > 0){ m.leapT -= dt; return true; }
-  if (!rooted && dp > 260 && m.leapCd <= 0 && !m.charge){
-    m.leapCd = m.enraged ? 4.5 : 7; const tx = P.x, ty = P.y, wait = .75; m.leapT = wait + .15;
-    VFX.play('warnCircle', {x:tx, y:ty, r:64, t:wait}); VFX.play('dustPuff', {x:m.x, y:m.y});
-    later(wait, () => { if (m.dead) return; const x0 = m.x, y0 = m.y; m.x = clamp(tx, 40, W - 40); m.y = clamp(ty, 60, H - 40); pushOut(m, d.r * .6);
-      VFX.play('blink', {x:x0, y:y0, x2:m.x, y2:m.y}); VFX.play('earthsplitBoom', {x:m.x, y:m.y, r:64}); VFX.shake(5); SFX.play('boom');
-      if (inHit(m.x, m.y, 64) && !P.roll) mobAttack(m, 1.4, true); });
-    return true;
-  }
+  // (v283) the owner: no boss jumps onto the hero any more. A boss left far behind just runs after you (mobs.js moveTo, with its fury speed)
   return false;
 }
 function updBoss(m, dt){
