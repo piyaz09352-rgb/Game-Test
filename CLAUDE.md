@@ -1,6 +1,7 @@
 # VAYRATHEN — notes for Claude
 
 - Explain work to the owner in Thai.
+- Before saying what the latest version is, or starting work: `git fetch origin` and compare `docs/UPDATES.md` / `?v=` on every branch (`git branch -r`), not only `main`. Work may sit on an unmerged `claude/*` branch (v253–v278 did) — continue from the newest one.
 - The game is played in landscape only (phones held sideways; Settings can turn the picture). Check layouts at PC 1920×1080, laptop 1366×768, tablet landscape 1024×768 and phone landscape 844×390 — not portrait.
 - Every finished version: bump `?v=NNN` in `index.html` for each changed file and add a section to `docs/UPDATES.md`.
   Then build the FULL game pack `updates/VAYRATHEN-vNNN-full.zip` = `index.html assets audio css js` (what firebase.json hosts)
