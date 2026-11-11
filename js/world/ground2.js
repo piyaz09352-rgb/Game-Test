@@ -44,11 +44,15 @@ function groundDetail(g, B, mapId){
   const patch = (n, col, a, rmin, rmax) => { for (let i = 0; i < n * A; i++){ const cx = R() * W, cy = R() * H, r = rmin + R() * (rmax - rmin), k = 14 + Math.floor(R() * 12); a *= .82;
       for (let j = 0; j < k; j++){ const x = cx + (R() - .5) * r * 1.6, y = cy + (R() - .5) * r * .9, rr = r * (.12 + R() * .3); g.fillStyle = g2a(col, a * (.5 + R() * .5)); g.beginPath(); g.ellipse(x, y, rr, rr * (.45 + R() * .25), R() * .6 - .3, 0, 7); g.fill(); } } };
   // a tuft: a few short blades fanning out of one root, dark at the base and lit at the tips
-  const tufts = (n, cols, h, clump) => { for (let i = 0; i < n * A; i++){ const cx = R() * W, cy = R() * H, m = 1 + Math.floor(R() * clump); if (trailD(cx, cy) < 26) continue;
+  // (v276) the blades are gathered into three paths and stroked once each: the same grass, but a map loads without the
+  // phone freezing (one stroke per blade was ~100 000 strokes, several seconds on a phone, and no tap answered meanwhile)
+  const tufts = (n, cols, h, clump) => { const P0 = new Path2D(), P1 = new Path2D(), P2 = new Path2D();
+    for (let i = 0; i < n * A; i++){ const cx = R() * W, cy = R() * H, m = 1 + Math.floor(R() * clump);
       for (let j = 0; j < m; j++){ const x = cx + (R() - .5) * 18, y = cy + (R() - .5) * 8, bl = 4 + Math.floor(R() * 4), hh = h * (.6 + R() * .7);
         for (let b = 0; b < bl; b++){ const a = -Math.PI / 2 + (b / (bl - 1) - .5) * 1.5 + (R() - .5) * .3, L = hh * (.7 + R() * .4), ex = x + Math.cos(a) * L * .6, ey = y + Math.sin(a) * L;
-          g.strokeStyle = cols[0]; g.lineWidth = 1.1; g.beginPath(); g.moveTo(x, y); g.quadraticCurveTo(x + (ex - x) * .3, y + (ey - y) * .6, ex, ey); g.stroke();
-          g.strokeStyle = cols[a < -Math.PI / 2 ? 2 : 1]; g.lineWidth = .6; g.beginPath(); g.moveTo(x + (ex - x) * .5, y + (ey - y) * .55); g.lineTo(ex, ey); g.stroke(); } } } };
+          P0.moveTo(x, y); P0.quadraticCurveTo(x + (ex - x) * .3, y + (ey - y) * .6, ex, ey);
+          const Q = a < -Math.PI / 2 ? P2 : P1; Q.moveTo(x + (ex - x) * .5, y + (ey - y) * .55); Q.lineTo(ex, ey); } } }
+    g.strokeStyle = cols[0]; g.lineWidth = 1.1; g.stroke(P0); g.lineWidth = .6; g.strokeStyle = cols[1]; g.stroke(P1); g.strokeStyle = cols[2]; g.stroke(P2); };
   // stones: in drifts (several near each other), each with a contact shadow, a body and a lit top
   const stones = (n, col, smin, smax) => { const lc = g2hsl(col, .16), dc = g2hsl(col, -.18); for (let i = 0; i < n * A; i++){ const cx = R() * W, cy = R() * H, m = 1 + Math.floor(R() * 5);
       for (let j = 0; j < m; j++){ const x = cx + (R() - .5) * 26, y = cy + (R() - .5) * 12, s = smin + R() * (smax - smin), rot = R() * .8 - .4;
@@ -58,7 +62,7 @@ function groundDetail(g, B, mapId){
         g.fillStyle = lc; g.beginPath(); g.ellipse(x - s * .3, y - s * .25, s * .38, s * .2, rot, 0, 7); g.fill(); } } };
   const cracks = (n, col, a, len) => { g.strokeStyle = g2a(col, a); for (let i = 0; i < n * A; i++){ let x = R() * W, y = R() * H, ang = R() * 6.28; g.lineWidth = .9 + R() * .6; g.beginPath(); g.moveTo(x, y);
       for (let s = 0; s < 5 + R() * 6; s++){ ang += (R() - .5) * 1.1; x += Math.cos(ang) * len * (.5 + R()); y += Math.sin(ang) * len * .55 * (.5 + R()); g.lineTo(x, y); if (R() < .25){ const bx = x, by = y, ba = ang + (R() < .5 ? 1 : -1) * (.8 + R() * .6); g.moveTo(bx, by); g.lineTo(bx + Math.cos(ba) * len * .8, by + Math.sin(ba) * len * .45); g.moveTo(x, y); } } g.stroke(); } };
-  const litter = (n, cols, s) => { for (let i = 0; i < n * A; i++){ const x = R() * W, y = R() * H; if (trailD(x, y) < 20) continue; const c = cols[Math.floor(R() * cols.length)], r = R() * 3.14;
+  const litter = (n, cols, s) => { for (let i = 0; i < n * A; i++){ const x = R() * W, y = R() * H;  const c = cols[Math.floor(R() * cols.length)], r = R() * 3.14;
       g.fillStyle = c; g.beginPath(); g.ellipse(x, y, s * (.8 + R() * .6), s * .4, r, 0, 7); g.fill(); g.strokeStyle = g2a('#2a1a0c', .35); g.lineWidth = .4; g.beginPath(); g.moveTo(x - Math.cos(r) * s, y - Math.sin(r) * s * .4); g.lineTo(x + Math.cos(r) * s, y + Math.sin(r) * s * .4); g.stroke(); } };
   const twigs = (n, col) => { g.strokeStyle = col; g.lineCap = 'round'; for (let i = 0; i < n * A; i++){ const x = R() * W, y = R() * H, a = R() * 6.28, L = 5 + R() * 9; g.lineWidth = .8 + R() * .5; g.beginPath(); g.moveTo(x, y); g.lineTo(x + Math.cos(a) * L, y + Math.sin(a) * L * .5); if (R() < .5){ g.moveTo(x + Math.cos(a) * L * .5, y + Math.sin(a) * L * .25); g.lineTo(x + Math.cos(a + .7) * L * .9, y + Math.sin(a + .7) * L * .45); } g.stroke(); } };
   const ripples = (n, col, a) => { g.strokeStyle = g2a(col, a); g.lineWidth = 1.1; for (let i = 0; i < n * A; i++){ const x = R() * W, y = R() * H, L = 30 + R() * 50, k = 3 + Math.floor(R() * 4);
@@ -66,7 +70,9 @@ function groundDetail(g, B, mapId){
 
   // fine grain over everything: thousands of specks a shade lighter and darker than the ground (soil, sand or snow grain)
   { const n = Math.round(52000 * A), dk = g2a(deep, .5), lt = g2a(pale, .45), dp = g2a(soil, .45);
-    for (let i = 0; i < n; i++){ const x = R() * W, y = R() * H, v = R(); g.fillStyle = v < .4 ? dk : v < .75 ? lt : dp; g.fillRect(x, y, 1.2 + R() * 1.2, .9 + R() * .7); } }
+    const Pd = new Path2D(), Pl = new Path2D(), Pp = new Path2D();   // (v276) one fill per colour instead of one per speck
+    for (let i = 0; i < n; i++){ const x = R() * W, y = R() * H, v = R(); (v < .4 ? Pd : v < .75 ? Pl : Pp).rect(x, y, 1.2 + R() * 1.2, .9 + R() * .7); }
+    g.fillStyle = dk; g.fill(Pd); g.fillStyle = lt; g.fill(Pl); g.fillStyle = dp; g.fill(Pp); }
   const T0 = tufts, S0 = stones; const tuftsX = (n, c, h, cl) => T0(n * 2.6, c, h, cl), stonesX = (n, c, a, b) => S0(n * 2, c, a, b);
   switch (kind){
     case 'grass': case 'forest': {

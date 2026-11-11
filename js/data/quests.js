@@ -16,7 +16,7 @@ const STORY = [
   ['ไอ้เคี่ยมตื่นจากใต้ท้องน้ำเจ้าพระยา ชาวเรือไม่กล้าล่องผ่านอีกต่อไป', 'Ai Khiam has risen from the river bed. No boat dares the Chao Phraya now.'],
   ['ตลาดน้ำร้างตั้งแต่นางพรายแม่ค้าคืนชีพ ตะเกียงเรือลุกไหม้เองทุกคืน', 'The floating market emptied when the Wraith Matron returned. Its boat lamps burn by themselves each night.'],
   ['ทวารบาลศิลาที่เคยเฝ้าประตูวัดลุกขึ้นทำลายทุกสิ่งที่เข้าใกล้', 'The stone Dvarapala who once guarded the temple gate now crushes all who come near.'],
-  ['ในถ้ำมืดเชียงดาว พญาแมงมุมทอใยรอบศิลาชิ้นที่หก', 'Deep in Chiang Dao\'s dark, the Spider Matriarch has woven her web around the sixth shard.'],
+  ['ในถ้ำมืดเชียงดาว นางพญาต่อสร้างรังยักษ์หุ้มศิลาชิ้นที่หก', 'Deep in Chiang Dao\'s dark, the Hornet Queen has built her giant nest around the sixth shard.'],
   ['เสือสมิงกลับมาล่าคนบนดอยหมอก เสียงเรียกชื่อจากในหมอกคือมันเอง', 'The Saming hunts the misty peaks again. The voice calling your name from the fog is its own.'],
   ['ผีปอบเฒ่าสูบพลังจากป่าช้า ศิลาชิ้นที่แปดถูกฝังอยู่ใต้โกศของมัน', 'The Elder Pop drinks the graveyard\'s strength. The eighth shard lies beneath its urn.'],
   ['ฝนไม่ตกที่ทุ่งกุลามาหลายปี พญาคันคากกักฝนไว้ทั้งหมด', 'No rain has fallen on the Kula plains for years. Phaya Khankhak holds every cloud.'],
@@ -38,7 +38,7 @@ const STORY = [
   ['ราชาหมาป่าเถ้าพาฝูงล่าอยู่ในป่าที่ไหม้ ทุกตอไม้ยังคุกรุ่น', 'The Ash Wolf King runs his pack through the burned forest. Every stump still smoulders.'],
   ['จอมเวทอัคนีผู้เฝ้าปล่องภูเขาไฟถูกเสียงอสูรปลุกให้คลั่ง ภูเขาไฟพร้อมระเบิด', 'Agni, keeper of the crater, has been driven mad by the Asura. The volcano is ready to burst.'],
   ['พญาเต่าน้ำแข็งหลับใต้ทะเลสาบ ศิลาถูกแช่แข็งไว้ในกระดองของมัน', 'The Ice Turtle Lord sleeps beneath the lake, the shard frozen into its shell.'],
-  ['ราชินีแมงมุมน้ำแข็งทอใยผลึกปิดถ้ำนิรันดร์ ไม่มีใครออกมาได้', 'The Frost Spider Queen has sealed the eternal cave with crystal webs. None who enter come out.'],
+  ['ราชินีผึ้งน้ำแข็งสร้างรวงผลึกปิดถ้ำนิรันดร์ ไม่มีใครออกมาได้', 'The Frost Bee Queen has sealed the eternal cave with crystal combs. None who enter come out.'],
   ['พญาช้างแมมมอธเดินนำฝูงข้ามธารน้ำแข็ง เหยียบทุกสิ่งที่ขวางหน้า', 'The Mammoth King leads his herd across the glacier and tramples all in its way.'],
   ['พญาหิมะปิดป้อมเหนือเมฆ ยึดศิลาไว้เพื่อแลกกับคำสัญญาของราชาอสูร', 'The Snow King has shut his citadel above the clouds, keeping the shard for a promise the Asura made him.'],
   ['ราชาอสูรไวราทะลวงผนึกออกมาได้ครึ่งตัว และบุกถึงประตูสวรรค์ดาวดึงส์ นี่คือการต่อสู้ครั้งสุดท้าย', 'Vaira, the Asura King, has half broken the seal and stormed the gate of Tavatimsa. This is the final battle.']
@@ -59,7 +59,7 @@ const QUESTS = STORY_ORDER.map((m, i) => {
     title:[`บทที่ ${i}: ${mp.name}`, `Chapter ${i}: ${mp.en}`], story:STORY[m],
     goals:[{k:'kill', t:a, n}, {k:'kill', t:b, n}, {k:'item', t:mat, n:5}, {k:'boss', t:mp.boss, n:1}],
     reward:{bia:500 + mp.lv[0] * 150, exp:Math.round(nextBase(Math.max(1, mp.lv[0])) * .8), jexp:Math.round(nextJob(Math.min(40, Math.max(1, Math.round(mp.lv[0] / 4)))) * 2),
-      items:[[mp.lv[0] < 30 ? 'redpot' : mp.lv[0] < 70 ? 'orangepot' : mp.lv[0] < 130 ? 'whitepot' : 'elixirpot', 10], ['bluepot', 5], ['talisman', 2]], shard:i}};
+      items:[[mp.lv[0] < 30 ? 'redpot' : mp.lv[0] < 70 ? 'orangepot' : mp.lv[0] < 130 ? 'whitepot' : 'elixirpot', 10], ['bluepot', 5], ['redpot', 10]], shard:i}};
 });
 ITEMS.shard = {name:'ศิลาผนึกวายรา', en:'Vayra Seal Shard', kind:'key', desc:[`เศษศิลาผนึกโบราณ รวบรวมให้ครบ ${MAPS.length} ชิ้น`, `A shard of the ancient seal. Gather all ${MAPS.length}.`]};
 

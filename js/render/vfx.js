@@ -80,7 +80,7 @@ const VFX = (() => {
   /* ---------- the effects ---------- */
   const E = {
     heal(o){
-      add({x:o.x, y:o.y, life:1, draw(k){ glow(this.x, this.y - 20, 30 + k * 10, GREEN, .5 * (1 - k)); ring(this.x, this.y, 12 + k * 18, 'rgba(160,255,170,1)', 1 - k, 1.2); }});
+      const HC = o.c1 || GREEN, HL = o.c2 || 'rgba(160,255,170,1)'; add({x:o.x, y:o.y, life:1, draw(k){ glow(this.x, this.y - 20, 30 + k * 10, HC, .5 * (1 - k)); ring(this.x, this.y, 12 + k * 18, HL, 1 - k, 1.2); }});
       for (let i = 0; i < N(14); i++){ const a = i / 14 * TAU; emit({x:o.x + Math.cos(a) * 12, y:o.y + Math.sin(a) * 5, z:R(0, 8), vz:R(25, 45), vx:-Math.sin(a) * 18, vy:Math.cos(a) * 8, life:R(.7, 1.1), size:R(2.5, 4), shape:i % 3 ? 'leaf' : 'petal', col:i % 3 ? 'rgba(120,220,120,1)' : LOTUS, add:false, vr:R(-4, 4)}); }
       for (let i = 0; i < N(6); i++) emit({x:o.x + R(-10, 10), y:o.y, z:R(10, 30), vz:20, life:.8, size:3, shape:'plus', col:'rgba(170,255,180,1)'});
     },
@@ -142,8 +142,8 @@ const VFX = (() => {
     charge(o){
       if (!isFinite(o.x2) || !isFinite(o.y2)){ o = {...o, x2:isFinite(o.tx) ? o.tx : o.x + (o.dir < 0 ? -40 : 40), y2:isFinite(o.ty) ? o.ty : o.y}; }   // a dash shown without an end point (e.g. by a clone)
       if (!isFinite(o.x) || !isFinite(o.y)) return;
-      add({x:o.x, y:o.y, x2:o.x2, y2:o.y2, life:.45, draw(k){ g.globalAlpha = 1 - k; const w = 10 * (1 - k);
-        const gr = g.createLinearGradient(sx(this.x), sy(this.y), sx(this.x2), sy(this.y2)); gr.addColorStop(0, 'rgba(255,210,110,0)'); gr.addColorStop(1, 'rgba(255,240,190,.9)');
+      add({x:o.x, y:o.y, x2:o.x2, y2:o.y2, c1:o.c1, c2:o.c2, life:.45, draw(k){ g.globalAlpha = 1 - k; const w = 10 * (1 - k);
+        const gr = g.createLinearGradient(sx(this.x), sy(this.y), sx(this.x2), sy(this.y2)); gr.addColorStop(0, (this.c1 || 'rgba(255,210,110,1)').replace(/[\d.]+\)$/, '0)')); gr.addColorStop(1, (this.c2 || 'rgba(255,240,190,1)').replace(/[\d.]+\)$/, '.9)'));
         g.strokeStyle = gr; g.lineWidth = w; g.lineCap = 'round'; g.beginPath(); g.moveTo(sx(this.x), sy(this.y - 16)); g.lineTo(sx(this.x2), sy(this.y2 - 16)); g.stroke(); }});
       for (let i = 0; i < N(12); i++){ const k = Math.random(); emit({x:o.x + (o.x2 - o.x) * k, y:o.y + (o.y2 - o.y) * k, z:2, vz:R(5, 20), vx:R(-15, 15), vy:R(-8, 8), size:6, grow:12, life:R(.4, .7), shape:'smoke', col:'rgba(200,175,140,1)', add:false}); }
     },
@@ -206,7 +206,7 @@ const VFX = (() => {
       burst(o.x, o.y, 4, 14, {s0:40, s1:130, vz0:10, vz1:50, p:{size:1.6, shape:'dot', col:'rgba(200,235,255,1)', life:.4}});
       flash('rgba(200,230,255,1)', .25);
     },
-    barrier(o){ add({life:.6, draw(k){ ring(P.x, P.y - 18, 14 + k * 24, 'rgba(140,200,255,1)', 1 - k, 2.5, .9); glow(P.x, P.y - 18, 30, 'rgba(120,180,255,1)', .6 * (1 - k)); }}); burst(o.x, o.y, 20, 12, {s0:20, s1:60, p:{size:2, shape:'star', col:'rgba(190,225,255,1)', life:.7}}); },
+    barrier(o){ const C = o.c1 || 'rgba(120,180,255,1)', CL = o.c2 || 'rgba(190,225,255,1)'; add({life:.6, draw(k){ ring(P.x, P.y - 18, 14 + k * 24, CL, 1 - k, 2.5, .9); glow(P.x, P.y - 18, 30, C, .6 * (1 - k)); }}); burst(o.x, o.y, 20, 12, {s0:20, s1:60, p:{size:2, shape:'star', col:CL, life:.7}}); },
     barrierHit(){ add({life:.3, draw(k){ ring(P.x, P.y - 18, 22 + k * 6, 'rgba(200,230,255,1)', (1 - k) * .9, 2, .95); }}); },
     blink(o){
       for (const [x, y] of [[o.x, o.y], [o.x2, o.y2]]){
@@ -274,17 +274,17 @@ const VFX = (() => {
           for (const dx of [-5, 0, 5]){ g.beginPath(); g.moveTo(sx(this.x + dx - 3), sy(this.y)); g.lineTo(sx(this.x + dx), sy(this.y - h - (dx ? 0 : 5))); g.lineTo(sx(this.x + dx + 3), sy(this.y)); g.closePath(); g.fill(); g.stroke(); } }});
         burst(x, y, 2, 4, {s0:20, s1:60, vz0:30, vz1:90, p:{g:-300, size:R(1.5, 3), shape:'rock', col:'rgba(140,110,80,1)', add:false}}); glowAt(x, y - 4, 14, FIRE, .25); });
     },
-    goldshield(o){ add({life:.8, draw(k){ ring(P.x, P.y - 18, 10 + k * 34, GOLDL, 1 - k, 3, .9); glow(P.x, P.y - 18, 40, GOLD, (1 - k) * .7); }}); burst(o.x, o.y, 20, 18, {s0:30, s1:90, p:{size:R(3, 5), shape:'kanok', col:GOLD, life:.8}}); },
+    goldshield(o){ const C = o.c1 || GOLD, CL = o.c2 || GOLDL; add({life:.8, draw(k){ ring(P.x, P.y - 18, 10 + k * 34, CL, 1 - k, 3, .9); glow(P.x, P.y - 18, 40, C, (1 - k) * .7); }}); burst(o.x, o.y, 20, 18, {s0:30, s1:90, p:{size:R(3, 5), shape:'kanok', col:C, life:.8}}); },   // (v278) o.c1/o.c2: a skill's own colours (skillsig277.js)
     roar(o){
       for (let i = 0; i < 3; i++) later(i * .12, () => add({x:o.x, y:o.y, r:o.r, life:.6, draw(k){ ring(this.x, this.y, this.r * k * 1.1, 'rgba(255,200,140,1)', (1 - k) * .9, 4 - i); ring(this.x, this.y - 20, this.r * .5 * k, 'rgba(255,230,190,1)', (1 - k) * .5, 2, 1); }}));
       burst(o.x, o.y, 2, 20, {s0:60, s1:160, vz0:5, vz1:20, p:{size:7, grow:16, shape:'smoke', col:'rgba(200,170,130,1)', add:false, life:.7}});
       flash('rgba(255,210,150,1)', .18);
     },
     bladestorm(o){
-      add({life:o.hits * o.every + .1, r:o.r, draw(k, f){ const n = 6, a0 = f.t * 14;
+      const BC = o.c1 || GOLD, BL = o.c2 || 'rgba(255,240,200,1)'; add({life:o.hits * o.every + .1, r:o.r, draw(k, f){ const n = 6, a0 = f.t * 14;
         for (let i = 0; i < n; i++){ const a = a0 + i / n * TAU, x = P.x + Math.cos(a) * this.r * .6, y = P.y + Math.sin(a) * this.r * .28;
-          g.save(); g.translate(sx(x), sy(y - 16)); g.rotate(a + Math.PI / 2); g.globalAlpha = .9; g.fillStyle = 'rgba(235,245,255,1)'; g.fillRect(-1, -9, 2, 18); g.fillStyle = GOLD; g.fillRect(-3, 8, 6, 2); g.restore(); }
-        g.save(); g.translate(sx(P.x), sy(P.y - 14)); g.scale(1, .45); g.globalAlpha = .5; g.strokeStyle = 'rgba(255,240,200,1)'; g.lineWidth = 3;
+          g.save(); g.translate(sx(x), sy(y - 16)); g.rotate(a + Math.PI / 2); g.globalAlpha = .9; g.fillStyle = 'rgba(235,245,255,1)'; g.fillRect(-1, -9, 2, 18); g.fillStyle = BC; g.fillRect(-3, 8, 6, 2); g.restore(); }
+        g.save(); g.translate(sx(P.x), sy(P.y - 14)); g.scale(1, .45); g.globalAlpha = .5; g.strokeStyle = BL; g.lineWidth = 3;
         for (let i = 0; i < 3; i++){ g.beginPath(); g.arc(0, 0, this.r * (.5 + i * .18), a0 + i, a0 + i + 2.2); g.stroke(); } g.restore();
         if (Math.random() < .5 * lvlMul()) emit({x:P.x + R(-this.r, this.r) * .6, y:P.y + R(-10, 10), z:2, vz:R(5, 20), size:6, grow:10, life:.5, shape:'smoke', col:'rgba(210,190,160,1)', add:false}); }});
     },
@@ -308,9 +308,10 @@ const VFX = (() => {
       for (let i = 0; i < N(22); i++) later(i * .04, () => { const a = R(0, TAU); emit({x:P.x + Math.cos(a) * 26, y:P.y + Math.sin(a) * 10, z:R(0, 6), vx:-Math.cos(a) * 18, vy:-Math.sin(a) * 7, vz:R(20, 40), life:R(.6, 1), size:R(1.6, 2.6), shape:'star', col:'rgba(150,200,255,1)'}); }); },
     /* ---------- monsters & bosses ---------- */
     // a red danger zone that fills up until the hit lands
-    warnCircle(o){ add({x:o.x, y:o.y, r:o.r, life:o.t, layer:'under', draw(k){ disc(this.x, this.y, this.r, 'rgba(220,40,30,1)', .16 + k * .14); disc(this.x, this.y, this.r * k, 'rgba(255,70,40,1)', .22);
+    warnCircle(o){ add({x:o.x, y:o.y, r:o.r, kind:o.kind, col:o.col, life:o.t, layer:'under', draw(k){ if (typeof teleCircle === 'function'){ teleCircle(g, sx(this.x), sy(this.y), this.r, k, {kind:this.kind, col:this.col}); return; }   // (v278) the ground warns, not red paint
+      disc(this.x, this.y, this.r, 'rgba(220,40,30,1)', .16 + k * .14); disc(this.x, this.y, this.r * k, 'rgba(255,70,40,1)', .22);
       ring(this.x, this.y, this.r, 'rgba(255,90,60,1)', .7 + Math.sin(T * 20) * .2, 1.6); }}); },
-    warnLine(o){ add({...o, life:o.t, layer:'under', draw(k){ const px = -this.uy, py = this.ux, w = this.w / 2, x0 = this.x, y0 = this.y, x1 = x0 + this.ux * this.len, y1 = y0 + this.uy * this.len;
+    warnLine(o){ add({...o, t:0, life:o.t, layer:'under', draw(k){ if (typeof teleLine === 'function'){ teleLine(g, sx(this.x), sy(this.y), this.ux, this.uy, this.len, this.w, k, {col:this.col}); return; } const px = -this.uy, py = this.ux, w = this.w / 2, x0 = this.x, y0 = this.y, x1 = x0 + this.ux * this.len, y1 = y0 + this.uy * this.len;
       const quad = (l, a) => { g.globalAlpha = a; g.beginPath(); g.moveTo(sx(x0 + px * w), sy(y0 + py * w * .5)); g.lineTo(sx(x0 + this.ux * l + px * w), sy(y0 + this.uy * l + py * w * .5)); g.lineTo(sx(x0 + this.ux * l - px * w), sy(y0 + this.uy * l - py * w * .5)); g.lineTo(sx(x0 - px * w), sy(y0 - py * w * .5)); g.closePath(); g.fill(); };
       g.fillStyle = 'rgba(220,40,30,1)'; quad(this.len, .18); g.fillStyle = 'rgba(255,80,50,1)'; quad(this.len * k, .25); }}); },
     mobShot(o){ const col = {fire:FIRE, ice:ICE, holy:GOLDL, dark:VIOLET, bolt:'rgba(180,220,255,1)', dart:POISON, arrow:GOLD}[o.kind] || VIOLET;
@@ -574,8 +575,8 @@ const VFX = (() => {
         g.strokeStyle = 'rgba(255,220,160,.45)'; g.lineWidth = 14 * (1 - k) + 2; g.beginPath(); g.arc(0, 0, this.r * .8, k * 7, k * 7 + 4.4); g.stroke();
         g.strokeStyle = 'rgba(255,250,235,1)'; g.lineWidth = 3; g.beginPath(); g.arc(0, 0, this.r * .8, k * 7 + 1.4, k * 7 + 4.4); g.stroke(); g.restore(); }});
       burst(o.x, o.y, 2, 14, {s0:40, s1:120, vz0:5, vz1:20, p:{size:6, grow:12, shape:'smoke', col:'rgba(210,185,150,1)', add:false, life:.5}}); shake(2); },
-    ramwai(o){ add({life:1.4, draw(k){ yantra(P.x, P.y, 26 + k * 6, GOLD, Math.sin(k * Math.PI), k * 3); for (let i = 0; i < 3; i++){ const kk = (k * 1.5 + i * .33) % 1; ring(P.x, P.y - kk * 40, 14, 'rgba(255,210,120,1)', (1 - kk) * .8, 2); } }});
-      burst(o.x, o.y, 20, 18, {s0:20, s1:70, vz0:30, vz1:70, p:{size:R(3, 5), shape:'kanok', col:GOLD, life:1}}); },
+    ramwai(o){ const C = o.c1 || GOLD, CL = o.c2 || 'rgba(255,210,120,1)'; add({life:1.4, draw(k){ yantra(P.x, P.y, 26 + k * 6, C, Math.sin(k * Math.PI), k * 3); for (let i = 0; i < 3; i++){ const kk = (k * 1.5 + i * .33) % 1; ring(P.x, P.y - kk * 40, 14, CL, (1 - kk) * .8, 2); } }});
+      burst(o.x, o.y, 20, 18, {s0:20, s1:70, vz0:30, vz1:70, p:{size:R(3, 5), shape:'kanok', col:C, life:1}}); },
     hanuman(o){ const m = o.m; later(.12, () => { if (!m) return; const x = m.x, y = m.y;
       add({x, y, life:.6, draw(k){ g.globalAlpha = (1 - k) * .9; const gr = g.createLinearGradient(0, sy(this.y - 90), 0, sy(this.y)); gr.addColorStop(0, 'rgba(255,220,120,0)'); gr.addColorStop(1, 'rgba(255,230,150,.9)'); g.fillStyle = gr; g.fillRect(sx(this.x - 9), sy(this.y - 90 * Math.min(1, k * 4)), 18, 90 * Math.min(1, k * 4)); }});
       burst(x, y, 10, 16, {s0:20, s1:70, vz0:80, vz1:160, p:{g:-200, size:R(3, 5), shape:'kanok', col:GOLD, life:.8}}); shake(3); }); },

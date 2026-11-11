@@ -1484,7 +1484,9 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   if (w === 'staff' && P.ring >= 0) dir = nrm([0, 1, .25]);
   // (v211) an axe is held up the haft, not at its very end: the head sits closer to the hands and the haft runs on past the lower hand
   const axeHL = cfg.axe && w === 'sword' ? len * (two ? .8 : .7) : 0;
-  const base = add(hR, mul(dir, w === 'staff' ? -6 : -.8)), tip = axeHL ? add(base, mul(dir, axeHL)) : add(hR, mul(dir, len));
+  // (v274) the owner: a short one-handed rod is held near its end, but a long staff is gripped about the middle of the shaft
+  const midS = w === 'staff' && two && !(P.ring >= 0), stL = len + 6;
+  const base = midS ? add(hR, mul(dir, -stL * .44)) : add(hR, mul(dir, w === 'staff' ? -6 : -.8)), tip = axeHL ? add(base, mul(dir, axeHL)) : midS ? add(hR, mul(dir, stL * .56)) : add(hR, mul(dir, len));
   (cx.wsegs || (cx.wsegs = [])).push(w === 'staff' ? [proj(cx, add(tip, mul(dir, -.4))), proj(cx, add(tip, mul(dir, 3.2)))]   // (v159) a staff glows at its head only, never along the shaft
     : [proj(cx, add(base, mul(dir, kat ? 2 : 1))), proj(cx, tip)]);   // the blade in this frame
   G();
@@ -1925,7 +1927,9 @@ function mirrorArms(P){ const Q = {...P}; for (const [a, b] of [['armL', 'armR']
    extra room costs no memory. */
 let MOB_PAD = globalThis.SPR_MOB_PAD ?? .3;
 // render scale: sprites are rasterised at K pixels per world unit, then drawn back at world size
-const kOf = () => GFX.k;   // sprites are rasterised at the quality preset's density (see GFX)
+const kOf = (kind, key) => {   // sprites are rasterised at the quality preset's density (see GFX)
+  // (v268) bosses are drawn 1.6–2.6× their sheet: rasterise them that much denser, or they show as coarse blocks
+  const m = kind === 'mob' && typeof MOB !== 'undefined' && MOB[key]; return m && m.boss ? GFX.k * (GFX.budget >= 40e6 ? 1.4 : GFX.budget >= 20e6 ? 1.2 : 1) : GFX.k; };   // (v271) a boss is sharper only as far as the picture cache allows: at 1.8× one boss's strips (×3.2 pixels) filled the cache and everything was painted again and again
 function newCanvas(w, h){ if (typeof OffscreenCanvas !== 'undefined' && !globalThis.__SPR_DOM) return new OffscreenCanvas(w, h); const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
 function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
   if (kind === 'char'){
@@ -2065,6 +2069,11 @@ async function buildAll(onProgress, prewarm = []){
   return out;
 }
 /* render the remaining frames in idle time, a few frames per slice */
+/* (v268) paint a sheet's frames now, within a time budget (ms); true when every asked strip is done */
+function prime(sh, acts, ms, only = -1, nf = 99){ if (!sh || !sh.index) return true; const t0 = performance.now();
+  for (const a of acts){ if (!sh.index[a]) continue; for (let d = 0; d < 8; d++){ if ((sh.kind === 'mob' && d > 4) || (only >= 0 && d !== only)) continue;   // mobs mirror the west-facing strips
+      const e = strip(sh, a, d); for (let f = 0; f < Math.min(nf, e.done.length); f++){ if (e.done[f]) continue; frameIn(sh, e, f); if (performance.now() - t0 > ms) return false; } } }
+  return true; }
 function warm(sheets, keys){
   const todo = [];
   for (const k of keys){ const [key, act] = Array.isArray(k) ? k : [k, null]; if (!sheets[key]) continue;
@@ -2139,5 +2148,5 @@ function draw(g, sh, act, dir, t, x, y, o = {}){
   g.imageSmoothingEnabled = sm; g.imageSmoothingQuality = sq;
 }
 const prim = {ell, cap, frustum, line, dot, rotX, rotY, rotZ, add, mul, lerp3, nrm, ramp:rampOf};
-return {STATS, WDRAWS, SDRAWS, prim, heroKey, lookKey, parseLookKey, HAIR_COLORS, IRIS_COLORS, HAIR_M, HAIR_F, GEAR_LOOK, buildAll, buildSheet, sheet, ensure, warm, tick, rebuild, renderFrame, draw, frameAt, dirFromVec, DIRS, DIR_TH, ACTIONS, MOB_ACTIONS, CHARS, CHAR_ACTIONS, MOBS, MATS, M, FS, ANCHOR_Y};
+return {STATS, WDRAWS, SDRAWS, prim, prime, heroKey, lookKey, parseLookKey, HAIR_COLORS, IRIS_COLORS, HAIR_M, HAIR_F, GEAR_LOOK, buildAll, buildSheet, sheet, ensure, warm, tick, rebuild, renderFrame, draw, frameAt, dirFromVec, DIRS, DIR_TH, ACTIONS, MOB_ACTIONS, CHARS, CHAR_ACTIONS, MOBS, MATS, M, FS, ANCHOR_Y};
 })();

@@ -11,7 +11,7 @@
 'use strict';
 
 const CS_LINES = ['blade', 'rune', 'ranger', 'muay', 'healer', 'rogue', 'summoner'];
-const CS_COINS = 100;   // (v57) unlocking a class costs Vayra Coins, not Bia
+const CS_COINS = 99;    // (v273: the owner set 99) (v57) unlocking a class costs Vayra Coins, not Bia
 const csFee = () => CS_COINS;
 const csCoins = () => (typeof ACC !== 'undefined' && ACC.coins) || 0;
 const csFeeTxt = () => `${fmtN(csFee())} ${L('เหรียญวายรา', 'Vayra Coins')}`;

@@ -295,8 +295,9 @@ function updSkills(dt){
     else { const d = Math.hypot(P.x - 24 - s.x, P.y + 6 - s.y); s.moving = d > 10; if (s.moving) moveTo(s, P.x - 24, P.y + 6, 150, dt); }
     if (s.pounce > 0) s.pounce -= dt;
   }
-  SUMMONS = SUMMONS.filter(s => { if (s.dead) return false; if (s.t < s.dur && !(s.kind === 'beast' && P.dead && s.beast !== 'bound')) return true; VFX.play(s.kind === 'beast' ? 'beastFade' : 'tigerFade', {x:s.x, y:s.y, col:s.kind === 'beast' ? beastDef(s).aura : null}); return false; });
-  if (S.bound && S.bound.hp > 0 && !P.dead && !SUMMONS.some(s => s.beast === 'bound')) spawnBound();
+  SUMMONS = SUMMONS.filter(s => { if ((s.dead || s.t >= s.dur) && s.beast === 'bound' && S.bound && !s.rested){ s.rested = true; S.bound.restUntil = Date.now() + BOND.rest * 1000; }   // (v274) it rests once it leaves
+    if (s.dead) return false; if (s.t < s.dur && !(s.kind === 'beast' && P.dead && s.beast !== 'bound')) return true; VFX.play(s.kind === 'beast' ? 'beastFade' : 'tigerFade', {x:s.x, y:s.y, col:s.kind === 'beast' ? beastDef(s).aura : null}); return false; });
+  // (v274) the bound boss comes only when called (Royal Bond), no longer by itself
   // Nine Planets orbs
   if (DER.pas.orbs && !P.dead){
     P.orbT -= dt;
@@ -484,8 +485,8 @@ function beastPull(s, B, m){
 function conjure(sk, lv){
   const kind = sk.beast, B = HIMMA[kind], pas = DER.pas || {};
   SUMMONS = SUMMONS.filter(s => !(s.kind === 'beast' && s.beast === kind));                // one of each kind; calling again renews it
-  const mine = SUMMONS.filter(s => s.kind === 'beast' && s.beast !== 'bound');               // the bound beast never counts against the limit
-  while (mine.length >= beastMax()){ const old = mine.shift(); SUMMONS = SUMMONS.filter(s => s !== old); VFX.play('beastFade', {x:old.x, y:old.y, col:HIMMA[old.beast].aura}); }
+  const mine = SUMMONS.filter(s => s.kind === 'beast' && s.beast !== 'bound'), cap = beastMax() - (SUMMONS.some(s => s.beast === 'bound') ? 1 : 0);   // (v274) the bound boss takes one of the places
+  while (mine.length >= Math.max(1, cap)){ const old = mine.shift(); SUMMONS = SUMMONS.filter(s => s !== old); VFX.play('beastFade', {x:old.x, y:old.y, col:HIMMA[old.beast].aura}); }
   const slot = BEAST_SLOT[mine.length % BEAST_SLOT.length], x = clamp(P.x + slot[0], 20, W - 20), y = clamp(P.y + slot[1], 20, H - 20);
   const dur = (sk.dur(lv) + (pas.sumDur || 0)) * (1 + (pas.sumDurPct || 0)), hp = beastHpOf(B, sk, lv);
   SUMMONS.push({kind:'beast', beast:kind, x, y, t:0, dur, lv, sk, atkCd:.6, atkT:0, skCd:B.skill.cd * .35, skT:0, dir:P.dir || 0, target:null, moving:false, hp, maxhp:hp});
@@ -495,10 +496,22 @@ function conjure(sk, lv){
 }
 /* Royal Bond: on a boss at 30% HP or less → bind it for good (it leaves the field and becomes yours).
    With no such boss targeted → call your bound beast back if it has fallen or is not out. */
+/* (v274) Royal Bond is back for the Sovereign, with limits so summons do not pile up:
+   · only a region boss at or below your level can be bound (no world boss, dungeon / tower guardian or invasion warlord)
+   · the bound boss comes only when you call it, stays BOND.dur seconds, then rests BOND.rest seconds
+   · it takes one of the beast places (Garuda, Erawan …): calling it sends the oldest beast home */
+const BOND = {dur:45, rest:90};
+const bondRest = () => Math.max(0, Math.ceil(((S.bound && S.bound.restUntil) || 0) - Date.now()) / 1000) | 0;
+function bondNo(t){
+  if (t.wb || t.dg || t.tw || t.inv || t.invBoss || t.minion) return L('บอสตัวนี้ผูกพันธะไม่ได้ (บอสโลก ดันเจี้ยน หอคอย และการรุกราน)', 'This boss cannot be bound (world, dungeon, tower and invasion bosses)');
+  if ((t.def.lvl || 0) > S.lvl) return L(`ผูกพันธะได้เฉพาะบอสเลเวลไม่เกินคุณ (บอส Lv ${t.def.lvl})`, `Only a boss at or below your level can be bound (this one is Lv ${t.def.lvl})`);
+  return '';
+}
 function bondCast(sk, lv, t){
   const out = SUMMONS.find(s => s.beast === 'bound');
   if (t && !t.dead && t.def.boss && dist(t, P) < 260){
     if (t.hp / t.maxhp > .3){ toast(L('ต้องทำให้บอสเหลือ HP ไม่เกิน 30% ก่อน', 'Bring the boss to 30% HP or less first')); P.cds[sk.id] = 1; return; }
+    const why = bondNo(t); if (why){ toast(why); P.cds[sk.id] = 1; return; }
     const prev = S.bound && MOB[S.bound.type];
     S.bound = {type:t.type, hp:1}; if (out) SUMMONS = SUMMONS.filter(s => s !== out);
     VFX.play('conjure', {x:t.x, y:t.y, col:'auraViolet'}); VFX.play('classAura', {col:'rgba(170,110,255,1)', colL:'rgba(235,215,255,1)'}); VFX.shake(5); SFX.play('jobUp');
@@ -507,12 +520,14 @@ function bondCast(sk, lv, t){
     later(.6, spawnBound); save(); return;
   }
   if (!S.bound){ toast(L('ยังไม่มีบอสที่ผูกพันธะ · ใช้กับบอสที่ HP ≤ 30%', 'No bound boss yet · use it on a boss at 30% HP or less')); P.cds[sk.id] = 1; return; }
-  if (out && !out.dead){ out.hp = out.maxhp; VFX.play('heal', {x:out.x, y:out.y}); toast(L('ฟื้นพลังสัตว์พันธะเต็ม', 'Bound beast fully restored')); return; }
+  if (out && !out.dead){ toast(L(`บอสพันธะอยู่ในสนามแล้ว · เหลือ ${Math.ceil(out.dur - out.t)} วิ`, `Your bound boss is out · ${Math.ceil(out.dur - out.t)} s left`)); P.cds[sk.id] = 1; return; }
+  const rest = bondRest(); if (rest > 0){ toast(L(`บอสพันธะกำลังพัก · อีก ${rest} วิ`, `Your bound boss is resting · ${rest} s`)); P.cds[sk.id] = 1; return; }
   S.bound.hp = 1; spawnBound();
 }
 function spawnBound(){
   if (!S.bound || !DER || SUMMONS.some(s => s.beast === 'bound') || S.bound.hp <= 0) return;
-  const s = {kind:'beast', beast:'bound', x:clamp(P.x - 34, 20, W - 20), y:clamp(P.y - 4, 20, H - 20), t:0, dur:Infinity, lv:1, sk:SKILLS.royalbond, atkCd:.8, atkT:0, skCd:4, skT:0, dir:P.dir || 0, target:null, moving:false};
+  { const mine = SUMMONS.filter(q => q.kind === 'beast' && q.beast !== 'bound'); while (mine.length >= beastMax()){ const old = mine.shift(); SUMMONS = SUMMONS.filter(q => q !== old); VFX.play('beastFade', {x:old.x, y:old.y, col:HIMMA[old.beast] ? HIMMA[old.beast].aura : 'auraViolet'}); } }   // (v274) it takes a beast's place
+  const s = {kind:'beast', beast:'bound', x:clamp(P.x - 34, 20, W - 20), y:clamp(P.y - 4, 20, H - 20), t:0, dur:BOND.dur, lv:1, sk:SKILLS.royalbond, atkCd:.8, atkT:0, skCd:4, skT:0, dir:P.dir || 0, target:null, moving:false};
   s.def = boundDef(); if (!s.def) return;
   s.maxhp = Math.round(DER.maxhp * BEAST_STAT); s.hp = Math.max(1, Math.round(s.maxhp * (S.bound.hp || 1)));
   SUMMONS.push(s); VFX.play('conjure', {x:s.x, y:s.y, col:'auraViolet'});

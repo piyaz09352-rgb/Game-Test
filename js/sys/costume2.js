@@ -349,7 +349,7 @@ document.addEventListener('click', e => {
 {
   const _t = NPC_OPEN.tailor;
   NPC_OPEN.tailor = n => { _t(n); const shop = document.querySelector('#dialog .db'); if (!shop) return;
-    const rows = [...Object.keys(WINGS), ...Object.keys(XCOS)].map(id => { const W = WINGS[id] || XCOS[id], own = cosHave(id), can = (ACC.coins || 0) >= W.price.c;
+    const rows = [...Object.keys(WINGS), ...Object.keys(XCOS)].filter(id => (WINGS[id] || XCOS[id]).price).map(id => {   /* (v274) pieces with no price (invasion wings) are not sold */ const W = WINGS[id] || XCOS[id], own = cosHave(id), can = (ACC.coins || 0) >= W.price.c;
       return `<div class="srow${own ? ' owned' : ''}"><span class="ic"><i class="cosw" data-cth="${id}" style="--c1:${W.c[1]};--c2:${W.c[2]}"></i></span><div class="nm"><b>${L(W.th, W.en)}</b><small>${(XCOS[id] ? (XCOS[id].slot === 'pet' ? L('สัตว์เลี้ยง', 'Pet') : L('พาหนะ', 'Mount')) : L('ปีก', 'Wings'))}${own ? ` · ${L('มีแล้ว', 'owned')}` : ` · ${L('ทดลองใช้ฟรีได้', 'free trial available')}`}</small></div>
         <span class="pr">${W.price.c} <small>${L('เหรียญ', 'coins')}</small></span><button class="btn sm" data-cosbuy="${id}" ${own || !can ? 'disabled' : ''}>${own ? '✓' : L('ซื้อ', 'Buy')}</button></div>`; }).join('');
     shop.insertAdjacentHTML('afterbegin', `<div class="sec">${L('ปีกอลังการ (เหรียญวายรา) · ลองสวมฟรีในตู้เสื้อผ้า', 'Grand wings (Vayra Coins) · try them free in the wardrobe')}</div><div class="shop">${rows}</div>`); };

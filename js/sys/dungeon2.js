@@ -4,7 +4,7 @@
    · Waves 2 and 3 bring an ELITE (★ name, 4× HP, hits harder) that the team should focus down together.
    · In the Palace the guardian comes with two elite lieutenants.
    · Rewards grow with the party: +15% Bia per member, every member opens their own chest, and each clear gives a
-     Socket Drill; from 3 members also a 30% chance at the guardian's card and 10% at a Diamond Drill. */
+     Socket Drill; from 3 members also a 1% chance at the guardian's card (v269; was 30%) and 10% at a Diamond Drill. */
 'use strict';
 
 const DG_MID = [
@@ -33,7 +33,8 @@ function dgElite(m, tag){
     S.bia += Math.round((S.bia - z0) * .15 * (pc - 1));
     addItem('drill_i', 1); log(L('ได้สว่านเจาะรูจากหีบดันเจี้ยน', 'A Socket Drill from the dungeon chest'), 'g');
     if (pc >= 3){ const g = MOB[MAPS[D.base].boss], card = g && g.card;
-      if (card && CARDS[card] && Math.random() < .3){ S.cards[card] = (S.cards[card] || 0) + 1; if (typeof cardPop === 'function') cardPop(card); log(L(`ได้ ${nm(CARDS[card])} (โบนัสทีม)`, `${nm(CARDS[card])} (team bonus)`), 'c'); }
+      if (card && CARDS[card] && Math.random() < .01){   // (v269) a boss card stays the rarest thing: 1%, not 30%
+      S.cards[card] = (S.cards[card] || 0) + 1; if (typeof cardPop === 'function') cardPop(card); log(L(`ได้ ${nm(CARDS[card])} (โบนัสทีม)`, `${nm(CARDS[card])} (team bonus)`), 'c'); }
       if (Math.random() < .1){ addItem('drill_d', 1); log(L('ได้สว่านเพชร (โบนัสทีม)!', 'A Diamond Drill (team bonus)!'), 'g'); } }
     if (pc > 1) toast(L(`โบนัสทีม ${pc} คน: เงิน +${15 * (pc - 1)}%${pc >= 3 ? ' · ลุ้นการ์ดผู้พิทักษ์และสว่านเพชร' : ''}`, `Team of ${pc}: Bia +${15 * (pc - 1)}%${pc >= 3 ? ' · a shot at the guardian card and a Diamond Drill' : ''}`));
     save(); return r; };
@@ -46,4 +47,4 @@ if (typeof LIVE !== 'undefined'){ const _u = LIVE.drawUnder;
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'dungeonmid', t:['ดันเจี้ยนปาร์ตี้ระดับกลาง', 'Mid-level party dungeons'], b:() => `<p>${L('ผู้เฝ้าประตูแสงในอาเรน · ไปคนเดียวได้ แต่ออกแบบมาให้ไปเป็นทีม', 'Gatekeeper Saeng in Aren · solo works, but they are made for a team')}</p>
   <ul>${DG_MID.map(D => `<li><b>${nm(D)}</b> Lv ${D.min}+ · ${L(...D.d)}</li>`).join('')}</ul>
   <ul><li>${L('ด่าน 2 และ 3 มีหัวหน้าฝูง ★ (เลือด 4 เท่า ตีแรงขึ้น วงทองใต้ตัว)', 'Waves 2 and 3 bring a ★ elite (4× HP, harder hits, a gold ring under it)')}</li>
-  <li>${L('รางวัล: เงิน +15% ต่อสมาชิกเพิ่ม · สว่านเจาะรูทุกครั้ง · ทีม 3 คนขึ้นไปลุ้นการ์ดผู้พิทักษ์ 30% และสว่านเพชร 10%', 'Rewards: +15% Bia per extra member · a Socket Drill every clear · teams of 3+ get a 30% shot at the guardian card and 10% at a Diamond Drill')}</li></ul>`});
+  <li>${L('รางวัล: เงิน +15% ต่อสมาชิกเพิ่ม · สว่านเจาะรูทุกครั้ง · ทีม 3 คนขึ้นไปลุ้นการ์ดผู้พิทักษ์ 1% และสว่านเพชร 10%', 'Rewards: +15% Bia per extra member · a Socket Drill every clear · teams of 3+ get a 1% shot at the guardian card and 10% at a Diamond Drill')}</li></ul>`});

@@ -1,10 +1,13 @@
 /* VAYRATHEN — js/world/shops213.js — (v213) every shop in Aren is its own building
    The owner did not want twelve copies of one shop (v212 gave them depth and light but kept one template). Each trade
    now has the house that trade would really have, in a Thai town:
-     โรงตีเหล็ก   a sooty open forge shed under a dark hip roof, smoke vent on the ridge, glowing hearth, tall chimney
-     โรงหลอมแร่   a brick bottle kiln with a fire mouth beside a lean-to shed with a rusty tin roof and stacked ingots
+     โรงตีเหล็ก   (v259, the owner's picture) an open forge under a dark slate roof with a lit vent house, a brick chimney,
+                  an arched furnace, an anvil, benches of ingots, tongs, swords and a shield, lanterns, barrels and flowers
+     โรงหลอมแร่   (v259, the owner's picture) a banded brick bottle kiln with a wide glowing mouth beside an open shed of
+                  gold, silver and copper ingots under a striped tin roof, a crucible pouring into moulds, an ore cart on rails
      ร้านเจาะมณี  a white Thai-Chinese plaster shop, blue glazed roof with curled ridge ends, an arched display window
-     ร้านยา       a two-storey wooden shophouse: folding plank doors, a wall of medicine drawers, a balcony, a red vertical sign
+     ร้านยา       (v260, the owner's picture) a two-storey wooden apothecary: red tile gable with a mortar emblem, a
+                  white balcony with flowers, green louvres, a drawer wall, shelves of bottles, a counter, lanterns, a banner
      สมุนไพร      a bamboo hut on stilts with woven walls and a steep straw roof, herbs drying underneath
      โรงครัว      an open-air kitchen under a striped tarp on bamboo poles, woks steaming, string lights, tables
      ร้านตัดชุด   a pastel wooden boutique with fretwork eaves, a bay window with a dress on a stand, flower boxes
@@ -54,51 +57,101 @@ const S3 = {
 const S3_NAME = k => (VSHOP_NAME[k] || ['ร้านค้า'])[0];
 
 const S3_DRAW = {
-  smith(g, rng){
-    S3.plinth(g, -46, 86, 6, rng);
-    S3.side(g, 40, -56, -6, 8, '#3a3434');
-    // back wall: sooty brick; posts; the hearth glowing at the back
-    blocks(g, -40, -56, 80, 50, 6, 3, ['#6a3a2a', '#5a3022', '#7a4430', '#4a2a20'], '#2a1a14', rng, 6); S3.shade(g, -40, -56, 80, 50, .5);
-    g.fillStyle = 'rgba(20,10,6,.45)'; g.fillRect(-40, -56, 80, 12);
-    { const gr = g.createRadialGradient(-12, -14, 2, -12, -14, 34); gr.addColorStop(0, 'rgba(255,150,60,.75)'); gr.addColorStop(1, 'rgba(255,90,20,0)'); g.fillStyle = gr; g.fillRect(-46, -50, 70, 46); }
-    blocks(g, -26, -22, 26, 16, 5, 3, ['#7a4a34', '#6a3a28'], '#2a1a12', rng); g.fillStyle = '#1a0a04'; g.fillRect(-21, -19, 16, 6); vgFire(g, -13, -13, 1.1);
-    g.fillStyle = '#ffb040'; for (let i = 0; i < 6; i++){ g.fillRect(-20 + rng() * 14, -16 - rng() * 12, .8, .8); }
-    // tools on the wall, anvil on a stump, quench barrel
-    for (let i = 0; i < 4; i++){ const x = 8 + i * 6; g.fillStyle = PAL.barkM; g.fillRect(x, -48, 1.2, 14); g.fillStyle = '#5a5e68'; g.fillRect(x - 2, -48, 5.2, 3); }
-    g.fillStyle = PAL.barkD; g.fillRect(12, -14, 10, 8); g.fillStyle = '#4a4e58'; pv(g, [8, -20, 26, -20, 24, -16, 20, -15, 20, -14, 14, -14, 14, -15, 10, -16]); g.fill(); g.fillStyle = 'rgba(255,255,255,.35)'; g.fillRect(9, -20, 16, .7);
-    g.fillStyle = vsLin(g, 28, 0, 38, 0, [[0, '#5a3a20'], [.5, '#8a5a30'], [1, '#4a2e18']]); g.fillRect(28, -16, 10, 10); g.fillStyle = '#2a3a4a'; ov(g, 33, -16, 5, 1.6); g.fill();
-    for (const x of [-44, -2, 38]){ g.fillStyle = vsLin(g, x, 0, x + 5, 0, [[0, '#2a1a10'], [.5, '#5a3a24'], [1, '#2a1a10']]); g.fillRect(x, -60, 5, 54); }
-    // a dark hip roof with a smoke vent on the ridge
-    tileQuad(g, [-54, -56, 54, -56, 26, -84, -26, -84], 7, 9, ['#3a3e46', '#5a606a', '#1e2026']);
-    g.fillStyle = vsLin(g, -40, -84, 40, -56, [[0, 'rgba(255,255,255,.18)'], [1, 'rgba(0,0,0,.25)']]); pv(g, [-54, -56, 54, -56, 26, -84, -26, -84]); g.fill();
-    g.fillStyle = '#1a1c20'; g.fillRect(-54, -57, 108, 2.4);
-    g.fillStyle = '#2a2c32'; g.fillRect(-8, -92, 16, 8); tileQuad(g, [-12, -91, 12, -91, 6, -97, -6, -97], 2, 4, ['#3a3e46', '#5a606a', '#1e2026']); S3.smoke(g, 0, -99, 4);
-    // a tall brick chimney on the right
-    blocks(g, 44, -96, 9, 90, 4.5, 3, ['#7a3a28', '#8a4430', '#6a3022'], '#3a1a12', rng); g.fillStyle = '#2a1a14'; g.fillRect(43, -98, 11, 3); S3.smoke(g, 49, -101, 3);
-    S3.board(g, 0, -55, S3_NAME('smith'), {bg:['#3a3e46', '#1e2026'], fg:'#ffb060', frame:'#a0a4ac', w:40});
+  smith(g, rng){   // (v259) the owner's picture: an open forge under a dark slate roof, a vent house on the ridge, a brick chimney
+    // stone plinth, front steps, flower boxes at the corners
+    S3.plinth(g, -50, 100, 6, rng);
+    for (let k = 0; k < 2; k++){ g.fillStyle = k ? '#d8d0bc' : '#e6dfcc'; g.fillRect(-16 + k * 2, -2 - k * 3, 32 - k * 4, 3.4); g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(-16 + k * 2, 1 - k * 3, 32 - k * 4, .6); }
+    // the brick back wall, lit warm by the furnace
+    blocks(g, -42, -52, 84, 46, 6, 3, ['#9a4a2c', '#8a3e24', '#aa5634', '#7a3420'], '#3a1a10', rng, 6); S3.shade(g, -42, -52, 84, 46, .45);
+    { const gr = g.createRadialGradient(-16, -18, 2, -16, -18, 44); gr.addColorStop(0, 'rgba(255,160,70,.55)'); gr.addColorStop(1, 'rgba(255,100,30,0)'); g.fillStyle = gr; g.fillRect(-42, -52, 84, 46); }
+    // the stone floor inside
+    g.fillStyle = '#8a7a6a'; g.fillRect(-42, -10, 84, 4); for (let x = -42; x < 42; x += 6){ g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(x, -10, .5, 4); }
+    // the arched brick furnace with its fire
+    blocks(g, -34, -40, 30, 34, 5, 3, ['#7a3a24', '#8a4430', '#6a3020'], '#2a140c', rng); g.fillStyle = 'rgba(0,0,0,.2)'; g.fillRect(-34, -40, 30, 3);
+    g.fillStyle = '#1a0804'; g.beginPath(); g.moveTo(-28, -8); g.lineTo(-28, -22); g.arc(-19, -22, 9, Math.PI, 0); g.lineTo(-10, -8); g.closePath(); g.fill();
+    { const gr = g.createRadialGradient(-19, -14, 1, -19, -14, 12); gr.addColorStop(0, '#fff4b0'); gr.addColorStop(.45, '#ffa030'); gr.addColorStop(1, 'rgba(200,60,10,.4)'); g.fillStyle = gr; g.beginPath(); g.moveTo(-27, -8); g.lineTo(-27, -21); g.arc(-19, -21, 8, Math.PI, 0); g.lineTo(-11, -8); g.closePath(); g.fill(); }
+    vgFire(g, -19, -9, .9); g.strokeStyle = '#c8603a'; g.lineWidth = 1.4; g.beginPath(); g.arc(-19, -22, 10, Math.PI, 0); g.stroke();
+    // tongs hanging, a rack of swords, a shield on the wall
+    for (let i = 0; i < 3; i++){ const x = 2 + i * 4.5; g.strokeStyle = '#3a3a40'; g.lineWidth = 1; g.beginPath(); g.moveTo(x, -46); g.lineTo(x - 1.4, -34); g.moveTo(x, -46); g.lineTo(x + 1.4, -34); g.stroke(); g.fillStyle = '#2a2a30'; g.beginPath(); g.arc(x, -46, 1.2, 0, 7); g.fill(); }
+    g.fillStyle = '#5a3a1e'; g.fillRect(16, -47, 18, 2); for (let i = 0; i < 4; i++){ const x = 18 + i * 4.4; g.fillStyle = '#d8dce4'; g.fillRect(x - .8, -45, 1.6, 13); g.fillStyle = '#e3b04b'; g.fillRect(x - 2, -46, 4, 1.2); g.fillStyle = '#6a4a2a'; g.fillRect(x - .6, -48, 1.2, 2.4); }
+    g.fillStyle = '#e8e4dc'; g.beginPath(); g.moveTo(32, -50); g.lineTo(40, -50); g.lineTo(40, -44); g.quadraticCurveTo(36, -38, 36, -38); g.quadraticCurveTo(32, -42, 32, -44); g.closePath(); g.fill();
+    g.fillStyle = '#d8902a'; g.beginPath(); g.moveTo(36, -50); g.lineTo(40, -50); g.lineTo(40, -44); g.quadraticCurveTo(38, -41, 36, -38); g.closePath(); g.fill(); g.strokeStyle = '#6a4a20'; g.lineWidth = .8; g.beginPath(); g.moveTo(32, -50); g.lineTo(40, -50); g.lineTo(40, -44); g.quadraticCurveTo(36, -38, 36, -38); g.quadraticCurveTo(32, -42, 32, -44); g.closePath(); g.stroke();
+    // workbenches with ingots, the anvil on its stump
+    for (const [bx, w] of [[-40, 14], [24, 16]]){ g.fillStyle = '#7a5230'; g.fillRect(bx, -16, w, 2.4); g.fillStyle = '#5a3a1e'; g.fillRect(bx + 1, -14, 1.6, 8); g.fillRect(bx + w - 2.6, -14, 1.6, 8);
+      g.fillStyle = '#c8ccd4'; g.fillRect(bx + 2, -19.6, 5, 3.6); g.fillRect(bx + 4, -22.4, 5, 2.8); g.fillStyle = 'rgba(255,255,255,.5)'; g.fillRect(bx + 2, -19.6, 5, .6); }
+    g.fillStyle = '#8a5a30'; g.fillRect(-5, -11, 12, 7); g.fillStyle = '#6a4220'; g.fillRect(-5, -11, 12, 1.4); g.fillStyle = 'rgba(0,0,0,.25)'; g.fillRect(4, -11, 3, 7);
+    g.fillStyle = '#5a5e6a'; pv(g, [-8, -18, 12, -18, 10, -15, 5, -14, 5, -11, -1, -11, -1, -14, -4, -15]); g.fill(); g.fillStyle = 'rgba(255,255,255,.4)'; g.fillRect(-7, -18, 18, .8);
+    // timber posts with knee braces
+    for (const x of [-46, 41]){ g.fillStyle = vsLin(g, x, 0, x + 5, 0, [[0, '#3a2412'], [.5, '#7a5230'], [1, '#3a2412']]); g.fillRect(x, -56, 5, 50); }
+    g.strokeStyle = '#5a3a1e'; g.lineWidth = 2.2; g.beginPath(); g.moveTo(-41, -44); g.lineTo(-30, -55); g.moveTo(41, -44); g.lineTo(30, -55); g.stroke();
+    g.fillStyle = '#5a3a1e'; g.fillRect(-50, -58, 100, 4);
+    // lanterns on the posts
+    for (const x of [-48, 48]){ g.strokeStyle = '#2a1a0a'; g.lineWidth = .8; g.beginPath(); g.moveTo(x, -50); g.lineTo(x, -46); g.stroke(); g.fillStyle = '#2a1a0a'; g.fillRect(x - 2.6, -46, 5.2, 1.2); g.fillRect(x - 2.6, -38, 5.2, 1.2);
+      g.fillStyle = '#ffd068'; g.fillRect(x - 2, -45, 4, 7); g.fillStyle = 'rgba(255,220,120,.35)'; g.beginPath(); g.arc(x, -41.5, 7, 0, 7); g.fill(); }
+    // the dark slate hip roof, a vent house with glowing windows on the ridge
+    tileQuad(g, [-60, -56, 60, -56, 30, -82, -30, -82], 7, 10, ['#3a3e48', '#5a606c', '#1e2028']);
+    g.fillStyle = vsLin(g, -40, -82, 40, -56, [[0, 'rgba(255,255,255,.16)'], [1, 'rgba(0,0,0,.25)']]); pv(g, [-60, -56, 60, -56, 30, -82, -30, -82]); g.fill();
+    g.fillStyle = '#1a1c22'; g.fillRect(-60, -57, 120, 2.4);
+    g.fillStyle = '#2a2c34'; g.fillRect(-11, -91, 22, 9); for (const x of [-8, -2, 4]){ g.fillStyle = '#ffb050'; g.fillRect(x, -89, 4, 5); }
+    tileQuad(g, [-15, -90, 15, -90, 8, -97, -8, -97], 2, 4, ['#3a3e48', '#5a606c', '#1e2028']); S3.smoke(g, 0, -99, 4);
+    // the tall red brick chimney on the right
+    blocks(g, 44, -104, 11, 98, 5.5, 3, ['#a04830', '#b05638', '#8a3c26'], '#3a1a12', rng); g.fillStyle = '#2a1a14'; g.fillRect(43, -106, 13, 3.4); S3.smoke(g, 50, -110, 4);
+    // barrels and a crate at the sides
+    for (const [x, y] of [[-58, 0], [-56, -9]]){ g.fillStyle = '#7a4a26'; ov(g, x, y - 5, 4.6, 5.6); g.fill(); g.fillStyle = '#4a2a12'; g.fillRect(x - 4.6, y - 8, 9.2, 1); g.fillRect(x - 4.6, y - 3, 9.2, 1); }
+    g.fillStyle = '#8a5a2c'; g.fillRect(52, -9, 9, 9); g.strokeStyle = '#4a2c12'; g.lineWidth = .8; g.strokeRect(52, -9, 9, 9); g.beginPath(); g.moveTo(52, -9); g.lineTo(61, 0); g.stroke();
+    // the sign: a dark board with a gold frame under the eave
+    S3.board(g, 0, -55, S3_NAME('smith'), {bg:['#3a2a1a', '#1e140a'], fg:'#ffd27a', frame:'#e3b04b', w:42, h:9.6, font:6.6});
   },
-  forger(g, rng){
-    S3.plinth(g, -50, 98, 5, rng);
-    // the lean-to shed (right) with a rusty tin roof
-    S3.boards(g, 2, -48, 42, 43, rng, ['#7a5a3a', '#6a4a2e', '#8a6a46']); S3.shade(g, 2, -48, 42, 43);
-    g.fillStyle = '#1e1008'; g.fillRect(8, -40, 30, 26); { const gr = g.createRadialGradient(22, -24, 1, 22, -24, 22); gr.addColorStop(0, 'rgba(255,140,40,.55)'); gr.addColorStop(1, 'rgba(255,100,20,0)'); g.fillStyle = gr; g.fillRect(8, -40, 30, 26); }
-    for (let r = 0; r < 3; r++) for (let i = 0; i < 4 - r; i++){ const x = 12 + i * 5.6 + r * 2.8, y = -16 - r * 2.6; g.fillStyle = PAL.goldD; pv(g, [x, y, x + 5, y, x + 4, y - 2.4, x + 1, y - 2.4]); g.fill(); g.fillStyle = PAL.goldL; g.fillRect(x + 1, y - 2.4, 3, .7); }
-    g.fillStyle = '#3a2a24'; ov(g, 32, -22, 4, 3); g.fill(); g.fillStyle = '#ff8a2a'; ov(g, 32, -24, 3.2, 1.2); g.fill();
-    S3.tin(g, [-2, -46, 50, -54, 50, -48, -2, -40], rng, '#8a8a90'); g.fillStyle = '#4a4a50'; g.fillRect(-2, -41, 52, 1.2);
-    for (const x of [3, 41]) S3.rect(g, x, -46, 3, 41, '#4a3220');
-    S3.board(g, 23, -38, S3_NAME('forger'), {bg:['#5a2a18', '#3a180c'], fg:'#ffc070', frame:'#c88a40', w:30, h:7.6, font:5.6});
-    // the bottle kiln (left): brick body narrowing to a neck, a glowing fire mouth
-    const body = [-46, -4, -46, -40, -40, -62, -30, -74, -26, -96, -16, -96, -12, -74, -2, -62, 4, -40, 4, -4];
-    g.save(); pv(g, body); g.clip(); blocks(g, -48, -98, 54, 96, 5, 3, ['#9a4a2e', '#8a3e26', '#aa5838', '#7a3420'], '#4a2216', rng, 4);
-    g.fillStyle = vsLin(g, -46, 0, 4, 0, [[0, 'rgba(255,220,180,.18)'], [.45, 'rgba(0,0,0,0)'], [1, 'rgba(20,6,0,.45)']]); g.fillRect(-48, -98, 54, 96); g.restore();
+  forger(g, rng){   // (v259) the owner's picture: a brick bottle kiln with a glowing mouth beside an open shed of ingots under a tin roof
+    S3.plinth(g, -52, 108, 5, rng);
+    g.fillStyle = '#c8c0ac'; g.fillRect(-10, -1, 34, 3.4); g.fillStyle = 'rgba(0,0,0,.2)'; g.fillRect(-10, 2, 34, .6);   // the front step
+    // the shed (right): plank back wall, shelves of ingots
+    S3.boards(g, 2, -50, 46, 45, rng, ['#7a5230', '#6a4628', '#8a5e38']); S3.shade(g, 2, -50, 46, 45, .45);
+    { const gr = g.createRadialGradient(28, -20, 1, 28, -20, 26); gr.addColorStop(0, 'rgba(255,170,70,.45)'); gr.addColorStop(1, 'rgba(255,110,30,0)'); g.fillStyle = gr; g.fillRect(2, -50, 46, 45); }
+    for (const y of [-38, -26]){ g.fillStyle = '#4a2c14'; g.fillRect(6, y, 38, 1.8); }
+    const bar = (x, y, c, hi) => { g.fillStyle = c; pv(g, [x, y, x + 5, y, x + 4, y - 2.2, x + 1, y - 2.2]); g.fill(); g.fillStyle = hi; g.fillRect(x + 1, y - 2.2, 3, .6); };
+    for (let r = 0; r < 3; r++) for (let k = 0; k < 3 - r; k++) bar(8 + k * 5 + r * 2.5, -38 - r * 2.2, '#e8b030', '#fff0a0');      // gold
+    for (let r = 0; r < 2; r++) for (let k = 0; k < 3 - r; k++) bar(28 + k * 5 + r * 2.5, -38 - r * 2.2, '#b8bcc4', '#ffffff');     // silver
+    for (let k = 0; k < 3; k++) bar(16 + k * 5.4, -26, '#c86a3a', '#ffb080');                                                           // copper
+    g.fillStyle = '#5a4a40'; ov(g, 11, -28, 3.4, 2.2); g.fill(); g.fillStyle = '#ff9a3a'; ov(g, 11, -29, 2.6, .9); g.fill();
+    // the casting table: a crucible pouring into the moulds
+    blocks(g, 22, -14, 24, 10, 4, 2.5, ['#7a7a80', '#8a8a92', '#6a6a72'], '#3a3a40', rng); g.fillStyle = '#9a9aa2'; g.fillRect(21, -15, 26, 2);
+    for (const x of [24, 31, 38]){ g.fillStyle = '#3a3a40'; g.fillRect(x, -18, 6, 3); g.fillStyle = x === 31 ? '#ffb030' : '#5a5a62'; g.fillRect(x + 1, -17.4, 4, 1.6); }
+    g.fillStyle = '#4a4a52'; pv(g, [36, -28, 44, -30, 45, -26, 38, -24]); g.fill(); g.fillStyle = '#2a2a30'; g.fillRect(43, -31, 4, 6);
+    g.strokeStyle = '#ffb030'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(37, -26); g.quadraticCurveTo(34, -22, 34, -18); g.stroke(); g.fillStyle = 'rgba(255,200,80,.5)'; g.beginPath(); g.arc(34, -18, 3, 0, 7); g.fill();
+    // the timber frame with knee braces, the tin roof in silver and rust stripes
+    for (const x of [2, 46]){ g.fillStyle = vsLin(g, x, 0, x + 4, 0, [[0, '#3a2412'], [.5, '#8a5a30'], [1, '#3a2412']]); g.fillRect(x, -54, 4, 49); }
+    g.fillStyle = '#5a3a1e'; g.fillRect(0, -56, 52, 3.4); g.strokeStyle = '#5a3a1e'; g.lineWidth = 2; g.beginPath(); g.moveTo(6, -44); g.lineTo(14, -54); g.moveTo(46, -44); g.lineTo(38, -54); g.stroke();
+    { const q = [-4, -54, 56, -62, 58, -55, -4, -48]; g.save(); pv(g, q); g.fillStyle = '#9a9aa2'; g.fill(); g.clip();
+      for (let x = -6, k = 0; x < 60; x += 4.2, k++){ g.fillStyle = k % 3 === 1 ? '#b8683a' : (k % 2 ? '#c8ccd4' : '#a8acb4'); g.fillRect(x, -64, 4.2, 18); g.fillStyle = 'rgba(0,0,0,.2)'; g.fillRect(x + 3.4, -64, .8, 18); }
+      g.restore(); g.fillStyle = '#5a5a62'; pv(g, [-4, -48, 58, -55, 58, -53.6, -4, -46.6]); g.fill(); }
+    // the sign with crossed picks
+    S3.board(g, 25, -51, S3_NAME('forger'), {bg:['#6a3a1a', '#3a1e0a'], fg:'#ffd27a', frame:'#e3b04b', w:34, h:8.4, font:6});
+    g.strokeStyle = '#d8dce4'; g.lineWidth = 1.2; g.beginPath(); g.moveTo(21, -60); g.lineTo(29, -53); g.moveTo(29, -60); g.lineTo(21, -53); g.stroke(); g.fillStyle = '#e3b04b'; g.fillRect(20, -61, 3, 1.4); g.fillRect(27, -61, 3, 1.4);
+    // a lantern on a bracket
+    g.fillStyle = '#3a2412'; g.fillRect(50, -46, 6, 1.4); g.fillStyle = '#2a1a0a'; g.fillRect(52.4, -45, 5.2, 1.2); g.fillRect(52.4, -37, 5.2, 1.2); g.fillStyle = '#ffd068'; g.fillRect(53, -44, 4, 7);
+    g.fillStyle = 'rgba(255,220,120,.35)'; g.beginPath(); g.arc(55, -40.5, 7, 0, 7); g.fill();
+    // the bottle kiln (left): a brick body with iron bands, narrowing to a neck with a cap, a wide glowing mouth
+    const body = [-50, -5, -50, -46, -44, -56, -38, -74, -30, -90, -30, -100, -16, -100, -16, -90, -8, -74, -2, -56, 4, -46, 4, -5];
+    g.save(); pv(g, body); g.clip(); blocks(g, -52, -102, 58, 98, 5, 3, ['#b04a2c', '#9a4026', '#c05834', '#8a3620'], '#4a2216', rng, 4);
+    g.fillStyle = vsLin(g, -50, 0, 4, 0, [[0, 'rgba(255,220,180,.2)'], [.45, 'rgba(0,0,0,0)'], [1, 'rgba(20,6,0,.45)']]); g.fillRect(-52, -102, 58, 98); g.restore();
     g.strokeStyle = '#3a1a0e'; g.lineWidth = 1; pv(g, body); g.stroke();
-    for (const y of [-40, -62]){ g.fillStyle = '#5a2a18'; g.fillRect(-47, y - 1, 52, 2); }
-    g.fillStyle = '#1a0804'; g.beginPath(); g.moveTo(-30, -4); g.lineTo(-30, -16); g.arc(-21, -16, 9, Math.PI, 0); g.lineTo(-12, -4); g.closePath(); g.fill();
-    { const gr = g.createRadialGradient(-21, -10, 1, -21, -10, 14); gr.addColorStop(0, 'rgba(255,200,90,.95)'); gr.addColorStop(1, 'rgba(255,90,20,0)'); g.fillStyle = gr; g.fillRect(-36, -26, 30, 24); } vgFire(g, -21, -6, 1.2);
-    S3.smoke(g, -20, -100, 4);
-    // an ore cart
-    g.fillStyle = '#5a4030'; pv(g, [36, -10, 56, -10, 54, -2, 38, -2]); g.fill(); g.fillStyle = '#6a6a72'; for (let i = 0; i < 5; i++){ ov(g, 40 + i * 3.4, -11 - (i % 2) * 1.6, 2.2, 1.8); g.fill(); }
-    g.fillStyle = '#2a2a2e'; for (const x of [41, 51]){ g.beginPath(); g.arc(x, -1, 2.4, 0, 7); g.fill(); }
+    for (const [y, x0, x1] of [[-46, -51, 5], [-74, -39, -7]]){ g.fillStyle = '#5a5e66'; g.fillRect(x0, y - 2, x1 - x0, 3.4); g.fillStyle = '#8a8e96'; g.fillRect(x0, y - 2, x1 - x0, .8); for (let x = x0 + 4; x < x1; x += 8){ g.fillStyle = '#3a3e46'; g.fillRect(x, y - 1, 1.4, 1.4); } }
+    g.fillStyle = '#3a3e46'; g.fillRect(-32, -104, 18, 5); g.fillStyle = '#6a6e76'; g.fillRect(-32, -104, 18, 1.2);
+    g.fillStyle = '#1a0804'; g.beginPath(); g.moveTo(-38, -5); g.lineTo(-38, -22); g.arc(-23, -22, 15, Math.PI, 0); g.lineTo(-8, -5); g.closePath(); g.fill();
+    { const gr = g.createRadialGradient(-23, -12, 1, -23, -12, 18); gr.addColorStop(0, '#fff6b8'); gr.addColorStop(.4, '#ffb030'); gr.addColorStop(1, 'rgba(220,70,10,.5)'); g.fillStyle = gr; g.beginPath(); g.moveTo(-36, -5); g.lineTo(-36, -21); g.arc(-23, -21, 13, Math.PI, 0); g.lineTo(-10, -5); g.closePath(); g.fill(); }
+    vgFire(g, -23, -9, 1.1); g.strokeStyle = '#d8603a'; g.lineWidth = 2; g.beginPath(); g.arc(-23, -22, 16, Math.PI, 0); g.stroke();
+    g.fillStyle = '#ffe080'; for (let i = 0; i < 6; i++) g.fillRect(-30 + rng() * 14, -26 + rng() * 14, .9, .9);
+    S3.smoke(g, -23, -108, 5);
+    // barrels of ore and a crate (left), the ore cart on its rails (right)
+    for (const [x, y] of [[-58, 0], [-58, -12]]){ g.fillStyle = '#7a4a26'; g.fillRect(x - 5, y - 10, 10, 10); g.fillStyle = '#4a4e56'; g.fillRect(x - 5, y - 8, 10, 1.2); g.fillRect(x - 5, y - 3, 10, 1.2); }
+    g.fillStyle = '#8a8e96'; for (let i = 0; i < 4; i++){ ov(g, -61 + i * 2.2, -22.5 - (i % 2), 1.6, 1.2); g.fill(); }
+    g.fillStyle = '#8a5a2c'; g.fillRect(-50, -10, 11, 10); g.strokeStyle = '#4a2c12'; g.lineWidth = .8; g.strokeRect(-50, -10, 11, 10); g.beginPath(); g.moveTo(-50, -10); g.lineTo(-39, 0); g.stroke();
+    g.fillStyle = '#9a9ea6'; for (let i = 0; i < 4; i++){ ov(g, -48 + i * 2.6, -10.5 - (i % 2), 1.6, 1.2); g.fill(); }
+    g.fillStyle = '#4a3a2a'; g.fillRect(34, -1.4, 26, 1.2); g.fillRect(34, .8, 26, 1.2);
+    g.fillStyle = '#6a4a2a'; pv(g, [36, -12, 58, -12, 56, -4, 38, -4]); g.fill(); g.fillStyle = '#4a4e56'; g.fillRect(36, -12, 22, 1.2);
+    g.fillStyle = '#9a9ea6'; for (let i = 0; i < 6; i++){ ov(g, 39 + i * 3.4, -13 - (i % 2) * 1.6, 2.2, 1.8); g.fill(); }
+    g.fillStyle = '#2a2a2e'; for (const x of [41, 53]){ g.beginPath(); g.arc(x, -2.4, 2.6, 0, 7); g.fill(); g.fillStyle = '#6a6e76'; g.beginPath(); g.arc(x, -2.4, 1, 0, 7); g.fill(); g.fillStyle = '#2a2a2e'; }
   },
   driller(g, rng){
     S3.plinth(g, -46, 90, 6, rng);
@@ -124,27 +177,57 @@ const S3_DRAW = {
     // the gem-cutting wheel outside
     g.fillStyle = PAL.teakD; g.fillRect(48, -14, 10, 2); g.fillRect(49, -12, 1.4, 12); g.fillRect(56, -12, 1.4, 12); g.fillStyle = '#9aa4b0'; g.beginPath(); g.arc(53, -18, 4.6, 0, 7); g.fill(); g.fillStyle = '#5a6470'; g.beginPath(); g.arc(53, -18, 1.4, 0, 7); g.fill();
   },
-  shop(g, rng){
-    S3.plinth(g, -40, 80, 5, rng);
-    S3.side(g, 38, -76, -5, 8, '#6a4428');
-    // ground floor: folding plank doors, the middle ones open on a wall of medicine drawers
-    S3.boards(g, -36, -40, 74, 35, rng, ['#8a5a34', '#7a4e2c', '#9a6a40']); S3.shade(g, -36, -40, 74, 35);
-    g.fillStyle = '#2a160a'; g.fillRect(-20, -38, 40, 33);
-    for (let r = 0; r < 5; r++) for (let c = 0; c < 6; c++){ const x = -18 + c * 6.2, y = -36 + r * 5.6; g.fillStyle = (r + c) % 2 ? '#8a4a24' : '#7a3e1c'; g.fillRect(x, y, 5.6, 5); g.fillStyle = PAL.goldL; g.fillRect(x + 2.3, y + 2.2, 1, .8); }
-    for (let i = 0; i < 4; i++){ g.fillStyle = ['#e0d8c0', '#c8b890', '#d8cca8', '#b8a880'][i]; ov(g, -14 + i * 9, -8.6, 3, 3.4); g.fill(); g.fillStyle = '#8a2a20'; g.fillRect(-15.6 + i * 9, -12.6, 3.2, 1.2); }
-    for (const [x, open] of [[-36, 0], [-28, 0], [20, 0], [28, 0]]){ void open; g.fillStyle = '#6a3e20'; g.fillRect(x, -40, 8, 35); g.strokeStyle = 'rgba(30,14,4,.5)'; g.lineWidth = .6; g.strokeRect(x + 1, -38, 6, 14); g.strokeRect(x + 1, -21, 6, 14); }
-    // upper floor: a balcony with a railing and louvred windows
-    S3.boards(g, -36, -72, 74, 32, rng, ['#9a6a40', '#8a5a34']); S3.shade(g, -36, -72, 74, 32);
-    for (const x of [-30, -6, 18]){ g.fillStyle = '#3a6a4a'; g.fillRect(x, -68, 14, 18); g.fillStyle = 'rgba(0,0,0,.35)'; for (let y = -66; y < -51; y += 2.2) g.fillRect(x + 1, y, 12, .8); g.strokeStyle = '#e8dcc0'; g.lineWidth = .8; g.strokeRect(x, -68, 14, 18); }
-    g.fillStyle = '#5a3a20'; g.fillRect(-40, -42, 80, 3); g.fillStyle = '#e8dcc0'; for (let x = -38; x < 40; x += 3.4) g.fillRect(x, -50, 1.2, 8); g.fillRect(-40, -51, 80, 1.6);
-    for (const x of [-34, 30]){ g.fillStyle = '#b8603a'; ov(g, x, -52.5, 3, 1.6); g.fill(); g.fillStyle = '#4a9a44'; ov(g, x, -55, 3.4, 2.6); g.fill(); }
-    // a front gable with red tiles
-    tileQuad(g, [-46, -72, 46, -72, 36, -80, -36, -80], 3, 12, [PAL.roofM, PAL.roofL, PAL.roofD]);
-    g.fillStyle = PAL.teakD; pv(g, [-36, -80, 0, -98, 36, -80]); g.fill(); g.fillStyle = PAL.roofD; for (const s of [-1, 1]){ g.save(); g.lineWidth = 5; g.strokeStyle = PAL.roofM; g.beginPath(); g.moveTo(s * 40, -79); g.lineTo(0, -99); g.stroke(); g.restore(); }
-    g.fillStyle = '#fff6dc'; g.beginPath(); g.arc(0, -86, 4, 0, 7); g.fill(); g.strokeStyle = PAL.gold; g.lineWidth = .8; g.stroke(); g.font = '5.6px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText('🧪', 0, -85.6); g.textBaseline = 'alphabetic';
-    // the vertical red sign and a gourd charm
-    S3.vboard(g, -48, -66, S3_NAME('shop')); g.strokeStyle = '#3a2010'; g.lineWidth = .6; g.beginPath(); g.moveTo(-43.5, -70); g.lineTo(-43.5, -66); g.stroke();
-    g.fillStyle = '#c8a040'; ov(g, 44, -30, 3, 3.6); g.fill(); ov(g, 44, -35.6, 2, 2.2); g.fill(); g.fillStyle = '#8a2a20'; g.fillRect(43.2, -39, 1.6, 2);
+  shop(g, rng){   // (v260) the owner's picture: a two-storey wooden apothecary under red tiles, a balcony, a drawer wall, lanterns
+    const NAME = 'ร้านขายยา';
+    S3.plinth(g, -46, 92, 5, rng);
+    g.fillStyle = '#d8d0bc'; g.fillRect(-14, -1, 28, 3.4); g.fillStyle = 'rgba(0,0,0,.2)'; g.fillRect(-14, 2, 28, .6);
+    // ground floor: the back wall of medicine drawers under four cloth banners, shelves either side
+    S3.boards(g, -40, -44, 80, 39, rng, ['#8a5a34', '#7a4e2c', '#9a6a40']); S3.shade(g, -40, -44, 80, 39, .3);
+    for (let r = 0; r < 4; r++) for (let c = 0; c < 5; c++){ const x = -15 + c * 6.2, y = -30 + r * 5; g.fillStyle = (r + c) % 2 ? '#8a4a24' : '#7a3e1c'; g.fillRect(x, y, 5.6, 4.4); g.fillStyle = '#e3b04b'; g.fillRect(x + 2.2, y + 1.8, 1.4, 1); }
+    const ic = ['#4a9a44', '#9a6ad8', '#d8a050', '#d83a3a']; for (let k = 0; k < 4; k++){ const x = -15 + k * 7.8; g.fillStyle = '#f2ead6'; g.fillRect(x, -40, 6.6, 8); g.fillStyle = ic[k]; g.beginPath(); g.arc(x + 3.3, -36, 1.8, 0, 7); g.fill(); }
+    // left shelves: coloured bottles, jars, a mortar; herbs and a lantern hanging
+    for (const y of [-30, -20]){ g.fillStyle = '#5a3418'; g.fillRect(-36, y, 18, 1.4); }
+    const bc = ['#3a8ad8', '#d83a5a', '#9a5ad8', '#e8a030', '#3ab08a']; for (let k = 0; k < 5; k++){ g.fillStyle = bc[k]; g.fillRect(-35 + k * 3.4, -34, 2.4, 4); g.fillStyle = '#e8e4dc'; g.fillRect(-34.6 + k * 3.4, -35, 1.6, 1); }
+    for (let k = 0; k < 3; k++){ g.fillStyle = '#e8dcc0'; ov(g, -33 + k * 5.2, -22.4, 2.2, 2.4); g.fill(); g.fillStyle = '#5a9a4a'; g.fillRect(-33.6 + k * 5.2, -23, 1.2, 1.2); }
+    g.fillStyle = '#c8c4bc'; ov(g, -21, -12.6, 3, 1.8); g.fill(); g.fillStyle = '#a8a49c'; g.fillRect(-21, -17, 1.2, 4);
+    for (const x of [-34, -30]){ g.fillStyle = '#6a8a3a'; pv(g, [x - 1.6, -42, x + 1.6, -42, x + 1, -35, x - 1, -35]); g.fill(); }
+    g.fillStyle = '#2a1a0a'; g.fillRect(-26.6, -42, 4.6, 1.2); g.fillStyle = '#ffd068'; g.fillRect(-26, -41, 3.4, 4.6); g.fillStyle = 'rgba(255,220,120,.35)'; g.beginPath(); g.arc(-24.3, -38.6, 6, 0, 7); g.fill();
+    // right shelves: jars and a gold scale
+    for (const y of [-30, -20]){ g.fillStyle = '#5a3418'; g.fillRect(18, y, 18, 1.4); }
+    for (let k = 0; k < 3; k++){ g.fillStyle = 'rgba(230,240,240,.85)'; g.fillRect(20 + k * 5.4, -35, 3.6, 5); g.fillStyle = ['#9a6ad8', '#6aaa5a', '#d8a050'][k]; g.fillRect(20.4 + k * 5.4, -33, 2.8, 2.6); }
+    g.strokeStyle = '#e3b04b'; g.lineWidth = .9; g.beginPath(); g.moveTo(27, -27); g.lineTo(27, -21); g.moveTo(22, -26); g.lineTo(32, -26); g.stroke(); for (const x of [22, 32]){ g.beginPath(); g.arc(x, -24, 2, 0, Math.PI); g.stroke(); }
+    // the counter with a red runner, sacks and a basket of greens, jars of herbs
+    g.fillStyle = '#7a4a26'; g.fillRect(-30, -16, 60, 3); g.fillStyle = '#5a3418'; g.fillRect(-30, -13, 60, 8);
+    g.fillStyle = '#b02a2a'; g.fillRect(-8, -16, 16, 11); g.fillStyle = '#e3b04b'; g.fillRect(-8, -16, 16, 1); g.beginPath(); g.moveTo(0, -12.6); g.lineTo(2.4, -10.4); g.lineTo(0, -8.2); g.lineTo(-2.4, -10.4); g.closePath(); g.fill();
+    g.fillStyle = '#c8b088'; ov(g, -36, -5, 5, 5); g.fill(); g.fillStyle = '#d8a050'; ov(g, -36, -9.6, 3.6, 1.6); g.fill();
+    g.fillStyle = '#8a6030'; pv(g, [-30, -8, -22, -8, -23, -2, -29, -2]); g.fill(); g.fillStyle = '#5aaa4a'; ov(g, -26, -9, 4, 2.4); g.fill();
+    for (const [x, c] of [[22, '#e8dcc0'], [28, '#e8dcc0'], [34, '#b8603a']]){ g.fillStyle = c; ov(g, x, -5.4, 2.8, 3.4); g.fill(); g.fillStyle = c === '#b8603a' ? '#c02a2a' : '#7a5ad8'; ov(g, x, -9, 2.6, .9); g.fill(); }
+    // posts with braces
+    for (const x of [-44, 40]){ g.fillStyle = vsLin(g, x, 0, x + 4, 0, [[0, '#3a2412'], [.5, '#8a5a30'], [1, '#3a2412']]); g.fillRect(x, -46, 4, 41); }
+    g.strokeStyle = '#5a3a1e'; g.lineWidth = 1.6; g.beginPath(); g.moveTo(-40, -36); g.lineTo(-32, -45); g.moveTo(40, -36); g.lineTo(32, -45); g.stroke();
+    // the red tile awning over the ground floor and the big sign on it
+    tileQuad(g, [-54, -42, 54, -42, 48, -50, -48, -50], 2, 14, [PAL.roofM, PAL.roofL, PAL.roofD]);
+    { const w = 50, y = -55; g.fillStyle = 'rgba(0,0,0,.3)'; g.fillRect(-w / 2 + .8, y + .8, w, 11); g.fillStyle = vsLin(g, 0, y, 0, y + 11, [[0, '#8a1e18'], [1, '#5a0e0a']]); g.fillRect(-w / 2, y, w, 11);
+      g.strokeStyle = PAL.gold; g.lineWidth = 1; g.strokeRect(-w / 2 + .6, y + .6, w - 1.2, 9.8); g.fillStyle = '#ffe08a'; g.font = '700 7px Sarabun,"Noto Sans Thai",sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(NAME, 0, y + 6, w - 12); g.textBaseline = 'alphabetic';
+      g.fillStyle = '#5aaa4a'; for (const d of [-1, 1]){ ov(g, d * 21.5, y + 5.5, 2, 1.2); g.fill(); } }
+    // upper floor: planks, three green louvred windows, a white balcony with flower pots
+    S3.boards(g, -42, -78, 84, 26, rng, ['#9a6a40', '#8a5a34']); S3.shade(g, -42, -78, 84, 26);
+    for (const x of [-32, -7, 18]){ g.fillStyle = '#e8e0cc'; g.fillRect(x - 1, -75, 16, 18); g.fillStyle = '#2a6a4a'; g.fillRect(x, -74, 14, 16); g.fillStyle = 'rgba(0,0,0,.3)'; for (let y = -72; y < -58; y += 2) g.fillRect(x, y, 14, .7); g.fillStyle = '#1a4a32'; g.fillRect(x + 6.6, -74, .8, 16); }
+    g.fillStyle = '#f2ede2'; g.fillRect(-44, -60, 88, 1.6); g.fillRect(-44, -53, 88, 1.6); for (let x = -43; x < 44; x += 3) g.fillRect(x, -59, 1.1, 6);
+    for (const x of [-36, 36]){ g.fillStyle = '#b8603a'; pv(g, [x - 3.6, -60, x + 3.6, -60, x + 2.6, -65, x - 2.6, -65]); g.fill(); g.fillStyle = '#4a9a44'; ov(g, x, -67, 4.6, 3); g.fill(); g.fillStyle = '#ffd8e8'; for (const dx of [-2, 0, 2]) { g.beginPath(); g.arc(x + dx, -68.4 + Math.abs(dx) * .4, .9, 0, 7); g.fill(); } }
+    // the gable roof with the round mortar-and-pestle emblem
+    tileQuad(g, [-56, -76, 56, -76, 10, -104, -10, -104], 6, 14, [PAL.roofM, PAL.roofL, PAL.roofD]);
+    g.fillStyle = '#8a5a34'; pv(g, [-30, -78, 0, -98, 30, -78]); g.fill(); g.fillStyle = 'rgba(0,0,0,.2)'; for (let x = -28; x < 30; x += 4) g.fillRect(x, -96 + Math.abs(x) * .62, .6, 20 - Math.abs(x) * .62);
+    g.fillStyle = PAL.gold; g.beginPath(); g.arc(0, -85, 7, 0, 7); g.fill(); g.fillStyle = '#8a1e18'; g.beginPath(); g.arc(0, -85, 5.8, 0, 7); g.fill();
+    g.fillStyle = '#f2ede2'; g.beginPath(); g.moveTo(-3.4, -85); g.lineTo(3.4, -85); g.lineTo(2, -82); g.lineTo(-2, -82); g.closePath(); g.fill(); g.fillStyle = '#d8d0c0'; g.save(); g.translate(1.6, -87); g.rotate(.6); g.fillRect(-.8, -3, 1.6, 4); g.restore();
+    g.fillStyle = '#5aaa4a'; for (const [x, y] of [[-3, -88], [3.4, -87]]){ ov(g, x, y, 1.6, 1); g.fill(); }
+    // the vertical red banner (left) and two red lanterns (right)
+    g.strokeStyle = '#3a2010'; g.lineWidth = .8; g.beginPath(); g.moveTo(-54, -72); g.lineTo(-48, -72); g.stroke(); S3.vboard(g, -58, -70, NAME, {w:10});
+    for (const y of [-70, -42]){ g.strokeStyle = '#2a1a0a'; g.lineWidth = .6; g.beginPath(); g.moveTo(52, y - 4); g.lineTo(52, y); g.stroke();
+      g.fillStyle = '#d8281e'; ov(g, 52, y + 5, 4.4, 5.6); g.fill(); g.fillStyle = '#e3b04b'; g.fillRect(49.6, y, 4.8, 1.2); g.fillRect(49.6, y + 9.8, 4.8, 1.2); g.fillStyle = 'rgba(255,200,120,.4)'; ov(g, 51, y + 4, 2, 3); g.fill(); g.fillStyle = '#c8281e'; g.fillRect(51.4, y + 11, 1.2, 3); }
+    // stone planters with pink flowers at the front corners
+    for (const x of [-50, 50]){ g.fillStyle = '#c8c4bc'; g.fillRect(x - 5, -8, 10, 8); g.fillStyle = '#a8a49c'; g.fillRect(x - 5, -8, 10, 1.2); g.fillStyle = '#4a9a44'; ov(g, x, -10, 6, 3.4); g.fill();
+      g.fillStyle = '#ffb8d0'; for (const dx of [-3.6, -1, 1.8, 4]){ g.beginPath(); g.arc(x + dx, -11.6 + (dx > 0 ? .6 : 0), 1.1, 0, 7); g.fill(); } }
   },
   herbal(g, rng){
     // stilts and a raised floor, herbs drying underneath
@@ -316,7 +399,7 @@ const S3_DRAW = {
 /* (v214) one standard for all twelve: each house's main body (from the ground to its roof ridge, eave to eave — not
    smoke, chimneys, flags or spires) is scaled to the same height on the same ground line, within the same width */
 const S3_STD = {h:92, w:120, base:2};
-const S3_MAIN = {smith:[-86, -54, 54], forger:[-96, -50, 50], driller:[-88, -56, 56], shop:[-98, -48, 46], herbal:[-98, -54, 54], cook:[-82, -54, 56],
+const S3_MAIN = {smith:[-90, -60, 60], forger:[-100, -60, 60], driller:[-88, -56, 56], shop:[-104, -58, 58], herbal:[-98, -54, 54], cook:[-82, -54, 56],
   tailor:[-88, -52, 52], banker:[-98, -50, 50], registrar:[-92, -54, 54], festival:[-96, -50, 50], trader:[-94, -54, 54], beast:[-90, -56, 56]};
 PROP_TYPES.vshop = (seed, v = 0) => makeProp({w:128, h:124, ax:64, ay:112,   // (v214) taller canvas: chimneys and spires are no longer cut off
   seed, shadow:[52, 12, 3], collide:30, glow:[0, -40, 62], paint(g, rng){
@@ -327,5 +410,5 @@ PROP_TYPES.vshop = (seed, v = 0) => makeProp({w:128, h:124, ax:64, ay:112,   // 
   // every house gets its pots by the door and, where it fits, a lantern at the eave
   const pk = VSHOP_PLANT[V.k] || 'fern';
   if (!['herbal', 'beast', 'cook', 'festival'].includes(V.k)) for (const px of [-30, 30]){ g.save(); g.translate(px, 1); g.scale(.62, .62); vsPlant(g, 0, 0, pk, rng); g.restore(); }
-  if (['shop', 'festival', 'cook', 'tailor'].includes(V.k)) { vsLantern(g, V.k === 'shop' ? 40 : -44, V.k === 'tailor' ? -58 : -60, 3); }
+  if (['festival', 'cook', 'tailor'].includes(V.k)) { vsLantern(g, -44, V.k === 'tailor' ? -58 : -60, 3); }
 }});

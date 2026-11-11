@@ -128,7 +128,8 @@ const PREY = /hare|deer|serow|fowl|squirrel|frog|rat|gecko|shrimp|crab|egret|gru
       if (m.preyOf && !m.preyOf.dead && m.preyOf.hunt === m){ const p = m.preyOf, dx = m.x - p.x, dy = m.y - p.y, l = Math.hypot(dx, dy) || 1;
         moveTo(m, m.x + dx / l * 40, m.y + dy / l * 40, d.speed * 1.15, dt); m.moving = true; m.dir = SPR.dirFromVec(dx, dy); pushOut(m, d.r * .6); return true; }
       // day creatures sleep at night (you can sneak by)
-      if (isNight() && !d.night && !m.elite && !m.hitT0 && dist(m, P) > 70){ m.moving = false; m.sleeping = true; m.atkT += dt; return true; }
+      // (v274) only about three in ten doze (the owner saw whole maps standing frozen at night); the rest roam as by day
+      if (isNight() && !d.night && !m.elite && !m.hitT0 && ((m.id | 0) % 10) < 3 && dist(m, P) > 70){ m.moving = false; m.sleeping = true; m.atkT += dt; return true; }
       if (m.sleeping){ m.sleeping = false; if (typeof emote === 'function') emote(m, 'alert'); }
     }
   });
@@ -159,12 +160,12 @@ EV.on('kill', m => {
     const rp = m.fz.berserk > 0, n = m.fz.rampages || 0, bonus = Math.round(d.exp * RATE * (.7 + n * .15) * (rp ? 1.3 : 1));
     gainExp(bonus, Math.round(d.jexp * JRATE * (.7 + n * .15)));
     for (let i = 0; i < (rp ? 2 : 1); i++){ const g0 = gearDrop(m), g = g0 && rollGear(g0, rp ? 'rampage' : 'fury', m.x, m.y - MOB_H[m.type]); if (g) dropLoot(g, m.x + rand(-16, 16), m.y + rand(-8, 8)); }
-    if (rp && d.card && Math.random() < .05){ S.cards[d.card] = (S.cards[d.card] || 0) + 1; if (typeof cardPop === 'function') cardPop(d.card); }
+    if (rp && d.card && Math.random() < (d.cardRate || 0) * 2){ S.cards[d.card] = (S.cards[d.card] || 0) + 1; if (typeof cardPop === 'function') cardPop(d.card); }
     banner(L(`โบนัสความโหด · EXP +${bonus.toLocaleString()}${rp ? ' · ปราบขณะอาละวาด!' : ''}`, `Ferocity bonus · EXP +${bonus.toLocaleString()}${rp ? ' · slain mid-rampage!' : ''}`));
     NPCMEM('boss', nm(d));
   }
 });
-EV.on('tick', () => { for (const m of mobs){ const F = m.fz; if (!F || m.dead) continue; if (F.berserk > 0 && !m._rpc){ m._rpc = true; F.rampages = (F.rampages || 0) + 1; tip('rampage'); if (typeof AMB !== 'undefined') AMB.roar(m); } if (!(F.berserk > 0)) m._rpc = false;
+EV.on('tick', () => { for (const m of mobs){ const F = m.fz; if (!F || m.dead || F.hop) continue; if (F.berserk > 0 && !m._rpc){ m._rpc = true; F.rampages = (F.rampages || 0) + 1; tip('rampage'); if (typeof AMB !== 'undefined') AMB.roar(m); } if (!(F.berserk > 0)) m._rpc = false;
   if (F.phase >= 2 && !m._tp2){ m._tp2 = true; tip('bossPhase'); } if (F.phase !== m._rph){ if (m._rph && typeof AMB !== 'undefined') AMB.roar(m); m._rph = F.phase; }
   if (F.act && F.act.id !== m._lact){ m._lact = F.act.id; if (F.act.id === 'burrow' || F.act.id === 'soar') tip('burrow'); if (F.act.id === 'breath' || F.act.id === 'miasma') tip('breath'); } if (!F.act) m._lact = null;
   if (m.aggro && !m._agr){ m._agr = true; if (typeof AMB !== 'undefined') AMB.roar(m); } if (!m.aggro) m._agr = false; } });
@@ -231,8 +232,8 @@ const TIPS = {
   silence:['ติดใบ้!', 'Silenced!', 'ใช้สกิลไม่ได้ชั่วคราว ตีปกติยังได้ · ยาเขียวแก้ได้', 'No skills for a while, basic attacks still work · a Green Potion cures it'],
   bossPhase:['บอสเข้าระยะใหม่!', 'The boss changed phase!', 'ทุกระยะบอสจะแรงขึ้นและมีท่าใหม่ · ดูวงสีแดงบนพื้นแล้วกด "กลิ้ง" หลบ', 'Each phase it hits harder and learns new moves · watch for red circles and Dodge-roll out'],
   rampage:['บอสอาละวาด!', 'Rampage!', 'แถบความคลั่งเต็ม 7 วิต่อจากนี้บอสเร็วและแรงมาก · ถอยห่างหรือป้องกันไว้ · ฆ่าตอนอาละวาดได้รางวัลพิเศษ', 'For 7 seconds it is very fast and strong · back off or guard · slaying it now pays extra'],
-  burrow:['บอสหายไป!', 'It vanished!', 'บอสมุดดินหรือบินขึ้นฟ้า ตีไม่เข้า · เมื่อวงแดงขึ้นใต้เท้า รีบกลิ้งออก', 'It dug under or took to the sky and cannot be hit · when a red circle appears under you, roll away'],
-  breath:['ระวังกรวยพ่น!', 'Breath attack!', 'อยู่นอกกรวยสีแดง หรือออกจากหมอกพิษให้เร็ว · ติดสถานะตามธาตุของบอส', 'Stay out of the red cone or the poison cloud · it carries the boss\'s element'],
+  burrow:['บอสหายไป!', 'It vanished!', 'บอสมุดดิน หายเข้าหมอก หรือบินขึ้นฟ้า ตีไม่เข้า · เมื่อวงแดงขึ้นใต้เท้า รีบกลิ้งออก', 'It dug under or took to the sky and cannot be hit · when a red circle appears under you, roll away'],
+  breath:['ระวังลมหายใจบอส!', 'Breath attack!', 'บอสเงยหัวรวมพลังที่ปาก แล้วพ่นเป็นสาย อย่ายืนในสายที่พ่นออกมา หรือออกจากหมอกพิษให้เร็ว · ติดสถานะตามธาตุของบอส', 'It rears back and gathers power at its mouth, then pours out a stream: stay out of the stream, or out of the poison mist · you suffer its element\'s ailment'],
   elite:['หัวหน้าฝูง!', 'An alpha!', 'มอนตัวใหญ่สีทอง HP ×4 ใช้สกิลและปลุกฝูงได้ · ฆ่าได้ EXP ×3 และมีโอกาสได้อุปกรณ์', 'A big golden monster with ×4 HP, skills and a pack call · worth ×3 EXP and often gear'],
   hunt:['ห่วงโซ่อาหาร', 'The food chain', 'สัตว์นักล่าไล่จับเหยื่อได้เอง · กลางคืนสัตว์กลางวันจะหลับ เดินผ่านเงียบๆ ได้', 'Hunters chase and catch prey on their own · at night day creatures sleep, you can sneak by'],
   wx_rain:['ฝนตก', 'Rain', 'เวทไฟอ่อนลง 20% · เวทน้ำแรงขึ้น 15%', 'Fire −20% · water +15%'],
@@ -253,8 +254,8 @@ document.addEventListener('click', e => { if (e.target.closest('[data-tipx]')){ 
 EV.on('tick', () => { if (typeof afHas !== 'function' || !P.af) return; if (afDot()) tip('poison'); if (afHas('silence')) tip('silence'); });
 EV.on('pickup', id => { if (ITEMS[id] && ITEMS[id].opts && ITEMS[id].opts.some(o => o[0] === 'resPct')) tip('resist'); });
 
-WIKI_SYS.push({id:'world2', t:['โลกมีชีวิต', 'A living world'], b:() => `<p>${L('<b>สภาพอากาศ</b> เปลี่ยนตามเวลาจริงทุก 15 นาที (ทุกคนในแผนที่เห็นเหมือนกัน): ฝน = ไฟ −20% น้ำ +15% · พายุ = ฟ้าผ่า (วงแดงก่อน) ลม +20% · หมอก = มอนมองเห็นใกล้ลง 40% · ทะเลทราย/ภูเขาไฟ/หิมะเป็นฝุ่นหมอกแทนฝน · ในถ้ำไม่มีอากาศ', '<b>Weather</b> changes every 15 real minutes (the same for everyone on the map): rain = fire −20%, water +15% · storm = lightning (red circle first), wind +20% · fog = monsters notice you 40% closer · deserts, volcanoes and snow get haze · caves have none')}</p>
-  <p>${L('<b>หัวหน้าฝูง</b> (★ สีทอง) เกิดราว 4% ตัวใหญ่ HP ×4 ตีแรง ×1.5 มีสกิล 2 อย่าง + ปลุกฝูง · ฆ่าได้ EXP ×3 และ 50% ได้อุปกรณ์', '<b>Alphas</b> (golden ★) are ~4% of spawns: bigger, ×4 HP, ×1.5 hits, two skills and a pack call · ×3 EXP and a 50% gear drop')}</p>
-  <p>${L('<b>ห่วงโซ่อาหาร</b>: นักล่า (เสือ หมาจิ้งจอก งู เหี้ย…) ไล่จับเหยื่อ (กระต่าย กวาง ไก่ป่า กบ…) · กลางคืนสัตว์กลางวันหลับ แอบผ่านได้ถ้าไม่เข้าใกล้เกิน 70', '<b>Food chain</b>: hunters (tigers, jackals, snakes, monitors…) chase prey (hares, deer, fowl, frogs…) · at night day creatures sleep, you can pass if you stay 70 away')}</p>
-  <p>${L('<b>รางวัลความโหดของบอส</b>: EXP โบนัส +70% (+15% ต่อการอาละวาดที่รอดมาได้) และดรอปอุปกรณ์เพิ่ม 1 ชิ้นที่หายากขึ้น · ฆ่าตอนอาละวาด: ×1.3 อุปกรณ์เพิ่มอีกชิ้น และลุ้นการ์ด', '<b>Boss ferocity reward</b>: +70% bonus EXP (+15% per rampage survived) and one more, rarer gear drop · slain mid-rampage: ×1.3, a second extra piece and a card chance')}</p>
-  <p>${L('NPC ทักเจ้าตามเวลา อากาศ สภาพร่างกาย และเรื่องที่เจ้าทำล่าสุด · ออปชันสุ่ม "ต้านทานสถานะ" บนอุปกรณ์ (รวมสูงสุด 60%)', 'NPCs greet you by the time, the weather, how you look and what you did lately · random option "Status Resist" on gear (up to 60% in total)')}</p>`});
+WIKI_SYS.push({id:'world2', t:['โลกมีชีวิต', 'A living world'], b:() => `<p>${L('<b>สภาพอากาศ</b> เปลี่ยนตามเวลาจริงเป็นระยะ (ทุกคนในแผนที่เห็นเหมือนกัน): ฝน = ไฟอ่อนลง น้ำแรงขึ้น · พายุ = ฟ้าผ่า (วงแดงก่อน) ลมแรงขึ้น · หมอก = มอนมองเห็นได้ใกล้ลง · ทะเลทราย/ภูเขาไฟ/หิมะเป็นฝุ่นหมอกแทนฝน · ในถ้ำไม่มีอากาศ', '<b>Weather</b> changes every so often in real time (the same for everyone on the map): rain = fire weaker, water stronger · storm = lightning (red circle first), wind stronger · fog = monsters notice you only up close · deserts, volcanoes and snow get haze · caves have none')}</p>
+  <p>${L('<b>หัวหน้าฝูง</b> (★ สีทอง) เกิดนาน ๆ ครั้ง ตัวใหญ่ เลือดหนา ตีแรง มีสกิล 2 อย่าง + ปลุกฝูง · ฆ่าได้ EXP มากกว่าปกติและมีลุ้นได้อุปกรณ์', '<b>Alphas</b> (golden ★) turn up now and then: bigger, tougher, harder-hitting, with two skills and a pack call · more EXP and a good chance of gear')}</p>
+  <p>${L('<b>ห่วงโซ่อาหาร</b>: นักล่า (เสือ หมาจิ้งจอก งู เหี้ย…) ไล่จับเหยื่อ (กระต่าย กวาง ไก่ป่า กบ…) · กลางคืนสัตว์กลางวันหลับ แอบผ่านได้ถ้าไม่เข้าใกล้เกินไป', '<b>Food chain</b>: hunters (tigers, jackals, snakes, monitors…) chase prey (hares, deer, fowl, frogs…) · at night day creatures sleep, you can pass if you keep your distance')}</p>
+  <p>${L('<b>รางวัลความโหดของบอส</b>: EXP โบนัส (ยิ่งรอดการอาละวาดมาได้ยิ่งเยอะ) และดรอปอุปกรณ์เพิ่มที่หายากขึ้น · ฆ่าตอนอาละวาด: รางวัลมากขึ้นอีก อุปกรณ์เพิ่มอีกชิ้น และลุ้นการ์ด', '<b>Boss ferocity reward</b>: bonus EXP (more for every rampage survived) and an extra, rarer gear drop · slain mid-rampage: even more, a second extra piece and a card chance')}</p>
+  <p>${L('NPC ทักเจ้าตามเวลา อากาศ สภาพร่างกาย และเรื่องที่เจ้าทำล่าสุด · ออปชันสุ่ม "ต้านทานสถานะ" บนอุปกรณ์', 'NPCs greet you by the time, the weather, how you look and what you did lately · random option "Status Resist" on gear')}</p>`});

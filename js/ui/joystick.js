@@ -114,6 +114,7 @@ const joyEnd = e => {
   if (!JOY.keys.size) P.tx = null;
 };
 el('joyZone').addEventListener('pointerup', joyEnd); el('joyZone').addEventListener('pointercancel', joyEnd);
+el('joyZone').addEventListener('lostpointercapture', joyEnd);   // (v276) a finger lifted while the game was busy (a warp) must not leave the stick held
 
 /* WASD / arrows drive the same vector (works in both modes) */
 const KEYDIR = {w:[0, -1], arrowup:[0, -1], s:[0, 1], arrowdown:[0, 1], a:[-1, 0], arrowleft:[-1, 0], d:[1, 0], arrowright:[1, 0]};

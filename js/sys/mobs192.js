@@ -17,7 +17,8 @@ for (const k in MOB){ const d = MOB[k]; if (!d || d.boss || d._m192 || k === 'du
   if ((d.lvl || 0) >= MOB192.third && Array.isArray(d.msk) && d.msk.length < 3){
     const pool = {quad:['slam', 'rally', 'pounce'], rock:['harden', 'slam', 'blind'], squat:['blind', 'slam'], slime:['mend', 'spit', 'web'], bug:['web', 'bite', 'spit'],
       bird:['volley', 'dive', 'blind'], serpent:['coil', 'spit', 'frost'], floater:['hex', 'nova', 'hush']}[d.nature || 'quad'] || ['slam', 'rend'];
-    const extra = (d.race === 'undead' || d.race === 'demon' ? ['hex', 'hush'] : []).concat(pool, ['slam', 'rend', 'bolt']).find(id => MSK[id] && !d.msk.includes(id));
+    const fly = d.nature === 'bug' && Array.isArray(d.msk) && d.msk[0] === 'dive';   // (v274) hornets and wasps: a sting (spit venom), never a web
+    const extra = (d.race === 'undead' || d.race === 'demon' ? ['hex', 'hush'] : []).concat(fly ? pool.filter(x => x !== 'web') : pool, ['slam', 'rend', 'bolt']).find(id => MSK[id] && !d.msk.includes(id));
     if (extra) d.msk = d.msk.concat(extra); }
 }
 /* skills come back sooner on tougher monsters */

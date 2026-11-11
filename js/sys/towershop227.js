@@ -5,8 +5,8 @@
      run summary.
    · THE TOWER SHOP (in the tower window): wardrobe pieces found nowhere else — the Tower Guardian outfit, the Dawn
      Sandstone crown, Kanok tower wings — and potions for the climb.
-   · MILESTONES: your best floor unlocks a piece no one can buy — floor 50: the Indigo Night crown · floor 100: the
-     Floating Stone Dais mount (and the new title «เจ้าแห่งหอคอย») · floor 150: the Golden Heaven wings.
+   · MILESTONES: your best floor unlocks a piece no one can buy — floor 50: the Indigo Night crown · floor 75: the
+     Golden Heaven wings · floor 100: the Floating Stone Dais mount (and the title «เจ้าแห่งหอคอย»).
    Wardrobe pieces go to the account's wardrobe like the story pieces (the tailor does not sell them). */
 'use strict';
 
@@ -51,7 +51,7 @@ function twsGive(n, why){ if (n <= 0) return; const s = twsTok(); s.tok += n; TW
 
 /* ---------- the shop and the milestones ---------- */
 const TWS_SHOP = [['tws_top', 300], ['tws_crown', 150], ['tws_kanok', 500], ['whitepot', 12, 10], ['bigbluepot', 15, 10]];
-const TWS_MILE = [[50, 'tws_night'], [100, 'tws_dais'], [150, 'tws_heaven']];
+const TWS_MILE = [[50, 'tws_night'], [75, 'tws_heaven'], [100, 'tws_dais']];   // (v255) the tower ends at 100: the wings moved from 150 to 75
 const twsPiece = id => COSTUME[id] || WINGS[id] || XCOS[id];
 const twsHave = id => COSTUME[id] ? (typeof cosHave === 'function' && cosHave(id)) : !!(ACC.wardrobe && ACC.wardrobe[id]);
 function twsGrant(id){ if (COSTUME[id]) return typeof cosGrant === 'function' ? cosGrant(id) : false; const w = ACC.wardrobe = ACC.wardrobe || {}; if (w[id]) return false; w[id] = 1; if (typeof accSave === 'function') accSave(); return true; }
@@ -75,7 +75,7 @@ document.addEventListener('click', e => { const t = e.target.closest && e.target
   if (row[2]){ s.tok -= row[1]; addItem(id, row[2]); toast(L(`ได้ ${nm(ITEMS[id])} ×${row[2]}`, `Got ${nm(ITEMS[id])} ×${row[2]}`)); }
   else { if (twsHave(id)) return; s.tok -= row[1]; twsGrant(id); const d = twsPiece(id); toast(L(`ได้ ${d.th} · ใส่ได้ที่หน้าต่างแฟชั่น`, `Got ${d.en} · wear it from the wardrobe`)); }
   SFX.play('coin'); dirty = true; save(); if (typeof reWin === 'function') reWin('tower'); });
-// the new title at floor 100 (10, 50 and 150 already have theirs)
+// the new title at floor 100 (10, 50 and 75 already have theirs)
 if (typeof ACH !== 'undefined' && typeof ACH_BY !== 'undefined' && !ACH_BY.tower100){ const a = {id:'tower100', cat:'hunt', tier:3, th:'เจ้าแห่งหอคอย', en:'Lord of the Tower', dth:'ผ่านหอคอยวายราชั้น 100', den:'Clear floor 100 of the Vayra Tower', prog:() => [(S.tower && S.tower.best) || 0, 100], coin:60, title:['เจ้าแห่งหอคอย', 'Lord of the Tower']}; ACH.push(a); ACH_BY.tower100 = a; }
 { const st = document.createElement('style'); st.textContent = `.twshop{display:flex;flex-direction:column;gap:4px}.twsr{display:grid;grid-template-columns:1fr auto auto;gap:8px;align-items:center;padding:5px 8px;border-radius:9px;background:#f7f4ff;border:1px solid #e6defc}
   .twsr b{display:block;font-size:13px}.twsr small{color:#6a5a8a;font-size:11px}.twsr span{font-weight:800;color:#5a2ad8;white-space:nowrap}.twsr.own{opacity:.7}.twtok{color:#5a2ad8;font-weight:800}`; document.head.appendChild(st); }

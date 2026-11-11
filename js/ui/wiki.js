@@ -23,7 +23,7 @@ function wikiIndex(){
   return (WIKI_IX = {where, droppers, skillOf});
 }
 const wkLink = (tab, id, label, cls = '') => `<a class="wkl ${cls}" data-wk="${tab}:${id}">${label}</a>`;
-const wkPct = v => (v >= .1 ? Math.round(v * 100) : +(v * 100).toFixed(2)) + '%';
+const wkPct = v => (v >= .1 ? Math.round(v * 100) : +(v * 100).toFixed(v < .0001 ? 3 : 2)) + "%";
 
 /* (v57) a card's effects, one per line, each with what it means in plain words */
 const WK_FX = [
@@ -111,14 +111,14 @@ const WIKI_SYS = [
     `<p>โลกใช้ <b>เวลาประเทศไทย</b> · <b>กลางคืน 18:30–06:00</b> มืดลงและมีมอนกลางคืนออกมา · <b>อีเว้นหลังเลิกงาน 17:00–02:00</b> EXP และของดรอป ×1.5</p>`,
     `<p>The world runs on <b>Thailand time</b> · <b>Night 18:30–06:00</b> gets dark and night monsters come out · <b>After-work event 17:00–02:00</b>: EXP and drops ×1.5</p>`)},
   {id:'boss', t:['บอส', 'Bosses'], b:() => L(
-    `<p>ทุกแคว้นมีบอส 1 ตัว เกิดสุ่มตำแหน่งและเดินย้ายที่ไปเรื่อย ๆ · บอสมีสกิลพร้อมวงเตือนสีแดงบนพื้น ให้เดินหลบ · ถ้าหนีไกล บอสจะคลั่งวิ่งเร็วขึ้นและกระโดดใส่ · HP ต่ำกว่า 30% บางตัวคลั่งตีแรงขึ้น · ดรอปการ์ด 15% และอุปกรณ์แน่นอน 1 ชิ้น</p>`,
-    `<p>Every region has one boss that spawns at a random spot and roams · its skills show red warning areas on the ground: step out · run far and it goes into a frenzy, running faster and leaping at you · some enrage below 30% HP · 15% card drop and one guaranteed piece of gear</p>`)},
+    `<p>ทุกแคว้นมีบอส 1 ตัว เกิดสุ่มตำแหน่งและเดินย้ายที่ไปเรื่อย ๆ · บอสมีสกิลพร้อมวงเตือนสีแดงบนพื้น ให้เดินหลบ · ถ้าหนีไกล บอสจะคลั่งวิ่งเร็วขึ้นและกระโดดใส่ · HP ต่ำกว่า 30% บางตัวคลั่งตีแรงขึ้น · ดรอปการ์ดบอส 0.005% (ยากที่สุด) · อุปกรณ์ 50% (ชิ้นที่ 2: 30% · ชิ้นที่ 3: 10%) · ดรอปของมากกว่ามอนปกติ ×1.5</p>`,
+    `<p>Every region has one boss that spawns at a random spot and roams · its skills show red warning areas on the ground: step out · run far and it goes into a frenzy, running faster and leaping at you · some enrage below 30% HP · boss card 0.005% (the rarest) · gear 50% (2nd: 30% · 3rd: 10%) · item drops ×1.5 of a normal monster</p>`)},
   {id:'pet', t:['สัตว์เลี้ยงและการจับ', 'Pets & capture'], b:() => L(
     `<p>ตีมอนให้ HP เหลือไม่เกิน 30% แล้วกด T (หรือปุ่มจับ) เพื่อจับเป็นสัตว์เลี้ยง · สัตว์เลี้ยงเดินตามและเพิ่ม EXP · สายพรานสั่งให้ช่วยตีได้ · จอมอัญเชิญหิมพานต์ผูกพันธะบอสเป็นสัตว์คู่กายถาวรได้ (สกิลผูกพันธะราชันย์)</p>`,
     `<p>Bring a monster to 30% HP or less and press T (or Capture) to make it your pet · pets follow you and add EXP · hunters can make them fight · the Himmapan Sovereign can bind a boss as a permanent companion (Royal Bond)</p>`)},
   {id:'gear', t:['อุปกรณ์และดรอป', 'Gear & drops'], b:() => L(
-    `<p>มอนทุกตัวมีโอกาสดรอปอุปกรณ์ (~2%) ในช่วงเลเวลใกล้ตัวมัน (−30 ถึง +5) · อาวุธจะดรอปเฉพาะชนิดที่อาชีพคุณใช้ได้ · บอสดรอปแน่นอน 1 ชิ้น และอีก 35% · เกราะ หมวก ลูกธนู ซื้อได้ที่ช่างตีเหล็กเพชร (ลูกธนูที่ร้านป้าบัวคำ) · อุปกรณ์ที่สวมแสดงบนตัวละคร</p>`,
-    `<p>Any monster can drop gear (~2%) near its level (−30 to +5) · weapons only drop in your class's weapon type · bosses always drop one piece, 35% for a second · armour, helmets and arrows are sold by Blacksmith Phet · worn gear shows on your hero</p>`)},
+    `<p>มอนทุกตัวมีโอกาสดรอปอุปกรณ์ (~2%) ในช่วงเลเวลใกล้ตัวมัน (−30 ถึง +5) · อาวุธจะดรอปเฉพาะชนิดที่อาชีพคุณใช้ได้ · บอสดรอปอุปกรณ์ 50% ชิ้นที่ 2: 30% ชิ้นที่ 3: 10% · ไม่มีของดรอปไหนเกิน 50% · การ์ดมอน 0.01% หัวหน้าฝูง 0.02% บอส 0.005% · เกราะ หมวก ลูกธนู ซื้อได้ที่ช่างตีเหล็กเพชร (ลูกธนูที่ร้านป้าบัวคำ) · อุปกรณ์ที่สวมแสดงบนตัวละคร</p>`,
+    `<p>Any monster can drop gear (~2%) near its level (−30 to +5) · weapons only drop in your class's weapon type · bosses drop gear 50%, a 2nd 30%, a 3rd 10% · no drop is above 50% · cards: monsters 0.01%, alphas 0.02%, bosses 0.005% · armour, helmets and arrows are sold by Blacksmith Phet · worn gear shows on your hero</p>`)},
   {id:'auto', t:['ออโต้และเก็บของ', 'Auto & looting'], b:() => L(
     `<p>Auto (B) ล่ามอนที่เหมาะกับเลเวล ใช้สกิลตามชุดที่ตั้ง (หมุนใช้ทุกสกิลที่ติ๊ก) กินยา นั่งพัก และกลับเมืองเมื่อยาหมด · กดสั่งเองเมื่อไหร่จะหยุด 5 วิ · ของดรอปตกที่พื้น ต้องเก็บเอง (กด Z / ชี้เมาส์ / ปุ่มเก็บ) หรือเช่าสัตว์ช่วยเก็บที่ลุงบุญมา</p>`,
     `<p>Auto (B) hunts monsters fit for your level, rotates every ticked skill, drinks potions, rests and heads home when out of potions · any manual input pauses it for 5s · drops land on the ground: pick them up yourself (Z, point the mouse, or the pick-up button) or rent a helper animal from Uncle Boonma</p>`)},

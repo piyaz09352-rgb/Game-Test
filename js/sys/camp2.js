@@ -41,7 +41,7 @@ NPC_OPEN.quarter = n => {
   npcFrame(n, L('มานั่งพักข้างกองไฟก่อนสิพ่อหนุ่มแม่หนุ่ม มีงานให้ทำ มีปลามาลุงย่างให้ด้วย', 'Sit by the fire a while. I have work for you, and if you bring fish, I will cook it for you.'),
     `<div class="sec">${L('งานประจำแคมป์วันนี้', "Today's camp jobs")} <span class="ct">${fmtN(pay.z)} ${CUR()} · ${L('แร่', 'ore')} ×${pay.ore} · ${L('เหรียญ', 'coin')} ×${pay.c} ${L('ต่องาน', 'each')}</span></div><div class="shop">${jobs.map(jobRow).join('')}</div>
      <div class="sec">${L('ทำอาหารข้างกองไฟ', 'Campfire cooking')}</div><div class="shop">${cook}</div>
-     <p class="hint">${L('ยา ยันต์ และลูกธนู ซื้อได้ที่ร้านป้าบัวคำในนครอาเรน', 'Potions, talismans and arrows: Auntie Buakham\'s store in Aren')}</p>
+     <p class="hint">${L('ยาซื้อได้ที่ร้านป้าบัวคำในนครอาเรน · กลับเมืองฟรีที่ผู้เฝ้าศาลข้างกองไฟ', 'Potions: Auntie Buakham\'s store in Aren · the Shrine Keeper by the fire takes you home for free')}</p>
      <p class="hint">${L('ตกปลาได้ริมน้ำทุกแห่ง: เดินไปใกล้น้ำแล้วกดปุ่ม 🎣 · อาหารให้บัฟ 3 นาที (กินได้ทีละอย่าง)', 'Fish at any water: walk to the shore and press 🎣 · food gives a 3-minute buff (one dish at a time)')}</p>`);
 };
 document.addEventListener('click', e => {

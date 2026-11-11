@@ -35,7 +35,7 @@ function tpHue(hex, deg){ // rotate hue (rainbow falls)
 { const _mk = BEAST.make;
   BEAST.make = function(key, spec){
     const th = typeof key === 'string' ? key.split('_')[0] : '';
-    if (!spec || !key.includes('_') || (!THEME_PAL[th] && th !== 'rainbowfall')) return _mk.call(this, key, spec);
+    if (!spec || !key.includes('_') || (!THEME_PAL[th] && th !== 'rainbowfall') || ['croc', 'rat', 'boar'].includes(spec.head)) return _mk.call(this, key, spec);   // (v274) crocodiles keep a real crocodile's olive hide (a teal one looked like a toy)
     const h = tpHash(key), f = ((h % 7) - 3) * .045;   // each species a little lighter or darker
     let pal = THEME_PAL[th];
     if (th === 'rainbowfall'){ const base = ['#e04a6a', '#f8b0c0', '#ffe060', '#5a1a2a'], deg = (h % 6) * 60; pal = base.map(c => tpHue(c, deg)); }

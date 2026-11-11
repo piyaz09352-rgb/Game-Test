@@ -13,6 +13,7 @@ const WB_TIMES = [[12, 30], [19, 30], [21, 30]], WB_LEN = 15;
 const WB = {key:null, m:null, acc:0, sendT:0, my:0, warned:{}, forced:null, left:0};
 function wbWindow(){
   if (WB.forced && Date.now() < WB.forced.until) return {key:WB.forced.key, active:true, left:(WB.forced.until - Date.now()) / 6e4};
+  if (globalThis.__VTEST__) return null;   // (v272) automated tests: only a forced appearance
   const c = thaiClock(), now = c.h * 60 + c.m + c.s / 60;
   for (let i = 0; i < WB_TIMES.length; i++){ const st = WB_TIMES[i][0] * 60 + WB_TIMES[i][1], key = `${dayKey()}-${i}`;
     if (now >= st && now < st + WB_LEN) return {key, active:true, left:st + WB_LEN - now};

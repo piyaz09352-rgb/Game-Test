@@ -30,7 +30,7 @@ const nbOn = () => typeof nmActive === 'function' && nmActive() && NET.room && N
 /* rings appear later (after a leap, or one by one): send each new ring */
 EV.on('tick', () => {
   if (!nbOn()) return;
-  for (const m of mobs){ const F = m.fz; if (!F || m.dead || !m.nid || F.remote) continue; const n = F.rings.length;
+  for (const m of mobs){ const F = m.fz; if (!F || m.dead || !m.nid || F.remote || F.hop) continue; const n = F.rings.length;
     if (n > (m._nbR || 0)) for (let i = m._nbR || 0; i < n; i++){ const r = F.rings[i]; if (r._sent) continue; r._sent = true; mapEmit('bz', {r:NET.mapName, n:m.nid, s:'ring', k:'ring', x:Math.round(r.x), y:Math.round(r.y), t:0}).catch(() => {}); }
     m._nbR = n; }
 });

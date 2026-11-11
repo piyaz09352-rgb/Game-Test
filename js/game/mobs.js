@@ -177,7 +177,7 @@ function bossCast(m, id){
     case 'meteor': {
       say();
       for (let i = 0; i < 5; i++){ const x = at.x + (i ? rand(-90, 90) : 0), y = at.y + (i ? rand(-50, 50) : 0), wt = 1 + i * .18;
-        VFX.play('warnCircle', {x, y, r:46, t:wt});
+        VFX.play('warnCircle', {x, y, r:46, t:wt, kind:'fall'});
         later(wt, () => { if (m.dead) return; VFX.play('boom', {x, y, big:false}); if (e === 'fire') VFX.play('groundFire', {x, y, r:20, life:2.4}); if (inHit(x, y, 46)) mobAttack(m, 1.5, true); }); }
       return 2;
     }

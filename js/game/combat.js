@@ -79,8 +79,8 @@ function killMob(m){
   // (v27) EXP no longer floats over the monster: it is a line in the chat window's System tab (syschat.js)
   questKill(m.type); partyShareExp(be, je, m.x, m.y); SFX.play(d.boss ? 'boom' : 'mobDie');
   for (const [id, ch] of d.drops){ if (!m.minion && Math.random() < ch * nmul) dropLoot(id, m.x, m.y); }
-  // equipment drops: GEAR_DROP (2%) from monsters, every boss drops one piece (and often a second)
-  if (!m.minion){ const n = d.boss ? 1 + (Math.random() < .6 ? 1 : 0) + (Math.random() < .2 ? 1 : 0) : Math.random() < GEAR_DROP * nmul ? 1 : 0;
+  // equipment drops: GEAR_DROP from monsters; a boss 50% / 30% / 10% for up to three pieces (v269: nothing certain)
+  if (!m.minion){ const n = d.boss ? (Math.random() < .5 ? 1 : 0) + (Math.random() < .3 ? 1 : 0) + (Math.random() < .1 ? 1 : 0) : Math.random() < GEAR_DROP * nmul ? 1 : 0;
     for (let i = 0; i < n; i++){ const g0 = gearDrop(m), g = g0 && rollGear(g0, d.boss ? 'boss' : 'mob', m.x, m.y - MOB_H[m.type]); if (g){ dropLoot(g, m.x + rand(-10, 10), m.y + rand(-6, 6)); if (!d.boss) addText(m.x, m.y - MOB_H[m.type] - 32, 'Gear!', '#ffd56a', 14); } } }
   if (!m.minion && Math.random() < d.cardRate * nmul){
     S.cards[d.card] = (S.cards[d.card] || 0) + 1; bump('cards'); EV.emit('card', d.card);
@@ -99,7 +99,8 @@ function killMob(m){
 function gainExp(b, j){
   const lv0 = S.lvl, jl0 = S.jlvl;
   S.exp += b;
-  while (S.lvl < LV_MAX && S.exp >= nextBase(S.lvl)){
+  const cap = typeof patchCap === 'function' ? patchCap() : LV_MAX;   // (v257) the server's patch cap (patch257.js): EXP past it is stored
+  while (S.lvl < cap && S.exp >= nextBase(S.lvl)){
     S.exp -= nextBase(S.lvl); S.lvl++; S.statPts += statGain(S.lvl);
     derive(); S.hp = DER.maxhp; S.sp = DER.maxsp;
     pulseChar();

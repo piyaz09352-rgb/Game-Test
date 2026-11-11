@@ -14,7 +14,7 @@
 'use strict';
 
 const BOSS_SIZE = {
-  whitemonkeyking:2.0, lotusturtle:2.3, aikhiam:2.8, marketmatron:1.9, dvarapala:3.0, cavematriarch:2.4, saming:2.3,
+  whitemonkeyking:2.0, lotusturtle:2.3, aikhiam:2.8, marketmatron:1.9, dvarapala:3.0, cavematriarch:1.6, frostqueen:1.5, saming:2.3,
   elderpop:1.8, khankhak:2.4, templecolossus:2.9, andamancrab:2.6, seaogress:2.7, phantomgeneral:2.2, lordkotchasi:3.0,
   waterelephantking:3.1, laplaelord:2.0, nagaking:3.2, tenfacedogre:3.2, garudaking:3.0, vessavana:3.4};
 const BN_OLD = 1.6;   // the one size every boss had before (bosshard.js), whose plate and radius changes are undone here
