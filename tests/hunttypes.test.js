@@ -9,7 +9,7 @@ test('fight only the chosen kinds', { skip, timeout: 90000 }, async () => {
   try {
     await enterWorld(page, 'Hunt');
     const r = await page.evaluate(async () => {
-      loadMap(1); for (const m of mobs) m.dead = true; mobs.length = 0; P.x = W / 2; P.y = H / 2;
+      loadMap(1); for (const m of mobs) m.dead = true; mobs.length = 0; spawnSlots.length = 0; P.x = W / 2; P.y = H / 2;   // no spawn slots: nothing new walks up mid-test
       const kinds = [...new Set(MAPS[1].mobs)].slice(0, 3); if (kinds.length < 2) return {skip:true};
       const a = spawnMob(kinds[0], P.x + 40, P.y, {zone:MAPZ}), b = spawnMob(kinds[1], P.x + 120, P.y, {zone:MAPZ});
       a.hp = a.maxhp = b.hp = b.maxhp = 1e6;

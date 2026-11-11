@@ -8,7 +8,7 @@ const ECON = {drop:.5, card:.5, sell:.5, mvpBia:1500};
 for (const k in MOB){ const d = MOB[k]; if (!d || d._econ) continue; d._econ = 1;
   if (Array.isArray(d.drops)) d.drops = d.drops.map(([id, ch]) => [id, ch * ECON.drop]);
   if (d.cardRate) d.cardRate *= ECON.card; }
-for (const k in ITEMS){ const it = ITEMS[k]; if (!it || it._econ || typeof it.sell !== 'number') continue; it._econ = 1; it.sell = Math.max(1, Math.round(it.sell * ECON.sell)); }
+for (const k in ITEMS){ const it = ITEMS[k]; if (!it || it._econ || typeof it.sell !== 'number') continue; it._econ = 1; if (it.sell > 0) it.sell = Math.max(1, Math.round(it.sell * ECON.sell)); }   // (v283) a 0 stays 0: items that are not for sale (Vayra Dust, keys) had become sellable for 1 Bia
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'econ', t:['เศรษฐกิจและอัตรา', 'Economy and rates'], b:() => L(
   `<p>อัตรา EXP · Job · ดรอป = x1 (ปกติ)</p><p>โอกาสดรอปของและการ์ด และราคาที่ NPC รับซื้อ เหลือครึ่งหนึ่งของเดิม (v192) · v269: ไม่มีของดรอปไหนเกิน 50% · การ์ดมอน 0.01% หัวหน้าฝูง 0.02% บอส 0.005% · บอสให้ MVP ${ECON.mvpBia.toLocaleString()} เบี้ย</p>`,
   `<p>EXP · Job · drop rates = x1 (normal)</p><p>Item and card drop chances and NPC buy-back prices are half of before (v192) · v269: no drop above 50% · cards: monsters 0.01%, alphas 0.02%, bosses 0.005% · a boss gives the MVP ${ECON.mvpBia.toLocaleString()} Bia</p>`)});
