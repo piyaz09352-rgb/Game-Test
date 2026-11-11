@@ -227,8 +227,6 @@ function skfxKinds(){
 .hk[data-kind="buff"],.mo.sk[data-kind="buff"]{box-shadow:inset 0 0 0 2px #5bd17a;border-radius:16px}
 .hk[data-kind="passive"],.mo.sk[data-kind="passive"]{box-shadow:inset 0 0 0 2px #9aa3ad}
 .hk.skult,.mo.sk.skult{box-shadow:inset 0 0 0 2px #e8b84a,0 0 0 2px #9a5cf0}
-#pane-skill .skn[data-kind="active"]{outline:2px solid #e8b84a;outline-offset:-2px}
-#pane-skill .skn[data-kind="buff"]{outline:2px solid #5bd17a;outline-offset:-2px;border-radius:14px}
-#pane-skill .skn[data-kind="passive"]{outline:2px solid #9aa3ad;outline-offset:-2px;border-radius:50%}
-#pane-skill .skn.skult{outline:2px solid #9a5cf0;box-shadow:0 0 0 3px #e8b84a}`;
+/* (v279) no frame on the skill window's tree nodes: the card (.sknb) has its own frame; an outline round the whole node
+   (card + line tag under it) drew stray boxes and circles beside the cards */`;
   document.head.appendChild(st); }

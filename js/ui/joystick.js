@@ -38,8 +38,7 @@ function renderMoba(){
     : `<button class="mo sk s${i}${i > 3 ? ' mini' : ''} empty" disabled aria-label="${L('ช่องสกิลว่าง', 'Empty skill slot')}"><b>${i + 1}</b></button>`;
   box.innerHTML = `
     <button class="mo atk w-${JOBS[S.job].weapon.type}" data-mo="atk" aria-label="${L('โจมตี', 'Attack')}"><i class="atkaura"></i>${ATK_ICON[JOBS[S.job].weapon.type] || icon.atk}</button>
-    ${S.hot.map(skillBtn).join('')}
-    <button class="mo sm roll" data-mo="roll" aria-label="${L('กลิ้งหลบ', 'Dodge')}">${icon.roll}<b class="rollb">${L('หลบ', 'Dodge')}</b><i class="cdv" data-cd="roll"></i></button>`;
+    ${S.hot.map(skillBtn).join('')}`;
   // potions sit beside the joystick (left thumb), HP above SP, each showing its own bottle and count
   const hp = bestHp(), sp = bestSp(), pb = (k, id) => `<button class="mo pot ${k}" data-mo="${k === 'hp' ? 'pot' : 'potsp'}" aria-label="${nm(ITEMS[id])}" title="${nm(ITEMS[id])}" ${S.inv[id] ? '' : 'disabled'}>${itemArt(id, true)}<em>${S.inv[id] || 0}</em></button>`;
   if (el('mobaPot')) el('mobaPot').innerHTML = pb('hp', hp) + pb('sp', sp);

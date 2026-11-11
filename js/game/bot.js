@@ -144,7 +144,7 @@ function updBot(dt){
     if (safe){
       if (P.sit){ P.sit = false; renderHotbar(); } BOT.resting = false;
       P.target = null; P.pending = null; BOT.roam = null; P.tx = safe.x; P.ty = safe.y;
-      if (!P.ride){ P.ride = true; renderHotbar(); }
+      if (!P.ride && canRideNow()){ P.ride = true; renderHotbar(); }
       BOT.state = 'flee'; renderBotChip(); return;
     }
     if (near && !inVillage(P) && dist(near, P) < 140 && !th.some(m => m !== near)){   // a calm boss only makes Auto step away when it is right on top of you, and never in the middle of a fight
@@ -154,7 +154,7 @@ function updBot(dt){
       let go = null;
       for (const a of [0, .6, -.6, 1.2, -1.2, 1.8, -1.8]){ const c = Math.cos(a), s2 = Math.sin(a), q = {x:P.x + (ux * c - uy * s2) * 260, y:P.y + (ux * s2 + uy * c) * 260};
         if (walkable(q.x, q.y, 18)){ go = q; break; } }
-      if (go){ P.tx = go.x; P.ty = go.y; if (!P.ride){ P.ride = true; renderHotbar(); } }
+      if (go){ P.tx = go.x; P.ty = go.y; if (!P.ride && canRideNow()){ P.ride = true; renderHotbar(); } }
       BOT.state = 'flee'; renderBotChip(); return;
     }
   }
@@ -163,10 +163,10 @@ function updBot(dt){
   if (hp < BOT_CFG.retreatHp && !hpPot && MAP_ID !== 0){ const k = NPCS.find(x => x.id === 'warp');
     if (k && !threats().length){ BOT.state = 'retreat'; if (P.sit) P.sit = false; P.target = null; P.pending = null;
       if (Math.hypot(k.x - P.x, k.y - P.y) < 70){ warpTo(0); return; }
-      if (!P.ride){ P.ride = true; renderHotbar(); } P.tx = k.x; P.ty = k.y + 40; renderBotChip(); return; } }
+      if (!P.ride && canRideNow()){ P.ride = true; renderHotbar(); } P.tx = k.x; P.ty = k.y + 40; renderBotChip(); return; } }
   if (hp < BOT_CFG.retreatHp && !hpPot && MAP_ID === 0 && !inVillage(P)){
     BOT.state = 'retreat'; if (P.sit) P.sit = false;
-    P.target = null; P.pending = null; if (!P.ride && th.length === 0){ P.ride = true; renderHotbar(); }
+    P.target = null; P.pending = null; if (!P.ride && canRideNow() && th.length === 0){ P.ride = true; renderHotbar(); }
     P.tx = 300; P.ty = 860; renderBotChip(); return;
   }
   // rest until topped up
@@ -200,7 +200,7 @@ function updBot(dt){
     if (!BOT.roam){ renderBotChip(); return; }
   }
   P.tx = BOT.roam.x; P.ty = BOT.roam.y;
-  if (!P.ride && Math.hypot(BOT.roam.x - P.x, BOT.roam.y - P.y) > 400){ P.ride = true; renderHotbar(); }
+  if (!P.ride && canRideNow() && Math.hypot(BOT.roam.x - P.x, BOT.roam.y - P.y) > 400){ P.ride = true; renderHotbar(); }
   renderBotChip();
 }
 function renderBotChip(){

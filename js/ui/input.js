@@ -58,7 +58,7 @@ window.addEventListener('keydown', e => {
   if (k === 'b' && e.shiftKey){ botSettings(); return; }   // Shift+B: Auto settings (D is a WASD move key)
   if (k === 'b'){ botButton(); return; }
   if (k === 'x' && !P.dead && !P.cast){ P.sit = !P.sit; P.ride = false; P.tx = null; P.target = null; renderHotbar(); return; }
-  if (k === ' ' || k === 'c'){ e.preventDefault(); doRoll(); return; }
+  if (k === ' '){ e.preventDefault(); return; }   // (v279) no dodge roll any more
   if (k === 'r'){ toggleRide(); return; }
   if (k === 't'){ tryCapture(); return; }
   if (k === 'z'){ const l = nearestLoot(); if (l){ botPauseFromManual(); P.loot = l; P.target = null; P.npc = null; P.tx = null; P.sit = false; } else toast(L('ไม่มีของใกล้ ๆ', 'Nothing to pick up nearby')); return; }

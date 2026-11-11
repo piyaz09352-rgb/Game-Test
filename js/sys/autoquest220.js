@@ -69,7 +69,7 @@ function aqPlanFor(tr){
     if (AQ.plan && AQ.plan.mode === 'elite' && MS.eliteM && !MS.eliteM.dead) return MS.eliteM;
     return mobs.filter(m => !m.dead && !m.vanish && AQ.types.includes(m.type) && !BOT.skip.has(m) && !botShun(m) && dist(m, P) < BOT_CFG.seek * 1.6).sort(tgtCmp)[0] || null; }; }   // (v269) not one Auto keeps away from (by a gate): picking it again and again froze Auto
 function aqGo(x, y){ if (P.sit){ P.sit = false; renderHotbar(); } BOT.resting = false; P.target = null; P.pending = null; BOT.roam = null; P.tx = x; P.ty = y;
-  if (!P.ride && Math.hypot(x - P.x, y - P.y) > 260 && !threats().length){ P.ride = true; renderHotbar(); } }
+  if (!P.ride && canRideNow() && Math.hypot(x - P.x, y - P.y) > 260 && !threats().length){ P.ride = true; renderHotbar(); } }
 { const _ub = updBot;
   updBot = function(dt){
     if (!BOT.on || !aqOn() || BOT.pause > 0 || P.dead || (typeof DG !== 'undefined' && DG.active)) { AQ.types = null; return _ub.apply(this, arguments); }

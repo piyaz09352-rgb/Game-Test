@@ -150,7 +150,7 @@ EV.on('tick', dt => {
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'dungeonfun', t:['ลูกเล่นในดันเจี้ยน', 'Dungeon twists'], b:() => `<ul>
   <li>${L('ปุ่ม "ออกจากดันเจี้ยน" อยู่ข้างมินิแมพตลอดเวลา', 'A "Leave dungeon" button sits beside the minimap the whole time')}</li>
   <li>${L('ผ่านแต่ละด่าน เลือกพร 1 ใน 3 ใช้ได้จนออก', 'After each wave pick 1 of 3 blessings, kept until you leave')}</li>
-  <li>${L('วงแดงบนพื้นจะระเบิด กลิ้งหลบหรือเดินออก (โดน 12% HP)', 'Red circles on the ground explode: roll or walk out (12% HP)')}</li>
+  <li>${L('วงแดงบนพื้นจะระเบิด เดินออกให้ทัน (โดน 12% HP)', 'Red circles on the ground explode: walk out in time (12% HP)')}</li>
   <li>${L('ภูตทองคำ ★ จับได้รับเงินและเหรียญวายรา', 'Catch the ★ Golden Spirit for Bia and Vayra Coins')}</li>
   <li>${L('ผู้พิทักษ์เรียกองครักษ์ที่ 60% และคลุ้มคลั่งที่ 30%', 'The guardian calls guards at 60% and goes berserk at 30%')}</li>
   <li>${L('ผ่านแล้วได้ระดับ S/A/B/C ตามเวลา จำนวนครั้งที่ล้ม และคอมโบ · ระดับสูงได้โบนัส', 'Clearing gives an S/A/B/C rank by time, falls and combo · higher ranks pay a bonus')}</li></ul>`});

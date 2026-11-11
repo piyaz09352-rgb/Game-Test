@@ -13,7 +13,7 @@
 
 const AF_INFO = {
   poison:['พิษ', 'Poison', '#7fe05a', 'ติด HP ทุกวิ · อาจขัดการร่าย', 'HP drain · may break casts'],
-  burn:['ไฟลวก', 'Burn', '#ff8a3a', 'ไฟไหม้ HP ทุกวิ · อาจขัดการร่าย · กลิ้งเพื่อดับ', 'Burning · may break casts · roll to put it out'],
+  burn:['ไฟลวก', 'Burn', '#ff8a3a', 'ไฟไหม้ HP ทุกวิ · อาจขัดการร่าย', 'Burning · may break casts'],
   bleed:['เลือดไหล', 'Bleed', '#ff4a5a', 'เสีย HP ทุกวิ (เดินแล้วหนักขึ้น) · อาจขัดการร่าย', 'HP loss (worse while moving) · may break casts'],
   slow:['เชื่องช้า', 'Slow', '#8ab8ff', 'เดินช้าลง', 'Slower movement'],
   freeze:['แช่แข็ง', 'Frozen', '#bff0ff', 'ขยับไม่ได้', 'Cannot act'],
@@ -202,7 +202,7 @@ EV.on('draw', () => {
 WIKI_SYS.push({id:'afflict', t:['อาการผิดปกติ', 'Afflictions'], b:() => `<p>${L('การโจมตีของมอนและสกิลบอสติดสถานะได้ (ไอคอนขึ้นที่แถบบัฟและเหนือหัว) · ระหว่างติด<b>พิษ ไฟลวก เลือดไหล</b> (ดาเมจต่อเนื่อง) <b>ร่ายเวทไม่ได้</b> และทุกครั้งที่เสีย HP จากอาการจะขัดการร่าย · โดนตีปกติระหว่างร่ายก็ถูกขัดเช่นกัน · โดนแรงจะกระเด็นถอย', 'Monster hits and boss skills carry statuses (icons in the buff bar and over your head) · while <b>poisoned, burning or bleeding</b> (damage over time) you <b>cannot cast</b>, and every tick breaks a cast · a normal hit also breaks your cast · heavy hits knock you back')}</p>
   <table class="wkt"><tr><th>${L('อาการ', 'Status')}</th><th>${L('ผล', 'Effect')}</th><th>${L('มาจาก', 'From')}</th></tr>
   ${[['poison', L('สัตว์มีพิษ แมลง · บ่อพิษ · หมอกพิษ', 'venomous beasts, insects · cursed pool · miasma')], ['burn', L('ธาตุไฟ · ฝนอุกกาบาต', 'fire · meteor rain')], ['bleed', L('ธาตุลม สัตว์ป่า · พุ่งทะลวง มุดดิน พายุหมุน', 'wind, wild beasts · dash, burrow, spin')], ['slow', L('ธาตุน้ำ · แผ่นดินไหว กระโจน คลื่นกระแทก', 'water · quake, leap, shock rings')], ['freeze', L('ลมหายใจธาตุน้ำ', 'water breath')], ['silence', L('ธาตุศักดิ์สิทธิ์ · คำรามสะท้าน', 'holy · roar')], ['blind', L('ผีดิบ', 'undead')], ['curse', L('ธาตุความมืด · ดูดกลืนวิญญาณ', 'shadow · soul vortex')]].map(([k, f]) => `<tr><td style="color:${AF_INFO[k][2]}"><b>${L(AF_INFO[k][0], AF_INFO[k][1])}</b></td><td>${L(AF_INFO[k][3], AF_INFO[k][4])}</td><td>${f}</td></tr>`).join('')}</table>
-  <p>${L('รักษา: <b>ยาเขียว</b> (ร้านยา 120 เบี้ย) หายทุกอาการ · กลิ้งเพื่อดับไฟ · สกิลฮีลเพิ่มแค่ HP แต่ทำให้ทุกอาการหมดเร็วขึ้น (ลดเวลาที่เหลือ 40%) · ยาอายุวัฒนะล้างพิษ/ไฟ/เลือด · ระบบ Auto ใช้ยาเขียวเอง', 'Cures: <b>Green Potion</b> (potion seller, 120) clears everything · roll to put out burns · Heal skills only restore HP but cut the time left on every affliction by 40% · Elixir clears DoTs · Auto battle drinks Green Potions itself')}</p>`});
+  <p>${L('รักษา: <b>ยาเขียว</b> (ร้านยา 120 เบี้ย) หายทุกอาการ · สกิลฮีลเพิ่มแค่ HP แต่ทำให้ทุกอาการหมดเร็วขึ้น (ลดเวลาที่เหลือ 40%) · ยาอายุวัฒนะล้างพิษ/ไฟ/เลือด · ระบบ Auto ใช้ยาเขียวเอง', 'Cures: <b>Green Potion</b> (potion seller, 120) clears everything · roll to put out burns · Heal skills only restore HP but cut the time left on every affliction by 40% · Elixir clears DoTs · Auto battle drinks Green Potions itself')}</p>`});
 
 /* other players see your afflictions: a short list in presence, small icons over their name */
 const afPres = () => ({af:P.af ? Object.keys(P.af).filter(k => P.af[k].t > 0).join(',').slice(0, 60) : ''});

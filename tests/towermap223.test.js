@@ -23,7 +23,7 @@ test('tower halls: own map, stairs, Auto, tiers, leaving', { skip, timeout: 1200
       const st = twmStairs(); P.x = st.x; P.y = st.y + 10; adv(3); adv(20); const e = twmEntry();
       o.climbed = TW.f === 2 && TW.phase === 'fight' && Math.hypot(P.x - e.x, P.y - e.y) < 30;
       // Auto takes the stairs
-      for (const m of mobs) if (m.dg) m.dead = true; adv(4); setBot(true); for (let i = 0; i < 200 && TW.phase === 'rest'; i++) adv(1); o.auto = TW.f === 3 && TW.phase === 'fight'; setBot(false);
+      for (const m of mobs) if (m.dg) m.dead = true; adv(4); S.inv.mount1 = 1; setBot(true);   /* (v279) riding needs a mount: this hero has one, as before */  for (let i = 0; i < 200 && TW.phase === 'rest'; i++) adv(1); o.auto = TW.f === 3 && TW.phase === 'fight'; setBot(false);
       // (v259) a new zone at floor 21 (ป่าต้องสาป)
       twQuit('leave'); adv(5); twStart(21); adv(70); o.tier = TWM.tier === 1 && el('mapName').textContent.includes('21') && el('mapName').textContent.includes(L('ป่าต้องสาป', 'Cursed Forest'));
       twQuit('leave'); adv(10); o.back = !TW.active && W === MAP_WH(MAP_ID)[0] && H === MAP_WH(MAP_ID)[1] && MAPZ.x0 === 180 && (MAP_ID === 0 || GATES.length > 0);

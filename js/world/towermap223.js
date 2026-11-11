@@ -174,7 +174,7 @@ EV.on('tick', dt => {
   { const d = el('dialog'); if (d && !d.hidden && d.dataset.npc === 'tl_chandra') return; }   // (v229) Chandra is telling a chapter: the stairs wait, and Auto does not walk off
   if (Math.hypot(P.x - s.x, (P.y - s.y) * 1.4) < 30){ twmClimb(); return; }   // (v271) on the door's sill itself, not partway up the steps
   if (typeof twHost !== 'function' || twHost()) TW.restT = Math.max(TW.restT, 1);   // (v273) the owner: the next floor waits until you walk through the door yourself (no timer carries you up)
-  if (typeof BOT !== 'undefined' && BOT.on && !(BOT.pause > 0) && !P.dead){ P.tx = s.x; P.ty = s.y; if (!P.ride){ P.ride = true; if (typeof renderHotbar === 'function') renderHotbar(); } }   // Auto takes the stairs
+  if (typeof BOT !== 'undefined' && BOT.on && !(BOT.pause > 0) && !P.dead){ P.tx = s.x; P.ty = s.y; if (!P.ride && canRideNow()){ P.ride = true; if (typeof renderHotbar === 'function') renderHotbar(); } }   // Auto takes the stairs
 });
 // the open stairs glowing
 { const _u = LIVE.drawUnder; LIVE.drawUnder = function(g, ...a){ const r = _u.call(this, g, ...a); if (!twmOn()) return r;
