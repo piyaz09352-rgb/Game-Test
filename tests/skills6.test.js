@@ -12,7 +12,7 @@ test('skills: eight a tier, each in a style, and the new effects work', { skip, 
     // (v159) the 4/1/1 shape became eight skills a tier in three play styles (skills8.js)
     const shape = await page.evaluate(() => Object.keys(SK8).map(j => [j, JOBS[j].skills.length, JOBS[j].skills.every(id => SKILLS[id] && SK8_OF[id])]));
     // (v193) the hunter line was reworked by the owner: some of its skills were removed on purpose (6 · 4 · 6)
-    const RG = new Proxy({}, {get:() => 5});   // (v209) every class has exactly 5 skills a tier
+    const RG = new Proxy({}, {get:(o, j) => (j === 'sovereign' ? 6 : 5)});   // (v209) every class has exactly 5 skills a tier · (v274) the Sovereign got Royal Bond back as a sixth
     for (const [j, n, styled] of shape) assert.ok(n === RG[j] && styled, `${j} has ${RG[j]} skills, each in a style (has ${n})`);
     await page.evaluate(() => loadMap(1)); await page.waitForTimeout(800);
     const r = await page.evaluate(() => {

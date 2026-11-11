@@ -11,6 +11,7 @@ const SETUP_JOB = job => {
   for (const [id, sk] of Object.entries(SKILLS)) if (sk.job === job || sk.job === 'novice' || sk.job === JOBS[job].parent || sk.job === (JOBS[JOBS[job].parent] || {}).parent) S.skills[id] = sk.max;
   for (const g of GEAR_LIST) if (g[1] === 'ammo') S.inv[g[0]] = 999;
   S.gear = S.gear || {}; S.gear.ammo = 'q_wood';
+  S.bia = 1e7;   // the merchant's skills spend Bia (Gold Sack up to 700 a throw)
   derive(); S.hp = DER.maxhp; S.sp = DER.maxsp; renderHotbar(); dirty = true;
 };
 
