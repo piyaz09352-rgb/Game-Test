@@ -147,7 +147,10 @@ const gmAnnounce = text => gmRun('announce', {text}, async () => {
 { const _die = playerDie; playerDie = function(){ if (GM.on && GM.god){ S.hp = DER.maxhp; return; } return _die.apply(this, arguments); }; }
 { const _ma = mobAttack; mobAttack = function(m){ if (GM.on && GM.inv){ m.aggro = false; return; } if (GM.on && GM.god){ const r = _ma.apply(this, arguments); S.hp = DER.maxhp; return r; } return _ma.apply(this, arguments); }; }
 { const _ms = mobShoot; mobShoot = function(m){ if (GM.on && GM.inv){ m.aggro = false; return; } return _ms.apply(this, arguments); }; }
-{ const _dv = derive; derive = function(){ const r = _dv.apply(this, arguments); if (GM.on && GM.spd > 1 && DER) DER.move *= GM.spd; return r; }; }
+/* (v283) the speed boost is put on last, once every file has loaded: the stat caps (caps193.js) wrap derive after this
+   file and used to cut the boost straight back to the normal top speed */
+EV.on('tick', function gmSpdWrap(){ if (GM.spdWrapped) return; GM.spdWrapped = true;
+  const _dv = derive; derive = function(){ const r = _dv.apply(this, arguments); if (GM.on && GM.spd > 1 && DER) DER.move *= GM.spd; return r; }; });
 EV.on('tick', () => { if (!GM.on) return; if (GM.god){ S.hp = DER.maxhp; S.sp = DER.maxsp; } if (GM.inv) for (const m of mobs) if (m.aggro && !m.taunt) m.aggro = false; });
 
 /* ---------- server backup / restore / reset ---------- */

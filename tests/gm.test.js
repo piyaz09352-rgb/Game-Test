@@ -24,8 +24,9 @@ test('offline: a normal player has no GM; ?gm=1 on a local page gives the test G
         return { res, inv: (S.inv.redpot || 0) - inv, map: MAP_ID === map, lvl: S.lvl === lvl, log: GM.log.length }; });
       assert.deepStrictEqual(r, { res: [false, false, false, false, false], inv: 0, map: true, lvl: true, log: 0 }, 'every GM call is refused');
       // the owner deploys RESET_SEASON = 2 (no GM needed): this browser is archived and starts again
+      // (tests/serve.js runs the build at season 1; the pattern ends in * because the script is loaded as firebase-config.js?v=NNN)
       await page.evaluate(() => save());
-      await page.route('**/js/net/firebase-config.js', async rt => { const res = await rt.fetch(); await rt.fulfill({ response: res, body: (await res.text()).replace('RESET_SEASON = 1', 'RESET_SEASON = 2') }); });
+      await page.route('**/js/net/firebase-config.js*', async rt => { const res = await rt.fetch(); await rt.fulfill({ response: res, body: (await res.text()).replace('RESET_SEASON = 1', 'RESET_SEASON = 2') }); });
       await page.reload(); await page.waitForFunction(() => !!window.__vay, null, { timeout: 60000 });
       await page.waitForFunction(() => el('confirm').dataset.season === '1', null, { timeout: 10000 });
       const w = await page.evaluate(() => ({ slots: [0, 1, 2].some(i => !!localStorage.getItem(slotKey(i))), acc: ACC.name, season: localStorage.getItem('vayrathen-season'), arch: JSON.parse(localStorage.getItem('vayrathen-archive-1') || '{}').slots.filter(Boolean).length }));

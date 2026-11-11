@@ -10,7 +10,8 @@
 const AB = {R:400, heal:['firstaid', 'herbheal', 'elixir'], buff:['barrier', 'ward', 'goldshield', 'thread', 'poultice', 'spiritlink', 'unity']};
 const abShared = id => AB.heal.includes(id) || AB.buff.includes(id);
 /* the only buff fields a friend may give you, each with a hard ceiling */
-const AB_CAP = {def:120, reflect:.2, regenPct:.12, every:[1, 5], sumAtkB:.3, sumHaste:.4, t:[1, 90]};
+const AB_CAP = {def:120, reflect:.2, riposte:2.5, regenPct:.12,   // (v283) riposte: Riposte (ตอบโต้, v204) in the old Gold Shield's place — it was dropped here, so a friend got an empty buff
+  every:[1, 5], sumAtkB:.3, sumHaste:.4, t:[1, 90]};
 function abClean(b){
   const o = {}; if (!b || typeof b !== 'object') return null;
   for (const k in AB_CAP){ const v = +b[k]; if (!isFinite(v) || v <= 0) continue; const c = AB_CAP[k]; o[k] = Array.isArray(c) ? clamp(v, c[0], c[1]) : Math.min(v, c); }
