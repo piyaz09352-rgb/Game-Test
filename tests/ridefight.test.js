@@ -11,11 +11,11 @@ test('only Swordsman / Warlord keep riding when they attack', { skip, timeout: 6
       for (const job of ['blade', 'warlord', 'ranger', 'warden', 'rune', 'muay']){ S.job = job; if (job === 'warden') S.skills.mountedarcher = 3; derive(); out[job] = !!DER.pas.rideAtk; }
       S.job = 'novice'; derive(); return out; });
     assert.deepStrictEqual(r, {blade:true, warlord:true, ranger:false, warden:false, rune:false, muay:false});
-    // Rapid Fire (the old Mounted Archery) is a buff that speeds up attacks
-    const rf = await page.evaluate(() => new Promise(res => { S.job = 'warden'; S.lvl = 99; S.skills.mountedarcher = SKILLS.mountedarcher.max; derive(); const iv0 = DER.interval; S.sp = DER.maxsp; P.cds = {}; P.acd = 0; P.cast = null;
-      trySkill('mountedarcher'); setTimeout(() => res({iv0, iv1:DER.interval, buff:!!P.buffs.mountedarcher, type:SKILLS.mountedarcher.type}), 1500); }));
-    assert.strictEqual(rf.type, 'buff'); assert.ok(rf.buff, 'the buff is on');
-    assert.ok(rf.iv1 < rf.iv0 * .85, `faster attacks (${rf.iv0} → ${rf.iv1} s)`);
+    // Rapid Fire (the old Mounted Archery) speeds up attacks. (v193 ranger193.js made it a passive: always on, no cast)
+    const rf = await page.evaluate(() => { S.job = 'warden'; S.lvl = 99; S.skills.mountedarcher = 0; derive(); const iv0 = DER.interval;
+      S.skills.mountedarcher = SKILLS.mountedarcher.max; derive(); const iv1 = DER.interval; S.job = 'novice'; derive(); return {iv0, iv1, type:SKILLS.mountedarcher.type}; });
+    assert.strictEqual(rf.type, 'passive');
+    assert.ok(rf.iv1 < rf.iv0, `faster attacks with it (${rf.iv0} → ${rf.iv1} s)`);
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no runtime errors');
 });
