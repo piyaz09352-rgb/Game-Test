@@ -182,8 +182,9 @@ const SIG_DRAW = {
 };
 
 /* ---------- playing a skill's signature ---------- */
+const SIG_NONE = new Set(['stone']);   // (v280) the owner: no signature on Stone Throw (its white phantom blades looked like a glitch)
 function sigPlay(id, lv, t){
-  const sk = SKILLS[id]; if (!sk || sk.type === 'passive') return; if (!SIGFX.of[id]) sigAssign(); const v = SIGFX.of[id]; if (!v) return;
+  const sk = SKILLS[id]; if (!sk || sk.type === 'passive' || SIG_NONE.has(id)) return; if (!SIGFX.of[id]) sigAssign(); const v = SIGFX.of[id]; if (!v) return;
   const sp = (() => { try { return sk.sp(lv); } catch (e){ return 10; } })(), p = clamp(sp / 55 * (sk.req ? 1.25 : 1), .45, 1.4);
   const self = SIG_SELF.includes(sk.type), pal = SIG_PAL[sk.type === 'heal' || sk.type === 'restore' ? 'heal' : sk.elem] || SIG_PAL.neutral;
   const tg = t && typeof t.x === 'number' ? t : null, at = self || sk.type === 'aoeSelf' || !tg ? P : tg, d = Math.hypot(at.x - P.x, at.y - P.y);
