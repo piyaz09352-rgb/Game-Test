@@ -43,3 +43,9 @@ const SEA280 = [
 for (const [a, da, b, db] of [...LINKS280, ...SEA280]){ const A = MAPS[a], B = MAPS[b]; if (!A || !B) continue; A.links = A.links || {}; B.links = B.links || {};
   if (A.links[da] != null || B.links[db] != null || Object.values(A.links).includes(b)) continue; A.links[da] = b; B.links[db] = a; }
 const SEA_SET = new Set(SEA280.map(([a, , b]) => Math.min(a, b) + ',' + Math.max(a, b)));
+/* (v283) the floating temple city (map 70, a town between the inner Himmapan and the sacred lake) stood on top of the
+   Eternal Ice Cave's marker on the world map: it now sits halfway between the two maps it joins */
+if (typeof WM_PIC !== 'undefined' && MAPS[70] && MAPS[70].links && Object.values(MAPS[70].links).includes(56) && Object.values(MAPS[70].links).includes(18)) WM_PIC[70] = [.81, .40];
+/* (v283) the sandstone city (map 68, a town between the Khmer stone castle and the buried city) had its marker out in the
+   sea on the far side of the island: it now stands on land between the two maps it joins */
+if (typeof WM_PIC !== 'undefined' && MAPS[68] && MAPS[68].links && Object.values(MAPS[68].links).includes(10) && Object.values(MAPS[68].links).includes(38)) WM_PIC[68] = [.276, .148];

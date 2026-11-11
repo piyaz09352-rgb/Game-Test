@@ -152,7 +152,9 @@ function wmPlaceLabels(pic, S0){
   const pri = e => { const i = +e.dataset.wml; return (i === WM.sel) * 8 + (i === MAP_ID) * 4 + (i === 0) * 2 + (S.visited && S.visited[i] ? 1 : 0); };
   els.sort((a, b) => pri(b) - pri(a));
   for (const e of els){ const i = +e.dataset.wml, [x, y, mr] = mk[i], w = e.offsetWidth, h = e.offsetHeight, g = mr + 2, must = pri(e) >= 2;
-    const cand = [[x - w / 2, y + g], [x - w / 2, y - g - h], [x + g, y - h / 2], [x - g - w, y - h / 2], [x + g - 4, y + g - 6], [x - w - g + 4, y + g - 6], [x + g - 4, y - g - h + 6], [x - w - g + 4, y - g - h + 6], [x - w / 2, y + g + h + 2], [x - w / 2, y - g - 2 * h - 2]];
+    const cand = [[x - w / 2, y + g], [x - w / 2, y - g - h], [x + g, y - h / 2], [x - g - w, y - h / 2], [x + g - 4, y + g - 6], [x - w - g + 4, y + g - 6], [x + g - 4, y - g - h + 6], [x - w - g + 4, y - g - h + 6], [x - w / 2, y + g + h + 2], [x - w / 2, y - g - 2 * h - 2],
+      // (v283) a few more spots a little further out, so more names find room at the fitted size
+      [x + g + 6, y - h / 2 + h], [x + g + 6, y - h / 2 - h], [x - g - w - 6, y - h / 2 + h], [x - g - w - 6, y - h / 2 - h], [x - w / 2 + w * .6, y + g + 2], [x - w / 2 - w * .6, y + g + 2], [x - w / 2 + w * .6, y - g - h - 2], [x - w / 2 - w * .6, y - g - h - 2]];
     let pick = null;
     for (const [cx, cy] of cand){ const lx = clamp(cx, 2, S0 - w - 2), ly = clamp(cy, 2, S0 - h - 2), q = {l:lx, t:ly, r:lx + w, b:ly + h}; if (!hit(q)){ pick = q; break; } }
     if (!pick && must){ const lx = clamp(cand[0][0], 2, S0 - w - 2), ly = clamp(cand[0][1], 2, S0 - h - 2); pick = {l:lx, t:ly, r:lx + w, b:ly + h}; }
