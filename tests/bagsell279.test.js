@@ -26,7 +26,7 @@ test('bag selling, the mount rule, robot mounts and no roll', { skip, timeout: 1
       delete S.inv.mount1; P.ride = false; toggleRide(); o.noRide = P.ride === false; P.ride = true; o.noForce = P.ride === false;
       S.bia = 150000; addItem('mount1', 1); toggleRide(); o.ride = P.ride === true && MOVES.ride.speed === 1.3; P.ride = false;
       // robot mounts are in the coin shop's list
-      o.robots = ['rb_m_steed', 'rb_m_tiger', 'rb_m_walker', 'rb_m_dragon'].every(id => XMOUNT[id] && XMOUNT[id].price.c > 0 && CSH_FASH().includes(id));
+      o.robots = ['rb_m_steed', 'rb_m_unicorn', 'rb_m_drake', 'rb_m_dragon', 'rb_m_phoenix'].every(id => XMOUNT[id] && XMOUNT[id].price.c > 0 && CSH_FASH().includes(id));
       // no roll
       const x0 = P.x; doRoll(); o.noRoll = !P.roll && !document.querySelector('[data-move="roll"]');
       return o; });

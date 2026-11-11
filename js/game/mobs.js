@@ -81,7 +81,8 @@ function updMob(m, dt){
     } else {
       if (d.boss && bossHunt(m, dt, dp, rooted)) { m.moving = m.moved; return; }
       if (d.boss && updBoss(m, dt)) { m.moving = m.moved; return; }
-      const reach = d.range ? d.range : (d.reach || d.r + 12), fury = d.boss ? 1 + Math.min(.7, (m.flee || 0) * .18) : 1;
+      // (v280) the owner: monsters with a ranged attack do not keep their distance — only bosses stand off; the rest walk in and shoot from close by
+      const reach = d.range && d.boss ? d.range : (d.reach || d.r + 12 + (d.range && typeof MSP_GAP !== 'undefined' ? MSP_GAP : 0)), fury = d.boss ? 1 + Math.min(.7, (m.flee || 0) * .18) : 1;
       const fo = m.foe && !m.foe.dead && (SUMMONS.includes(m.foe) || (typeof petIsFoe === 'function' && petIsFoe(m.foe))) ? m.foe : (m.foe = null), tg = fo || P, dt0 = fo ? dist(m, fo) : dp;   // a bound beast that hit it pulls it away from you
       if (dt0 > reach + (fo ? 8 : 0)){ if (!rooted) moveTo(m, tg.x, tg.y, d.speed * 1.3 * spd * (m.enraged ? 1.3 : 1) * fury, dt); }
       else { m.dir = SPR.dirFromVec(tg.x - m.x, tg.y - m.y); if (m.atkCd <= 0){ if (fo){ m.lunge = .2; m.atkT = 0; SFX.mob('atk', m); if (fo === PET) petHurt(m); else hitBeast(fo, m); } else if (d.range) mobShoot(m); else mobAttack(m); m.atkCd = d.delay * (m.enraged ? .7 : 1); } }

@@ -40,7 +40,7 @@
 /* ---------- close range: a gap, no stacking, everywhere ---------- */
 const MSP_GAP = 22;   // ≈ two body-widths between the monster's edge and the hero's
 { const _u = updMob; updMob = function(m, dt){ const out = _u.apply(this, arguments); if (!m || m.dead || !m.def || P.dead) return out;
-    const d = m.def, melee = !d.range, minD = melee && m.aggro ? (d.r || 12) + 12 + MSP_GAP * .6 : (d.r || 12) + 12;   // any monster, calm or ranged too, never stands inside the hero
+    const d = m.def, melee = !d.range || !d.boss, minD = melee && m.aggro ? (d.r || 12) + 12 + MSP_GAP * .6 : (d.r || 12) + 12;   // any monster, calm or ranged too, never stands inside the hero
     // spread round the hero: two monsters fighting side by side do not overlap
     if (melee && m.aggro) for (const o of mobs){ if (o === m || o.dead || !o.aggro || !o.def) continue; const ox = m.x - o.x, oy = m.y - o.y, od = Math.hypot(ox, oy) || .01, want = ((d.r || 12) + (o.def.r || 12)) * .9;
       if (od < want){ const k = (want - od) / od * .5, nx = m.x + ox * k, ny = m.y + oy * k; if (walkable(nx, ny, (d.r || 12) * .6)){ m.x = nx; m.y = ny; } } }

@@ -67,14 +67,22 @@ function w3Tint(hex, hue, k, seed, force = 0){ const [h, s0, l0] = w3Hsl(hex); i
   const s = force ? Math.max(s0, .3 + force * .05) : s0, l = force ? clamp(l0 + (force % 2 ? -1 : 1) * .12, .1, .9) : l0;
   const dh = ((hue - h + 540) % 360) - 180, nh = h + dh * k + (seed % 40 - 20), ns = clamp(s * (.85 + (seed % 7) * .06) + .08, 0, 1);
   return w3Hex(nh, ns, clamp(l + ((seed >> 3) % 9 - 4) * .02, .06, .94)); }
+const W3_STEP = [0, 45, -45, 95, -95, 140, -140, 180];   // (v280) the owner: a region's monsters were all one colour — each species turns the region's hue by its own step
 function w3Look(look, hue, seed, force = 0){
+  hue = (hue + W3_STEP[(seed >>> 3) % W3_STEP.length] + 360) % 360;
   const nat = look.head === 'croc' || look.head === 'rat' || look.head === 'boar';   // (v276) real furred and scaled animals keep their real colours, a little tinted (insects take the region's colours: real beetles come in every colour)   // (v274) crocodiles get a real crocodile's colours (olive hide, cream belly, dark bands), only a little tinted by the region (teal or mint ones from the lava-drake template looked like toys)
-  if (look.head === 'croc'){ look = {...look, skin:'#4f5a33', belly:'#d6cc98', stripe:'#2a3019'}; delete look.eyeGlow; }
+  if (look.head === 'croc'){ look = {...look, head:'lizard', skin:'#5a5a3a', belly:'#e0d8a8', stripe:'#2a2a1a', spots:'#e8d070'}; delete look.eyeGlow; }   // (v280) the owner: no crocodiles at all — they are monitor lizards now
   const o = {}; let i = 0;
+  // (v280) the owner: monsters of one colour from head to tail. A creature keeps its own mix of colours and the whole
+  // set turns so its main colour meets the region's hue (each species its own step): several colours, still the region's kin
+  const mainC = [look.skin, look.body, look.col, look.shell, look.top].find(v => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v)), mainH = mainC ? w3Hsl(mainC)[0] : hue, rotD = ((hue - mainH + 540) % 360) - 180;
   for (const k in look){ const v = look[k];
+    if (!nat && !force && typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v)){ const [h0, s0, l0] = w3Hsl(v); const sd = (seed + i++ * 37) & 255;
+      o[k] = s0 < .08 && l0 > .85 ? v : w3Hex(h0 + rotD + (sd % 24 - 12), clamp(Math.max(s0, .28) * (.9 + (sd % 5) * .05), 0, 1), clamp(l0 + ((sd >> 3) % 7 - 3) * .02, .06, .94)); continue; }
     if (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v)){ o[k] = w3Tint(v, hue + (force ? i * 47 : 0), nat ? Math.min(.6, .18 + force * .08) : force ? .55 : i++ % 3 === 2 ? .45 : .75, (seed + i * 37) & 255, nat ? 0 : force); if (nat) i++;   /* a natural animal takes more of the region's colour only while it is still too like another */ if (force) i++; }
     else if (typeof v === 'number' && /^(len|size|girth|leg|thick|neckLen|legLen|bulk|beakLen|rise)$/.test(k)) o[k] = +(v * (.88 + ((seed + k.length * 13) % 25) / 100)).toFixed(2);
     else o[k] = Array.isArray(v) ? v.slice() : v; }
+  if (!nat && look.arch !== 'human' && typeof tpMulti === 'function') tpMulti(o, seed);   // (v280) several colours on every creature
   return o;
 }
 /* no new creature may be a near-copy of another of its body (tests/data.test.js uses the same measure) */
@@ -167,3 +175,4 @@ function WORLD_MORE(){
     const raw = ROAD_LV_RAW[d], lo = raw[0][0], hi = raw[raw.length - 1][1], n = out.length, step = (hi - lo) / n;
     raw.length = 0; for (let k = 0; k < n; k++){ const a = Math.round(lo + k * step); raw.push([a, Math.round(Math.min(hi, a + step * 1.25 + 2))]); } }
 }
+
