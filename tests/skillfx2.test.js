@@ -15,7 +15,7 @@ test('unique effects and poses; Moon Claws replaces Shadow Clones', { skip, time
       const sig = id => `${SKILLS[id].fx}|${SKILLS[id].fxDash || ''}|${SKILLS[id].act}`;
       out.distinct = new Set(['spiritburst', 'goldenhong', 'deathmark', 'assassinate', 'shadowlunge', 'tigerpounce', 'moonclaw'].concat(SKILLS.shadowexec ? ['shadowexec'] : []).map(sig)).size;
       out.n = 7 + (SKILLS.shadowexec ? 1 : 0);
-      out.noClone = !SKILLS.shadowclone && JOBS.tigershade.skills.includes('moonclaw') && !JOBS.tigershade.skills.includes('shadowclone');
+      out.noClone = !SKILLS.shadowclone && !JOBS.tigershade.skills.includes('shadowclone') && !!SKILLS.moonclaw && SKILLS.moonclaw.job === 'tigershade';   // (v209) a tier has its own five skills: Moon Claws stays the Tiger Shade's, not always among the five
       // refund
       S._sfx2 = 0; S.skills.shadowclone = 4; S.skPts = 0; S.hot[0] = 'shadowclone'; derive(); out.refund = S.skPts; out.hot = S.hot[0];
       for (const [job, ids] of [['sovereign', ['goldenhong']], ['tigershade', ['moonclaw', 'deathmark', 'tigerpounce'].concat(SKILLS.shadowexec ? ['shadowexec'] : [])]]){

@@ -238,7 +238,8 @@ function p4ok(x, y, name, gap){
   return !obstacles.some(o => !o.water && Math.hypot(o.x - x, o.y - y) < o.r + gap);
 }
 function p4put(list, x, y, gap = 14){ const t = list[Math.floor(R() * list.length)], [name, nv] = Array.isArray(t) ? t : [t, 4];
-  if (!p4ok(x, y, name, gap)) return false; addProp(name, x, y, Math.floor(R() * nv)); return true; }
+  if (!p4ok(x, y, name, gap)) return false; const snowy = /glacier|frost|frozen|kailash|icecave|snow|tundra/.test(((typeof MAPS !== 'undefined' && MAPS[MAP_ID]) || {}).biome || '');
+  addProp(name, x, y, name === 'pine' && !snowy ? 2 * Math.floor(R() * nv / 2) : Math.floor(R() * nv)); return true; }   // (v286) green lands: only the green pines
 function p4layout(Z){
   const A = typeof AREA === 'function' ? AREA() : 1, clear = [];
   for (let i = 0; i < (Z.clearings || 3); i++) clear.push({x:W * (.2 + R() * .6), y:H * (.25 + R() * .5), r:110 + R() * 70});

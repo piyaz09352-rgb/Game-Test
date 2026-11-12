@@ -33,7 +33,36 @@ async function netInit(){
   if (typeof EV !== 'undefined') EV.emit('netready');
 }
 const netName = () => (S.name || (NET.me && NET.me.name) || nm(JOBS[S.job])).slice(0, 18);
-const clean = (s, n = 120) => String(s || '').replace(/[\u0000-\u001f\u007f​-‏‪-‮⁦-⁩]/g, '').slice(0, n);
+/* (v284) everything other players send passes through clean(): it also turns the characters HTML is made of into look-alikes,
+   so a name, a letter or a guild name can never become markup (a stored XSS: a name like <img onerror=…> ran code in
+   every player's game that showed it in the log, a banner or a list) */
+/* (v284) on the Firebase site the account ID is also the log-in name: it is never published (ranking, guild roster,
+   market), so nobody can collect everyone's log-in names to guess passwords. Firebase Authentication already keeps IDs
+   unique there. On claude.ai (no passwords) the ID still shows, as before. */
+const accPublic = () => (typeof ACC !== 'undefined' && ACC.name && !(window.claude && window.claude.firebase)) ? ACC.name : '';
+const CLEAN_HTML = {'<':'‹', '>':'›', '&':'＆', '"':'”', "'":'’', '`':'ˋ'};
+const clean = (s, n = 120) => String(s || '').replace(/[\u0000-\u001f\u007f​-‏‪-‮⁦-⁩]/g, '').replace(/[<>&"'`]/g, c => CLEAN_HTML[c]).slice(0, n);
+
+/* (v284) take something from a shared document exactly once (buy a listing, take a letter's attachment, cancel a listing).
+   pick(cur) looks at the document as it is now and returns {set:{…}} (fields to change), {del:true}, or null (leave it).
+   On Firebase it is a Firestore transaction: it re-runs if someone else changed the document first, so two buyers can
+   never both buy one listing (the old code used a claude.ai lease that Firebase does not have, and every purchase there
+   failed). On claude.ai it holds the artifact's lease. Returns {cur, did} or {busy:true}. */
+async function dbClaim(ref, pick){
+  const db = NET.db;
+  if (db && typeof db.runTransaction === 'function') try { return await db.runTransaction(async tx => {
+    const s = await tx.get(ref), cur = s.exists ? s.data() : null, w = pick(cur);
+    if (w && w.del) tx.delete(ref); else if (w && w.set) tx.update(ref, w.set);
+    return {cur, did:!!w}; }); }
+  catch (e){   // someone else won the race: the rules refuse our write. Look again: if there is nothing left to take, say so
+    if (!e || e.code !== 'permission-denied') throw e;
+    const s = await ref.get(), cur = s.exists ? s.data() : null; if (pick(cur)) throw e; return {cur, did:false}; }
+  const lk = typeof ref.acquire === 'function' ? await ref.acquire({holder:NET.uid, ttlMs:4000}) : {acquired:true};
+  if (!lk || !lk.acquired) return {busy:true};
+  const s = await ref.get(), cur = s.exists ? s.data() : null, w = pick(cur);
+  if (w && w.del) await ref.delete(); else if (w && w.set) await ref.update(w.set);
+  return {cur, did:!!w};
+}
 
 /* ---------- live map room ---------- */
 async function joinMapRoom(id){
@@ -51,7 +80,7 @@ function netTick(dt){
     // up to 20 heroes share a map room: send less often as it fills so the room stays light (8/s alone → ~4/s full)
     NET.presT = NET.mapRoom ? (NET.mapRoom.peers().length > 10 ? .33 : NET.mapRoom.peers().length > 4 ? .25 : NET.mapRoom.peers().length > 1 ? .2 : .5) : .5;   // (v185) 5/s with company, 2/s alone on the map (no one downloads it), 3–4/s in a crowd
     if (typeof NM !== 'undefined' && (NM.host || NM.holding)) NET.presT = Math.max(NET.presT, .2);   // the monster host's presence carries the snapshot: keep it at 5/s
-    const p = {n:netName(), j:S.job, l:S.lvl, x:Math.round(P.x), y:Math.round(P.y), d:P.dir || 0, a:P.act || 'idle', r:P.ride ? 1 : 0, h:Math.round(S.hp / DER.maxhp * 100), sp:Math.round(S.sp / DER.maxsp * 100), pt:NET.party || null, s:P.sit ? 1 : 0, dead:P.dead ? 1 : 0, g:(vg => { const a = GHOST_SLOTS.map(k => vg[k] || ''); while (a.length > 4 && !a[a.length - 1]) a.pop(); return a.join(','); })(typeof visGear === 'function' ? visGear(S.gear) : S.gear || {}), ti:S.title || '', gn:(S.guild && S.guild.name) || '', lk:SPR.lookKey(S.look), ...(typeof wbPres === 'function' ? wbPres() : {}), ...(typeof nmPres === 'function' ? nmPres() : {}), ...(typeof dgPres === 'function' ? dgPres() : {}), ...(typeof pvpPres === 'function' ? pvpPres() : {}), ...(typeof afPres === 'function' ? afPres() : {}), ...(typeof cosPres === 'function' ? cosPres() : {}), ...(typeof emoPres === 'function' ? emoPres() : {}), ...(typeof siegePres === 'function' ? siegePres() : {}), ...(typeof rfPres === 'function' ? rfPres() : {}), ...(typeof gmPres === 'function' ? gmPres() : {}), ...(typeof sumPres === 'function' ? sumPres() : {}), ...(typeof gfxPres === 'function' ? gfxPres() : {})};
+    const p = {...(typeof GAMEV !== 'undefined' && GAMEV ? {gv:GAMEV} : {}), n:netName(), j:S.job, l:S.lvl, x:Math.round(P.x), y:Math.round(P.y), d:P.dir || 0, a:P.act || 'idle', r:P.ride ? 1 : 0, h:Math.round(S.hp / DER.maxhp * 100), sp:Math.round(S.sp / DER.maxsp * 100), pt:NET.party || null, s:P.sit ? 1 : 0, dead:P.dead ? 1 : 0, g:(vg => { const a = GHOST_SLOTS.map(k => vg[k] || ''); while (a.length > 4 && !a[a.length - 1]) a.pop(); return a.join(','); })(typeof visGear === 'function' ? visGear(S.gear) : S.gear || {}), ti:S.title || '', gn:(S.guild && S.guild.name) || '', lk:SPR.lookKey(S.look), ...(typeof wbPres === 'function' ? wbPres() : {}), ...(typeof nmPres === 'function' ? nmPres() : {}), ...(typeof dgPres === 'function' ? dgPres() : {}), ...(typeof pvpPres === 'function' ? pvpPres() : {}), ...(typeof afPres === 'function' ? afPres() : {}), ...(typeof cosPres === 'function' ? cosPres() : {}), ...(typeof emoPres === 'function' ? emoPres() : {}), ...(typeof siegePres === 'function' ? siegePres() : {}), ...(typeof rfPres === 'function' ? rfPres() : {}), ...(typeof gmPres === 'function' ? gmPres() : {}), ...(typeof sumPres === 'function' ? sumPres() : {}), ...(typeof gfxPres === 'function' ? gfxPres() : {})};
     let ch = false; for (const k in p) if (p[k] !== NET.lastPres[k]){ ch = true; break; }
     NET.hbT = (NET.hbT || 0) - dt; if (!ch && NET.hbT <= 0) ch = true;   // heartbeat: other clients drop a hero who has been silent for 45 s (see firebase-shim.js)
     if (ch) NET.hbT = 10;
@@ -66,7 +95,7 @@ function netTick(dt){
     if (!ch && lp.h !== last.h && lp.pt && now - at > 6000) ch = true;
     if (ch || now - at > 20000){ NET.lastLobby = lp; NET.lastLobbyAt = now; NET.room.presence(lp).catch(() => {}); } }
   // players directory (for the ranking), only when something changed
-  if (NET.db && NET.uid && NET.dirT <= 0 && !S.gmLocal){ NET.dirT = 30; const acc = typeof ACC !== 'undefined' ? ACC.name : '', sig = `${netName()}|${S.job}|${S.lvl}|${MAP_ID}|${S.shards || 0}|${acc}|${S.title || ''}|${(S.guild && S.guild.id) || ''}|${S.pvp ? S.pvp.r : 1000}|${Object.keys(S.ach || {}).length}|${(S.tower && S.tower.best) || 0}|${typeof housePub === 'function' ? JSON.stringify(housePub()) : ''}`;
+  if (NET.db && NET.uid && NET.dirT <= 0 && !S.gmLocal){ NET.dirT = 30; const acc = accPublic(), sig = `${netName()}|${S.job}|${S.lvl}|${MAP_ID}|${S.shards || 0}|${acc}|${S.title || ''}|${(S.guild && S.guild.id) || ''}|${S.pvp ? S.pvp.r : 1000}|${Object.keys(S.ach || {}).length}|${(S.tower && S.tower.best) || 0}|${typeof housePub === 'function' ? JSON.stringify(housePub()) : ''}`;
     if (sig !== NET.dirSig){ NET.dirSig = sig; NET.db.doc(`players/${NET.uid}`).set({name:netName(), job:S.job, lvl:S.lvl, map:MAP_ID, shards:S.shards || 0, acc, title:S.title || '', guild:(S.guild && S.guild.id) || '', ach:Object.keys(S.ach || {}).length, pvp:S.pvp ? S.pvp.r : 1000, house:typeof housePub === 'function' ? housePub() : null, tower:(S.tower && S.tower.best) || 0, at:Date.now()}).catch(() => {}); } }
   // smooth everyone else toward their latest position
   if (NET.mapRoom) for (const pe of NET.mapRoom.peers()){
@@ -85,8 +114,15 @@ function netTick(dt){
    changed for 5 minutes (the AFK kick removes a live player before that) is no longer drawn or counted for the
    monsters and the world clock; the moment it moves again it is back. */
 const NET_IDLE = {ms:5 * 60e3, seen:new Map()};
+/* (v254) heroes stuck on the map, take two: the owner still saw strangers standing for good. Those were old versions
+   left running in forgotten tabs: they keep moving a little (HP/SP ticking, an idle pose) so the 5-minute check never
+   fires, they have no AFK kick, and some never stamp the time the 45-second drop needs. The map presence now carries the
+   game version (gv); a hero with no version (every game before v254) or an older version than mine is not drawn and not
+   counted. A real player on an old version sees the "new version" banner (newver.js), reloads, and is back. */
+function netOldGhost(q){ if (typeof GAMEV === 'undefined' || !GAMEV) return false; const v = +q.gv; return !(v > 0) || v < GAMEV; }
 function netIdleGhost(pe){
   const q = pe && pe.presence; if (!q) return false;
+  if (!pe.isMe && netOldGhost(q)) return true;
   const sig = `${q.x}|${q.y}|${q.a}|${q.d}|${q.h}|${q.s}|${q.r}|${q.dead}|${q.sp}`, now = Date.now();
   let e = NET_IDLE.seen.get(pe.peer); if (!e || e.sig !== sig){ e = {sig, t:now}; NET_IDLE.seen.set(pe.peer, e); }
   if (NET_IDLE.seen.size > 400) for (const k of NET_IDLE.seen.keys()){ NET_IDLE.seen.delete(k); if (NET_IDLE.seen.size < 300) break; }
@@ -105,13 +141,14 @@ function drawGhostsInto(ents, g){
   const list = [...NET.ghosts.values()]; if (list.length > NET_MAP_CAP - 1) list.sort((a, b) => Math.hypot(a.x - P.x, a.y - P.y) - Math.hypot(b.x - P.x, b.y - P.y)).length = NET_MAP_CAP - 1;
   for (const gh of list){
     if (typeof gmHidden === 'function' && gmHidden(gh)) continue;
-    const q = gh.q || {}, job = JOBS[q.j] ? q.j : 'novice', sh = heroSheet(job, ghostGear(q.g), ghostLook(q.lk, q.rf)); if (!sh) continue;
+    const q = gh.q || {}, job = JOBS[q.j] ? q.j : 'novice', rb = q.r && typeof XMOUNT !== 'undefined' && XMOUNT[q.mt] && XMOUNT[q.mt].robot ? XMOUNT[q.mt] : null,
+      sh = heroSheet(job, ghostGear(q.g), rb ? {...(ghostLook(q.lk, q.rf) || {}), mnt:rb.sprite} : ghostLook(q.lk, q.rf)); if (!sh) continue;   // (v281) a robot mount is part of the rider's sprite, for others too
     ents.push({y:gh.y, f:() => {
       const x = gh.x - cam.x, y = gh.y - cam.y; if (x < -60 || x > VW + 60 || y < -80 || y > VH + 40) return;
       const mk = q.r && typeof XMOUNT !== 'undefined' && XMOUNT[q.mt] ? XMOUNT[q.mt] : null, gem = typeof ghostEmo === 'function' ? ghostEmo(q) : null, emv = gem ? emoMotion(gem, T) : {dx:0, dy:0};
-      const act = q.dead ? 'die' : mk ? (mk.kind === 'beast' ? 'sit' : 'idle') : q.r ? (gh.moving ? 'ride' : 'rideIdle') : q.s ? 'sit' : gh.moving ? 'walk' : (sh.index[q.a] && !['die', 'ride', 'rideIdle'].includes(q.a) ? q.a : 'idle');
-      const wg = typeof wingDef === 'function' && typeof q.wg === 'string' && q.wg.length < 40 && wingDef(q.wg) && !q.dead ? q.wg : null, dd = clamp(q.d | 0, 0, 7), wo = {moving:gh.moving, ride:!!q.r && !mk, sit:!!q.s || !!(mk && mk.kind === 'beast')};
-      shadowW(g, x, y, q.r ? 16 : 9); if (SETTINGS.oFx !== false && typeof COS_SETS !== 'undefined' && COS_SETS[q.cset] && !q.dead) drawSetAura(g, q.cset, x, y, T);
+      const act = q.dead ? 'die' : mk && mk.robot ? (gh.moving ? 'ride' : 'rideIdle') : mk ? (mk.kind === 'beast' ? 'sit' : 'idle') : q.r ? (gh.moving ? 'ride' : 'rideIdle') : q.s ? 'sit' : gh.moving ? 'walk' : (sh.index[q.a] && !['die', 'ride', 'rideIdle'].includes(q.a) ? q.a : 'idle');
+      const wg = typeof wingDef === 'function' && typeof q.wg === 'string' && q.wg.length < 40 && wingDef(q.wg) && !q.dead ? q.wg : null, dd = clamp(q.d | 0, 0, 7), wo = {moving:gh.moving, ride:!!q.r && !mk, sit:!!q.s || !!(mk && mk.kind === 'beast' && !mk.robot)};
+      shadowW(g, x, y, q.r ? (mk && mk.fly ? 17 : 16) : 9); if (SETTINGS.oFx !== false && typeof COS_SETS !== 'undefined' && COS_SETS[q.cset] && !q.dead) drawSetAura(g, q.cset, x, y, T);
       if (mk) drawMountX(g, mk, x, y, dd, T, gh.moving, 'under');
       const lift = (mk ? mk.lift + (mk.fly ? mk.fly : 0) : 0) - emv.dy;
       g.save(); g.translate(emv.dx, -lift);
@@ -148,7 +185,11 @@ function ghostAt(p){ const touch = typeof GFX !== 'undefined' && GFX.touch, slop
   return best; }
 
 /* ---------- chat ---------- */
+/* (v286) a flood of chat from one player (a script) is dropped on arrival: at most 5 lines in 4 seconds from one sender */
+const CHAT_RL = new Map();
+function chatRate(by){ if (!by) return true; const now = performance.now(), a = (CHAT_RL.get(by) || []).filter(t => now - t < 4000); if (a.length >= 5){ CHAT_RL.set(by, a); return false; } a.push(now); CHAT_RL.set(by, a); return true; }
 function onChat(msg){
+  if (!msg.isMe && !chatRate(msg.by)) return;
   const d = msg.data || {}; const ch = ['all', 'map', 'party', 'guild', 'w'].includes(d.c) ? d.c : 'all';
   if (ch === 'w' && !msg.isMe && (!NET.uid || d.to !== NET.uid)) return;
   if (ch === 'guild' && (!S.guild || d.g !== S.guild.id)) return;
@@ -172,6 +213,7 @@ function chatSubmit(){
 document.addEventListener('submit', e => { if (e.target && e.target.id === 'chatForm'){ e.preventDefault(); chatSubmit(); } }, true);
 async function sendChat(text, ch){
   text = clean(text); if (!text) return;
+  if (!chatRate('__me')){ NET.chat.push({ch:'sys', who:'', text:L('พิมพ์เร็วเกินไป รอสักครู่', 'Slow down a little'), at:Date.now()}); renderChat(); return; }   // (v286) the same limit others hold us to
   if (ch === 'party' && !NET.party){ NET.chat.push({ch:'sys', who:'', text:L('คุณยังไม่ได้อยู่ในปาร์ตี้', 'You are not in a party'), at:Date.now()}); renderChat(); return; }
   if (!NET.room || !NET.on){ NET.chat.push({ch:'sys', who:'', text:L('ยังไม่ได้เชื่อมต่อออนไลน์', 'Not connected'), at:Date.now()}); renderChat(); return; }
   try { if (ch === 'guild' && !S.guild){ NET.chat.push({ch:'sys', who:'', text:L('คุณยังไม่มีกิลด์', 'You are not in a guild'), at:Date.now()}); renderChat(); return; }

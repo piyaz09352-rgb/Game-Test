@@ -25,7 +25,6 @@ const plainKey = e => !(e.ctrlKey || e.metaKey || e.altKey);
 const KEYMAP = [
   [['คลิก|Click'], 'เดิน · คลิกมอนสเตอร์เพื่อโจมตี · คลิก NPC เพื่อคุย', 'Walk · click a monster to attack · click an NPC to talk'],
   [['1–8'], 'Skill (1–6) และยา (7–8) ในแถบลัด', 'Skills (1–6) and potions (7–8) on the hotbar'],
-  [['Space', 'C'], 'กลิ้งหลบ ไม่โดนโจมตีระหว่างกลิ้ง', 'Dodge roll, untouchable while rolling'],
   [['R'], 'ขี่/ลงพาหนะ เร็วขึ้น 70%', 'Mount/dismount, 70% faster'],
   [['T'], 'จับมอนสเตอร์ที่ HP ไม่เกิน 30% มาเป็น Pet', 'Capture a monster at 30% HP or less as a pet'],
   [['X'], 'นั่งพับเพียบ ฟื้น HP/SP เร็วขึ้น 2 เท่า', 'Sit, recover HP/SP twice as fast'],

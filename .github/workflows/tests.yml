@@ -1,0 +1,30 @@
+# VAYRATHEN — run the game's tests on every push and pull request (v286), so a broken change is caught before it ships.
+# test:fast plays the game in Chromium; test:rules attacks the Firebase rules on the emulators and plays the website path.
+name: tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  fast:
+    runs-on: ubuntu-24.04   # Playwright 1.56 supports up to 24.04 (ubuntu-latest became 26.04)
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:fast
+  rules:
+    runs-on: ubuntu-24.04   # Playwright 1.56 supports up to 24.04 (ubuntu-latest became 26.04)
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: npm }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:rules

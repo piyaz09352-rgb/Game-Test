@@ -22,8 +22,23 @@
   let signedRes; const signedIn = new Promise(r => { signedRes = r; });   // true once someone is logged in, false when playing offline
   const boot = (async () => {
     for (const f of ['firebase-app-compat.js', 'firebase-auth-compat.js', 'firebase-firestore-compat.js', 'firebase-database-compat.js']) await load(SDK + f);
-    fb = window.firebase; fb.initializeApp(C); auth = fb.auth(); fs = fb.firestore(); try { fs.settings({ignoreUndefinedProperties:true, merge:true}); } catch (e) {}
+    fb = window.firebase; fb.initializeApp(C);
+    /* (v284) App Check: with a reCAPTCHA v3 site key in firebase-config.js (APPCHECK_KEY), Firebase only answers requests
+       from this website, not from scripts or copies elsewhere (switch on "Enforce" in Firebase Console → App Check) */
+    const ACE = typeof APPCHECK_ENTERPRISE_KEY === 'string' ? APPCHECK_ENTERPRISE_KEY.trim() : '', ACK = ACE || (typeof APPCHECK_KEY === 'string' ? APPCHECK_KEY.trim() : '');   // (v289) Fraud Defense (Enterprise) first
+    /* (v288) only when Google's reCAPTCHA really loads on this device (an ad blocker, a school network or a country that
+       blocks google.com would otherwise leave log-in waiting for a token forever): 6 seconds, then the game goes on without */
+    if (ACK) try {
+      const rc = await Promise.race([load(`https://www.google.com/recaptcha/${ACE ? 'enterprise' : 'api'}.js?render=` + encodeURIComponent(ACK)).then(() => true, () => false), new Promise(r => setTimeout(() => r(false), 6000))]);
+      if (rc){ await load(SDK + 'firebase-app-check-compat.js'); fb.appCheck().activate(ACE ? new fb.appCheck.ReCaptchaEnterpriseProvider(ACK) : new fb.appCheck.ReCaptchaV3Provider(ACK), true); }
+      else console.warn('App Check: reCAPTCHA did not load, playing without it');
+    } catch (e) { console.warn('App Check did not start', e); }
+    auth = fb.auth();
+    /* the end-to-end test (tools/rules-test/e2e.test.js) runs the real Firebase code against the local emulators */
+    const EMU = window.__VAY_EMU; if (EMU && /^(127\.0\.0\.1|localhost)$/.test(location.hostname)){ auth.useEmulator(`http://127.0.0.1:${EMU.auth}`); } fs = fb.firestore(); try { fs.settings({ignoreUndefinedProperties:true, merge:true}); } catch (e) {}
+    if (EMU && /^(127\.0\.0\.1|localhost)$/.test(location.hostname)) fs.useEmulator('127.0.0.1', EMU.fs);
     rtdb = C.databaseURL ? fb.database() : null;
+    if (rtdb && EMU && /^(127\.0\.0\.1|localhost)$/.test(location.hostname)) rtdb.useEmulator('127.0.0.1', EMU.db);
     if (rtdb) await new Promise(res => { const t = setTimeout(res, 2500); rtdb.ref('.info/serverTimeOffset').on('value', s => { offset = s.val() || 0; clearTimeout(t); res(); }); });   // server clock, so a phone with a wrong clock still hears chat
     await new Promise(res => { let first = true; auth.onAuthStateChanged(u => {   // the log-in itself is js/sys/auth.js's panel; this only reports who is signed in
       if (first){ first = false; if (state === 'init') state = 'fb'; res(); }

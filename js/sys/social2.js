@@ -61,18 +61,19 @@ async function mkList(){
   MK.busy = true; const it = ITEMS[id], inst = it.base ? instStore()[id] : null;
   S.inv[id] -= n; if (!S.inv[id]) delete S.inv[id]; S.bia -= fee; if (inst) delete instStore()[id];
   const key = `${NET.uid.slice(-6)}${Date.now().toString(36)}`;
-  try { await NET.db.doc(`market/${key}`).set({s:NET.uid, sn:netName(), sa:ACC.name || '', i:id, n, x:inst || null, p, at:Date.now(), sold:null, paid:false}); toast(L('วางขายแล้ว', 'Listed')); SFX.play('coin'); MK.sel = null; MK.price = ''; }
+  try { await NET.db.doc(`market/${key}`).set({s:NET.uid, sn:netName(), sa:accPublic(), i:id, n, x:inst || null, p, at:Date.now(), sold:null, paid:false}); toast(L('วางขายแล้ว', 'Listed')); SFX.play('coin'); MK.sel = null; MK.price = ''; }
   catch (e){ addItem(id, n); if (inst) instStore()[id] = inst; S.bia += fee; toast(L('วางขายไม่สำเร็จ', 'Could not list')); }
   MK.busy = false; dirty = true; save(); mkMine();
 }
 async function mkBuy(r){
   if (!mkOk() || MK.busy || r.s === NET.uid) return; if (S.bia < r.p) return toast(L('เงินไม่พอ', 'Not enough Bia')); MK.busy = true;
-  try { const ref = NET.db.doc(`market/${r.id}`), lk = await ref.acquire({holder:NET.uid, ttlMs:4000});
-    if (!lk.acquired){ toast(L('มีคนกำลังซื้อชิ้นนี้ ลองใหม่อีกครั้ง', 'Someone is buying this right now, try again')); MK.busy = false; return; }
-    const snap = await ref.get(), cur = snap.exists ? snap.data() : null;
-    if (!cur || cur.sold || !mkValid(cur)){ toast(L('ขายไปแล้ว', 'Already sold')); MK.busy = false; return; }
-    if (S.bia < cur.p){ toast(L('เงินไม่พอ', 'Not enough Bia')); MK.busy = false; return; }
-    await ref.update({sold:{b:NET.uid, bn:netName(), at:Date.now()}});
+  try { let why = '';
+    const res = await dbClaim(NET.db.doc(`market/${r.id}`), cur => { why = !cur || cur.sold || !mkValid(cur) ? 'sold' : cur.s === NET.uid ? 'mine' : S.bia < cur.p ? 'bia' : '';
+      return why ? null : {set:{sold:{b:NET.uid, bn:netName(), at:Date.now()}}}; });   // (v284) one transaction: nobody else can buy it in between
+    if (res.busy){ toast(L('มีคนกำลังซื้อชิ้นนี้ ลองใหม่อีกครั้ง', 'Someone is buying this right now, try again')); MK.busy = false; return; }
+    if (why === 'sold' || why === 'mine'){ toast(L('ขายไปแล้ว', 'Already sold')); MK.busy = false; return; }
+    if (why){ toast(L('เงินไม่พอ', 'Not enough Bia')); MK.busy = false; return; }
+    const cur = res.cur;
     S.bia -= cur.p; if (cur.x){ const d = sanitizeInst(cur.x); if (d){ instStore()[cur.i] = d; regInst(cur.i, d); } } if (ITEMS[cur.i]) addItem(cur.i, cur.n | 0);
     log(L(`ซื้อ ${nm(ITEMS[cur.i])} ×${cur.n} จาก ${clean(cur.sn, 18)} ราคา ${fmtN(cur.p)} เบี้ย`, `Bought ${nm(ITEMS[cur.i])} ×${cur.n} from ${clean(cur.sn, 18)} for ${fmtN(cur.p)} Bia`), 'g'); SFX.play('trade'); bump('trades'); EV.emit('trade');
   } catch (e){ toast(L('ซื้อไม่สำเร็จ', 'Purchase failed')); }
@@ -82,14 +83,16 @@ async function mkMine(){ if (!mkOk()) return; try { const q = await NET.db.colle
 /* collect what sold while we were away, and give back cancelled items */
 async function mkCollect(){
   if (!mkOk()) return; await mkMine(); let got = 0;
-  for (const r of MK.mine) if (r.sold && !r.paid){ try { await NET.db.doc(`market/${r.id}`).update({paid:true}); await NET.db.doc(`market/${r.id}`).delete(); S.bia += r.p | 0; got += r.p | 0; } catch (e) {} }
+  for (const r of MK.mine) if (r.sold && !r.paid){ try { const ref = NET.db.doc(`market/${r.id}`), res = await dbClaim(ref, c => c && c.sold && !c.paid && c.s === NET.uid ? {set:{paid:true}} : null);   // (v284) paid once, even with two devices
+    if (res.did){ const p = res.cur.p | 0; S.bia += p; got += p; } if (res.did || (res.cur && res.cur.paid)) await ref.delete().catch(() => {}); } catch (e) {} }
   if (got){ log(L(`ขายของในตลาดได้ ${fmtN(got)} เบี้ย`, `Market sales collected: ${fmtN(got)} Bia`), 'g'); banner(L(`ตลาดกลาง: ได้เงิน ${fmtN(got)} เบี้ย`, `Player market: +${fmtN(got)} Bia`)); SFX.play('coin'); dirty = true; save(); mkMine(); }
 }
 async function mkCancel(r){
   if (!mkOk() || MK.busy) return; MK.busy = true;
-  try { const ref = NET.db.doc(`market/${r.id}`), lk = await ref.acquire({holder:NET.uid, ttlMs:4000}); if (!lk.acquired){ toast(L('มีคนกำลังซื้ออยู่', 'A buyer is busy with it')); MK.busy = false; return; }
-    const snap = await ref.get(), cur = snap.exists ? snap.data() : null; if (!cur || cur.sold){ MK.busy = false; return mkCollect(); }
-    await ref.delete(); if (cur.x){ const d = sanitizeInst(cur.x); if (d){ instStore()[cur.i] = d; regInst(cur.i, d); } } if (ITEMS[cur.i]) addItem(cur.i, cur.n | 0); toast(L('ยกเลิกการขายแล้ว ของกลับเข้ากระเป๋า', 'Listing cancelled, item returned'));
+  try { const res = await dbClaim(NET.db.doc(`market/${r.id}`), cur => cur && !cur.sold && cur.s === NET.uid ? {del:true} : null);   // (v284) only while still unsold
+    if (res.busy){ toast(L('มีคนกำลังซื้ออยู่', 'A buyer is busy with it')); MK.busy = false; return; }
+    const cur = res.cur; if (!res.did){ MK.busy = false; return mkCollect(); }
+    if (cur.x){ const d = sanitizeInst(cur.x); if (d){ instStore()[cur.i] = d; regInst(cur.i, d); } } if (ITEMS[cur.i]) addItem(cur.i, cur.n | 0); toast(L('ยกเลิกการขายแล้ว ของกลับเข้ากระเป๋า', 'Listing cancelled, item returned'));
   } catch (e){ toast(L('ยกเลิกไม่สำเร็จ', 'Could not cancel')); }
   MK.busy = false; dirty = true; save(); mkMine();
 }

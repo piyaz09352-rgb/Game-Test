@@ -31,6 +31,7 @@ test('camp cook uses only this map\'s drops; dust is forge-only; coffee window; 
     await page.waitForTimeout(400);
     const pt = await page.evaluate(() => { const r = brect(cv), l = LOOT[0]; return { x: r.left + (l.x - cam.x) / VW * r.width, y: r.top + (l.y - cam.y) / VH * r.height }; });
     await page.mouse.move(pt.x - 40, pt.y - 40); await page.mouse.move(pt.x, pt.y);
+    await page.waitForFunction(() => !!hoverLoot, null, { timeout: 4000, polling: 50 }).catch(() => {});   // (v290) the hover is picked up on the next frame: on a busy machine that can take a while
     const hov = await page.evaluate(() => ({ loot: !!P.loot, hov: !!hoverLoot }));
     assert.deepStrictEqual(hov, { loot: false, hov: true }, 'pointing alone does not send the hero');
     await page.mouse.down(); await page.mouse.up();

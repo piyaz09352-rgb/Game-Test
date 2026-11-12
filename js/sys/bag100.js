@@ -45,12 +45,16 @@ if (typeof helperScore === 'function'){ const _h = helperScore; helperScore = fu
 if (typeof fgBuy === 'function'){ const _f = fgBuy; fgBuy = function(id){ const gr = typeof GEAR !== 'undefined' && GEAR[id]; if ((gr && gr.slot !== 'ammo' ? bagUsed() >= bagCap() : !bagFits(id))){ bagFullToast(); return; } return _f.apply(this, arguments); }; }
 
 /* the bag window: the count, and a 10 × 10 grid of equal squares */
+/* (v286) the number of cells, asked by bag.js while it draws: the empty cells used to be added after each draw, and the
+   next draw (which updates the window in place) removed them again before they came back: the empty part of the bag
+   blinked on every kill, potion or EXP tick */
+function bagSlotsWant(filled){ return BAG.tab === 'all' && !BAG.q ? Math.max(bagCap(), filled) : Math.max(40, filled); }
 { const _bd = bagDraw;
   bagDraw = function(){ const r = _bd.apply(this, arguments); const foot = el('bagFoot'), used = bagUsed();
     if (foot){ const cap = bagCap(), full = used >= cap, n = (S.bagX | 0); foot.innerHTML = `<span class="bcap${full ? ' full' : ''}">${L('ช่อง', 'Slots')} <b>${used}</b> / ${cap}</span>${n < BAGX.max ? ` <button class="btn sm bagx" data-bagx="1" title="${L('ซื้อช่องเพิ่มด้วยเหรียญวายรา', 'Buy more slots with Vayra Coins')}">+${BAGX.step} ◈ ${fmtN(BAGX.price(n))}</button>` : ''}${full ? ` <small class="bcapw">${L('เต็มแล้ว · ขายหรือฝากคลังเพื่อเก็บของใหม่', 'Full · sell or bank items to pick up more')}</small>` : ''}`; }
     const grid = el('bagGrid');
     if (grid && grid.classList.contains('grid')){
-      const filled = grid.querySelectorAll('.bslot:not(.empty)').length, want = BAG.tab === 'all' && !BAG.q ? Math.max(bagCap(), filled) : Math.max(40, filled);
+      const filled = grid.querySelectorAll('.bslot:not(.empty)').length, want = bagSlotsWant(filled);
       const empties = [...grid.querySelectorAll('.bslot.empty')], have = filled + empties.length;
       if (have > want) empties.slice(0, have - want).forEach(e => e.remove());
       else if (have < want) grid.insertAdjacentHTML('beforeend', '<span class="bslot empty"></span>'.repeat(want - have)); }

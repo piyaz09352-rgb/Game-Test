@@ -51,8 +51,9 @@ test('world map: picture, a marker on land for every region, no pile-ups, click 
     assert.ok(await page.$(`#wmPic .wmk.here[data-wmsel="${await page.evaluate(() => MAP_ID)}"]`), 'the current region pulses');
     assert.ok(await page.$('#wmPic .wmhere'), 'you-are-here pin');
     // routes: one dotted path per link (31 regions on a tree of roads: at least 30), lit when both ends are visited
-    const R = await page.evaluate(() => ({ n: document.querySelectorAll('#wmPic .wmr').length, links: wmLinks().length, lit: document.querySelectorAll('#wmPic .wmr.lit').length }));
-    assert.ok(R.links >= 30 && R.n === R.links, 'a route for every link: ' + JSON.stringify(R));
+    // (v281) a sea route between regions is drawn as a boat beside each of its two ports, not a line across the island
+    const R = await page.evaluate(() => ({ n: document.querySelectorAll('#wmPic .wmr').length, links: wmLinks().length, sea: typeof SEA280 !== 'undefined' ? SEA280.length : 0, boats: document.querySelectorAll('#wmPic .wmboat').length, lit: document.querySelectorAll('#wmPic .wmr.lit').length }));
+    assert.ok(R.links >= 30 && R.n === R.links - R.sea && R.boats === R.sea * 2, 'a route for every link: ' + JSON.stringify(R));
     assert.ok(R.lit >= 2, 'routes between visited regions are lit');
     // unvisited regions are fogged and dimmed
     const fog = await page.evaluate(() => ({ fog: document.querySelectorAll('#wmPic .wmfog').length, unk: document.querySelectorAll('#wmPic .wmk.unk').length, unseen: MAPS.filter((m, i) => !S.visited[i]).length }));

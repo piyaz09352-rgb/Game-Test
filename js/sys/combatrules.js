@@ -1,5 +1,5 @@
 /* VAYRATHEN — js/sys/combatrules.js — (v100) three rules for what stats do in a fight
-   · MOBBED: every monster past the second one fighting you takes 10% off your Flee (5 on you → −30%). Dragging a
+   · MOBBED: (v292) every monster past the third fighting you takes 5% off your Flee (6 on you → −15%, never below 40%). Dragging a
      whole pack around no longer leaves an AGI hero untouchable.
    · PERFECT DODGE from LUK: 1% for every 10 LUK, on top of any dodge passive. It works even when Flee fails.
    · STATUS RESIST from stats, on top of the "Status Resist" gear option (js/sys/afflict.js afRes):
@@ -8,7 +8,7 @@
    The Status details drawer lists all three. */
 'use strict';
 
-const RO_MOB = {range:90, step:.1};
+const RO_MOB = {range:90, step:.05, free:3};   // (v292) mobbed: −5% Flee per monster past the third (was −10% past the second): a pack leader's family alone no longer strips an AGI hero
 const RO_RES_STAT = {stun:'vit', poison:'vit', bleed:'vit', burn:'vit', silence:'int', freeze:'int', blind:'int', curse:'luk', slow:'agi', root:'agi'};
 const roResOf = k => { const s = RO_RES_STAT[k]; return s && DER && DER.b ? Math.min(.4, (DER.b[s] || 0) / 250) : 0; };
 const roLukDodge = () => (DER && DER.b ? (DER.b.luk || 0) * .001 : 0);
@@ -16,7 +16,7 @@ const roLukDodge = () => (DER && DER.b ? (DER.b.luk || 0) * .001 : 0);
 function roMobbed(){ let n = 0;
   for (const m of mobs) if (!m.dead && !m.vanish && m.aggro && Math.hypot(m.x - P.x, m.y - P.y) <= (m.def.range || 0) + (m.def.r || 0) + RO_MOB.range) n++;
   return n; }
-const roFleeMul = n => Math.max(0, 1 - Math.max(0, n - 2) * RO_MOB.step);
+const roFleeMul = n => Math.max(.4, 1 - Math.max(0, n - RO_MOB.free) * RO_MOB.step);
 
 { const _dv = derive; derive = function(){ const r = _dv.apply(this, arguments);
   if (DER && DER.pas){ DER.pas.dodge = +((DER.pas.dodge || 0) + roLukDodge()).toFixed(3); }

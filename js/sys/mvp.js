@@ -120,16 +120,17 @@ WIN_RENDER.mvp = function(){
 /* (v97) what a boss drops: everything killMob and the boss hooks can give, with the chance of each, so a player can
    pick which boss to hunt */
 function mvpDropsHTML(id, mapId){
-  const d = MOB[id], lvl = d.lvl || 1, mp = MAPS[mapId] || {}, pc = ch => `${Math.round(ch * 1000) / 10}%`, row = [];
+  const d = MOB[id], lvl = d.lvl || 1, mp = MAPS[mapId] || {}, pc = ch => `${ch >= .001 ? Math.round(ch * 1000) / 10 : +(ch * 100).toFixed(3)}%`, row = [];
   const chip = (icon, name, ch, sub) => `<div class="mvpdi">${icon}<span><b>${name}</b>${sub ? `<small>${sub}</small>` : ''}</span><em>${ch}</em></div>`;
   for (const [it, ch] of d.drops || []) if (ITEMS[it]) row.push(chip(itemIcon(it), escH(nm(ITEMS[it])), ch >= 1 ? L('แน่นอน', 'Always') : pc(ch)));
-  row.push(chip('<span class="mvpdg">⚔</span>', L('อุปกรณ์สำหรับอาชีพของคุณ 1–3 ชิ้น', '1–3 gear pieces for your class'), L('แน่นอน', 'Always'), `Lv ${Math.max(1, Math.min(lvl, LV_MAX) - 30)}–${lvl + 5} · ${L('ชิ้นที่ 2: 60% · ชิ้นที่ 3: 20%', '2nd: 60% · 3rd: 20%')}`));
+  row.push(chip('<span class="mvpdg">⚔</span>', L('อุปกรณ์ 0–3 ชิ้น', '0–3 gear pieces'), '50%', `Lv ${Math.max(1, Math.min(lvl, LV_MAX) - 30)}–${lvl + 5} · ${L('ชิ้นที่ 2: 30% · ชิ้นที่ 3: 10%', '2nd: 30% · 3rd: 10%')}`));
   if (typeof g10BossLine === 'function'){ const ln = g10BossLine({type:id, def:d}); if (ln && JOBS[ln]) row.push(chip('<span class="mvpdg">✦</span>', L(`อาวุธ/ชุดสาย${nm(JOBS[ln])}`, `${nm(JOBS[ln])} line weapon or set`), '35%', L('มีโอกาสได้ระดับหายาก', 'can be rare'))); }
   if (typeof ZS_LANDS !== 'undefined' && ZS_LANDS[mp.land]) row.push(chip('<span class="mvpdg">◆</span>', L(`ชิ้นส่วนเซต${ZS_LANDS[mp.land][0]}`, `${ZS_LANDS[mp.land][1]} set piece`), '25%'));
   if (lvl >= 150 && typeof csetDrop === 'function') row.push(chip('<span class="mvpdg">★</span>', L('ชิ้นส่วนชุดประจำสายของคุณ', 'Your class set piece'), '6%'));
   if (ITEMS.drill_d) row.push(chip(itemIcon('drill_d'), escH(nm(ITEMS.drill_d)), '12%'));
   if (d.card && CARDS[d.card]){ const c = CARDS[d.card]; row.push(chip('<span class="mvpdg cd">🂠</span>', escH(nm(c)), pc(d.cardRate || 0), escH(L(c.desc[0], c.desc[1])))); }
-  row.push(chip('<span class="mvpdg"><i class="biaI"></i></span>', L('เงินรางวัล MVP 3,000 เบี้ย', 'MVP reward 3,000 Bia'), L('แน่นอน', 'Always')));
+  { const mv = (typeof ECON !== 'undefined' ? ECON.mvpBia : 1500).toLocaleString(); row.push(chip('<span class="mvpdg"><i class="biaI"></i></span>', L(`เงินรางวัล MVP ${mv} เบี้ย`, `MVP reward ${mv} Bia`), L('แน่นอน', 'Always'))); }
+  if (typeof BCOIN !== 'undefined') row.push(chip('<span class="mvpdg">◈</span>', L(`เหรียญวายรา ${lvl >= 150 ? '3–5' : '1–2'}`, `${lvl >= 150 ? '3–5' : '1–2'} Vayra Coins`), L('ทุกคนที่ช่วยตี', 'every helper'), L('วันละไม่เกิน 30 · บอสต่ำกว่าเรา 20 เลเวลไม่ให้', 'up to 30 a day · none from a boss 20+ levels below you')));
   return `<div class="mvpdrop">${row.join('')}</div>`;
 }
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-mvpdrop]'); if (!b) return; MVP.open = MVP.open === b.dataset.mvpdrop ? null : b.dataset.mvpdrop; WIN_RENDER.mvp(); });

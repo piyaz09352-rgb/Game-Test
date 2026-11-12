@@ -55,7 +55,9 @@ function authKeep(){
   try { (AUTH.f.keep !== false ? localStorage : sessionStorage).setItem(AUTH.key, `${AUTH.sess}|${Date.now() + AUTH_DAYS * 864e5}`); } catch (e) {}
 }
 AUTH.ok = !authFbOn() && authed(); if (AUTH.ok) AUTH.sess = authTok();
-const authMode = () => (AUTH.bind && ACC.guest ? 'bind' : AUTH.mode || (!authFbOn() && authHasPw() ? 'login' : 'reg'));
+/* (v283) a device that already holds an account (name + password hash, offline or online) opens on Log in; only a
+   brand-new device opens on Register. Before, every online player was sent to the sign-up form on each return. */
+const authMode = () => (AUTH.bind && ACC.guest ? 'bind' : AUTH.mode || (ACC.name && authHasPw() ? 'login' : 'reg'));
 
 /* ---------- messages ---------- */
 const AUTH_ERR = {

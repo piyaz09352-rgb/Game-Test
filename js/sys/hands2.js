@@ -15,7 +15,7 @@
 'use strict';
 
 const HANDS_RULE = {
-  fist:() => '2h', bow:() => '2h', shuriken:() => '2h',   // (v184) ดาวกระจาย: thrown from one hand, counted as two-handed
+  fist:() => '2h', bow:() => '2h', shuriken:n => (/คุไน|kunai/i.test(n) ? '1h' : '2h'),   // (v184) ดาวกระจาย: thrown from one hand, counted as two-handed · (v258) คุไน is one-handed
   dagger:n => (/คู่|twin/i.test(n) ? '2h' : '1h'),
   sword:n => (/สองมือ|greatsword/i.test(n) ? '2h' : '1h'),
   staff:n => (/ไม้เท้ายาว|longstaff/i.test(n) ? '2h' : '1h')

@@ -26,13 +26,13 @@ function itCard(id){
   const it = ITEMS[id]; if (!it) return '';
   const have = (S.inv && S.inv[id]) || 0;
   if (it.kind === 'gear' && typeof g10Detail === 'function') return g10Detail(id, {n:have});
-  const r = rarOf(id), R = RAR[r] || RAR[0], k = IT_KIND[it.kind] || ['ไอเท็ม', 'Item'];
+  const mat = (it.kind === 'etc' || it.kind === 'mat') && typeof ia270Tier === 'function', r = mat ? ia270Tier(id) : rarOf(id), R = RAR[r] || RAR[0], k = IT_KIND[it.kind] || ['ไอเท็ม', 'Item'];   // (v270) materials have a tier too
   const fx = [it.heal ? `HP +${fmtN(it.heal)}` : '', it.spheal ? `SP +${fmtN(it.spheal)}` : '', it.st && typeof gearStatText === 'function' ? gearStatText(it.st) : ''].filter(Boolean);
   const chips = fx.join(' · ').split(' · ').filter(Boolean);
   const by = itDropBy(id), desc = itemDesc(id);
   const src = by.length ? by.map(([m, p]) => `${escH(L(MOB[m].name, MOB[m].en || MOB[m].name))} <small>${p >= 1 ? '100%' : (p * 100).toFixed(p < .01 ? 2 : 1) + '%'}</small>`).join(' · ')
     : it.buy ? L('ร้านค้า', 'Shops') : L('ภารกิจ · กิจกรรม · คราฟต์', 'Quests · events · crafting');
-  return `<div class="gdx r${r}" style="--rc:${R.c}">
+  return `<div class="gdx r${r}"${mat ? ` data-gs="m-${ia270Fam(id)}"` : ''} style="--rc:${R.c}">
     <div class="gdx-band"><span>${L(R.th, R.en)}</span></div>
     <div class="gdx-top"><span class="gdx-ic">${itemIcon(id)}</span><div class="gdx-id"><b class="rar r${r}">${escH(nm(it))}</b>
       <div class="gdx-tags"><span class="gdx-tag">${L(...k)}</span>${it.lv ? `<span class="gdx-tag${!it.lv || S.lvl >= it.lv ? '' : ' bad'}">Lv ${it.lv}</span>` : ''}${have ? `<span class="gdx-tag">${L('มี', 'Have')} ×${fmtN(have)}</span>` : ''}</div></div></div>

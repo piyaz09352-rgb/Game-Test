@@ -86,7 +86,7 @@ function wieldOk(it){
 /* axe pictures in the bag: a haft and a curved bit, tinted by tier */
 { const _art = itemArt;
   itemArt = function(id){ const b = (ITEMS[id] && ITEMS[id].base) || id, m = /^w_(g?)axe(\d+)$/.exec(b) || (/^k_(merchant|tradelord|tycoon)_w$/.test(b) ? ['', b === 'k_merchant_w' ? '' : 'g', b === 'k_tycoon_w' ? '8' : b === 'k_tradelord_w' ? '4' : '1'] : null);
-    if (!m) return _art.apply(this, arguments);
+    if (!m || typeof IA270_W !== 'undefined') return _art.apply(this, arguments);   // (v271) itemart270.js draws axes on the same tile as every other weapon
     const t = +m[2], two = m[1] === 'g', metal = ['#b8bcc4', '#c8ccd4', '#e08a4a', '#5a5a6a', '#4ac0a0', '#f0c040', '#e86a3a', '#a0e0ff', '#ffd860', '#80e0a0', '#ffe080'][t] || '#c8ccd4', haft = t >= 5 ? '#8a4a1a' : '#a0703a';
     const bit = sd => `<path d="M${20 + sd * 2} 9 Q${20 + sd * 13} 10 ${20 + sd * 12} 19 Q${20 + sd * 8} 17 ${20 + sd * 2} 17Z" fill="${metal}" stroke="#2a1a10" stroke-width="1.2"/><path d="M${20 + sd * 11.5} 11 Q${20 + sd * 12.8} 15 ${20 + sd * 11.6} 18.6" fill="none" stroke="#fff" stroke-width="1" opacity=".8"/>`;
     return `<svg viewBox="0 0 40 40"><rect x="2" y="2" width="36" height="36" rx="8" fill="#3a2a1a" opacity=".12"/><path d="M20 8 L20 35" stroke="${haft}" stroke-width="3" stroke-linecap="round"/><path d="M20 28 L20 34" stroke="#5a3a1a" stroke-width="3.4"/>${bit(1)}${two ? bit(-1) : `<path d="M18 12 L13 14 L18 15Z" fill="${metal}" stroke="#2a1a10" stroke-width="1"/>`}</svg>`; }; }

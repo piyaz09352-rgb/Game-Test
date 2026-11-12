@@ -93,7 +93,7 @@ document.addEventListener('change', e => { const t = e.target; if (!t || !t.data
   .bkrow input[type=checkbox]{width:18px;height:18px;flex:none}.bkrow.on{background:rgba(255,211,74,.14)}.bkrow.locked{opacity:.65}.bklk{font-size:14px;width:28px;height:28px}
   .bklist{max-height:min(46vh,380px);overflow:auto}.bkgo{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:6px 4px;border-top:1px solid rgba(255,255,255,.25)}
   .bkgo .plus{color:#7dffb0}.bklock{margin-left:6px}.bklock.on{background:#ffd34a;color:#3a2000}
-  .bkautog{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.bkautog .bkchip{border-color:#d4b47a;color:#5a3d12;background:#fff}`;
+  .bkautog{display:flex;flex-wrap:wrap;align-items:center;gap:6px}.bkautog .bkchip{border-color:#d4b47a;color:#5a3d12;background:#fff}\n  #bagFoot{position:relative}.bkautob{margin-right:auto}.bkautob.on{background:linear-gradient(#ffe7a0,#e8b84a) !important;color:#3a2200 !important}\n  .bkpop{position:absolute;left:0;bottom:calc(100% + 8px);z-index:20;width:min(320px,90vw);display:flex;flex-direction:column;gap:6px;padding:10px 12px;border-radius:12px;background:#fffaf0;box-shadow:0 0 0 1.5px #d4b47a,0 8px 20px rgba(0,0,0,.25);text-align:left;color:#3a2206}\n  .bkpop small{font-size:11px;color:#7a5a30}.bkpop select{font:600 13px var(--thai,sans-serif);padding:4px 6px;border-radius:8px;border:1.5px solid #d4b47a;background:#fff}.bkpop .bkpl{font-size:12px;font-weight:700}.bkpop .bkchip{border-color:#d4b47a;color:#5a3d12;background:#fff}`;
   document.head.appendChild(st); }
 
 /* ---------- locks hold everywhere: no trading, no market listing ---------- */
@@ -101,24 +101,29 @@ document.addEventListener('change', e => { const t = e.target; if (!t || !t.data
 { const _ml = mkList; mkList = async function(){ if (typeof MK !== 'undefined' && isLocked(MK.sel)){ toast(L('ชิ้นนี้ล็อคอยู่ · ปลดล็อคก่อนวางขาย', 'This piece is locked · unlock it to list it')); return; } return _ml.apply(this, arguments); }; }
 
 /* ---------- auto: sell or salvage low-grade gear the moment you pick it up (uses that mode's grade settings) ---------- */
-const bkAuto = () => (S && S.bulk && S.bulk.auto) || 'off';
+const bkAuto = () => 'off';   // (v292) the owner removed the bag's «⚙ ขายอัตโนมัติ» button: selling / salvaging on pick-up is off for everyone (a saved setting no longer sells anything)
 EV.on('pickup', id => {
   const mode = bkAuto(); if (mode === 'off' || !S.inv[id] || !ITEMS[id] || ITEMS[id].kind !== 'gear' || !bkAllowed(mode, id)) return;
   const v = bkValue(mode, id); delete S.inv[id]; if (typeof instPrune === 'function') instPrune();
   if (mode === 'sell'){ S.bia += v; addText(P.x, P.y - 70, `+${fmtN(v)} ${CUR()}`, '#ffe08a', 12); } else { addItem('dust', v); addText(P.x, P.y - 70, `+${v} ${L('ผง', 'dust')}`, '#cfe0ff', 12); }
   dirty = true;
 });
-/* (v159) the pick-up switch lives in the Auto settings window (ตั้งค่า Auto), not in the smith's sell-back list:
-   it is part of how Auto plays, and the smith's window is only for selling by hand. Its grade chips are the same
-   settings the sell-back / salvage lists use. */
-{ const _ra = renderAuto;
-  renderAuto = function(){ const r = _ra.apply(this, arguments); const pane = el('pane-auto'); if (!pane || !S) return r;
-    const a = bkAuto(), st = a === 'off' ? null : bkSet(a);
-    const chips = st ? `<div class="bkchips">${[0, 1, 2, 3].map(i => `<button class="bkchip r${i}${st.rar[i] ? ' on' : ''}" data-bkrar="${a}|${i}">${L(RAR[i].th, RAR[i].en)}</button>`).join('')}</div>` : '';
-    pane.insertAdjacentHTML('beforeend', `<div class="sec">${L('เก็บของ', 'Picking up')}</div>
-      <label class="set"><span><b>${L('ขาย/ย่อยอุปกรณ์อัตโนมัติเมื่อเก็บ', 'Sell / salvage gear on pick-up')}</b><small>${L('ชิ้นที่ล็อคไว้ การ์ด และชิ้นที่ดีกว่าที่สวมจะไม่โดน', 'Locked pieces, carded pieces and upgrades are kept')}</small></span>
-        <select data-bkauto="1"><option value="off" ${a === 'off' ? 'selected' : ''}>${L('ปิด', 'Off')}</option><option value="sell" ${a === 'sell' ? 'selected' : ''}>${L('ขายตามเกรด', 'Sell by grade')}</option><option value="salv" ${a === 'salv' ? 'selected' : ''}>${L('ย่อยตามเกรด', 'Salvage by grade')}</option></select></label>
-      ${st ? `<div class="set bkautog"><span><b>${L('เกรดที่จะ' + (a === 'sell' ? 'ขาย' : 'ย่อย'), `Grades to ${a === 'sell' ? 'sell' : 'salvage'}`)}</b></span>${chips}</div>` : ''}`);
-    return r; }; }
-{ const _br = bkRefresh; bkRefresh = function(){ _br.apply(this, arguments); if (typeof reWin === 'function') reWin('auto'); }; }
-document.addEventListener('change', e => { const t = e.target; if (t && t.dataset && t.dataset.bkauto){ S.bulk = S.bulk || {}; S.bulk.auto = t.value; dirty = true; if (typeof reWin === 'function') reWin('auto'); toast(t.value === 'off' ? L('ปิดขาย/ย่อยอัตโนมัติ', 'Auto sell/salvage off') : t.value === 'sell' ? L('เก็บของแล้วขายตามเกรดที่ตั้งทันที (ชิ้นที่ล็อคไม่โดน)', 'Picked-up gear is sold by your grade settings (locked pieces are safe)') : L('เก็บของแล้วย่อยตามเกรดที่ตั้งทันที (ชิ้นที่ล็อคไม่โดน)', 'Picked-up gear is salvaged by your grade settings (locked pieces are safe)')); } });
+/* (v274) the owner: selling / salvaging on pick-up has nothing to do with Auto, so it left the Auto settings and lives in
+   the bag window: a switch in the bag's footer ("ขายอัตโนมัติ: ปิด / ขาย / ย่อย") opens a small panel with the mode and
+   the grades. Its grade chips are the same settings the sell-back / salvage lists use. Wrapped once every file has
+   loaded, so it comes after bag100.js redraws the footer. */
+const BKP = {open:false};
+function bkPopHTML(){ const a = bkAuto(), st = a === 'off' ? null : bkSet(a);
+  const chips = st ? `<div class="bkchips">${[0, 1, 2, 3].map(i => `<button class="bkchip r${i}${st.rar[i] ? ' on' : ''}" data-bkrar="${a}|${i}">${L(RAR[i].th, RAR[i].en)}</button>`).join('')}</div>` : '';
+  return `<div id="bkPop" class="bkpop"><b>${L('ขาย/ย่อยอุปกรณ์อัตโนมัติเมื่อเก็บ', 'Sell / salvage gear on pick-up')}</b><small>${L('ชิ้นที่ล็อคไว้ การ์ด และชิ้นที่ดีกว่าที่สวมจะไม่โดน', 'Locked pieces, carded pieces and upgrades are kept')}</small>
+    <select data-bkauto="1"><option value="off" ${a === 'off' ? 'selected' : ''}>${L('ปิด', 'Off')}</option><option value="sell" ${a === 'sell' ? 'selected' : ''}>${L('ขายตามเกรด', 'Sell by grade')}</option><option value="salv" ${a === 'salv' ? 'selected' : ''}>${L('ย่อยตามเกรด', 'Salvage by grade')}</option></select>
+    ${st ? `<span class="bkpl">${L('เกรดที่จะ' + (a === 'sell' ? 'ขาย' : 'ย่อย'), `Grades to ${a === 'sell' ? 'sell' : 'salvage'}`)}</span>${chips}` : ''}</div>`; }
+function bkFoot(){ const foot = el('bagFoot'); if (!foot || !S) return; const a = bkAuto();
+  foot.querySelectorAll('.bkautob,#bkPop').forEach(x => x.remove()); return;   // (v292) no auto-sell button any more
+  foot.insertAdjacentHTML('afterbegin', `<button class="btn sm bkautob${a !== 'off' ? ' on' : ''}" data-bkpop="1" aria-expanded="${BKP.open}">⚙ ${L('ขายอัตโนมัติ', 'Auto-sell')}: <b>${a === 'off' ? L('ปิด', 'Off') : a === 'sell' ? L('ขาย', 'Sell') : L('ย่อย', 'Salvage')}</b></button>${BKP.open ? bkPopHTML() : ''}`); }
+EV.on('tick', function bkWrap(){ if (BKP.wrapped || typeof bagDraw !== 'function') return; BKP.wrapped = true;
+  const _bd = bagDraw; bagDraw = function(){ const r = _bd.apply(this, arguments); try { bkFoot(); } catch (e) {} return r; }; });
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-bkpop]'); if (b){ e.stopPropagation(); BKP.open = !BKP.open; bkFoot(); return; }
+  if (BKP.open && e.target.isConnected && !(e.target.closest && e.target.closest('#bkPop'))){ BKP.open = false; bkFoot(); } });   // a chip redraws the panel: its old button is gone, the panel stays
+{ const _br = bkRefresh; bkRefresh = function(){ _br.apply(this, arguments); try { bkFoot(); } catch (e) {} }; }
+document.addEventListener('change', e => { const t = e.target; if (t && t.dataset && t.dataset.bkauto){ S.bulk = S.bulk || {}; S.bulk.auto = t.value; dirty = true; bkFoot(); toast(t.value === 'off' ? L('ปิดขาย/ย่อยอัตโนมัติ', 'Auto sell/salvage off') : t.value === 'sell' ? L('เก็บของแล้วขายตามเกรดที่ตั้งทันที (ชิ้นที่ล็อคไม่โดน)', 'Picked-up gear is sold by your grade settings (locked pieces are safe)') : L('เก็บของแล้วย่อยตามเกรดที่ตั้งทันที (ชิ้นที่ล็อคไม่โดน)', 'Picked-up gear is salvaged by your grade settings (locked pieces are safe)')); } });

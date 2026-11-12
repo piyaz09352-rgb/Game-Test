@@ -67,9 +67,9 @@ function aqPlanFor(tr){
   pickTarget = function(){ if (!BOT.on || !aqOn() || !AQ.types || !AQ.types.length) return _pt.apply(this, arguments);
     const th = threats().filter(m => !BOT.skip.has(m)); if (th.length) return th.sort(tgtCmp)[0];
     if (AQ.plan && AQ.plan.mode === 'elite' && MS.eliteM && !MS.eliteM.dead) return MS.eliteM;
-    return mobs.filter(m => !m.dead && !m.vanish && AQ.types.includes(m.type) && !BOT.skip.has(m) && dist(m, P) < BOT_CFG.seek * 1.6).sort(tgtCmp)[0] || null; }; }
+    return mobs.filter(m => !m.dead && !m.vanish && AQ.types.includes(m.type) && !BOT.skip.has(m) && !botShun(m) && dist(m, P) < BOT_CFG.seek * 1.6).sort(tgtCmp)[0] || null; }; }   // (v269) not one Auto keeps away from (by a gate): picking it again and again froze Auto
 function aqGo(x, y){ if (P.sit){ P.sit = false; renderHotbar(); } BOT.resting = false; P.target = null; P.pending = null; BOT.roam = null; P.tx = x; P.ty = y;
-  if (!P.ride && Math.hypot(x - P.x, y - P.y) > 260 && !threats().length){ P.ride = true; renderHotbar(); } }
+  if (!P.ride && canRideNow() && Math.hypot(x - P.x, y - P.y) > 260 && !threats().length){ P.ride = true; renderHotbar(); } }
 { const _ub = updBot;
   updBot = function(dt){
     if (!BOT.on || !aqOn() || BOT.pause > 0 || P.dead || (typeof DG !== 'undefined' && DG.active)) { AQ.types = null; return _ub.apply(this, arguments); }
@@ -83,7 +83,7 @@ function aqGo(x, y){ if (P.sit){ P.sit = false; renderHotbar(); } BOT.resting = 
       if (p.item && !fighting){ if (P.loot && P.loot.id === p.item && LOOT.includes(P.loot)) return;
         const l = LOOT.filter(q => q.id === p.item && Math.hypot(q.x - P.x, q.y - P.y) < 420).sort((a, b) => Math.hypot(a.x - P.x, a.y - P.y) - Math.hypot(b.x - P.x, b.y - P.y))[0];
         if (l){ if (P.sit){ P.sit = false; renderHotbar(); } BOT.resting = false; P.target = null; P.pending = null; P.tx = null; P.loot = l; BOT.state = 'quest'; renderBotChip(); return; } }
-      if (!P.target || P.target.dead){ const want = mobs.filter(m => !m.dead && p.types && p.types.includes(m.type)).sort((a, b) => dist(a, P) - dist(b, P))[0] || (p.mode === 'elite' ? MS.elite : null);
+      if (!P.target || P.target.dead){ const want = mobs.filter(m => !m.dead && p.types && p.types.includes(m.type) && !BOT.skip.has(m) && !botShun(m)).sort((a, b) => dist(a, P) - dist(b, P))[0] || (p.mode === 'elite' ? MS.elite : null);
         if (want && dist(want, P) > BOT_CFG.seek * 1.5 && !fighting){ BOT.roam = {x:want.x, y:want.y}; } }
       const r = _ub.apply(this, arguments); if (BOT.state === 'roam' || BOT.state === 'hunt') BOT.state = 'quest'; renderBotChip(); return r; }
     AQ.types = null;

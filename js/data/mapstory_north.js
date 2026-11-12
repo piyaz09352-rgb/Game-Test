@@ -1,5 +1,5 @@
 /* VAYRATHEN — js/data/mapstory_north.js — (v217) map stories, the north road: «ประทีปพันดวง» (The Thousand Lamps)
-   19 maps, Lv 230–350, from the lands of darkness up to the lands of light: the forest temple ruins, the mire, the
+   19 maps, Lv 210–300, from the lands of darkness up to the lands of light: the forest temple ruins, the mire, the
    caves and the glowcap forest, the cemetery and the tomb of kings, Laplae, the cursed spire, the naga underworld, the
    crimson lake and the asura labyrinth, then Himmapan, the floating gardens, the Milky Way, Mount Meru, the crystal
    palace, the gate of Tavatimsa and the Throne of the Sun. (The Floating Deva City is a town, not a chapter.)
@@ -46,7 +46,7 @@ Object.assign(MS_CH, {
   6:{npc:msNN('ms_lungmuang', 'ลุงเหมือง', 'Uncle Mueang', 'วิญญาณคนขุดแร่ใจดี', 'Kind miner\'s ghost', 'm', 2, 'hairAsh', 'irisBr', {armor:'s_knight', head:'ms_h_minerwrap'}),
     title:['ตะเกียงของคนขุดแร่', "The Miner's Lamp"], cos:'ms_h_minerwrap',
     kh:['ถ้ำนี้ลึกจัง… ข้าได้ยินเสียงใครเคาะหินอยู่ข้างใน', 'This cave goes so deep… I can hear someone tapping stone inside.'], steps:[
-    {k:'kill', t:'cavespider', n:12, say:['อย่ากลัวนะหนู ลุงตายในถ้ำนี้นานแล้ว แต่ยังห่วงลูกน้อง แมงมุมถ้ำล้อมพวกเขาไว้ ช่วยไล่ 12 ตัวที', 'Don\'t be scared, child — I died in this cave long ago but still watch over my crew. Cave spiders have them surrounded; drive off 12.'],
+    {k:'kill', t:'cavespider', n:12, say:['อย่ากลัวนะหนู ลุงตายในถ้ำนี้นานแล้ว แต่ยังห่วงลูกน้อง ฝูงต่อถ้ำล้อมพวกเขาไว้ ช่วยไล่ 12 ตัวที', 'Don\'t be scared, child — I died in this cave long ago but still watch over my crew. Cave hornets have them surrounded; drive off 12.'],
       done:['ลูกน้องลุงปลอดภัยแล้ว… ลุงทำตะเกียงหายตอนถ้ำถล่ม ถ้าได้คืน ลุงจะได้นำทางพวกเขาออกไป', 'My crew are safe… I lost my lamp when the tunnel fell in. If I had it back, I could lead them out.']},
     {k:'item', t:'m_firemillipede', n:5, say:['ไส้ตะเกียงลุงทำจากเปลือกตะขาบไฟ ช่วยหามา 5 ชิ้นนะ', 'My lamp wick was made from fire-millipede shell. Bring me 5 pieces.'],
       done:['ตะเกียงลุงสว่างอีกครั้ง! ลุงนำลูกน้องออกจากถ้ำแล้ว… ประทีปดวงที่สามติดแล้ว!', 'My lamp burns again! I have led my crew out of the cave… the third lamp is lit!']},

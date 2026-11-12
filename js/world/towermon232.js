@@ -37,7 +37,7 @@ function twmonSpot(){
   const gk = NPCS.find(n => n.id === 'gatekeeper') || {x:VSPAWN.x + 200, y:VSPAWN.y - 300}, c = {x:gk.x + 160, y:gk.y + 70};
   for (let t = 0; t < 160; t++){ const a = t * 2.39, d = t * 7, x = Math.round(c.x + Math.cos(a) * d), y = Math.round(c.y + Math.sin(a) * d * .7);
     if (!walkable(x, y, 46) || !walkable(x, y + 30, 20)) continue;
-    if (NPCS.some(n => n !== TWMON && Math.hypot(n.x - x, n.y - y) < 110)) continue;
+    if (NPCS.some(n => n !== TWMON && Math.hypot(n.x - x, n.y - y) < 150)) continue;
     if (PROPS.some(p => Math.abs(p.x - x) < 80 && p.y > y - 60 && p.y < y + 60 && ['vshop', 'sala', 'armytent', 'house', 'shrine', 'tbld'].includes(p.type))) continue;
     return {x, y}; }
   return c;
@@ -47,7 +47,7 @@ function twmonSpot(){
     // no tree or bush in front of or behind the spire (buildings stay; the spot already keeps clear of them)
     const keep = new Set(['vshop', 'sala', 'armytent', 'house', 'shrine', 'tbld', 'tland', 'lamp']);
     for (let i = PROPS.length - 1; i >= 0; i--){ const p = PROPS[i]; if (keep.has(p.type)) continue; const im = propImg(p.type, p.variant), half = (im.w || 40) / 2;
-      const overX = Math.abs(p.x - at.x) < 62 + half, overY = p.y - (im.ay || 40) < at.y + 4 && p.y > at.y - 262;
+      const overX = Math.abs(p.x - at.x) < 125 + half, overY = p.y - (im.ay || 40) < at.y + 4 && p.y > at.y - 340;   // (v259) the wider monument
       if (overX && overY){ PROPS.splice(i, 1); for (let j = obstacles.length - 1; j >= 0; j--) if (obstacles[j].prop === p) obstacles.splice(j, 1); } }
     return r; }; }
 NPC_OPEN.tw_monument = () => { closeDialog(); openWin('tower'); };
@@ -55,10 +55,10 @@ NPC_OPEN.tw_monument = () => { closeDialog(); openWin('tower'); };
 { const _d = drawNpcW; drawNpcW = function(g, n){ if (!n || !n.mon) return _d.apply(this, arguments);
     const im = propImg('twmonument', 0), x = n.x - cam.x, y = n.y - cam.y; if (x < -im.w || x > VW + im.w || y < -20 || y - im.h > VH) return;
     drawPropW(g, {type:'twmonument', variant:0, x:n.x, y:n.y}, im, x, y);
-    const b = .55 + Math.sin(T * 2.4) * .2; g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y - 236, 1, x, y - 236, 22); gr.addColorStop(0, `rgba(255,236,160,${b})`); gr.addColorStop(1, 'rgba(255,200,90,0)'); g.fillStyle = gr; g.fillRect(x - 24, y - 260, 48, 48); g.restore(); }; }
+    const b = .55 + Math.sin(T * 2.4) * .2; g.save(); g.globalCompositeOperation = 'lighter'; const by = typeof TWMON_TOP !== 'undefined' ? TWMON_TOP : 236, gr = g.createRadialGradient(x, y - by, 1, x, y - by, 22); gr.addColorStop(0, `rgba(255,236,160,${b})`); gr.addColorStop(1, 'rgba(255,200,90,0)'); g.fillStyle = gr; g.fillRect(x - 24, y - by - 24, 48, 48); g.restore(); }; }
 // tapping anywhere on the picture walks you to its foot (the usual NPC tap only reaches the base)
 cv.addEventListener('pointerdown', e => { if (MAP_ID !== 0 || !TWMON.x || P.target) return; const p = typeof worldPt === 'function' ? worldPt(e) : null; if (!p) return;
-  if (Math.abs(p.x - TWMON.x) < 48 && p.y < TWMON.y + 6 && p.y > TWMON.y - 250){ P.npc = TWMON; P.tx = null; P.cast = null; P.pending = null; } });
+  if (Math.abs(p.x - TWMON.x) < 100 && p.y < TWMON.y + 6 && p.y > TWMON.y - 320){ P.npc = TWMON; P.tx = null; P.cast = null; P.pending = null; } });
 // the tower leaves the menu rail (it is entered at the monument now)
 function twmonRail(){ document.querySelectorAll('.mb[data-win="tower"]').forEach(b => b.remove()); }
 twmonRail(); window.addEventListener('DOMContentLoaded', twmonRail); setTimeout(twmonRail, 1500);

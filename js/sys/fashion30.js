@@ -540,7 +540,7 @@ renderWardrobe = function(){
     return `<button class="cosit grand${on ? ' on' : ''}${sel === id ? ' sel' : ''}" data-costry="${id}"><i class="cosw" data-cth="${id}" style="--c1:${fwSwatch(id, 0)};--c2:${fwSwatch(id, 1)}"></i><b>${itemName2(id)}</b>
       <small>${on ? L('สวมอยู่', 'Wearing') : own ? L('มีแล้ว', 'Owned') : tr ? `<em class="trial">${L('ทดลองฟรี', 'Free trial')}</em>` : L('ยังไม่มี', 'Locked')}</small></button>`; };
   const price = id => { const p = (COSTUME[id] || WINGS[id] || XCOS[id] || {}).price; return p ? (p.z ? `${fmtN(p.z)} ${CUR()}` : `${p.c} ${L('เหรียญ', 'coins')}`) : ''; };
-  const ids = fwIds(FW.tab), owned = ids.filter(cosHave).length;
+  const ids = fwIds(FW.tab).filter(cosHave), owned = ids.length;   // (v274) the owner: the wardrobe lists only what you own (browse and buy in the Coin Shop)
   pane.innerHTML = eqTabs() + `<div class="cosw2 fw">
     <div class="eqstage"><div class="eqaura"><i></i><canvas id="eqPrev"></canvas></div>
       <div class="eqplate"><b>${escH(S.name || nm(JOBS[S.job]))}</b><small>${sel ? `${L('ลองสวม', 'Trying on')}: ${itemName2(sel)}` : L('ชุดแฟชั่นไม่เปลี่ยนค่าพลัง', 'Costumes never change stats')}</small></div>
@@ -551,8 +551,8 @@ renderWardrobe = function(){
         ${XMOUNT[sel] ? `<p class="hint">${L('แสดงตอนขี่พาหนะ (R)', 'Shows while riding (R)')}</p>` : cosUsable(sel) && typeof dyeUI === 'function' && !COSTUME[sel] || (COSTUME[sel] && COSTUME[sel].slot !== 'mask') ? dyeUI(sel) : ''}</div>` : ''}
     </div>
     <div class="wrcol"><div class="wrtabs">${FW_TABS.map(([k, th, en]) => `<button class="${k === FW.tab ? 'on' : ''}" data-fwtab="${k}">${L(th, en)}</button>`).join('')}</div>
-      <div class="cosgrid fwgrid"><div class="sec">${L(...FW_TABS.find(x => x[0] === FW.tab).slice(1))} <span class="ct">${owned}/${ids.length}</span></div>
-        <div class="coslist">${ids.map(tile).join('')}</div>
+      <div class="cosgrid fwgrid"><div class="sec">${L(...FW_TABS.find(x => x[0] === FW.tab).slice(1))} <span class="ct">${L('มี', 'own')} ${owned}</span></div>
+        <div class="coslist">${ids.map(tile).join('')}</div>${ids.length ? '' : `<div class="fwempty"><p>${L('ยังไม่มีชุดในหมวดนี้', 'Nothing in this section yet')}</p><button class="btn gold" data-cshopen="1">◈ ${L('ไปร้านค้าเหรียญ', 'Go to the Coin Shop')}</button></div>`}
         <p class="hint">${L('เป็นของทั้งบัญชี ทุกตัวละครใช้ได้ · ซื้อถาวรได้ที่ช่างตัดชุดในนครอาเรน', 'Shared by your whole account · buy to keep from the tailor in Aren')}</p></div></div></div>`;
   const grid = pane.querySelector('.fwgrid'); if (grid) grid.scrollTop = FW.top[FW.tab] || 0;
   drawEquipPrev();

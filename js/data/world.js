@@ -1,5 +1,5 @@
 /* VAYRATHEN — js/data/world.js
-   The realm: the capital Aren + 30 regions on four roads (monsters Lv 1–350), 130 monster
+   The realm: the capital Aren + 30 regions on four roads (monsters Lv 1–300), 130 monster
    species built from the archetypes in gfx/beasts.js, one boss per map with its own skill set, the loot each
    species drops, boss cards, armour/headgear sold at the central market, and the market's daily prices.
    Monster stats come from one level curve (statsFor) so every map scales evenly. */
@@ -70,7 +70,7 @@ const SPECIES = [
   // 6 ถ้ำหินปูนเชียงดาว
   ['vampirebat', 'ค้างคาวแวมไพร์ถ้ำ', 'Cave Vampire Bat', 53, 'bird', {body:'#8a7a80', wing:'#5a4a52', bat:true, ears:1.5, noseLeaf:'#c88a8a', eyeGlow:'#ff3a3a', size:1.1}, 'shadow', 'brute', 's', {aggro:true, k:{spd:18}}],
   ['giantscorpion', 'แมงป่องช้าง', 'Giant Scorpion', 56, 'bug', {shell:'#2a2a3a', leg:'#3a3a4a', acc:'#c84a3a', kind:'scorpion'}, 'earth', 'insect', 'm', {aggro:true, k:{atk:1.2}}],
-  ['cavespider', 'แมงมุมถ้ำตาบอด', 'Blind Cave Spider', 55, 'bug', {shell:'#d8d0c8', leg:'#a89890', acc:'#8a7a70', kind:'spider', eyeGlow:'#a0e0ff'}, 'shadow', 'insect', 'm', {}],
+  ['cavespider', 'ต่อถ้ำตาซีด', 'Pale Cave Hornet', 55, 'bug', {shell:'#e6dcc2', leg:'#b8a888', acc:'#5a4a3a', kind:'hornet', eyeGlow:'#a0e0ff'}, 'shadow', 'insect', 'm', {}],
   ['stalagwalker', 'หินงอกเดินได้', 'Walking Stalagmite', 58, 'rock', {col:'#a8a090', acc:'#8a8274', eye:'#7ae0ff', form:'spire', crystals:'#c8f0ff'}, 'earth', 'formless', 'm', {k:{def:2.2, hp:1.3, spd:-10}}],
   ['firemillipede', 'กิ้งกือไฟ', 'Fire Millipede', 54, 'serpent', {skin:'#a8301a', belly:'#2a1a14', stripe:'#2a1a14', legs:true, len:1.1, rise:0, thick:.8}, 'fire', 'insect', 'm', {}],
   ['minerspirit', 'วิญญาณคนขุดแร่', "Miner's Spirit", 60, 'floater', {col:'#c8d8e0', kind:'wisp', lamp:'#ffd36a', dark:'#5a4a32', tails:2}, 'shadow', 'undead', 's', {aggro:true, range:120, shot:'ice'}],
@@ -100,7 +100,7 @@ const SPECIES = [
   ['stonenaga', 'นาคหินเจ็ดเศียร', 'Seven-headed Stone Naga', 90, 'serpent', {skin:'#9a948a', belly:'#7a756c', hood:'#a8a298', heads:7, spread:2.6, len:1.2, rise:10, thick:1.1, eyeGlow:'#7ae0ff'}, 'earth', 'formless', 'l', {k:{def:2, hp:1.3}, range:130, shot:'ice'}],
   ['khmerlion', 'สิงห์ขอม', 'Khmer Lion', 86, 'quad', {skin:'#c08870', belly:'#9a6a50', mane:'#9a6a50', ruff:true, head:'cat', tuft:true, eyeGlow:'#ffd36a', girth:1.1}, 'earth', 'formless', 'm', {k:{def:1.8}}],
   ['stoneapsara', 'อัปสราศิลา', 'Stone Apsara', 88, 'human', {skin:'#b0a898', top:'#a0988a', pants:'#a0988a', hair:'#8a8274', hat:'lomphok', hatCol:'#c8b48a', skirt:true, skirtTrim:'gold', iris:'irisGr'}, 'holy', 'formless', 'm', {range:130, shot:'holy'}],
-  ['khmerghost', 'ทหารขอมผี', 'Ghost Khmer Warrior', 87, 'human', {skin:'#8a9aa0', top:'#8a9aa0', sleeve:false, pants:'#6a4a2a', skirt:true, skirtTrim:'gold', hair:'#2a2a2a', hat:'band', hatCol:'#c8a040', weapon:'sword', iris:'irisBl'}, 'shadow', 'undead', 'm', {aggro:true}],
+  ['khmerghost', 'หมาจิ้งจอกปราสาทหิน', 'Sanctuary Jackal', 87, 'quad', {skin:'#8a6a44', belly:'#d8c4a0', stripe:'#3a2a1a', head:'dog', len:1, leg:1.05, girth:.85}, 'shadow', 'brute', 'm', {aggro:true}],
   ['carvedmonkey', 'ลิงหินแกะสลัก', 'Carved Stone Monkey', 85, 'human', {skin:'#9a948a', top:'#8a8478', pants:'#8a8478', hair:'#7a746a', tail:'#9a948a', sleeve:false, short:true}, 'earth', 'formless', 's', {k:{def:1.8, spd:10}}],
   ['sanctuarybat', 'ค้างคาวปราสาท', 'Sanctuary Bat', 89, 'bird', {body:'#6a4a2a', wing:'#4a3420', bat:true, ears:1.2, noseLeaf:'#a86a4a', eyeGlow:'#ffd36a'}, 'shadow', 'brute', 's', {aggro:true, k:{spd:18}}],
   // 11 ชายฝั่งอันดามัน
@@ -182,7 +182,7 @@ const SPECIES = [
   /* v27: folk creatures of the old capital (กรุงเก่าอโยธยา) */
   ['ayutyaksha', 'ยักษ์เฝ้ากรุงเก่า', 'Old Capital Yaksha', 113, 'human', {skin:'#3a8a6a', top:'#c8a040', pants:'#8a2a2a', hair:'#1a1a1a', hat:'lomphok', hatCol:'#e3b04b', fangs:true, weapon:'sword', necklace:true, iris:'irisGr', body:'brute'}, 'earth', 'demon', 'l', {aggro:true, k:{hp:1.3}}],
   ['krahangluang', 'กระหังกรุงเก่า', 'Old Capital Krahang', 116, 'human', {skin:'#6a5a4a', top:'#2a2a24', pants:'#3a2a1a', hair:'#141210', wings:'#c8a060', kradong:true, pestle:true, fangs:true, beard:true, size:1.35, body:'gaunt'}, 'wind', 'undead', 'm', {aggro:true}],
-  ['moatkappa', 'กัปปะคูเมือง', 'Moat Kappa', 109, 'human', {skin:'#5a9a5a', top:'#5a9a5a', pants:'#4a7a4a', hair:'#1a3a2a', shell:'#6a5a2a', beak:'#d8b040', dish:'#c8d0c0', sleeve:false, iris:'irisGd', size:1.35}, 'water', 'fish', 's', {}],
+  ['moatkappa', 'ตะพาบคูเมือง', 'Moat Softshell Turtle', 109, 'squat', {skin:'#6a7a5a', shell:'#5a6a48', belly:'#e8e0c8', kind:'turtle', scute:'#7a8a68', headStripe:'#c8c0a0', size:1.25}, 'water', 'fish', 's', {}],
   ['nangtani', 'ผีนางตานี', 'Lady Tani', 117, 'human', {skin:'#d8e8c8', top:'#5a9a3a', pants:'#3a6a2a', hair:'#0a140a', longHair:true, leaves:'#6aa83a', iris:'irisGr', body:'man', size:1.3}, 'earth', 'undead', 'm', {aggro:true}]
 ];
 
@@ -191,10 +191,10 @@ const SPECIES = [
 const BOSSES = [
   ['whitemonkeyking', 'พญาลิงเผือก', 'White Monkey King', 24, 'human', {skin:'#f4f0e8', top:'#e3b04b', pants:'#c83a2a', hair:'#f4f0e8', tail:'#f4f0e8', hat:'band', hatCol:'#e3b04b', weapon:'staff', sleeve:false, fangs:true}, 'wind', 'brute', ['slam', 'summon', 'charge']],
   ['lotusturtle', 'พญาเต่าบัวหลวง', 'Lotus Turtle Lord', 32, 'squat', {skin:'#6a7a3e', shell:'#4a5a2e', belly:'#e0d6a4', kind:'turtle', lotus:true}, 'water', 'brute', ['quake', 'heal', 'summon']],
-  ['aikhiam', 'ไอ้เคี่ยมจระเข้ยักษ์', 'Ai Khiam the Great Crocodile', 41, 'quad', {skin:'#3d4a2e', belly:'#c8c28a', stripe:'#252e1c', head:'croc', len:1.65, leg:.45, girth:1.12}, 'water', 'brute', ['charge', 'slam', 'roar']],
+  ['aikhiam', 'ไอ้เคี่ยมพญาตะกวด', 'Ai Khiam the Monitor King', 41, 'quad', {skin:'#4a4a2e', belly:'#e0d6a0', stripe:'#22220f', spots:'#e8cc60', head:'lizard', len:1.65, leg:.45, girth:1.12}, 'water', 'brute', ['charge', 'slam', 'roar']],
   ['marketmatron', 'นางพรายแม่ค้า', 'Wraith Matron of the Market', 49, 'human', {skin:'#c8d8e0', top:'#a83a5a', pants:'#3a2a4a', hair:'#1a1a2a', skirt:true, skirtTrim:'gold', longHair:true, hat:'ngob', necklace:true, cape:'#3a1a3a', iris:'irisVi'}, 'shadow', 'undead', ['teleport', 'summon', 'field', 'barrage']],
   ['dvarapala', 'ทวารบาลยักษ์ศิลา', 'Stone Dvarapala Giant', 57, 'human', {skin:'#a8a090', top:'#8a8274', pants:'#7a7266', hair:'#6a6458', hat:'lomphok', hatCol:'#b8a888', fangs:true, weapon:'sword', iris:'irisGr'}, 'earth', 'formless', ['slam', 'wave', 'quake', 'enrage']],
-  ['cavematriarch', 'พญาแมงมุมถ้ำมืด', 'Matriarch of the Dark Cave', 65, 'bug', {shell:'#2a1a2a', leg:'#3a2a3a', acc:'#c83a6a', kind:'spider', eyeGlow:'#ff3a6a'}, 'shadow', 'insect', ['field', 'summon', 'barrage', 'teleport']],
+  ['cavematriarch', 'นางพญาต่อถ้ำมืด', 'Hornet Queen of the Dark Cave', 65, 'bug', {shell:'#c8902a', leg:'#3a2418', acc:'#2a1418', kind:'hornet', eyeGlow:'#ff3a6a', crown:true}, 'shadow', 'insect', ['field', 'summon', 'barrage', 'teleport']],
   ['saming', 'พญาเสือสมิงดอย', 'Saming, the Highland Werething Tiger', 73, 'quad', {skin:'#d97424', belly:'#f6efe0', stripe:'#16120e', head:'cat', len:1.25, girth:1.1, eyeGlow:'#ffd36a'}, 'wind', 'demon', ['charge', 'teleport', 'roar', 'enrage']],
   ['elderpop', 'ผีปอบเฒ่า', 'Elder Pop', 81, 'human', {skin:'#b8b0a8', top:'#4a4440', pants:'#3a3430', hair:'#e8e4dc', longHair:true, fangs:true, beard:true, iris:'irisVi'}, 'shadow', 'undead', ['heal', 'summon', 'field', 'barrage']],
   ['khankhak', 'พญาคันคาก', 'Phaya Khankhak, the Toad King', 89, 'squat', {skin:'#7a6a3a', belly:'#e8dcb0', stripe:'#2a1e10', kind:'toad', warts:true, crown:true}, 'water', 'brute', ['meteor', 'heal', 'summon', 'charge']],
@@ -277,7 +277,7 @@ SPECIES.push(
   ['redpuma', 'เสือผาแดง', 'Red Cliff Puma', 0, 'quad', {skin:'#b8643a', belly:'#f0d0a8', head:'cat', len:1.05, eyeGlow:'#ffd36a'}, 'fire', 'brute', 'm', {aggro:true, k:{spd:16, atk:1.15}}],
   ['rockhawk', 'เหยี่ยวเพเรกรินผาแดง', 'Red Cliff Peregrine', 0, 'bird', {body:'#4a5260', wing:'#3a4250', belly:'#ece4d4', bars:'#3a3a44', beak:'#e8c050', hook:true}, 'wind', 'brute', 's', {range:140, shot:'dart'}],
   ['rattleviper', 'งูกะปะผาแดง', 'Red Rock Viper', 0, 'serpent', {skin:'#a84a2a', belly:'#e8b880', stripe:'#5a2010', len:1}, 'earth', 'brute', 's', {aggro:true, k:{atk:1.2}}],
-  ['canyonspider', 'แมงมุมหุบเขา', 'Canyon Spider', 0, 'bug', {shell:'#6a2a1a', leg:'#4a1a10', acc:'#e8a050', kind:'spider'}, 'earth', 'insect', 'm', {aggro:true}],
+  ['canyonspider', 'ต่อหัวเสือหุบเขา', 'Canyon Tiger Hornet', 0, 'bug', {shell:'#d88a2a', leg:'#5a3018', acc:'#3a1e10', kind:'hornet'}, 'earth', 'insect', 'm', {aggro:true}],
   ['redgolem', 'หินแดงเดินได้', 'Red Rock Golem', 0, 'rock', {col:'#b85a3a', acc:'#8a3a22', eye:'#ffb04a', strata:true, bulk:1.1}, 'earth', 'formless', 'l', {k:{def:2.2, hp:1.4, spd:-12}}],
   ['banditghost', 'วิญญาณโจรผา', 'Canyon Bandit Shade', 0, 'human', {skin:'#c8b8a8', top:'#6a2a1a', pants:'#3a2a1a', hair:'#2a1a1a', hat:'headwrap', weapon:'sword', iris:'irisGr'}, 'shadow', 'undead', 'm', {aggro:true}],
   // 23 ทุ่งลาวา
@@ -304,13 +304,13 @@ SPECIES.push(
   // 26 ทะเลสาบน้ำแข็ง
   ['frosttoad', 'คางคกน้ำแข็ง', 'Frost Toad', 0, 'squat', {skin:'#7ab0d8', belly:'#e8f4ff', stripe:'#c8e0f0', kind:'toad'}, 'water', 'fish', 's', {}],
   ['snowfox', 'จิ้งจอกหิมะ', 'Snow Fox', 0, 'quad', {skin:'#f4f8ff', belly:'#ffffff', head:'dog', len:.9, eyeGlow:'#7ae0ff', tuft:true}, 'water', 'brute', 's', {aggro:true, k:{spd:16}}],
-  ['icefisher', 'ผีชาวประมงน้ำแข็ง', 'Frozen Fisher', 0, 'human', {skin:'#c8dce8', top:'#3a5a7a', pants:'#2a3a5a', hair:'#e8f0f8', hat:'ngob', weapon:'staff', beard:true, iris:'irisBl'}, 'water', 'undead', 'm', {}],
+  ['icefisher', 'นกกระเต็นน้ำแข็ง', 'Ice Kingfisher', 0, 'bird', {body:'#4a8ac8', wing:'#2a5a9a', belly:'#f0f4f8', beak:'#2a2a2a', tail:'short', beakLen:1.5, size:.9}, 'water', 'brute', 'm', {}],
   ['frostjelly', 'เจลลี่น้ำแข็ง', 'Frost Jelly', 0, 'slime', {col:'#a8e0ff', emissive:true, spikes:true, topCol:'#e8f8ff'}, 'water', 'formless', 's', {range:110, shot:'ice'}],
   ['snowowl', 'นกเค้าหิมะ', 'Snow Owl', 0, 'bird', {body:'#f4f8ff', wing:'#d8e4f0', belly:'#ffffff', bars:'#5a5a64', beak:'#3a3a3a', tail:'short'}, 'wind', 'brute', 's', {range:130, shot:'ice'}],
   ['icecrab', 'ปูน้ำแข็ง', 'Ice Crab', 0, 'bug', {shell:'#7ab0e0', leg:'#5a8ac0', acc:'#e8f8ff', kind:'crab', bigClaw:true}, 'water', 'fish', 'm', {k:{def:1.8}}],
   // 27 ถ้ำน้ำแข็งนิรันดร์
   ['icebat', 'ค้างคาวน้ำแข็ง', 'Ice Bat', 0, 'bird', {body:'#5a7a9a', wing:'#3a5a7a', bat:true, eyeGlow:'#7ae0ff', wingGlow:'#c8f4ff', ears:1.3}, 'water', 'brute', 's', {aggro:true, k:{spd:18}}],
-  ['frostspider', 'แมงมุมผลึกน้ำแข็ง', 'Crystal Frost Spider', 0, 'bug', {shell:'#a8d0f0', leg:'#7aa8d0', acc:'#e8f8ff', kind:'spider', eyeGlow:'#7ae0ff'}, 'water', 'insect', 'm', {aggro:true}],
+  ['frostspider', 'แตนผลึกน้ำแข็ง', 'Crystal Frost Wasp', 0, 'bug', {shell:'#a8d0f0', leg:'#5a88b0', acc:'#2a4a6a', kind:'wasp', eyeGlow:'#7ae0ff'}, 'water', 'insect', 'm', {aggro:true}],
   ['crystalgolem', 'หุ่นผลึกน้ำแข็ง', 'Crystal Golem', 0, 'rock', {col:'#c8e8f8', acc:'#7ab8e0', eye:'#7ae0ff', crystals:'#e8f8ff', bulk:.95}, 'water', 'formless', 'l', {k:{def:2.4, hp:1.4, spd:-12}}],
   ['iceworm', 'หนอนน้ำแข็ง', 'Ice Worm', 0, 'serpent', {skin:'#e8f4ff', belly:'#c8dce8', grub:true, len:1.1, rise:5}, 'water', 'insect', 'm', {k:{hp:1.3, spd:-6}}],
   ['frostwisp', 'วิญญาณเยือกแข็ง', 'Frost Wisp', 0, 'floater', {col:'#c8f0ff', kind:'wisp', spikes:true, glow:'#e8fbff', dark:'#2a4a6a'}, 'water', 'formless', 's', {range:130, shot:'ice'}],
@@ -323,7 +323,7 @@ SPECIES.push(
   ['iceslime', 'เมือกน้ำแข็งใส', 'Clear Ice Ooze', 0, 'slime', {col:'#e8f8ff', topCol:'#a8d8f0'}, 'water', 'formless', 's', {}],
   ['icewyrm', 'นาคน้ำแข็ง', 'Ice Wyrm', 0, 'serpent', {skin:'#a8d0f0', belly:'#f4f8ff', hood:'#7ab0e0', len:1.3, rise:12, thick:1.2, eyeGlow:'#7ae0ff'}, 'water', 'dragon', 'l', {k:{hp:1.4}}],
   // 29 ป้อมน้ำแข็งพญาหิมะ
-  ['frostknight', 'อัศวินน้ำแข็ง', 'Frost Knight', 0, 'human', {skin:'#a8c8e0', top:'#4a6a8a', pants:'#2a3a5a', hair:'#e8f0f8', hat:'lomphok', hatCol:'#c8e0f0', weapon:'sword', cape:'#3a5a8a', iris:'irisBl'}, 'water', 'human', 'm', {aggro:true, k:{def:1.6}}],
+  ['frostknight', 'หมีขาวป้อมน้ำแข็ง', 'Citadel Polar Bear', 0, 'quad', {skin:'#ecf0f2', muzzle:'#c8ccd0', head:'bear', girth:1.3, len:1.05, shaggy:true}, 'water', 'brute', 'l', {aggro:true, k:{def:1.6}}],
   ['icegargoyle', 'การ์กอยล์น้ำแข็ง', 'Ice Gargoyle', 0, 'bird', {body:'#7a8a9a', wing:'#5a6a7a', bat:true, eyeGlow:'#7ae0ff', size:1.3, horns:'#c8e0f0', snout:true}, 'water', 'formless', 'm', {aggro:true, k:{def:1.8}}],
   ['snowlion', 'สิงโตหิมะแผงคราม', 'Turquoise-maned Snow Lion', 0, 'quad', {skin:'#f4f8ff', belly:'#e8f0f8', mane:'#3ac8b0', ruff:true, head:'cat', tuft:true, shaggy:true}, 'water', 'dragon', 'l', {aggro:true, k:{atk:1.25}}],
   ['frostwraith', 'วิญญาณป้อมน้ำแข็ง', 'Citadel Wraith', 0, 'floater', {col:'#6a8ac8', kind:'wisp', hood:true, spikes:true, dark:'#1a2a4a', glow:'#e8f8ff', tails:5}, 'shadow', 'undead', 's', {range:140, shot:'ice', night:true}],
@@ -344,7 +344,7 @@ BOSSES.push(
   ['ashwolfking', 'ราชาหมาป่าเถ้า', 'Ash Wolf King', 0, 'quad', {skin:'#4a4444', belly:'#8a8080', mane:'#ff6a1a', ruff:true, head:'dog', girth:1.25, eyeGlow:'#ff6a1a'}, 'fire', 'brute', ['charge', 'summon', 'roar', 'enrage']],
   ['agnilord', 'จอมเวทอัคนี', 'Agni, Lord of the Crater', 0, 'human', {skin:'#c83a1a', top:'#ffb04a', pants:'#8a1a10', hair:'#ffd04a', hat:'lomphok', hatCol:'#ffd04a', horns:'#2a1a1a', weapon:'staff', cape:'#c83a1a', iris:'irisGr'}, 'fire', 'demon', ['meteor', 'wave', 'teleport', 'field', 'enrage']],
   ['iceturtlelord', 'พญาเต่าน้ำแข็ง', 'Ice Turtle Lord', 0, 'squat', {skin:'#7ab0d8', shell:'#c8e8f8', belly:'#f4f8ff', kind:'turtle', size:1.3}, 'water', 'brute', ['quake', 'heal', 'barrage']],
-  ['frostqueen', 'ราชินีแมงมุมน้ำแข็ง', 'Frost Spider Queen', 0, 'bug', {shell:'#c8e8f8', leg:'#3a6a9a', acc:'#ffffff', kind:'spider', eyeGlow:'#7ae0ff', crown:true}, 'water', 'insect', ['field', 'summon', 'barrage', 'teleport']],
+  ['frostqueen', 'ราชินีผึ้งน้ำแข็ง', 'Frost Bee Queen', 0, 'bug', {shell:'#d8f0ff', leg:'#3a6a9a', acc:'#2a4a7a', kind:'bee', eyeGlow:'#7ae0ff', crown:true}, 'water', 'insect', ['field', 'summon', 'barrage', 'teleport']],
   ['mammothking', 'พญาช้างแมมมอธ', 'Mammoth King', 0, 'quad', {skin:'#4a2e1c', belly:'#6a4a32', acc:'#f4ecd8', mane:'#c8c0b0', head:'elephant', tusks:'curved', crown:true, girth:1.45, shaggy:true, eyeGlow:'#7ae0ff'}, 'earth', 'brute', ['charge', 'quake', 'roar', 'enrage']],
   ['snowking', 'พญาหิมะ', 'The Snow King', 0, 'human', {skin:'#c8e0f0', top:'#e8f4ff', pants:'#7aa8d0', hair:'#ffffff', hat:'lomphok', hatCol:'#c8e8f8', beard:true, weapon:'sword', cape:'#a8d0f0', iris:'irisBl'}, 'water', 'demon', ['wave', 'barrage', 'summon', 'heal', 'enrage']],
   ['asuraking', 'ราชาอสูรไวรา', 'Vaira, the Asura King', 0, 'human', {skin:'#8a1a2a', top:'#1a0a10', pants:'#0a0508', hair:'#1a1a1a', fangs:true, horns:'#f0d070', hornLen:4, weapon:'sword', cape:'#2a0a14', iris:'irisVi'}, 'shadow', 'demon', ['meteor', 'teleport', 'summon', 'wave', 'heal', 'enrage']]
@@ -365,18 +365,18 @@ MAPS.push(
 /* ---------- the realm's layout ----------
    The capital Aren (map 0) sits in the middle. Four roads leave it: east through the fertile lands (Lv 5–75),
    south through the arid lands into the volcano (Lv 70–163), west into the frozen lands (Lv 150–235) and north
-   through the lands of darkness up to the lands of light (Lv 230–350). Each map links back toward the capital and
+   through the lands of darkness up to the lands of light (Lv 210–300). Each map links back toward the capital and
    on to the next one; levels rise the farther you go. */
 const LANDS = {
   capital:['นครหลวง', 'Capital', '#e3b04b'], fertile:['ดินแดนอุดมสมบูรณ์', 'Fertile Lands', '#5aa84a'], arid:['ดินแดนแห้งแล้ง', 'Arid Lands', '#d0a050'],
   volcanic:['ดินแดนภูเขาไฟ', 'Volcanic Lands', '#e0502a'], frozen:['ดินแดนเหน็บหนาว', 'Frozen Lands', '#6ab0e0'], dark:['ดินแดนแห่งความมืด', 'Lands of Darkness', '#8a5ab0'], light:['ดินแดนแห่งแสงสว่าง', 'Lands of Light', '#f0d070']};
 const ROADS = {e:[1, 2, 3, 4, 11, 12, 15], s:[9, 10, 13, 21, 22, 23, 24, 25], w:[7, 26, 27, 28, 19, 29], n:[5, 6, 8, 16, 17, 18, 14, 20, 30]};
-/* east road 5–74, south 70–163, west 150–235, north 230–350 (LVMAP) */
-/* monsters reach Lv 350 (heroes stop at 300): the first half of the world keeps its levels, the later roads are
-   stretched so the last region is 335–350 and its boss ~358. EXP is NOT changed by this: every monster still gives
-   the EXP of the level its map had before (LVINV), so levelling speed stays exactly as it was. */
-const LVMAP = L => (L <= 150 ? L : Math.round(150 + (L - 150) * 200 / 150));
-const LVINV = L => (L <= 150 ? L : 150 + (L - 150) * 150 / 200);
+/* (v253) maps end at Lv 300, the hero's top level (they were stretched to 350: seven maps sat above anything a hero
+   could reach). Levels are the raw ones again: east 5–74, south 70–160, west 150–214, north 210–300. EXP was always
+   the raw level's (LVINV), so levelling speed is exactly as before; monsters past Lv 150 are now their own level's
+   strength instead of the stretched one. Bosses stay a few levels above their map. */
+const LVMAP = L => L;
+const LVINV = L => L;
 const ROAD_LV_RAW = {e:[[5, 15], [14, 24], [23, 33], [32, 42], [41, 52], [50, 62], [60, 74]],
   s:[[70, 82], [80, 92], [90, 102], [100, 112], [110, 122], [120, 134], [132, 146], [144, 160]],
   w:[[150, 162], [160, 172], [170, 182], [180, 192], [190, 202], [200, 214]],
@@ -454,7 +454,7 @@ const BOSS_CARD_BONUS = [{str:3, vit:2}, {vit:4, hpPct:.05}, {dex:3, agi:2}, {in
   {str:6, def:10}, {str:6, atkPct:.06}, {int:7, matkPct:.06}, {agi:6, crit:6}, {int:8, matkPct:.08}, {vit:8, hpPct:.1}, {dex:7, atkPct:.06}, {vit:9, def:16}, {all:5, spPct:.1}, {all:8, atkPct:.08, matkPct:.08}];
 BOSSES.forEach(([id, th, en, lvl, arch, look, elem, race, skills], i) => {
   const st = statsFor(lvl, {hp:28, atk:.8, def:1, exp:22, delay:1.5}, LVINV(lvl)), card = `c_${id}`;
-  BEAST.make(id, {arch, race, boss:true, ...look, scale:arch === 'human' ? 1.7 : arch === 'squat' || arch === 'bug' ? 2.6 : 2.2, fs:arch === 'human' ? 128 : 150});
+  BEAST.make(id, {arch, race, boss:true, ...look, scale:arch === 'human' ? 1.7 : arch === 'bug' && /^(hornet|wasp|bee)$/.test(look.kind || '') ? 1.9 : arch === 'squat' || arch === 'bug' ? 2.6 : 2.2, fs:arch === 'human' ? 128 : 150});
   const b = BOSS_CARD_BONUS[i % BOSS_CARD_BONUS.length], pt = (all) => Object.keys(b).map(k => { const v = b[k]; return k === 'all' ? `${all} +${v}` : /Pct$/.test(k) ? `${{hp:'Max HP', sp:'Max SP', atk:'ATK', matk:'MATK'}[k.replace('Pct', '')]} +${Math.round(v * 100)}%` : k === 'crit' ? `CRIT +${v}%` : `${k.toUpperCase()} +${v}`; }).join(', ');
   CARDS[card] = {name:`Card ${th}`, en:`${en} Card`, slot:CARD_HOME[CARD_SLOTS[i % CARD_SLOTS.length]] || CARD_SLOTS[i % CARD_SLOTS.length], bonus:b, desc:[pt('ทุก Stat'), pt('All Stats')]};
   MOB[id] = {name:th, en, ...st, defPct:.05, elem, race, size:'l', r:30, aggro:true, boss:true, bossSkills:skills,

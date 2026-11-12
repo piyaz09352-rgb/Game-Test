@@ -15,6 +15,9 @@ const TUT = [
   {t:['ค่าสถานะ', 'Stats'], d:() => [`เปิดหน้า Status ${touchUI() ? '(ปุ่มเมนูขวาบน)' : '(กด A)'} แล้วกด + เพิ่ม STR หรือ DEX สักแต้ม`, `Open Status ${touchUI() ? '(menu, top right)' : '(press A)'} and press + on STR or DEX`], hl:'.mb[data-win="stat"]', init:s => { s.p = S.statPts; }, done:s => S.statPts < s.p},
   {t:['ยา', 'Potions'], d:() => [`ยาแดงฟื้น HP ${touchUI() ? 'กดปุ่มยาข้างจอย' : 'กดเลข 7 หรือคลิกช่องยาในแถบลัด'} · ลองดื่มสักขวดเมื่อ HP ลด หรือกด "เข้าใจแล้ว"`, `Red Potions restore HP: ${touchUI() ? 'tap the potion button by the stick' : 'press 7 or click the potion slot'} · drink one when hurt, or press "Got it"`], ev:'potion', next:true, hl:'#mobaPot,.hot.pot,[data-hot="6"]'},
   {t:['เควสต์แรก', 'First quest'], d:['เดินไปหาครูวายรา (ฤๅษีหมวกลายเสือ มีเครื่องหมาย ! ) แล้วกดรับเควสต์บทที่ 0', 'Walk to Master Vayra (the hermit in the tiger hat, with the !) and accept Chapter 0'], arrow:'npc', done:() => !!qState().active || (qState().done || {}).main0},
+  // (v274) the free helper robot: most newcomers never found Uncle Boonma by themselves
+  {t:['หุ่นผู้ช่วยเก็บของฟรี', 'A free helper robot'], d:['ไปหาลุงบุญมา คนเลี้ยงสัตว์ (ลูกศรสีทองชี้อยู่) แล้วเลือกรับหุ่นผู้ช่วยฟรี 1 ตัว · มันจะบินไปเก็บของที่ดรอปให้ตลอด', 'Visit Uncle Boonma, the Beast Keeper (the gold arrow points at him), and take a free helper robot · it flies off to pick up your drops for good'],
+    arrow:'npc', npc:'beastkeeper', go:'beastkeeper', done:() => !!(S.helperFree || (S.helper && HELPERS[S.helper.k]))},
   {t:['แผนที่โลก', 'World map'], d:() => [`เปิดแผนที่โลก ${touchUI() ? '(เมนู → แผนที่โลก)' : '(กด M)'} ดูแคว้นทั้งหมดและจุดที่คุณอยู่`, `Open the world map ${touchUI() ? '(menu → World map)' : '(press M)'} to see every region and where you are`], hl:'.mb[data-win="world"]', done:() => !!UIS.open.world},
   {t:['ภารกิจรายวัน', 'Daily tasks'], d:() => [`ทุกวันมีภารกิจ 3 อย่างให้เหรียญวายรา ดูได้ที่หน้าต่างเควสต์ ${touchUI() ? '(เมนู → เควสต์)' : '(กด J)'}`, `Three tasks a day pay Vayra Coins: see the Quest window ${touchUI() ? '(menu → Quests)' : '(press J)'}`], hl:'.mb[data-win="quest"]', done:() => !!UIS.open.quest},
   {t:['พร้อมผจญภัยแล้ว!', 'Ready to adventure!'], d:['เก่งมาก! ถึง Job Lv 10 แล้วไปหาครูวายราเพื่อเลือกอาชีพ · วิกิ (K) มีข้อมูลทุกอย่างในเกม · ขอให้สนุกนะ', 'Well done! At Job Lv 10, visit Master Vayra to choose a class · the Wiki (K) has everything · have fun'], next:true, last:true}
@@ -39,12 +42,15 @@ function tutShow(){
   const d = typeof st.d === 'function' ? st.d() : st.d;
   b.innerHTML = `<div class="tuth"><span class="tutn">${S.tut.i + 1}/${TUT.length}</span><b>${L(...st.t)}</b><button class="tutx" data-tutskip="1">${L('ข้ามบทสอน', 'Skip tutorial')}</button></div>
     <p>${L(...d)}</p><div class="tutdots">${TUT.map((_, i) => `<i class="${i < S.tut.i ? 'ok' : i === S.tut.i ? 'on' : ''}"></i>`).join('')}</div>
-    ${st.next ? `<button class="btn gold sm" data-tutnext="1">${st.last ? L('เริ่มผจญภัย', 'Start adventuring') : S.tut.i === 0 ? L('เริ่มเลย', "Let's go") : L('เข้าใจแล้ว', 'Got it')}</button>` : ''}`;
+    ${st.go ? `<button class="btn sm" data-tutgo="${st.go}">${L('พาไป', 'Take me there')}</button>` : ''}    ${st.next ? `<button class="btn gold sm" data-tutnext="1">${st.last ? L('เริ่มผจญภัย', 'Start adventuring') : S.tut.i === 0 ? L('เริ่มเลย', "Let's go") : L('เข้าใจแล้ว', 'Got it')}</button>` : ''}`;
   b.hidden = false; b.style.zIndex = ++zTop; b.classList.remove('pop'); void b.offsetWidth; b.classList.add('pop');
   document.querySelectorAll('.tut-hl').forEach(e => e.classList.remove('tut-hl'));
   if (st.hl) document.querySelectorAll(st.hl).forEach(e => { if (e.offsetParent !== null) e.classList.add('tut-hl'); });
   if (st.hl && st.hl.includes('data-win')){ const rt = el('railTog'); if (rt && el('rail') && el('rail').classList.contains('folded')) rt.classList.add('tut-hl'); }
 }
+document.addEventListener('click', e => { const g = e.target.closest && e.target.closest('[data-tutgo]'); if (!g || !tutOn()) return;   // (v274) walk to the NPC the step talks about
+  if (MAP_ID !== 0){ toast(L('กลับนครอาเรนก่อนนะ (ผู้เฝ้าศาลที่แคมป์วาร์ปกลับฟรี)', 'Go back to Aren first (the camp Shrine Keeper warps you home free)')); return; }
+  const n = NPCS.find(x => x.id === g.dataset.tutgo); if (n){ P.npc = n; P.target = null; P.tx = null; P.cast = null; } });
 document.addEventListener('click', e => { const t = e.target.closest && e.target.closest('[data-tutnext],[data-tutskip]'); if (!t || !tutOn()) return;
   if (t.dataset.tutskip){ askConfirm(L('ข้ามบทสอน', 'Skip tutorial'), L('ข้ามบทสอนทั้งหมดใช่ไหม? (จะไม่ได้รับรางวัล)', 'Skip the whole tutorial? (no reward)'), L('ข้าม', 'Skip'), () => tutFinish(true)); return; }
   tutGo(S.tut.i + 1); });
@@ -56,7 +62,7 @@ EV.on('draw', () => {
   const st = tutOn(); if (!st || !st.arrow || PAUSED) return; let t = null;
   if (st.arrow === 'mob'){ let bd = 1e9; for (const m of mobs){ if (m.dead || m.def.boss || m.minion) continue; const d = Math.hypot(m.x - P.x, m.y - P.y); if (d < bd){ bd = d; t = {x:m.x, y:m.y - MOB_H[m.type] - 16}; } } }
   else if (st.arrow === 'loot'){ const l = nearestLoot(600); if (l) t = {x:l.x, y:l.y - 24}; }
-  else if (st.arrow === 'npc' && MAP_ID === 0){ const n = NPCS.find(n => n.id === 'job'); if (n) t = {x:n.x, y:n.y - 92}; }
+  else if (st.arrow === 'npc' && MAP_ID === 0){ const n = NPCS.find(n => n.id === (st.npc || 'job')); if (n) t = {x:n.x, y:n.y - 92}; }
   if (!t) return; const x = sx(t.x), y = sy(t.y) - Math.abs(Math.sin(T * 4)) * 10, z = clamp(PX / 2, .5, 2.6);
   ctx.save(); ctx.fillStyle = '#ffd76a'; ctx.strokeStyle = '#3a1a04'; ctx.lineWidth = 2.5 * z; ctx.shadowColor = 'rgba(255,200,80,.9)'; ctx.shadowBlur = 12 * z;
   ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 10 * z, y - 12 * z); ctx.lineTo(x - 4 * z, y - 12 * z); ctx.lineTo(x - 4 * z, y - 24 * z); ctx.lineTo(x + 4 * z, y - 24 * z); ctx.lineTo(x + 4 * z, y - 12 * z); ctx.lineTo(x + 10 * z, y - 12 * z); ctx.closePath();

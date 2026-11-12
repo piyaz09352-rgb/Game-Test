@@ -103,13 +103,14 @@ function paintBiome(g, B, mapId){
   if (typeof groundDetail === 'function') groundDetail(g, B, mapId);   // (v154) soil, tufts, stones, litter, cracks (world/ground2.js)
   // trails from every gate to the middle of the map
   const road = (w, col) => { for (const tr of TRAIL.lines){ g.beginPath(); tr.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.strokeStyle = col; g.lineWidth = w; g.stroke(); } };
-  road(52, B.road[0]); road(44, B.road[1]); road(34, B.road[2]);
-  if (B.plank) for (const tr of TRAIL.lines) for (let i = 0; i < tr.length; i += 1){ const [x, y] = tr[i]; g.fillStyle = 'rgba(40,20,10,.35)'; g.fillRect(x - .7, y - 20, 1.4, 40); }
-  for (const tr of TRAIL.lines) for (let i = 0; i < tr.length * 2; i++){ const [x, y] = tr[Math.floor(R() * tr.length)]; g.fillStyle = R() < .5 ? 'rgba(60,40,20,.3)' : 'rgba(255,240,200,.22)'; g.beginPath(); g.ellipse(x + (R() - .5) * 36, y + (R() - .5) * 36, .8 + R() * 1.6, .6 + R(), R() * 3, 0, 7); g.fill(); }
+  const NOROAD = true;   // (v263) the owner: no dirt roads on any map (the trail still keeps ponds and props out of the way)
+  if (!NOROAD){ road(52, B.road[0]); road(44, B.road[1]); road(34, B.road[2]); }
+  if (!NOROAD && B.plank) for (const tr of TRAIL.lines) for (let i = 0; i < tr.length; i += 1){ const [x, y] = tr[i]; g.fillStyle = 'rgba(40,20,10,.35)'; g.fillRect(x - .7, y - 20, 1.4, 40); }
+  if (!NOROAD) for (const tr of TRAIL.lines) for (let i = 0; i < tr.length * 2; i++){ const [x, y] = tr[Math.floor(R() * tr.length)]; g.fillStyle = R() < .5 ? 'rgba(60,40,20,.3)' : 'rgba(255,240,200,.22)'; g.beginPath(); g.ellipse(x + (R() - .5) * 36, y + (R() - .5) * 36, .8 + R() * 1.6, .6 + R(), R() * 3, 0, 7); g.fill(); }
   // grass blades
   // (v85) one path per colour, stroked once: the same blades as before, ~80,000 fewer stroke calls on every map load
   if (B.blades){ const paths = B.blades.map(() => new Path2D());
-    for (let i = 0; i < B.bladeN; i++){ const x = R() * W, y = R() * H; if (trailD(x, y) < 22) continue;
+    for (let i = 0; i < B.bladeN; i++){ const x = R() * W, y = R() * H;
       const p = paths[Math.floor(R() * B.blades.length)]; p.moveTo(x, y); p.lineTo(x + (R() - .5) * 2, y - 2.4 - R() * 3.5); }
     g.lineWidth = .7; paths.forEach((p, k) => { g.strokeStyle = B.blades[k]; g.stroke(p); }); }
   // flowers
@@ -178,7 +179,7 @@ function placeBiomeProps(B, mapId){
     const hitWater = obstacles.some(o => o.water && Math.hypot(o.x - x, o.y - y) < o.r + (water ? -6 : 18));
     if (water ? !obstacles.some(o => o.water && Math.hypot(o.x - x, o.y - y) < o.r + 34) && type[0] !== 'reed' : hitWater) continue;
     if (!water && obstacles.some(o => !o.water && Math.hypot(o.x - x, o.y - y) < o.r + 30)) continue;
-    addProp(type[0], x, y, Math.floor(R() * type[2])); n++;
+    addProp(type[0], x, y, type[3] === 'green' ? 2 * Math.floor(R() * type[2] / 2) : Math.floor(R() * type[2])); n++;   // (v286) 'green': a pine in a green land takes only the green (even) shapes
   }
 }
 

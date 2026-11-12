@@ -1,9 +1,56 @@
 {
   "hosting": {
     "public": ".",
-    "ignore": ["firebase.json", "firebase/**", "**/.*", "docs/**", "tools/**", "*.md", "tests/**", "node_modules/**", "package.json", "package-lock.json"],
-    "headers": [{ "source": "**/*.@(js|css)", "headers": [{ "key": "Cache-Control", "value": "max-age=300" }] }]
+    "ignore": [
+      "firebase.json",
+      "firebase/**",
+      "**/.*",
+      "docs/**",
+      "tools/**",
+      "*.md",
+      "tests/**",
+      "node_modules/**",
+      "package.json",
+      "package-lock.json",
+      "_headers"
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Content-Security-Policy",
+            "value": "default-src 'self'; script-src 'self' https://www.gstatic.com https://www.google.com https://www.recaptcha.net https://*.firebasedatabase.app https://*.firebaseio.com 'sha256-X6TN4kj8kiCBUH3S3enmmSJGzIVXUZsOxVBiuROzMVQ=' 'sha256-odDyp5ZIfnQZkQXYyCQ9NaUWXsudHBtqZyNKqfnNlIM='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' data: blob:; worker-src 'self' blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://www.google.com; frame-src https://*.firebaseapp.com https://www.google.com https://recaptcha.google.com https://www.recaptcha.net; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'"
+          },
+          {
+            "key": "X-Content-Type-Options",
+            "value": "nosniff"
+          },
+          {
+            "key": "Referrer-Policy",
+            "value": "strict-origin-when-cross-origin"
+          },
+          {
+            "key": "Permissions-Policy",
+            "value": "camera=(), microphone=(), geolocation=(), payment=()"
+          }
+        ]
+      },
+      {
+        "source": "**/*.@(js|css)",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "max-age=300"
+          }
+        ]
+      }
+    ]
   },
-  "firestore": { "rules": "firebase/firestore.rules" },
-  "database": { "rules": "firebase/database.rules.json" }
+  "firestore": {
+    "rules": "firebase/firestore.rules"
+  },
+  "database": {
+    "rules": "firebase/database.rules.json"
+  }
 }

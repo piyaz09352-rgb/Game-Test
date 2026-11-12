@@ -645,8 +645,109 @@ function drawElephant(cx, R){
   G(); E(add(hd, [0, 6.2, -1]), 2.2, 1.4, M.gold);
   return mul(add(hd, [0, 2, 4]), K);
 }
+/* (v280) robot mounts from the coin shop, built like the deer so the rider sits astride and the whole thing is pixel art
+   in the hero's own sprite: a mech steed, a mecha tiger, a two-legged walker and an iron dragon */
+function drawRoboMount(cx, R){
+  const ph = R.ph, mv = R.moving, B = R.bob, K = 1.32, kind = R.robo;
+  const E = (c, rx, ry, m, o = {}) => ell(cx, mul(c, K), rx * K, ry * K, m, o.rz ? {...o, rz:o.rz * K} : o);
+  const C = (a, b, r0, r1, m, o = {}) => cap(cx, mul(a, K), mul(b, K), r0 * K, r1 * K, m, o);
+  let gid = 200; const G = () => (cx.gid = gid++);
+  const panel = () => (n => (n[1] < -.55 ? {m:M.charcoal, t:1} : undefined));
+  const quadLegs = (hipY, legM, jointM, footM, thick, spread) => {
+    for (const [sd, z, off] of [[-1, 6.5, 0], [1, 6.5, Math.PI], [-1, -7, Math.PI], [1, -7, 0]]){
+      G(); const sw = mv ? Math.sin(ph + off) * .55 : 0, lift = mv ? Math.max(0, Math.cos(ph + off)) * 2.2 : 0;
+      const top = [sd * spread, hipY + B, z], knee = add(top, rotX([0, -(hipY * .48), 0], -(sw * 1.1 + (z < 0 ? -.3 : .15))));
+      const foot = add(knee, rotX([0, -(hipY * .5), 0], -(sw * .5 + (z < 0 ? .4 : -.1) - lift * .12))); foot[1] = Math.max(foot[1], .5 + lift * .5);
+      C(top, knee, thick, thick * .75, legM); C(knee, foot, thick * .7, thick * .6, legM);
+      G(); E(knee, thick * .75, thick * .75, jointM); G(); E(add(foot, [0, .1, .5]), thick * .9, .8, footM, {rz:thick * 1.2}); } };
+  if (kind === 'robosteed' || kind === 'robounicorn'){
+    const uni = kind === 'robounicorn', body = uni ? M.featherW : M.steel, glow = uni ? M.tipPink : M.tipAqua, trim = uni ? M.gold : M.charcoal;
+    quadLegs(13.5, body, glow, trim, 2.1, 2.8);
+    const coat = uni ? (n => (Math.sin(n[2] * 9) > .9 && n[1] > -.3 ? {m:M.gold, t:1} : undefined)) : panel();
+    G(); E([0, 15.6 + B, -6.6], 6.0, 5.7, body, {tex:coat}); G(); E([0, 15.2 + B, 0], 6.6, 5.9, body, {tex:coat}); G(); E([0, 15.4 + B, 6.2], 6.2, 6.0, body, {tex:coat});
+    for (const sd of [-1, 1]){ G(); E([sd * 6.2, 15.2 + B, 0], .9, 1.2, glow, {rz:5}); }
+    G(); E([0, 20.3 + B, -.8], 6.4, 2.4, uni ? M.tipViolet : M.charcoal, {rz:2.4, tex:n => (Math.abs(n[0]) > .8 || Math.abs(n[2]) > .8 ? {m:M.gold} : undefined)});
+    const hb = mv ? Math.sin(ph * 2) * .6 : Math.sin(ph) * .3;
+    if (uni){ // a flowing tail and mane of coloured light
+      const tails = [M.tipPink, M.tipAqua, M.tipViolet];
+      for (let i = 0; i < 5; i++){ G(); E([Math.sin(ph + i) * .6 * i, 17.5 + B - i * 1.6, -12.5 - i * 1.5], 1.9 - i * .2, 1.6 - i * .15, tails[i % 3]); }
+    } else { G(); const t0 = [0, 16.5 + B, -12.6], t1 = add(t0, [Math.sin(ph), -3.5, -4.5]); C(t0, t1, 1, .7, M.charcoal); G(); E(t1, 1, 1, glow); }
+    G(); C([0, 18.5 + B, 8.5], [0, 25.5 + B + hb, 11.2], 3.2, 2.6, body, {tex:n => (!uni && n[2] < -.5 ? {m:M.tipAqua} : undefined)});
+    if (uni){ const mane = [M.tipPink, M.tipAqua, M.tipViolet, M.tipPink, M.tipAqua]; for (let i = 0; i < 5; i++){ const k = i / 4; G(); E([Math.sin(ph * 2 + i) * .5, 19.5 + B + k * 7.5 + hb * k, 7.2 + k * 3.2 - 1.6], 1.5, 1.8, mane[i]); } }
+    const hd = [0, 27.6 + B + hb, 12.6];
+    G(); E(hd, 3.8, 3.6, body, {tex:n => (n[2] > .1 && Math.abs(n[1] - .15) < .16 ? {m:glow} : undefined)});
+    G(); C(add(hd, [0, -.6, 1.6]), add(hd, [0, -1.8, 5.2]), 2.3, 1.7, body, {tex:(n, lo, q, t) => (t > .8 ? {m:trim} : undefined)});
+    if (uni){ G(); const h0 = add(hd, [0, 2.6, 1.2]), h1 = add(hd, [0, 9.6, 4.6]); C(h0, h1, 1.1, .25, M.gold, {tex:(n, lo, q, t) => (Math.sin(t * 22) > .3 ? {m:M.crown} : undefined)}); G(); E(h1, .7, .7, M.tipViolet);
+      for (const sd of [-1, 1]){ G(); C(add(hd, [sd * 2.2, 2.4, -1]), add(hd, [sd * 2.8, 4.6, -1.8]), .8, .3, M.featherW); } }
+    else for (const sd of [-1, 1]){ G(); const a0 = add(hd, [sd * 1.6, 3.2, -.8]), a1 = add(hd, [sd * 2.6, 7.6, -2.4]); C(a0, a1, .55, .4, M.charcoal); G(); E(a1, .8, .8, M.tipAqua); }
+    return mul(add(hd, [0, -1.6, 4.2]), K);
+  }
+  if (kind === 'robodrake'){
+    // a walking mecha dragon: red armour with gold plates, folded wings, a spiked tail, horns and a glowing jaw
+    quadLegs(12.6, M.charcoal, M.lanternGlow, M.gold, 2.6, 3.6);
+    const coat = n => (n[1] < -.35 ? {m:M.gold} : Math.sin(n[2] * 8) > .75 && n[1] > .2 ? {m:M.charcoal, t:1} : undefined);
+    G(); E([0, 15 + B, -6.6], 6.4, 5.4, M.scarlet, {tex:coat}); G(); E([0, 15 + B, 0], 7.0, 5.8, M.scarlet, {tex:coat}); G(); E([0, 15.2 + B, 6.2], 6.6, 5.6, M.scarlet, {tex:coat});
+    G(); E([0, 20.3 + B, -.8], 6.2, 2.4, M.charcoal, {rz:2.4, tex:n => (Math.abs(n[0]) > .8 || Math.abs(n[2]) > .8 ? {m:M.gold} : undefined)});
+    for (let i = 0; i < 4; i++){ G(); C([0, 20 + B, -9 + i * 4.5], [0, 23 + B, -10 + i * 4.5], 1.1, .2, M.gold); }   // back spines
+    for (const sd of [-1, 1]){ const r0 = [sd * 6, 19 + B, 2], fl = Math.sin(ph) * (mv ? .6 : .3);   // folded wings
+      G(); C(r0, [sd * 9, 25 + B + fl, -3], 1, .6, M.charcoal); C([sd * 9, 25 + B + fl, -3], [sd * 8, 18 + B, -9], .7, .4, M.charcoal);
+      G(); E([sd * 8, 21 + B + fl * .5, -4], 1.2, 4.2, M.crimson, {rz:5, tex:n => (n[1] > .6 ? {m:M.gold} : undefined)}); }
+    for (let i = 0; i < 6; i++){ const z = -11 - i * 3, y = 15.5 + B - i * 1.5 + Math.sin(ph - i * .7) * .7; G(); E([Math.sin(ph * .8 - i * .6) * i * .3, y, z], 2.8 - i * .35, 2.5 - i * .32, i % 2 ? M.gold : M.scarlet); }
+    G(); E([0, 8 + B, -29], 1.6, 1.4, M.gold, {rz:2.6});   // tail blade
+    const hb = mv ? Math.sin(ph * 2) * .6 : Math.sin(ph) * .3;
+    G(); C([0, 18 + B, 8.5], [0, 23.5 + B + hb, 12], 3.2, 2.6, M.scarlet, {tex:n => (n[2] < -.5 ? {m:M.gold} : undefined)});
+    const hd = [0, 25 + B + hb, 14];
+    G(); E(hd, 3.8, 3.3, M.scarlet, {tex:n => (n[2] > .1 && n[1] > .05 && n[1] < .35 && Math.abs(n[0]) > .3 ? {m:M.lanternGlow} : undefined)});
+    G(); C(add(hd, [0, -.2, 1.8]), add(hd, [0, -1, 6.6]), 2.4, 1.5, M.scarlet, {tex:(n, lo, q, t) => (t > .85 ? {m:M.gold} : undefined)});
+    G(); C(add(hd, [0, -2.2, 1.6]), add(hd, [0, -2.8 - (mv ? .5 : .2), 6]), 1.5, 1, M.charcoal); G(); E(add(hd, [0, -2.4, 6]), 1.2, .8, M.lanternGlow);
+    for (const sd of [-1, 1]){ G(); C(add(hd, [sd * 2, 2.2, -1]), add(hd, [sd * 3, 6.2, -5]), .9, .3, M.gold); }
+    return mul(add(hd, [0, -1.6, 5]), K);
+  }
+  if (kind === 'robophoenix'){
+    // a mecha phoenix in flight: a golden body, great wings of red and gold plates beating, a tail of flame-coloured streamers
+    const fl = Math.sin(ph * (mv ? 1.6 : 1.1)), hov = 4;
+    for (let i = 0; i < 5; i++){ const sp = (i - 2) * 1.6; G(); C([sp * .3, 15 + B + hov, -8], [sp, 13 + B + hov - i % 2 * 2 + Math.sin(ph - i) * 1.2, -20 - (i % 3) * 3], 1.2, .4, [M.lanternGlow, M.scarlet, M.gold][i % 3]); }   // tail streamers
+    G(); E([0, 16 + B + hov, -5], 4.8, 4.4, M.gold, {tex:n => (n[1] < -.4 ? {m:M.lanternGlow} : Math.sin(n[2] * 9) > .8 ? {m:M.scarlet, t:1} : undefined)});
+    G(); E([0, 16.4 + B + hov, 1.5], 5.6, 5.2, M.gold, {tex:n => (n[1] < -.4 ? {m:M.lanternGlow} : Math.sin(n[2] * 9) > .8 ? {m:M.scarlet, t:1} : undefined)});
+    G(); E([0, 20.4 + B + hov, -.8], 5.6, 2.2, M.scarlet, {rz:2.4, tex:n => (Math.abs(n[0]) > .8 ? {m:M.gold} : undefined)});
+    for (const sd of [-1, 1]){ const root = [sd * 4.6, 19.5 + B + hov, 1], up = 5 + fl * 6;
+      const mid = [sd * 10, root[1] + 4 + up * .6, -1], tip = [sd * 15, root[1] + 9 + up, -4];
+      G(); C(root, mid, 1.3, 1, M.gold); C(mid, tip, 1, .5, M.gold); G(); E(tip, 1, 1, M.lanternGlow);
+      for (let i = 0; i < 5; i++){ const k = (i + 1) / 6; G(); E(lerp3(root, tip, k), 3.4 - i * .4, .7, i % 2 ? M.scarlet : M.crimson, {rz:4.4 - i * .5, tex:n => (n[2] < -.55 ? {m:M.gold} : undefined)}); } }
+    for (const sd of [-1, 1]){ G(); C([sd * 2.6, 12.5 + B + hov, 2], [sd * 3, 9.5 + B + hov, 3.5], .9, .6, M.charcoal); }   // tucked talons
+    const hb = Math.sin(ph) * .4;
+    G(); C([0, 18 + B + hov, 6.5], [0, 23.5 + B + hov + hb, 10], 2.4, 1.9, M.gold, {tex:n => (n[2] < -.5 ? {m:M.scarlet} : undefined)});
+    const hd = [0, 25 + B + hov + hb, 11.4];
+    G(); E(hd, 3, 2.8, M.gold, {tex:n => (n[2] > .2 && n[1] > .05 && n[1] < .35 && Math.abs(n[0]) > .35 ? {m:M.tipAqua} : undefined)});
+    G(); C(add(hd, [0, -.4, 2]), add(hd, [0, -1.6, 5.4]), 1.2, .3, M.charcoal);   // beak
+    for (let i = 0; i < 3; i++){ G(); C(add(hd, [0, 2.2, -1]), add(hd, [(i - 1) * 1.6, 6.6 - Math.abs(i - 1), -4.5]), .7, .2, [M.scarlet, M.lanternGlow, M.scarlet][i]); }   // crest
+    return null;
+  }
+  // the iron dragon: hovers, wings beating, a plated tail, thrusters glowing under it
+  const fl = Math.sin(ph * (mv ? 1.6 : 1)) * (mv ? .9 : .5), hov = 4;
+  G(); E([-2.6, 10 + B + hov, 1], 1.4, 2.6, M.tipPink); G(); E([2.6, 10 + B + hov, 1], 1.4, 2.6, M.tipPink);   // thrusters
+  for (const sd of [-1, 1]){ G(); C([sd * 3, 13 + B + hov, 4], [sd * 3.4, 9.5 + B + hov, 6], 1.3, .9, M.charcoal); G(); C([sd * 3, 13 + B + hov, -5], [sd * 3.4, 9.5 + B + hov, -4], 1.3, .9, M.charcoal); }   // tucked claws
+  const coat = n => (n[1] > .55 && Math.sin(n[2] * 8) > .2 ? {m:M.charcoal} : n[1] < -.4 ? {m:M.tech, t:1} : undefined);
+  G(); E([0, 16 + B + hov, -6], 5.4, 5, M.navy, {tex:coat}); G(); E([0, 16 + B + hov, 0], 6.2, 5.6, M.navy, {tex:coat}); G(); E([0, 16.2 + B + hov, 6], 5.6, 5.2, M.navy, {tex:coat});
+  G(); E([0, 20.6 + B + hov, -.8], 6, 2.2, M.charcoal, {rz:2.4, tex:n => (Math.abs(n[0]) > .8 ? {m:M.tipPink} : undefined)});
+  // wings: three bones each with a membrane of plates
+  for (const sd of [-1, 1]){ const root = [sd * 5, 20 + B + hov, 1], up = 6 + fl * 5;
+    const tip = [sd * 13, root[1] + 9 + up, -5], mid = [sd * 9, root[1] + 5 + up * .6, -1];   // swept up, so a side view sees them
+    G(); C(root, mid, 1.3, 1, M.steel); C(mid, tip, 1, .6, M.steel); G(); E(tip, .9, .9, M.tipPink);
+    for (let i = 0; i < 4; i++){ const k = (i + 1) / 5; G(); E(lerp3(root, tip, k), 3.2 - i * .4, .7, M.indigoD, {rz:4.2 - i * .5, tex:n => (n[2] < -.6 ? {m:M.tipPink} : undefined)}); } }
+  for (let i = 0; i < 6; i++){ const z = -11 - i * 3.2, y = 16 + B + hov - i * .6 + Math.sin(ph - i * .7) * .8; G(); E([Math.sin(ph * .8 - i * .6) * i * .35, y, z], 2.8 - i * .35, 2.6 - i * .32, i % 2 ? M.charcoal : M.navy); }
+  const hb = Math.sin(ph) * .4;
+  G(); C([0, 18 + B + hov, 8.5], [0, 24.5 + B + hov + hb, 11.5], 2.8, 2.2, M.navy, {tex:n => (n[2] < -.5 ? {m:M.charcoal} : undefined)});
+  const hd = [0, 26 + B + hov + hb, 13.4];
+  G(); E(hd, 3.6, 3.2, M.navy, {tex:n => (n[2] > .1 && n[1] > .05 && n[1] < .35 && Math.abs(n[0]) > .3 ? {m:M.tipPink} : undefined)});
+  G(); C(add(hd, [0, -.4, 1.8]), add(hd, [0, -1.2, 6.4]), 2.2, 1.4, M.steel);
+  G(); C(add(hd, [0, -2.2, 1.6]), add(hd, [0, -2.6 - (mv ? .6 : .2), 5.6]), 1.4, .9, M.charcoal);   // jaw
+  for (const sd of [-1, 1]){ G(); C(add(hd, [sd * 1.8, 2.4, -1.4]), add(hd, [sd * 2.6, 5.4, -5]), .8, .3, M.charcoal); }
+  return null;
+}
 function drawMount(cx, R){
   if (R.elephant) return drawElephant(cx, R);
+  if (R.robo) return drawRoboMount(cx, R);
   const ph = R.ph, mv = R.moving, B = R.bob, K = 1.32;
   const E = (c, rx, ry, m, o = {}) => ell(cx, mul(c, K), rx * K, ry * K, m, o.rz ? {...o, rz:o.rz * K} : o);
   const C = (a, b, r0, r1, m, o = {}) => cap(cx, mul(a, K), mul(b, K), r0 * K, r1 * K, m, o);
@@ -686,7 +787,7 @@ function drawHuman(cx, cfg, P){
   const B = P.bob, sitK = P.sit, ride = P.ride;
   const hipY = 9.5 + B, fwdLean = P.lean, tw = P.twist || 0;
   let mouth = null;
-  if (ride){ ride.elephant = cfg.mount === 'elephant'; mouth = drawMount(cx, ride); }
+  if (ride){ ride.elephant = cfg.mount === 'elephant'; ride.robo = /^robo/.test(cfg.mount || '') ? cfg.mount : null; mouth = drawMount(cx, ride); }
   if (P.fall){ const a = P.fall; cx.pre = p => { const q = rotX(p, a); return [q[0], Math.max(q[1], .6), q[2]]; }; }
   if (P.spin && !P.fall && !P.roll){ const a = P.spin, hx = P.hipX || 0; cx.pre = p => { const q = rotY([p[0] - hx, p[1], p[2]], a); return [q[0] + hx, q[1], q[2]]; }; }
   if (P.roll){ const a = P.roll, py = 8; cx.pre = p => { const q = rotX([p[0], p[1] - py, p[2]], a); return [q[0], Math.max(q[1] + py, .3), q[2]]; }; }
@@ -1484,7 +1585,9 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   if (w === 'staff' && P.ring >= 0) dir = nrm([0, 1, .25]);
   // (v211) an axe is held up the haft, not at its very end: the head sits closer to the hands and the haft runs on past the lower hand
   const axeHL = cfg.axe && w === 'sword' ? len * (two ? .8 : .7) : 0;
-  const base = add(hR, mul(dir, w === 'staff' ? -6 : -.8)), tip = axeHL ? add(base, mul(dir, axeHL)) : add(hR, mul(dir, len));
+  // (v274) the owner: a short one-handed rod is held near its end, but a long staff is gripped about the middle of the shaft
+  const midS = w === 'staff' && two && !(P.ring >= 0), stL = len + 6;
+  const base = midS ? add(hR, mul(dir, -stL * .44)) : add(hR, mul(dir, w === 'staff' ? -6 : -.8)), tip = axeHL ? add(base, mul(dir, axeHL)) : midS ? add(hR, mul(dir, stL * .56)) : add(hR, mul(dir, len));
   (cx.wsegs || (cx.wsegs = [])).push(w === 'staff' ? [proj(cx, add(tip, mul(dir, -.4))), proj(cx, add(tip, mul(dir, 3.2)))]   // (v159) a staff glows at its head only, never along the shaft
     : [proj(cx, add(base, mul(dir, kat ? 2 : 1))), proj(cx, tip)]);   // the blade in this frame
   G();
@@ -1925,7 +2028,9 @@ function mirrorArms(P){ const Q = {...P}; for (const [a, b] of [['armL', 'armR']
    extra room costs no memory. */
 let MOB_PAD = globalThis.SPR_MOB_PAD ?? .3;
 // render scale: sprites are rasterised at K pixels per world unit, then drawn back at world size
-const kOf = () => GFX.k;   // sprites are rasterised at the quality preset's density (see GFX)
+const kOf = (kind, key) => {   // sprites are rasterised at the quality preset's density (see GFX)
+  // (v268) bosses are drawn 1.6–2.6× their sheet: rasterise them that much denser, or they show as coarse blocks
+  const m = kind === 'mob' && typeof MOB !== 'undefined' && MOB[key]; return m && m.boss ? GFX.k * (GFX.budget >= 40e6 ? 1.4 : GFX.budget >= 20e6 ? 1.2 : 1) : GFX.k; };   // (v271) a boss is sharper only as far as the picture cache allows: at 1.8× one boss's strips (×3.2 pixels) filled the cache and everything was painted again and again
 function newCanvas(w, h){ if (typeof OffscreenCanvas !== 'undefined' && !globalThis.__SPR_DOM) return new OffscreenCanvas(w, h); const c = document.createElement('canvas'); c.width = w; c.height = h; return c; }
 function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
   if (kind === 'char'){
@@ -2065,6 +2170,11 @@ async function buildAll(onProgress, prewarm = []){
   return out;
 }
 /* render the remaining frames in idle time, a few frames per slice */
+/* (v268) paint a sheet's frames now, within a time budget (ms); true when every asked strip is done */
+function prime(sh, acts, ms, only = -1, nf = 99){ if (!sh || !sh.index) return true; const t0 = performance.now();
+  for (const a of acts){ if (!sh.index[a]) continue; for (let d = 0; d < 8; d++){ if ((sh.kind === 'mob' && d > 4) || (only >= 0 && d !== only)) continue;   // mobs mirror the west-facing strips
+      const e = strip(sh, a, d); for (let f = 0; f < Math.min(nf, e.done.length); f++){ if (e.done[f]) continue; frameIn(sh, e, f); if (performance.now() - t0 > ms) return false; } } }
+  return true; }
 function warm(sheets, keys){
   const todo = [];
   for (const k of keys){ const [key, act] = Array.isArray(k) ? k : [k, null]; if (!sheets[key]) continue;
@@ -2139,5 +2249,5 @@ function draw(g, sh, act, dir, t, x, y, o = {}){
   g.imageSmoothingEnabled = sm; g.imageSmoothingQuality = sq;
 }
 const prim = {ell, cap, frustum, line, dot, rotX, rotY, rotZ, add, mul, lerp3, nrm, ramp:rampOf};
-return {STATS, WDRAWS, SDRAWS, prim, heroKey, lookKey, parseLookKey, HAIR_COLORS, IRIS_COLORS, HAIR_M, HAIR_F, GEAR_LOOK, buildAll, buildSheet, sheet, ensure, warm, tick, rebuild, renderFrame, draw, frameAt, dirFromVec, DIRS, DIR_TH, ACTIONS, MOB_ACTIONS, CHARS, CHAR_ACTIONS, MOBS, MATS, M, FS, ANCHOR_Y};
+return {STATS, WDRAWS, SDRAWS, prim, prime, heroKey, lookKey, parseLookKey, HAIR_COLORS, IRIS_COLORS, HAIR_M, HAIR_F, GEAR_LOOK, buildAll, buildSheet, sheet, ensure, warm, tick, rebuild, renderFrame, draw, frameAt, dirFromVec, DIRS, DIR_TH, ACTIONS, MOB_ACTIONS, CHARS, CHAR_ACTIONS, MOBS, MATS, M, FS, ANCHOR_Y};
 })();

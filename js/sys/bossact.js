@@ -21,13 +21,13 @@
 const BA = {ctx:0, warn:[], slow:1};   // slow: a test switch that makes the swing marks last longer
 const BA_KIND = {
   slam:'heavy', quake:'heavy', trample:'heavy', leap:'heavy', ring:'heavy', boulder:'heavy', g_quake:'heavy', stampede:'dash',
-  charge:'dash', pounce:'dash', rend:'dash', dash:'dash',
+  charge:'dash', rend:'dash', dash:'dash', rush:'dash',
   bladestorm:'spin', spin:'spin',
   roar:'roar', warcry:'roar', enrage:'roar',
   teleport:'blink', shadowstep:'blink', burrow:'blink', soar:'blink', split:'blink',
   heal:'power', healaura:'power', shell:'power', summon:'power'
 };
-const BA_SIG = {meteor:'spell', pillars:'spell', curse:'spell', web:'spell', vortex:'spell', wave:'spell', quake:'heavy', pounce:'blink'};
+const BA_SIG = {meteor:'spell', pillars:'spell', curse:'spell', web:'spell', vortex:'spell', wave:'spell', quake:'heavy', rush:'dash'};
 const baKind = id => BA_KIND[id] || 'spell';
 const baCol = m => (typeof SKFX_EL !== 'undefined' && (SKFX_EL[m.def.elem] || SKFX_EL.neutral)) || ['#fff8e0', '#ffc24a', '#c9761a'];
 const baBz = m => m.def.bsz || (typeof BOSS_SZ !== 'undefined' ? BOSS_SZ : 1.6);
@@ -118,7 +118,7 @@ if (typeof bossCast === 'function') bossCast = baWrap(bossCast, (m, a, w, r) => 
   return {id, kind:baKind(id), wind:w || (id === 'charge' ? .75 : .55), name:baName(id)}; });
 if (typeof furyStart === 'function') furyStart = baWrap(furyStart, (m, a, w) => {
   const id = a[2], F = a[1], act = F && F.act;
-  const wind = w || (act && (act.wind || (id === 'leap' ? act.dur * .7 : id === 'dash' || id === 'spin' ? .5 : act.w))) || .55;
+  const wind = w || (act && (act.wind || (id === 'dash' || id === 'spin' ? .5 : act.w))) || .55;
   return {id, kind:baKind(id), wind, name:baName(id)}; });
 if (typeof sigStart === 'function') sigStart = baWrap(sigStart, m => {
   const s = m.sig; if (!s) return null;
@@ -229,14 +229,14 @@ function baHeroFx(m, b, bz){
   const x = m.x, y = m.y, e = m.def.elem || 'neutral', a = Math.atan2(P.y - y, P.x - x), ux = Math.cos(a), uy = Math.sin(a);
   const id = b.sig && m.sig ? 'sig_' + m.sig.kind : b.id, line = len => { const k = BA_LINE[e]; if (k) VFX.play(k, {x, y, ux, uy, len, tx:P.x, ty:P.y}); };
   switch (id){
-    case 'slam': case 'leap':
+    case 'slam':
       for (let i = 0; i < 4; i++){ const q = a + i * Math.PI / 2 + .4; VFX.play('earthsplit', {x, y, ux:Math.cos(q), uy:Math.sin(q), len:70 * bz}); } break;
     case 'quake': case 'ring': case 'sig_quake': VFX.play('quake', {x, y, r:90 * bz}); break;
     case 'charge': case 'dash': case 'stampede': VFX.play('charge', {x, y, x2:x + ux * 220, y2:y + uy * 220}); break;
     case 'wave': case 'breath': case 'sig_wave': line(300); if (!BA_LINE[e]) VFX.play('waveslash', {x, y, tx:P.x, ty:P.y}); break;
     case 'teleport': case 'shadowstep': VFX.play('shadowBlink', {x:b.x, y:b.y, x2:x, y2:y}); break;
     case 'summon': VFX.play('conjure', {x, y}); break;
-    case 'pounce': case 'sig_pounce': VFX.play('starPounce', {x:P.x, y:P.y, r:90}); break;
+    case 'rush': case 'sig_rush': VFX.play('charge', {x, y, x2:x + ux * 260, y2:y + uy * 260}); break;
     case 'field': case 'sig_curse': if (e === 'shadow' || id === 'sig_curse') VFX.play('hexField', {x:P.x, y:P.y, r:70, dur:3}); break;
     case 'miasma': VFX.play('smokeCloud', {x, y, r:90 * bz}); break;
     case 'pull': case 'sig_vortex': VFX.play('darkStar', {x, y, r:70 * bz}); break;

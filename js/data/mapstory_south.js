@@ -38,7 +38,7 @@ Object.assign(MS_CH, {
   37:{npc:msN('ms_baitoei', 'ใบเตย', 'Bai Toei', 'นักบวชสาวแห่งโอเอซิส', 'Oasis priestess', 'f', 13, 'hairGreen', 'irisGr', {armor:'ms_t_oasis', head:'h_wreathj'}),
     title:['โอเอซิสที่กำลังแห้ง', 'The Shrinking Oasis'], cos:'ms_t_oasis',
     kh:['โอเอซิส! น้ำที่นี่จะใช้ผสมดินบั้งไฟได้ไหมนะ', 'An oasis! Could this water mix our rocket powder?'], steps:[
-    {k:'kill', t:'oasis_crocodile', n:12, say:['จระเข้โอเอซิสดุขึ้นทุกวัน เพราะน้ำเหลือน้อยลง ช่วยไล่ 12 ตัวก่อนนะ ข้าจะได้ทำพิธีเรียกน้ำ', 'The oasis crocodiles grow fiercer as the water shrinks. Drive off 12 so I can perform the water rite.'],
+    {k:'kill', t:'oasis_crocodile', n:12, say:['ตะกวดโอเอซิสดุขึ้นทุกวัน เพราะน้ำเหลือน้อยลง ช่วยไล่ 12 ตัวก่อนนะ ข้าจะได้ทำพิธีเรียกน้ำ', 'The oasis monitors grow fiercer as the water shrinks. Drive off 12 so I can perform the water rite.'],
       done:['น้ำในสระลดลงทุกคืน เหมือนมีใครดูดมันไป… คนในชุดคลุมสีส้มแดงมาเดินวนรอบสระทุกคืนเดือนมืด', 'The pool drops every night, as if something drinks it… people in red-orange robes circle it on moonless nights.']},
     {k:'find', n:3, what:['ตราเปลวไฟที่ฝังในทราย', 'Flame seal buried in the sand'], say:['พวกนั้นฝังอะไรไว้รอบสระ 3 จุด ช่วยขุดขึ้นมาดูที', 'They buried something in three places round the pool. Dig them up.'],
       done:['ตราเปลวไฟของ «ลัทธิเปลวแล้ง»! พวกมันสาปให้น้ำระเหย… — «คนพวกนี้แหละที่ขโมยฝนไป» พิรุณกำหมัด', 'The flame seal of the «Cult of the Dry Flame»! They cursed the water away… — «These are the ones who stole the rain,» Phirun says, fists clenched.']},
@@ -102,7 +102,7 @@ Object.assign(MS_CH, {
       done:['ไร่ปลอดภัยแล้ว ยางกระบองเพชรของที่นี่เหนียวยิ่งกว่ากาวหนังวัวอีก', 'The farm is safe. Our cactus sap is stickier than hide glue.']},
     {k:'item', t:'m_cactus_beetle', n:5, say:['ด้วงกระบองเพชรช่วยทำยางเหนียวพิเศษ ข้าต้องใช้ 5 ชิ้น', 'The cactus beetles make the extra-sticky glue. I need 5 pieces.'],
       done:['ยางเหนียวพิเศษเสร็จแล้ว! ติดหางบั้งไฟเข้ากับลำได้แน่นปึ้ก', 'Extra-sticky glue, done! The tail will hold to the rocket no matter what.']},
-    {k:'elite', t:'cactus_crocodile', name:['จระเข้หนามเหล็ก', 'The Iron-spined Crocodile'], say:['จระเข้หนามเหล็กกินกระบองเพชรของข้าไปครึ่งไร่ ช่วยข้าด้วย!', 'The iron-spined crocodile has eaten half my farm! Help!'],
+    {k:'elite', t:'cactus_crocodile', name:['ตะกวดหนามเหล็ก', 'The Iron-spined Monitor'], say:['ตะกวดหนามเหล็กกินกระบองเพชรของข้าไปครึ่งไร่ ช่วยข้าด้วย!', 'The iron-spined monitor has eaten half my farm! Help!'],
       done:['เจ้ากล้าหาญมาก! กิ๊บดอกกระบองเพชรนี้ ข้าทำจากดอกที่บานแค่คืนเดียว', 'So brave! This cactus-flower pin is made from a bloom that opens for only one night.']}
   ]},
   22:{npc:msN('ms_sueanoi', 'เสือน้อย', 'Suea Noi', 'อดีตโจรกลับใจ', 'Reformed bandit', 'm', 11, 'hairCrimson', 'irisRd', {armor:'s_shadow', mask:'ms_k_bandana'}),

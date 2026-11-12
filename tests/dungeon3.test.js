@@ -13,8 +13,12 @@ test('dungeon: leave button, blessings, hazards, guardian phases and the clear r
     await page.waitForTimeout(600);
     assert.ok(await page.$('#dgLeave'), 'the leave button shows inside the dungeon');
     await page.waitForTimeout(800);
-    const pos = await page.evaluate(() => { const b = el('dgLeave').getBoundingClientRect(), m = el('mapCard').getBoundingClientRect(); return {gap:Math.round(m.left - b.right), dy:Math.round(b.top - m.top)}; });
-    assert.ok(pos.gap >= 0 && pos.gap <= 16 && Math.abs(pos.dy) <= 2, `the leave button sits beside the minimap: ${JSON.stringify(pos)}`);
+    // beside the minimap, level with its top — or stepped down below what it would cover there (v259: the chips; v274:
+    // the ◈ coin shop button), and never on top of another button
+    const pos = await page.evaluate(() => { const b = el('dgLeave').getBoundingClientRect(), m = el('mapCard').getBoundingClientRect();
+      const over = [...document.querySelectorAll('#ui button, #ui .chip, #ui [class*="chip"]')].filter(e => e.offsetWidth && !e.closest('.win,#dialog') && getComputedStyle(e).visibility !== 'hidden').map(e => e.getBoundingClientRect()).filter(o => b.left < o.right - 1 && b.right > o.left + 1 && b.top < o.bottom - 1 && b.bottom > o.top + 1).length;
+      return {gap:Math.round(m.left - b.right), dy:Math.round(b.top - m.top), mh:Math.round(m.height), over}; });
+    assert.ok(pos.gap >= 0 && pos.gap <= 16 && pos.dy >= -2 && pos.dy <= pos.mh && pos.over === 0, `the leave button sits beside the minimap, on nothing: ${JSON.stringify(pos)}`);
     // wave 1 comes, then clear it: a blessing choice appears
     await page.waitForFunction(() => DG.wave >= 1 && mobs.some(m => m.dg && !m.dead), null, { timeout: 15000 });
     await page.evaluate(() => { for (const m of mobs) if (m.dg){ m.hp = 0; m.dead = true; } });

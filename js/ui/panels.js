@@ -121,12 +121,18 @@ function confirmSkills(){
 /* ---------- hotbar ---------- */
 function hotbarDef(){
   const list = S.hot.map(id => (id && skl(id) ? {k:'skill', id} : null));
-  const best = (ids) => ids.find(id => S.inv[id] > 0) || ids[ids.length - 1];
-  list.push({k:'item', id:best(['elixirpot', 'whitepot', 'orangepot', 'redpot'])}, {k:'item', id:best(['bigbluepot', 'bluepot'])});
+  list.push({k:'item', id:potPick('hp')}, {k:'item', id:potPick('sp')});
   return list;
 }
-const bestHp = () => ['elixirpot', 'whitepot', 'orangepot', 'redpot'].find(id => S.inv[id] > 0) || 'redpot';
-const bestSp = () => ['bigbluepot', 'bluepot'].find(id => S.inv[id] > 0) || 'bluepot';
+/* (v290) the two potion slots: every HP / SP potion, strongest first (the old lists stopped at the Elixir and the Dark
+   Blue Potion, so the Divine Potion and the Sky Blue Potion were never put in the slot nor drunk by Auto). The owner
+   can hold a slot and pick one (S.potSel, js/sys/potslot290.js); that one is used while the bag has it, else the strongest. */
+const POT_LIST = k => Object.keys(ITEMS).filter(id => ITEMS[id].kind === 'use' && (k === 'hp' ? ITEMS[id].heal > 0 && !ITEMS[id].spheal : ITEMS[id].spheal > 0))
+  .sort((a, b) => (k === 'hp' ? ITEMS[b].heal - ITEMS[a].heal : ITEMS[b].spheal - ITEMS[a].spheal));
+function potPick(k){ const c = S.potSel && S.potSel[k], L = POT_LIST(k);
+  if (c && ITEMS[c] && S.inv[c] > 0) return c; return L.find(id => S.inv[id] > 0) || (c && ITEMS[c] ? c : L[L.length - 1]); }
+const bestHp = () => potPick('hp');
+const bestSp = () => potPick('sp');
 function useHot(h){ if (h.k === 'skill') trySkill(h.id); else useItem(h.id); }
 function renderHotbar(){
   if (typeof renderMoba === 'function') renderMoba();
@@ -136,8 +142,7 @@ function renderHotbar(){
     if (h.k === 'skill'){ const s = SKILLS[h.id]; return `<button class="hk ico sk-${s.elem || 'neutral'}" data-hot="${i}" title="${skName(s)}">${skillIcon(h.id)}<kbd>${i + 1}</kbd><b>${skShort(s)}</b><span class="lv">${skl(h.id)}</span><i class="cdv" data-cd="${h.id}"></i></button>`; }
     return `<button class="hk ico${i === 6 ? ' first-item' : ''}" data-hot="${i}" ${S.inv[h.id] ? '' : 'disabled'} title="${nm(ITEMS[h.id])}">${itemIcon(h.id)}<kbd>${i + 1}</kbd><b>${nm(ITEMS[h.id])}</b><span class="lv">${S.inv[h.id] || 0}</span></button>`;
   }).join('') + `<span class="hsep"></span>`
-    + `<button class="hk" data-move="roll" title="${L('กลิ้งหลบ (ไม่โดนโจมตีระหว่างกลิ้ง)', 'Dodge roll (untouchable while rolling)')}"><kbd>␣</kbd><b>${L('กลิ้ง', 'Roll')}</b><i class="cdv" data-cd="roll"></i></button>`
-    + `<button class="hk${P.ride ? ' on' : ''}" data-move="ride" title="${L('ขี่พาหนะ เร็วขึ้น 70%', 'Ride your mount, 70% faster')}"><kbd>R</kbd><b>${P.ride ? L('ลง', 'Off') : L('ขี่', 'Ride')}</b></button>`
+    + `<button class="hk${P.ride ? ' on' : ''}" data-move="ride" title="${L('ขี่สัตว์ขี่ เร็วขึ้น 30%', 'Ride your mount, 30% faster')}"><kbd>R</kbd><b>${P.ride ? L('ลง', 'Off') : L('ขี่', 'Ride')}</b></button>`
     + `<button class="hk" data-move="capture" title="${L('จับมอนที่ HP ไม่เกิน 30% มาเป็น Pet', 'Capture a monster at 30% HP or less as a pet')}"><kbd>T</kbd><b>${L('จับ', 'Catch')}</b></button>`
     + `<button class="hk${BOT.on ? ' on' : ''}" data-bot="1" title="${BOT.on ? L('ปิด Auto', 'Turn Auto off') : L('เปิด Auto', 'Turn Auto on')}"><kbd>B</kbd><b>Auto</b><span>${BOT.on ? L('เปิด', 'ON') : L('ปิด', 'OFF')}</span></button>`
     + `<button class="hk hkset" data-botset="1" title="${L('ตั้งค่า Auto (สกิล · ยา · นั่งพัก · บอส)', 'Auto settings (skills · potions · rest · bosses)')}"><kbd>⇧B</kbd><b>⚙</b><span>${L('ตั้งค่า', 'Setup')}</span></button>`

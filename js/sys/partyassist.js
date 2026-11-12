@@ -49,7 +49,7 @@ EV.on('tick', dt => {
   const d = Math.hypot(g.x - P.x, g.y - P.y);
   if (P.target && !P.target.dead && d < 320) return;                    // fighting near them: carry on
   if (d > 70){ const k = Math.max(0, d - 46) / d; P.target = null; P.pending = null; P.tx = P.x + (g.x - P.x) * k; P.ty = P.y + (g.y - P.y) * k;
-    if (d > 380 && !P.ride && typeof toggleRide === 'function' && !inVillage(P)){ P.ride = true; renderHotbar(); } }
+    if (d > 380 && !P.ride && canRideNow() && typeof toggleRide === 'function' && !inVillage(P)){ P.ride = true; renderHotbar(); } }
   else if (P.tx != null && Math.hypot(P.tx - P.x, P.ty - P.y) < 30) P.tx = null;
 });
 
@@ -62,7 +62,7 @@ EV.on('tick', dt => {
       const busy = P.target && !P.target.dead && dist(P.target, P) < 260;
       if (d > 300 && !th.length || d > 170 && !busy && !th.length){ if (P.sit){ P.sit = false; renderHotbar(); } BOT.resting = false; P.target = null; P.pending = null; BOT.roam = null;
         const k = Math.max(0, d - 50) / d; P.tx = P.x + (g.x - P.x) * k; P.ty = P.y + (g.y - P.y) * k;
-        if (d > 420 && !P.ride && !inVillage(P)){ P.ride = true; renderHotbar(); }
+        if (d > 420 && !P.ride && canRideNow() && !inVillage(P)){ P.ride = true; renderHotbar(); }
         BOT.state = 'roam'; renderBotChip(); return; } }
     return _ub.apply(this, arguments);
   };

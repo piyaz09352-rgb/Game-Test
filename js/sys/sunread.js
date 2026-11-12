@@ -8,7 +8,7 @@
 'use strict';
 
 const SR_ROOT = '.cubox,.win,.dialog,.card,.tipcard,.tutbox,.achpop,.ptyhud,#confirm';
-const SR_SKIP = '.dy,.dyesw,.tst,.tic,#buffs,.bf,.castbar,.cdv,.sw,.gdx,.wt,.dh,.btn,button.on,kbd,.hk,svg,canvas,.tcard,.tc-art,.eqaura,.iart,.rar:not(.r0),[style*="url("],.gem,.wchip,.pbar,.bar,.sl-keep';
+const SR_SKIP = '.dy,.dyesw,.tst,.tic,#buffs,.bf,.castbar,.cdv,.sw,.gdx,.wt,.dh,.btn,button.on,kbd,.hk,svg,canvas,.tcard,.tc-art,.eqaura,.iart,.rar:not(.r0),[style*="url("],.gem,.wchip,.pbar,.bar,.sl-keep,gr-x';   // (v274) gr-x: the rarity decorations (gearrar270.js), which flickered as .slt came and went
 const SR_N = '*:not(svg *)';
 const srRGBA = s => { const m = /rgba?\(([^)]+)\)/.exec(s || ''); if (!m) return null; const p = m[1].split(/[ ,\/]+/).filter(Boolean).map(Number); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; };
 const srLum = c => { const f = v => { v /= 255; return v <= .03928 ? v / 12.92 : Math.pow((v + .055) / 1.055, 2.4); }; return .2126 * f(c[0]) + .7152 * f(c[1]) + .0722 * f(c[2]); };

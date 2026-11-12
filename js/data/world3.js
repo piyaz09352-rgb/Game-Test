@@ -45,9 +45,9 @@ const W3_MAPS = [
 /* what a creature is called, by body and kind */
 const W3_NOUN = {
   'quad:bear':['หมี', 'Bear'], 'quad:bovine':['กระทิง', 'Gaur'], 'quad:cat':['เสือ', 'Cat'], 'quad:croc':['จระเข้', 'Crocodile'], 'quad:deer':['กวาง', 'Stag'], 'quad:dog':['หมาป่า', 'Wolf'],
-  'quad:elephant':['ช้าง', 'Elephant'], 'quad:horse':['ม้า', 'Steed'], 'quad:lizard':['ตะกวด', 'Lizard'], 'quad:-':['สัตว์ร้าย', 'Beast'],
+  'quad:elephant':['ช้าง', 'Elephant'], 'quad:horse':['ม้า', 'Steed'], 'quad:lizard':['ตะกวด', 'Lizard'], 'quad:boar':['หมูป่า', 'Boar'], 'quad:rat':['หนู', 'Rat'], 'quad:-':['สัตว์ร้าย', 'Beast'],
   'bird:fan':['ไก่ฟ้า', 'Pheasant'], 'bird:long':['นกหางยาว', 'Longtail'], 'bird:short':['นกน้อย', 'Finch'], 'bird:-':['เหยี่ยว', 'Hawk'],
-  'bug:beetle':['ด้วง', 'Beetle'], 'bug:crab':['ปู', 'Crab'], 'bug:scorpion':['แมงป่อง', 'Scorpion'], 'bug:shrimp':['กุ้ง', 'Shrimp'], 'bug:spider':['แมงมุม', 'Spider'], 'bug:-':['แมลง', 'Bug'],
+  'bug:beetle':['ด้วง', 'Beetle'], 'bug:ant':['มด', 'Ant'], 'bug:crab':['ปู', 'Crab'], 'bug:scorpion':['แมงป่อง', 'Scorpion'], 'bug:shrimp':['กุ้ง', 'Shrimp'], 'bug:spider':['แมงมุม', 'Spider'], 'bug:hornet':['ต่อ', 'Hornet'], 'bug:wasp':['แตน', 'Wasp'], 'bug:bee':['ผึ้ง', 'Bee'], 'bug:-':['แมลง', 'Bug'],
   'floater:jar':['ผีไห', 'Jar Spirit'], 'floater:krasue':['กระสือ', 'Krasue'], 'floater:lantern':['โคมผี', 'Lantern'], 'floater:mask':['หน้ากากผี', 'Mask'], 'floater:pearl':['ภูตมุก', 'Pearl Spirit'],
   'floater:squid':['หมึกลอยฟ้า', 'Sky Squid'], 'floater:star':['ภูตดาว', 'Star Wisp'], 'floater:vortex':['วังวน', 'Vortex'], 'floater:wisp':['ภูต', 'Wisp'], 'floater:-':['วิญญาณ', 'Spirit'],
   'human:bow':['นักธนู', 'Archer'], 'human:staff':['หมอผี', 'Shaman'], 'human:sword':['นักรบ', 'Warrior'], 'human:-':['อสูร', 'Fiend'],
@@ -67,12 +67,22 @@ function w3Tint(hex, hue, k, seed, force = 0){ const [h, s0, l0] = w3Hsl(hex); i
   const s = force ? Math.max(s0, .3 + force * .05) : s0, l = force ? clamp(l0 + (force % 2 ? -1 : 1) * .12, .1, .9) : l0;
   const dh = ((hue - h + 540) % 360) - 180, nh = h + dh * k + (seed % 40 - 20), ns = clamp(s * (.85 + (seed % 7) * .06) + .08, 0, 1);
   return w3Hex(nh, ns, clamp(l + ((seed >> 3) % 9 - 4) * .02, .06, .94)); }
+const W3_STEP = [0, 45, -45, 95, -95, 140, -140, 180];   // (v280) the owner: a region's monsters were all one colour — each species turns the region's hue by its own step
 function w3Look(look, hue, seed, force = 0){
+  hue = (hue + W3_STEP[(seed >>> 3) % W3_STEP.length] + 360) % 360;
+  const nat = look.head === 'croc' || look.head === 'rat' || look.head === 'boar';   // (v276) real furred and scaled animals keep their real colours, a little tinted (insects take the region's colours: real beetles come in every colour)   // (v274) crocodiles get a real crocodile's colours (olive hide, cream belly, dark bands), only a little tinted by the region (teal or mint ones from the lava-drake template looked like toys)
+  if (look.head === 'croc'){ look = {...look, head:'lizard', skin:'#5a5a3a', belly:'#e0d8a8', stripe:'#2a2a1a', spots:'#e8d070'}; delete look.eyeGlow; }   // (v280) the owner: no crocodiles at all — they are monitor lizards now
   const o = {}; let i = 0;
+  // (v280) the owner: monsters of one colour from head to tail. A creature keeps its own mix of colours and the whole
+  // set turns so its main colour meets the region's hue (each species its own step): several colours, still the region's kin
+  const mainC = [look.skin, look.body, look.col, look.shell, look.top].find(v => typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v)), mainH = mainC ? w3Hsl(mainC)[0] : hue, rotD = ((hue - mainH + 540) % 360) - 180;
   for (const k in look){ const v = look[k];
-    if (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v)){ o[k] = w3Tint(v, hue + (force ? i * 47 : 0), force ? .55 : i++ % 3 === 2 ? .45 : .75, (seed + i * 37) & 255, force); if (force) i++; }
+    if (!nat && !force && typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v)){ const [h0, s0, l0] = w3Hsl(v); const sd = (seed + i++ * 37) & 255;
+      o[k] = s0 < .08 && l0 > .85 ? v : w3Hex(h0 + rotD + (sd % 24 - 12), clamp(Math.max(s0, .28) * (.9 + (sd % 5) * .05), 0, 1), clamp(l0 + ((sd >> 3) % 7 - 3) * .02, .06, .94)); continue; }
+    if (typeof v === 'string' && /^#[0-9a-f]{6}$/i.test(v)){ o[k] = w3Tint(v, hue + (force ? i * 47 : 0), nat ? Math.min(.6, .18 + force * .08) : force ? .55 : i++ % 3 === 2 ? .45 : .75, (seed + i * 37) & 255, nat ? 0 : force); if (nat) i++;   /* a natural animal takes more of the region's colour only while it is still too like another */ if (force) i++; }
     else if (typeof v === 'number' && /^(len|size|girth|leg|thick|neckLen|legLen|bulk|beakLen|rise)$/.test(k)) o[k] = +(v * (.88 + ((seed + k.length * 13) % 25) / 100)).toFixed(2);
     else o[k] = Array.isArray(v) ? v.slice() : v; }
+  if (!nat && look.arch !== 'human' && typeof tpMulti === 'function') tpMulti(o, seed);   // (v280) several colours on every creature
   return o;
 }
 /* no new creature may be a near-copy of another of its body (tests/data.test.js uses the same measure) */
@@ -99,6 +109,34 @@ const W3_HABIT = {quad:['เดินหากินเป็นฝูงเล�
   squat:['หมอบนิ่งริมน้ำ แล้วกระโดดใส่ทันทีที่เผลอ', 'squats by the water and leaps the moment you look away']};
 const w3Hash = s => { let h = 2166136261; for (const c of s){ h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
 
+/* (v276) the owner: too many people and elephants among the monsters — make room for rats, ants, beetles, boars.
+   About two in three regional creatures made from a person or an elephant (unless a story quest names them) become one of these
+   instead (each region picks by its own hash, so the realm keeps its variety). Natural colours; the region still tints
+   them a little. A person who shot from afar becomes an ant that spits. Ids stay as they were (saves and quests). */
+const W3_SMALL = [
+  {arch:'quad', race:'brute', size:'s', look:{head:'rat', skin:'#6e6058', belly:'#cbbcaa', len:1, leg:1, girth:1}},
+  {arch:'bug', race:'insect', size:'s', look:{kind:'ant', shell:'#8a2a1a', leg:'#5a1a10', acc:'#3a0e08', size:1, legLen:1}},
+  {arch:'bug', race:'insect', size:'m', look:{kind:'beetle', shell:'#3a2a1a', leg:'#2a1a10', acc:'#6a4a2a', horn:true, size:1.1, legLen:1}},
+  {arch:'quad', race:'brute', size:'m', look:{head:'boar', skin:'#5a4a3a', belly:'#8a7a66', stripe:'#3a2e24', tusks:true, len:1, leg:1, girth:1}},
+  {arch:'bug', race:'insect', size:'s', look:{kind:'ant', shell:'#2a2420', leg:'#1a1614', acc:'#4a3a30', size:1.1, legLen:1}},
+  {arch:'quad', race:'brute', size:'s', look:{head:'rat', skin:'#4a4440', belly:'#9a9088', len:1.05, leg:1, girth:1}},
+  {arch:'bug', race:'insect', size:'m', look:{kind:'beetle', shell:'#2a3a1a', leg:'#1a2410', acc:'#5a7a2a', size:1, legLen:1}}];
+const W3_KEEP = new Set(['asuramaze_steed','asuramaze_warrior','aurora_fiend','aurora_stag','basalt_fiend','basalt_golem','blizzard_warrior','blizzard_wisp','cactus_crocodile','cactus_scorpion','cinder_golem','cinder_serpent','crimsonlake_elephant','crimsonlake_fiend','firefly_fiend','firefly_golem','fjord_golem','fjord_wolf','fm_clr','fm_disc','fm_mile','fm_spd','fm_story','galegorge_hawk','galegorge_wolf','gempalace_fiend','gempalace_serpent','gloom_elephant','gloom_jelly','glowcap_fiend','glowcap_stag','goldbloom_golem','goldbloom_wolf','hexspire_mask','hexspire_steed','kingtomb_elephant','kingtomb_warrior','m_banteng','m_carvedmonkey','m_celadonjar','m_dragonpearl','m_fallenstar','m_firemillipede','m_flamegaruda','m_frostwisp','m_giantclam','m_goldshrimp','m_hauntedurn','m_heavenhamsa','m_hermitcrab','m_kilen','m_offeringsquirrel','m_sakuna','m_serow','m_snowfox','m_spiritpearl','m_tormentwisp','m_wanderdurian','magmariver_golem','magmariver_serpent','mangrove_crawler','mangrove_golem','milkyway_spire','milkyway_wisp','oasis_crocodile','oasis_shaman','orchard_crawler','orchard_fiend','rainbowfall_crab','rainbowfall_golem','sandcity_golem','sandcity_jarspirit','sapphire_crawler','sapphire_golem','skygarden_elephant','skygarden_fiend','snowpine_bear','snowpine_wisp','sulphur_golem','sulphur_wisp','suncourt_fiend','suncourt_warrior','sunflower_beetle','sunflower_golem','wreck_crab','wreck_warrior']);   // creatures a story quest names: they stay what the story says
+function w3Small(arch, look, seed, x, sid){
+  if (W3_KEEP.has(sid)) return null;
+  const hum = arch === 'human', ele = arch === 'quad' && look.head === 'elephant'; if (!hum && !ele) return null;
+  if ((seed >>> 3) % 100 >= (hum ? 70 : 75)) return null;
+  const ranged = hum && (x.range || x.shot), pick = ranged ? W3_SMALL[(seed >>> 9) % 2 ? 1 : 4] : W3_SMALL[(seed >>> 9) % W3_SMALL.length];
+  const lk = {...pick.look}, v = (seed >>> 5) % 5;
+  if (lk.head === 'rat') [lk.skin, lk.belly] = [['#6e6058', '#cbbcaa'], ['#4a4440', '#9a9088'], ['#8a6a4a', '#d8c4a8'], ['#d8d0c4', '#f4eee6'], ['#33302c', '#6a645c']][v];   // brown, grey, sandy, white, black rats
+  if (lk.head === 'boar') [lk.skin, lk.belly] = [['#5a4a3a', '#8a7a66'], ['#3a3430', '#6a625a'], ['#7a5a3a', '#a88a66'], ['#4a3a2e', '#7a6a5a'], ['#6a6058', '#9a9088']][v];
+  if (lk.len) { lk.len = +(1 + ((seed >>> 11) % 5 - 2) * .1).toFixed(2); lk.girth = +(1 + ((seed >>> 13) % 5 - 2) * .1).toFixed(2); }
+  if (lk.size) lk.size = +(.9 + ((seed >>> 11) % 5) * .08).toFixed(2);
+  return {arch:pick.arch, race:pick.race, size:pick.size, look:lk, shot:ranged ? 'dart' : null};
+}
+/* (v278) five people of the old roads became animals; the regions still choose their templates as before (so every
+   regional creature, its id and the quests that name it stay the same) */
+const W3_WAS = {khmerghost:['human', {weapon:'sword'}], moatkappa:['human', {}], icefisher:['human', {weapon:'staff'}], frostknight:['human', {weapon:'sword'}], koboldscale:['human', {weapon:'sword'}]};
 function WORLD_MORE(){
   if (MAPS.length > 31) return;
   const SP = {}; SPECIES.forEach(s => { SP[s[0]] = s; }); const BS = {}; BOSSES.forEach(b => { BS[b[0]] = b; });
@@ -108,10 +146,12 @@ function WORLD_MORE(){
     const id = MAPS.length, quota = 10 + (mi >= 25 ? 1 : 0), pool = roadPool[road].slice(), seen = new Set(), mobsOut = [];
     // ten templates: different kinds first, in a mixed order unique to the region
     pool.sort((a, b) => w3Hash(key + a) - w3Hash(key + b));
-    for (const pass of [0, 1]) for (const t of pool){ if (mobsOut.length >= quota) break; const s = SP[t], sub = w3Sub(s[4], s[5]); if (pass === 0 && seen.has(sub)) continue; if (mobsOut.some(m => m.t === t)) continue; seen.add(sub); mobsOut.push({t, s}); }
+    for (const pass of [0, 1]) for (const t of pool){ if (mobsOut.length >= quota) break; const s = SP[t], o0 = W3_WAS[t], sub = o0 ? w3Sub(o0[0], o0[1]) : w3Sub(s[4], s[5]); if (pass === 0 && seen.has(sub)) continue; if (mobsOut.some(m => m.t === t)) continue; seen.add(sub); mobsOut.push({t, s}); }
     const ids = mobsOut.map(({t, s}, i) => {
-      const [, , , , arch, look, el0, race, size, x] = s, seed = w3Hash(key + t), [nth, nen] = w3Noun(arch, look);
-      let sid = `${key}_${nen.toLowerCase().replace(/[^a-z]/g, '')}`; while (used.has(sid)) sid += 'x'; used.add(sid);
+      let [, , , , arch, look, el0, race, size, x] = s; const seed = w3Hash(key + t), was = W3_WAS[t], [, idEn] = was ? w3Noun(was[0], was[1]) : w3Noun(arch, look);
+      const sm = w3Small(arch, look, seed, x, `${key}_${idEn.toLowerCase().replace(/[^a-z]/g, '')}`); if (sm){ arch = sm.arch; look = sm.look; race = sm.race; size = sm.size; x = {...x}; if (sm.shot) x.shot = sm.shot; else { delete x.range; delete x.shot; } }
+      const [nth, nen] = w3Noun(arch, look);
+      let sid = `${key}_${['hornet', 'wasp', 'bee'].includes(look.kind) ? 'spider' : idEn.toLowerCase().replace(/[^a-z]/g, '')}`;   /* the id keeps the old creature's name */   /* (v274) the spiders became hornets and wasps: their ids stay, so saves and quests still find them */ while (used.has(sid)) sid += 'x'; used.add(sid);
       const elm = i % 5 < 3 ? elem : el0, xx = {...x}; if (i % 4 === 0) xx.aggro = true; delete xx.night;
       let vth = '', ven = '', vi = 0; while (usedNm.has(`${aen} ${ven}${nen}`)){ [vth, ven] = W3_VAR[vi++ % W3_VAR.length]; ven += ' '; } usedNm.add(`${aen} ${ven}${nen}`);
       SPECIES.push([sid, `${nth}${vth}${ath}`, `${aen} ${ven}${nen}`, 0, arch, w3Unique(arch, look, hue, seed), elm, race, size, xx]);
@@ -135,3 +175,4 @@ function WORLD_MORE(){
     const raw = ROAD_LV_RAW[d], lo = raw[0][0], hi = raw[raw.length - 1][1], n = out.length, step = (hi - lo) / n;
     raw.length = 0; for (let k = 0; k < n; k++){ const a = Math.round(lo + k * step); raw.push([a, Math.round(Math.min(hi, a + step * 1.25 + 2))]); } }
 }
+

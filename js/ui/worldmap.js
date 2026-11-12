@@ -72,8 +72,14 @@ function wmLinks(){ const seen = new Set(), out = [];
   return out; }
 function wmMapHTML(){
   const vis = i => !!(S.visited && S.visited[i]);
-  const routes = wmLinks().map(([a, b]) => { const [x1, y1] = wmPic(a).map(v => v * 1000), [x2, y2] = wmPic(b).map(v => v * 1000), bend = ((a + b) % 2 ? 1 : -1) * .14;
+  const boats = [];
+  const routes = wmLinks().map(([a, b]) => { const sea = typeof SEA_SET !== 'undefined' && SEA_SET.has(a + ',' + b);   // (v281) sea routes between regions: a dashed blue line out over the water, with a boat
+    const [x1, y1] = wmPic(a).map(v => v * 1000), [x2, y2] = wmPic(b).map(v => v * 1000), bend = ((a + b) % 2 ? 1 : -1) * (sea ? .3 : .14);
     const mx = (x1 + x2) / 2 + (y2 - y1) * bend, my = (y1 + y2) / 2 - (x2 - x1) * bend, dpath = `M${x1.toFixed(1)} ${y1.toFixed(1)}Q${mx.toFixed(1)} ${my.toFixed(1)} ${x2.toFixed(1)} ${y2.toFixed(1)}`, both = vis(a) && vis(b);
+    if (sea){ // (v281) regions on opposite coasts: no line across the island, a boat beside each port pointing the way
+      for (const [p, q, to] of [[[x1, y1], [x2, y2], b], [[x2, y2], [x1, y1], a]]){ const dl = Math.hypot(q[0] - p[0], q[1] - p[1]) || 1, bx = p[0] + (q[0] - p[0]) / dl * 46, by = p[1] + (q[1] - p[1]) / dl * 46;
+        boats.push(`<span class="wmboat${both ? ' lit' : ''}" style="left:${(bx / 10).toFixed(2)}%;top:${(by / 10).toFixed(2)}%" title="${L('เรือไป', 'Ship to')} ${nm(MAPS[to])} · Lv ${MAPS[to].lv[0]}–${MAPS[to].lv[1]}">⛵</span>`); }
+      return ''; }
     return `<path class="wmr-u" d="${dpath}"/><path class="wmr ${both ? 'lit' : ''}" data-wmr="${a}-${b}" d="${dpath}"/>`; }).join('');
   const fog = MAPS.map((m, i) => { if (vis(i)) return ''; const [x, y] = wmPic(i); return `<circle class="wmfog" cx="${(x * 1000).toFixed(1)}" cy="${(y * 1000).toFixed(1)}" r="46"/>`; }).join('');
   const marks = MAPS.map((m, i) => { const [x, y] = wmPic(i), seen = vis(i), cap = i === 0, here = i === MAP_ID, sel = i === WM.sel, col = (LANDS[m.land] || LANDS.fertile)[2];
@@ -86,7 +92,7 @@ function wmMapHTML(){
       <img class="wmimg" src="${WM_IMG}" alt="${L('แผนที่โลก', 'World map')}" draggable="false">
       <svg class="wmsvg" viewBox="0 0 1000 1000" preserveAspectRatio="none" aria-hidden="true"><defs><radialGradient id="wmFogG"><stop offset="0" stop-color="#e8ecf4" stop-opacity=".78"/><stop offset=".55" stop-color="#dfe4ee" stop-opacity=".5"/><stop offset="1" stop-color="#dfe4ee" stop-opacity="0"/></radialGradient></defs>
         <g class="wmfogs">${fog}</g><g class="wmroutes">${routes}</g></svg>
-      ${marks}${labels}
+      ${boats.join('')}${marks}${labels}
       <div class="wmhere" style="left:${(hx * 100).toFixed(2)}%;top:${(hy * 100).toFixed(2)}%"><span>${L('คุณอยู่ที่นี่', 'You are here')}</span></div>
     </div></div>
     <div class="wmzoom"><button class="ibtn" data-wmz="1" aria-label="${L('ขยาย', 'Zoom in')}">+</button><button class="ibtn" data-wmz="-1" aria-label="${L('ย่อ', 'Zoom out')}">−</button></div>`;
@@ -146,7 +152,9 @@ function wmPlaceLabels(pic, S0){
   const pri = e => { const i = +e.dataset.wml; return (i === WM.sel) * 8 + (i === MAP_ID) * 4 + (i === 0) * 2 + (S.visited && S.visited[i] ? 1 : 0); };
   els.sort((a, b) => pri(b) - pri(a));
   for (const e of els){ const i = +e.dataset.wml, [x, y, mr] = mk[i], w = e.offsetWidth, h = e.offsetHeight, g = mr + 2, must = pri(e) >= 2;
-    const cand = [[x - w / 2, y + g], [x - w / 2, y - g - h], [x + g, y - h / 2], [x - g - w, y - h / 2], [x + g - 4, y + g - 6], [x - w - g + 4, y + g - 6], [x + g - 4, y - g - h + 6], [x - w - g + 4, y - g - h + 6], [x - w / 2, y + g + h + 2], [x - w / 2, y - g - 2 * h - 2]];
+    const cand = [[x - w / 2, y + g], [x - w / 2, y - g - h], [x + g, y - h / 2], [x - g - w, y - h / 2], [x + g - 4, y + g - 6], [x - w - g + 4, y + g - 6], [x + g - 4, y - g - h + 6], [x - w - g + 4, y - g - h + 6], [x - w / 2, y + g + h + 2], [x - w / 2, y - g - 2 * h - 2],
+      // (v283) a few more spots a little further out, so more names find room at the fitted size
+      [x + g + 6, y - h / 2 + h], [x + g + 6, y - h / 2 - h], [x - g - w - 6, y - h / 2 + h], [x - g - w - 6, y - h / 2 - h], [x - w / 2 + w * .6, y + g + 2], [x - w / 2 - w * .6, y + g + 2], [x - w / 2 + w * .6, y - g - h - 2], [x - w / 2 - w * .6, y - g - h - 2]];
     let pick = null;
     for (const [cx, cy] of cand){ const lx = clamp(cx, 2, S0 - w - 2), ly = clamp(cy, 2, S0 - h - 2), q = {l:lx, t:ly, r:lx + w, b:ly + h}; if (!hit(q)){ pick = q; break; } }
     if (!pick && must){ const lx = clamp(cand[0][0], 2, S0 - w - 2), ly = clamp(cand[0][1], 2, S0 - h - 2); pick = {l:lx, t:ly, r:lx + w, b:ly + h}; }
@@ -199,3 +207,11 @@ function renderQuestLog(){
       return `<div class="item qrow ${st}"><span class="rk">${i}</span><div class="nm"><b>${L(Q.title[0], Q.title[1])}</b><small>${st === 'done' ? L('สำเร็จแล้ว', 'Complete') : st === 'cur' ? L('กำลังทำ', 'In progress') : st === 'next' ? L(`รับได้ที่${i === 0 ? 'ครูวายรา' : 'ผู้เฝ้าศาล ' + MAPS[Q.map].name} · Lv ${Q.lv}+`, `Take it from ${i === 0 ? 'Master Vayra' : 'the shrine keeper of ' + MAPS[Q.map].en} · Lv ${Q.lv}+`) : L('ยังไม่ปลดล็อก', 'Locked')}</small></div></div>`; }).join('')}</div>
     ${q.main >= QUESTS.length ? `<p class="hint">${L(...ENDING)}</p>` : ''}`;
 }
+
+{ const st = document.createElement('style'); st.textContent = `
+.wms-u,.wms{fill:none;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.wms-u{stroke:rgba(10,40,80,.45);stroke-width:5}
+.wms{stroke:#8fd4ff;stroke-width:2.4;stroke-dasharray:7 6}
+.wms.lit{stroke:#d8f2ff}
+.wmboat{position:absolute;transform:translate(-50%,-60%);font-size:clamp(13px,2.2vmin,20px);line-height:1;pointer-events:auto;filter:drop-shadow(0 1px 1px rgba(0,0,0,.55));z-index:2}
+.wmboat:not(.lit){opacity:.75}`; document.head.appendChild(st); }

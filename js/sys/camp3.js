@@ -107,3 +107,7 @@ campPlace = function(){
 };
 if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'camp3', t:['แคมป์พักแรม', 'Camps'], b:() => `<p>${L('แคมป์เป็นที่พักชั่วคราวใต้ต้นไม้ใหญ่ ไม่ใช่บ้าน หน้าตาตามดินแดน: ต้นไทรใหญ่ (อุดมสมบูรณ์) ต้นอะคาเซีย (แห้งแล้ง) ต้นใบไฟ (ภูเขาไฟ) ต้นไม้หิมะ (เหน็บหนาว) ต้นไม้ใบม่วงแขวนโคมวิญญาณ (ความมืด) ต้นโพธิ์ทอง (แสงสว่าง) · ทุกแคมป์จัดวางต่างกัน · ในแคมป์ปลอดภัยและพักฟื้นเร็ว',
   'A camp is a temporary rest under a great tree, not a home, and looks like its land: a banyan (fertile), an acacia (arid), a fire-leaf tree (volcanic), a snow giant (frozen), a violet tree hung with spirit lanterns (dark), a golden bodhi (light) · each camp is laid out its own way · camps are safe and resting is faster')}</p>`});
+
+/* (v279) the owner did not want them on any map: bedrolls, log seats and the stake lamps (red ball on a pole) are never placed */
+{ const NOPE = new Set(['bedroll', 'logseat', 'stakelamp']), _ap = addProp;
+  addProp = function(type){ if (NOPE.has(type)) return; return _ap.apply(this, arguments); }; }

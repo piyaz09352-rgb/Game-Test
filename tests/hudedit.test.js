@@ -13,6 +13,7 @@ test('arrange mode: drag the skill cluster and the joystick, resize, keep it aft
     await page.click('[data-heopen]');
     assert.ok(await page.evaluate(() => HE.on && !!document.getElementById('heBar')), 'arrange mode is on');
     const box = async id => page.evaluate(id => { const r = document.getElementById(id).getBoundingClientRect(); return {x:r.left, y:r.top, w:r.width, h:r.height}; }, id);
+    await page.waitForFunction(() => { const r = document.getElementById('mobaAct').getBoundingClientRect(); return r.width > 0 && r.left > 100; }, null, { timeout: 10000, polling: 100 });   // (v290) on a busy machine the cluster was measured before it was laid out (x 0)
     const a0 = await box('mobaAct');
     // drag the skill cluster to the left middle
     await page.mouse.move(a0.x + a0.w / 2, a0.y + a0.h / 2); await page.mouse.down(); await page.mouse.move(300, 220, { steps: 8 }); await page.mouse.up();
@@ -36,10 +37,13 @@ test('arrange mode: drag the skill cluster and the joystick, resize, keep it aft
     assert.ok(Math.abs(a3.x - a2.x) < 3 && Math.abs(a3.w - a2.w) < 3, 'the layout keeps the custom place');
     // reset
     await page.evaluate(() => { heStart(); }); await page.click('[data-he="reset"]'); await page.click('[data-he="done"]');
-    const a4 = await box('mobaAct');
-    assert.ok(Math.abs(a4.x - a0.x) < 30 && Math.abs(a4.w - a0.w) < 3, 'reset puts it back ' + JSON.stringify([a0, a4]));
-    // a phone held sideways starts from the default layout: skills bottom right and a little bigger, joystick bottom left
-    assert.ok(a0.x + a0.w > 860 && a0.y + a0.h > 380 && a0.w > 190, 'default skill cluster bottom right ' + JSON.stringify(a0));
+    // (v244) with no hand-made layout the touch layout (moblay244) places each button itself and stretches the group
+    // boxes over the screen, so check the buttons, not the group: nothing hand-made is left, attack button bottom right
+    const rs = await page.evaluate(() => { const q = document.querySelector('#mobaAct .mo.atk').getBoundingClientRect();
+      return {hand:Object.keys((HE.data && HE.data[heOri()]) || {}).length, atk:{x:q.left, y:q.top, w:q.width, h:q.height}}; });
+    assert.strictEqual(rs.hand, 0, 'reset clears the hand-made layout');
+    const at = rs.atk;
+    assert.ok(at.x + at.w > 860 && at.y + at.h > 380 && at.w >= 64, 'reset puts the attack button back bottom right ' + JSON.stringify(at));
     const jz = await box('joy');
     assert.ok(jz.x < 60 && jz.y + jz.h > 380, 'default joystick bottom left ' + JSON.stringify(jz));
   } finally { await close(); }
@@ -52,8 +56,11 @@ test('potion buttons never cover the minimap or the menu button', { skip, timeou
     try {
       await enterWorld(page);
       const r = await page.evaluate(() => { localStorage.removeItem('vay_hudpos_v1'); HE.data = {}; SETTINGS.control = 'joy'; applyControlMode(); layoutHud(); renderMoba(); layoutHud();
-        const p = el('mobaPot').getBoundingClientRect(), hit = id => { const e = el(id); if (!e || !e.offsetWidth) return false; const q = e.getBoundingClientRect(); return p.left < q.right && p.right > q.left && p.top < q.bottom && p.bottom > q.top; };
-        return {map:hit('mapCard'), menu:hit('railTog'), p:[p.left, p.top, p.width]}; });
+        // (v244) the potion group box covers the screen; each potion button is placed on its own: check the buttons
+        const ps = [...el('mobaPot').querySelectorAll('.mo')].filter(b => b.offsetWidth).map(b => b.getBoundingClientRect());
+        const hit = id => { const e = el(id); if (!e || !e.offsetWidth) return false; const q = e.getBoundingClientRect(); return ps.some(p => p.left < q.right && p.right > q.left && p.top < q.bottom && p.bottom > q.top); };
+        return {n:ps.length, map:hit('mapCard'), menu:hit('railTog'), p:ps.map(p => [Math.round(p.left), Math.round(p.top), Math.round(p.width)])}; });
+      assert.ok(r.n > 0, `${width}×${height}: potion buttons shown`);
       assert.ok(!r.map && !r.menu, `${width}×${height}: potions clear of minimap and menu ` + JSON.stringify(r));
     } finally { await close(); }
     assert.deepStrictEqual(errors, [], 'no runtime errors');

@@ -1,5 +1,5 @@
 /* VAYRATHEN — tests/towershop227.test.js — (v227) tower tokens from cleared floors, the tower shop in the tower window,
-   and the milestone pieces (floor 50 crown, floor 100 dais mount, floor 150 wings) that cannot be bought. */
+   and the milestone pieces (floor 50 crown, floor 75 wings, floor 100 dais mount — v255: the tower ends at 100) that cannot be bought. */
 'use strict';
 const test = require('node:test'), assert = require('node:assert');
 const { chromium, openGame, enterWorld } = require('./browser');
@@ -18,14 +18,15 @@ test('tower shop: tokens, buying, milestone pieces', { skip, timeout: 120000 }, 
       twsTok().tok = 1000; reWin('tower'); document.querySelector('#pane-tower [data-twsbuy="tws_crown"]').click();
       o.crown = twsHave('tws_crown') && twsTok().tok === 850; o.notSold = !COSTUME.tws_crown.price && !COSTUME.tws_night.price;
       document.querySelector('#pane-tower [data-twsbuy="whitepot"]').click(); o.pots = (S.inv.whitepot || 0) >= 10;
-      twSt().best = 100; twsMilestones(); o.mile = twsHave('tws_night') && twsHave('tws_dais') && !twsHave('tws_heaven');
+      twSt().best = 74; twsMilestones(); o.mile = twsHave('tws_night') && !twsHave('tws_heaven');
+      twSt().best = 100; twsMilestones(); o.mile = o.mile && twsHave('tws_heaven') && !twsHave('tws_dais') && !TWS_MILE.some(m => m[1] === 'tws_dais');   // (v286) the floor-100 dais mount was retired
       closeWin('tower'); return o;
     });
     assert.strictEqual(r.tok1, 1, 'clearing floor 1 gives a tower token');
-    assert.ok(r.shop >= 8 && r.buyOff, 'the tower window lists the shop and milestones; too few tokens = cannot buy');
+    assert.ok(r.shop >= 7 && r.buyOff, 'the tower window lists the shop and milestones; too few tokens = cannot buy');
     assert.ok(r.crown && r.notSold, 'the crown is bought with tokens and sold nowhere else');
     assert.ok(r.pots, 'potions from the tower shop');
-    assert.ok(r.mile, 'floor 50 and 100 pieces unlock at best floor 100, the floor 150 wings do not yet');
+    assert.ok(r.mile, 'floor 50 piece at best 74 (not yet 75/100); the floor 75 wings and floor 100 dais at best 100');
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no runtime errors');
 });

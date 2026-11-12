@@ -41,7 +41,7 @@ test('mail: Bia and an item reach an offline-style inbox, taken once; weekly tow
     await b.evaluate(() => { const c = el('confirm'); if (c) c.hidden = true; openWin('mail'); });   // any first-visit prompt out of the way
     const id = await b.evaluate(() => ML.rows[0].id);
     await b.click(`#pane-mail [data-mlopen="${id}"]`);
-    assert.ok(await b.evaluate(() => /For you <b>!<\/b>/.test(el('pane-mail').querySelector('.mlm').textContent)), 'the message shows as plain text');
+    assert.ok(await b.evaluate(() => { const m = el('pane-mail').querySelector('.mlm'); return /For you ‹b›!‹\/b›/.test(m.textContent) && !m.querySelector('b'); }), 'the message shows as plain text (v284: HTML characters become look-alikes)');
     await b.click(`#pane-mail [data-mltake="${id}"]`);
     await b.waitForFunction(() => S.inv.redpot === 25 && S.bia === 60000, null, { timeout: 15000, polling: 250 });
     // taking twice gives nothing more

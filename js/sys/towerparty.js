@@ -25,7 +25,7 @@ function twpStart(f0){
 }
 function onTwp(msg){
   const d = msg.data || {}; if (msg.isMe || d.k !== 'open' || !NET.party || d.pt !== NET.party) return;
-  if (typeof d.code !== 'string' || !/^\w{2,24}$/.test(d.code)) return; const f0 = clamp(d.f0 | 0, 1, 99999), pc = clamp(d.pc | 0, 2, 5);
+  if (typeof d.code !== 'string' || !/^\w{2,24}$/.test(d.code)) return; const f0 = clamp(d.f0 | 0, 1, TW_MAX), pc = clamp(d.pc | 0, 2, 5);
   sysPrompt(L(`${clean(d.n, 18)} ชวนปีนหอคอยวายราชั้น ${f0} (ปาร์ตี้ ${pc} คน) · เข้าร่วมไหม?`, `${clean(d.n, 18)} is climbing the Vayra Tower from floor ${f0} (party of ${pc}) · join?`),
     () => { if (twStart(f0, {code:d.code, pc, join:true})) TW.restT = 6; }, () => {});   // a moment for the room to pick its host before anyone spawns
   SFX.play('chat');
@@ -48,7 +48,7 @@ EV.on('tick', () => {
   for (const m of mobs) if (m.dg && !m.dead && !m.tw){ const k = m.hp / Math.max(1, m.maxhp); m.tw = TW.f; twScale(m, TW.f); m.hp = m.maxhp * k; }
   if (!twHost()) TW.mine = false;   // the host's foes, not mine (tower.js takes them over if I become host)
   const h = twpHostPres(); if (!h) return;
-  const hf = clamp(h.twf | 0, 1, 99999), th = h.twth | 0;
+  const hf = clamp(h.twf | 0, 1, TW_MAX + 1), th = h.twth | 0;
   if (MAPS[th] && th !== TW.theme) twpLand(th);
   while (TW.f < hf && TW.active) twClear();   // each floor the party cleared pays me too
   if (h.twp === 'fight' && TW.f === hf){ if (TW.phase !== 'fight'){ TW.phase = 'fight'; TW.spawned = true; DG.lv = twLvC(hf); dgLabel(); banner(L(`ชั้น ${hf}`, `Floor ${hf}`)); }

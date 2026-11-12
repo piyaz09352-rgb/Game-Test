@@ -31,14 +31,16 @@ function npcClear(){
       for (const p of near){ if (NC_STRUCT.has(p.type)) continue; if (ncCover(n, p) > .04) ncRemove(p); }
       // a building drawn over the NPC: step forward (down the screen, in front of it) to a clear spot
       const over = () => PROPS.some(p => NC_STRUCT.has(p.type) && p.y > n.y + 1 && Math.abs(p.x - n.x) < 280 && ncCover(n, p) > .08);
-      if (over()){ const x0 = n.x, y0 = n.y; let ok = false;
+      if (!(typeof ARN_L !== 'undefined' && ARN_L.has(n)) && over()){ const x0 = n.x, y0 = n.y;   // (v269) a keeper on a stroll is not pushed: their stroll spots are checked (town269.js) let ok = false;
         for (let t = 1; t < 40 && !ok; t++){ const a = t * 2.4, d = 10 + t * 7; n.x = Math.round(x0 + Math.cos(a) * d * .8); n.y = Math.round(y0 + Math.abs(Math.sin(a)) * d + 8);
           ok = walkable(n.x, n.y, 10) && !NPCS.some(m => m !== n && Math.hypot(m.x - n.x, m.y - n.y) < 44) && !over(); }
         if (!ok){ n.x = x0; n.y = y0; } }
     }
   } finally { for (const im of NC.used) delete im._ncA; NC.used = []; }   // the pixel copies are only needed for this pass
 }
-const ncSig = () => MAP_ID + ':' + NPCS.map(n => `${n.id}@${Math.round(n.x)},${Math.round(n.y)}`).join('|');
+// (v269) a strolling Aren keeper counts at their place, not mid-stroll: re-checking on every step pushed them about
+const ncAt = n => { const s = typeof ARN_L !== 'undefined' && ARN_L.get(n); return s ? [s.hx, s.hy] : [n.x, n.y]; };
+const ncSig = () => MAP_ID + ':' + NPCS.map(n => { const [x, y] = ncAt(n); return `${n.id}@${Math.round(x)},${Math.round(y)}`; }).join('|');
 { const _lm = loadMap; loadMap = function(){ const r = _lm.apply(this, arguments); try { npcClear(); } catch (e) {} NC.sig = ncSig(); return r; }; }
 // an NPC added or moved later (a story chapter, a festival): check again, at most twice a second
 EV.on('tick', dt => { NC.t -= dt; if (NC.t > 0) return; NC.t = .5; const s = ncSig(); if (s === NC.sig) return; NC.sig = s; try { npcClear(); } catch (e) {} NC.sig = ncSig(); });

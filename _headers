@@ -1,0 +1,11 @@
+# VAYRATHEN — _headers — (v284) security headers for the website (Netlify reads this file from the site's root folder;
+# firebase.json carries the same for Firebase Hosting). Keep it in the full pack next to index.html.
+#
+# Content-Security-Policy: the browser runs only the game's own scripts, the Firebase SDK and Google reCAPTCHA. A script
+# smuggled into the page (a name like <img onerror=…>) does not run. The two small inline scripts of index.html are
+# allowed by their hash: if you change either one, run `npm run test:fast` (tests/csp284.test.js prints the new hashes).
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://www.gstatic.com https://www.google.com https://www.recaptcha.net https://*.firebasedatabase.app https://*.firebaseio.com 'sha256-X6TN4kj8kiCBUH3S3enmmSJGzIVXUZsOxVBiuROzMVQ=' 'sha256-odDyp5ZIfnQZkQXYyCQ9NaUWXsudHBtqZyNKqfnNlIM='; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' data: https://fonts.gstatic.com; img-src 'self' data: blob:; media-src 'self' data: blob:; worker-src 'self' blob:; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com https://*.firebasedatabase.app wss://*.firebasedatabase.app https://www.google.com; frame-src https://*.firebaseapp.com https://www.google.com https://recaptcha.google.com https://www.recaptcha.net; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'self'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()

@@ -20,11 +20,11 @@ html body #title::before,html body #title::after{display:none !important}
 /* ---------- the card: its width sets every size inside (cqw = 1% of it) ---------- */
 html body #title .title-card.authing{
   --uz:var(--uiz, 1);   /* the game zooms its UI layer on big screens: sizes here are divided back */
-  --cw:calc(min(47vw, calc((100vh - 64px) * .8), 820px) / var(--uz));
+  --cw:calc(min(47vw, calc((100vh - 64px) * .74), 820px) / var(--uz));   /* (v283) the whole stack (crown · form · base · button row) is 1.21× as tall as wide: .74 makes it 90% of the height, the same space above and below */
   --b:2.9cqw;
   --s1:1.25cqw; --s2:2.02cqw; --s3:3.27cqw; --s4:5.3cqw;
   --fh:7.2cqw;
-  container-type:inline-size;justify-self:end;align-self:center;width:var(--cw) !important;max-width:none !important;max-height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;
+  container-type:inline-size;justify-self:end;align-self:center;width:var(--cw) !important;min-width:0 !important;max-width:none !important;   /* (v283) min-width 0: hud.css gives every title card 380px at least, which kept the phone card too big for its screen */max-height:100%;overflow-y:auto;overflow-x:hidden;scrollbar-width:none;
   margin:0 calc(29.3vw / var(--uz) - var(--cw) / 2) 0 0 !important;
   padding:0 !important;background:none !important;border:0 !important;box-shadow:none !important;display:flex;flex-flow:row wrap;justify-content:center;align-content:center}
 html body #title .title-card.authing:has(#auBox[data-m="reg"]){--cw:calc(min(42vw, calc((100vh - 64px) * .66), 720px) / var(--uz))}
@@ -35,7 +35,7 @@ html body #title .title-card.authing > #titleBody{flex:0 0 100%;width:100%;order
 
 /* ---------- the frame: crown above, repeating side bars, base below ---------- */
 html body #title .authing .au-box{position:relative;width:100% !important;max-width:none !important;box-sizing:border-box;
-  margin:calc(100cqw * 138 / 880) 0 calc(100cqw * 208 / 880 * .26) !important;
+  margin:calc(100cqw * 138 / 880) 0 calc(100cqw * 208 / 880 * .74 + var(--s3)) !important;   /* (v283) room below for the base ornament: it hangs 74% out of the box, and the Discord · Settings · Support row was laid on top of it (1366×768 and smaller) */
   padding:var(--s3) 19.1cqw var(--s2) !important;
   border:0 !important;border-radius:0 !important;box-shadow:none !important;overflow:visible !important;
   background:url('../assets/ui/frame-mid.webp') top center / 100% auto repeat-y !important;min-height:20cqw}
@@ -120,6 +120,11 @@ html body #title .title-card.authing > .supdcbig,html body #title .title-card.au
   html body #title .title-card.authing{--cw:calc(min(46vw, calc(100vh * .82), 420px) / var(--uz));--b:3.5cqw;--fh:8.6cqw;--s3:2.4cqw;--s4:3.6cqw;margin-right:calc(3vw / var(--uz)) !important}
   html body #title .title-card.authing:has(#auBox[data-m="reg"]){--cw:calc(min(42vw, calc(100vh * .7), 360px) / var(--uz))}
   html body #title .authing .au-tagline{display:none}
+  /* (v283) on a phone the whole stack — crown, form, gold base, then the Discord · Settings · Support row — is sized
+     from the screen's height so it fits with the same space above and below; the row sits centred under the card */
+  html body #title .title-card.authing{--cw:calc(min(46vw, calc(100vh * .73), 420px) / var(--uz))}   /* stack 1.23× its width on a phone → 90% of the height */
+  html body #title .title-card.authing:has(#auBox[data-m="reg"]){--cw:calc(min(42vw, calc(100vh * .64), 360px) / var(--uz))}   /* the register form: 1.4× its width on a phone → 90% */
+}
 }
 
 /* ---------- the character list: on the right too, so the crest stays in view (the wide maker stays centred) ---------- */

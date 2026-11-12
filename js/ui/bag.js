@@ -73,7 +73,7 @@ function bagDraw(){
   if (BAG.sel && !list.some(e => e.id === BAG.sel)) BAG.sel = null;
   const ico = e => e.card ? cardHTML(e.id, 'mini') : itemIcon(e.id), worn = e => !e.card && S.gear && S.gear.ammo === e.id;
   if (BAG.view === 'grid'){
-    const cols = 8, slots = Math.max(cols * 5, Math.ceil(list.length / cols) * cols);
+    const cols = 8, slots = typeof bagSlotsWant === 'function' ? Math.max(list.length, bagSlotsWant(list.length)) : Math.max(cols * 5, Math.ceil(list.length / cols) * cols);   // (v286) bag100.js says how many cells, so the draw makes them all at once
     let h = '';
     for (let i = 0; i < slots; i++){ const e = list[i];
       h += e ? `<button class="bslot${BAG.sel === e.id ? ' sel' : ''}${e.it.rar ? ' r' + e.it.rar : ''}" data-bagsel="${e.id}" title="${nm(e.it)}">${ico(e)}${worn(e) ? '<i class="bE">E</i>' : ''}${e.n > 1 || e.card ? `<em>${e.n.toLocaleString()}</em>` : ''}</button>` : `<span class="bslot empty"></span>`; }

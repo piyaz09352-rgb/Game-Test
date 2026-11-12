@@ -391,6 +391,7 @@ const PROPS = [];
 const propCache = {};
 function propImg(type, variant = 0){ const k = type + variant; return propCache[k] || (propCache[k] = PROP_TYPES[type](1000 + variant * 7919 + type.length * 31, variant)); }
 function addProp(type, x, y, variant = 0){
+  if (type === 'pine' && variant % 2 && !/glacier|frost|frozen|kailash|icecave|snow|tundra/.test(((typeof MAPS !== 'undefined' && typeof MAP_ID !== 'undefined' && MAPS[MAP_ID]) || {}).biome || '')) variant--;   // (v286) no snowy pine in a green land, whoever plants it
   const p = {type, x, y, variant};
   PROPS.push(p);
   const im = propImg(type, variant);

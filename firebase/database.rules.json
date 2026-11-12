@@ -6,11 +6,18 @@
     },
     "rooms": {
       "$room": {
+        ".validate": "$room.length <= 64",
         "peers": {
           ".read": "auth != null",
           ".indexOn": ["by"],
           "$peer": {
-            ".write": "auth != null && (!data.exists() || data.child('by').val() === auth.uid) && (!newData.exists() || newData.child('by').val() === auth.uid)"
+            ".write": "auth != null && $peer.length <= 64 && (!data.exists() || data.child('by').val() === auth.uid) && (!newData.exists() || newData.child('by').val() === auth.uid)",
+            ".validate": "newData.hasChildren(['by', 'j', 't']) && newData.child('j').isString() && newData.child('j').val().length < 20000 && newData.child('t').isNumber() && newData.child('t').val() <= now + 60000",
+            "by": { ".validate": "newData.val() === auth.uid" },
+            "j": { ".validate": "newData.isString()" },
+            "k": { ".validate": "newData.isString() && newData.val().length < 20000" },
+            "t": { ".validate": "newData.isNumber()" },
+            "$other": { ".validate": false }
           }
         },
         "ev": {
@@ -18,7 +25,13 @@
           ".indexOn": ["t"],
           "$e": {
             ".write": "auth != null && (!data.exists() || data.child('by').val() === auth.uid) && (!newData.exists() || newData.child('by').val() === auth.uid)",
-            ".validate": "newData.child('j').isString() && newData.child('j').val().length < 60000 && (newData.child('topic').val() !== 'gm' || root.child('gms').child(auth.uid).val() === true)"
+            ".validate": "newData.hasChildren(['topic', 'j', 'peer', 'by', 't']) && newData.child('j').isString() && newData.child('j').val().length < 60000 && (newData.child('topic').val() !== 'gm' || root.child('gms').child(auth.uid).val() === true) && root.child('rooms').child($room).child('peers').child(newData.child('peer').val()).child('by').val() === auth.uid",
+            "topic": { ".validate": "newData.isString() && newData.val().length <= 32" },
+            "j": { ".validate": "newData.isString()" },
+            "peer": { ".validate": "newData.isString() && newData.val().length <= 64" },
+            "by": { ".validate": "newData.val() === auth.uid" },
+            "t": { ".validate": "newData.isNumber() && newData.val() <= now + 60000 && newData.val() >= now - 60000" },
+            "$other": { ".validate": false }
           }
         }
       }

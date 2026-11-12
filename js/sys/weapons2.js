@@ -55,11 +55,13 @@ if (typeof SPR !== 'undefined' && SPR.heroKey){ const _hk = SPR.heroKey;
 const WPN_CURVE = L => 22 + L * 1.25;
 const WPN_KIND = st => {
   if (!st || !st.wtype) return null; const two = st.hands === '2h';
-  if (st.wtype === 'sword') return two ? 'gsword' : 'sword';
-  if (st.wtype === 'staff') return two ? 'lstaff' : 'rod';
-  if (st.wtype === 'dagger') return st.claw ? 'fist' : isKatana(st) ? 'katana' : st.twin ? 'twin' : 'dagger';
+  if (st.wtype === 'sword') return st.axe ? (two ? 'gaxe' : 'axe') : two ? 'gsword' : 'sword';   // (v258) the merchant's axes are their own kind
+  if (st.wtype === 'fist') return st.claw ? 'claw' : st.glove ? 'glove' : 'fist';                   // (v258) knuckles · gloves · claws each play their own way
+  if (st.wtype === 'shuriken') return two ? 'shuriken' : 'kunai';
+  if (st.wtype === 'staff') return two ? 'lstaff' : st.curseAmp ? 'hexrod' : 'rod';   // (v258) the hexer's skull rod
+  if (st.wtype === 'dagger') return st.claw ? 'claw' : isKatana(st) ? 'katana' : st.twin ? 'twin' : 'dagger';
   return st.wtype; };
-const WPN_RATIO = {sword:[1, 0], gsword:[1.24, 0], dagger:[.84, 0], katana:[1.1, 0], twin:[1.08, 0], fist:[1, 0], bow:[.94, 0], rod:[.45, 1.2], lstaff:[.5, 1.5]};
+const WPN_RATIO = {sword:[1, 0], gsword:[1.24, 0], dagger:[.84, 0], katana:[1.1, 0], twin:[1.08, 0], fist:[1, 0], glove:[1, 0], claw:[1, 0], bow:[.94, 0], rod:[.45, 1.2], lstaff:[.5, 1.5]};
 for (const g of GEAR_LIST){ if (g[1] !== 'weapon' || !g[6] || g[6].line) continue; const k = WPN_KIND(g[6]), r = WPN_RATIO[k]; if (!r) continue;
   const c = WPN_CURVE(g[4]); g[6].watk = Math.round(c * r[0]); if (r[1]) g[6].wmatk = Math.round(c * r[1]);
   for (const o of [GEAR[g[0]], ITEMS[g[0]]]) if (o && o.st){ o.st.watk = g[6].watk; if (r[1]) o.st.wmatk = g[6].wmatk; } }
@@ -83,14 +85,21 @@ const WTRAIT = {
   sword:{th:'ปัดป้อง: 8% (+0.4%/ขั้นตีบวก) ปัดการโจมตีระยะประชิดทิ้ง · ใช้คู่โล่ได้', en:'Parry: 8% (+0.4% per refine) to turn aside a melee blow · shield allowed'},
   gsword:{th:'เจาะเกราะ 25% · รุนแรง: คริแรงขึ้น 30% · บ้าคลั่ง: HP ต่ำกว่า 40% ตีแรงขึ้น 20%', en:'Armour pierce 25% · Severe: crits +30% · Berserk: below 40% HP +20% damage'},
   rod:{th:'สนับสนุน: ฮีลและโล่ +15% · รับดาเมจ −6% · ใช้คู่โล่ได้', en:'Support: heals and shields +15% · damage taken −6% · shield allowed'},
+  hexrod:{th:'ไม้เท้ากะโหลก: คุณไสย: คำสาปแรงขึ้น (ตามค่าผลคำสาป) · ขลังกำบัง: รับดาเมจ −6% · ใช้คู่โล่ได้', en:'Skull rod: curses hit harder (by its Curse power) · Warding: damage taken −6% · shield allowed'},
   lstaff:{th:'ดาเมจมหาศาล: MATK +20% · ร่ายช้าลง 10%', en:'Overwhelming: MATK +20% · casting 10% slower'},
   dagger:{th:'เจาะเกราะ 20% · พิษ: 15% ต่อครั้งที่ตี · ใช้คู่โล่ได้', en:'Armour pierce 20% · Venom: 15% per hit · shield allowed'},
   twin:{th:'มีดคู่ (มือละเล่ม): เจาะเกราะ 20% · พิษ 15% ต่อครั้ง · เร็ว: ASPD +4 · CRIT +5%', en:'Twin daggers (one in each hand): armour pierce 20% · venom 15% per hit · speed: ASPD +4 · CRIT +5%'},
   katana:{th:'เร็ว: ASPD +6 · CRIT +8% คริแรงขึ้น 20% · เลือดออก 12% ต่อครั้ง · หลบ: FLEE +10% หลบแน่นอน +5%', en:'Speed: ASPD +6 · CRIT +8%, crits +20% · Bleed 12% per hit · Evasion: FLEE +10%, Perfect Dodge +5%'},
-  fist:{th:'เจาะเกราะ 30% · หนัก +8% · เลือดไหล 10% · มึนสั้น 8% · คอมโบ: ทุกหมัดที่ 3 ต่อเนื่อง ×1.5', en:'Armour pierce 30% · Heavy +8% · Bleed 10% · Mini-stun 8% · Combo: every 3rd hit in a row ×1.5'},
+  fist:{th:'สนับมือ: เจาะเกราะ 30% · หนัก: ดาเมจ +8% · คอมโบ: ทุกหมัดที่ 3 ต่อเนื่องใส่เป้าเดิม ×1.5', en:'Knuckles: armour pierce 30% · Heavy: +8% damage · Combo: every 3rd hit in a row on one target ×1.5'},
+  glove:{th:'นวมคู่: เจาะเกราะ 20% · หมัดหนัก: มึน 12% ต่อครั้ง (0.5 วิ ไม่รวมบอส) · การ์ดแน่น: รับดาเมจ −5% · คอมโบหมัดที่ 3 ×1.3', en:'Boxing gloves: armour pierce 20% · Heavy punch: 12% to stun (0.5 s, not bosses) · Tight guard: damage taken −5% · 3rd-hit combo ×1.3'},
+  claw:{th:'กรงเล็บ: เจาะเกราะ 20% · ฉีกเนื้อ: เลือดออก 15% ต่อครั้ง · ว่องไว: ASPD +4 · CRIT +5%', en:'Claws: armour pierce 20% · Rend: 15% per hit to bleed · Swift: ASPD +4 · CRIT +5%'},
+  axe:{th:'ขวานมือเดียว: ผ่าหนัก: 12% ต่อครั้งฟันเต็มแรง ×1.6 · ใช้คู่โล่ได้', en:'Hand axe: Cleaving blow: 12% per hit to strike ×1.6 · shield allowed'},
+  gaxe:{th:'ขวานศึกสองมือ: เจาะเกราะ 30% · ผ่าหนัก: 15% ต่อครั้งฟันเต็มแรง ×1.8', en:'War axe: armour pierce 30% · Cleaving blow: 15% per hit to strike ×1.8'},
+  shuriken:{th:'ดาวกระจาย: ขว้างเร็ว ASPD +3 · แม่น HIT +10 · CRIT +5%', en:'Throwing stars: quick throws ASPD +3 · HIT +10 · CRIT +5%'},
+  kunai:{th:'คุไน (มือเดียว): ใช้คู่โล่ได้ · พริ้วไหว: FLEE +8% หลบแน่นอน +3%', en:'Kunai (one hand): shield allowed · Nimble: FLEE +8%, Perfect Dodge +3%'},
   bow:{th:'แม่นยำ: HIT +20 · ยิงเร็ว: ASPD +4 · ยิงต่อเนื่อง: ตีเป้าเดิมต่อกัน +3% ต่อครั้ง สูงสุด +18%', en:'Accurate: HIT +20 · Rapid: ASPD +4 · Steady fire: +3% per hit in a row on one target, up to +18%'}
 };
-const WK_PIERCE = {gsword:.25, dagger:.2, twin:.2, fist:.3};
+const WK_PIERCE = {gsword:.25, dagger:.2, twin:.2, fist:.3, glove:.2, claw:.2, gaxe:.3};
 
 /* numbers that live in DER */
 { const _dv = derive;
@@ -100,6 +109,11 @@ const WK_PIERCE = {gsword:.25, dagger:.2, twin:.2, fist:.3};
     if (k === 'lstaff'){ DER.matk = Math.round(DER.matk * 1.2); DER.castMul *= 1.1; }
     if (k === 'katana'){ DER.aspd = Math.min(ASPD_CAP, DER.aspd + 6); DER.crit = +(DER.crit + 8).toFixed(1); DER.critDmg += .2; DER.flee = Math.round(DER.flee * 1.1); pas.dodge = (pas.dodge || 0) + .05; }
     if (k === 'twin'){ DER.aspd = Math.min(ASPD_CAP, DER.aspd + 4); DER.crit = +(DER.crit + 5).toFixed(1); }   // (v208)
+    if (k === 'claw'){ DER.aspd = Math.min(ASPD_CAP, DER.aspd + 4); DER.crit = +(DER.crit + 5).toFixed(1); }   // (v258)
+    if (k === 'glove') pas.wkRed = (pas.wkRed || 0) + .05;
+    if (k === 'hexrod') pas.wkRed = (pas.wkRed || 0) + .06;
+    if (k === 'shuriken'){ DER.aspd = Math.min(ASPD_CAP, DER.aspd + 3); DER.hit += 10; DER.crit = +(DER.crit + 5).toFixed(1); }
+    if (k === 'kunai'){ DER.flee = Math.round(DER.flee * 1.08); pas.dodge = (pas.dodge || 0) + .03; }
     if (k === 'gsword') DER.critDmg += .3;
     if (k === 'bow'){ DER.hit += 20; DER.aspd = Math.min(ASPD_CAP, DER.aspd + 4); }
     DER.interval = aspdIv(DER.aspd);
@@ -123,6 +137,8 @@ const WKC = {tgt:null, chain:0};
     if (WKC.tgt === m) WKC.chain++; else { WKC.tgt = m; WKC.chain = 1; }
     if (k === 'bow') f *= 1 + Math.min(.18, (WKC.chain - 1) * .03);
     if (k === 'fist' && WKC.chain % 3 === 0){ f *= 1.5; res.combo = true; }
+    if (k === 'glove' && WKC.chain % 3 === 0){ f *= 1.3; res.combo = true; }
+    if ((k === 'axe' && Math.random() < .12) || (k === 'gaxe' && Math.random() < .15)){ f *= k === 'axe' ? 1.6 : 1.8; res.crush = true; }   // (v258) the axe's cleaving blow
     if (f !== 1) res.dmg = Math.max(1, Math.round(res.dmg * f));
     return res; }; }
 /* what the blade leaves behind: venom, bleeding, a short stun */
@@ -132,8 +148,9 @@ const WKC = {tgt:null, chain:0};
     if (live && !m.dead && !m.def.boss){
       const roll = p => Math.random() < p, st = m.st || (m.st = {});
       if ((k === 'dagger' || k === 'twin') && roll(.15)){ applyStatus(m, {poison:[.3, 4]}); addText(m.x, m.y - MOB_H[m.type] - 18, L('พิษ', 'Venom'), '#7fe05a', 12); }
-      if ((k === 'katana' && roll(.12)) || (k === 'fist' && roll(.1))){ st.bleed = 4; st.bleedDps = DER.atk * .3; st.bleedT = 1; addText(m.x, m.y - MOB_H[m.type] - 18, L('เลือดออก', 'Bleed'), '#ff4a5a', 12); }
-      if (k === 'fist' && roll(.08)) applyStatus(m, {stun:.4}); }
+      if ((k === 'katana' && roll(.12)) || (k === 'claw' && roll(.15))){ st.bleed = 4; st.bleedDps = DER.atk * .3; st.bleedT = 1; addText(m.x, m.y - MOB_H[m.type] - 18, L('เลือดออก', 'Bleed'), '#ff4a5a', 12); }
+      if (k === 'glove' && roll(.12)) applyStatus(m, {stun:.5}); }
+    if (live && res.crush) addText(m.x, m.y - MOB_H[m.type] - 30, L('ผ่า!', 'Cleave!'), '#ffb04a', 13);
     if (live && res.combo) addText(m.x, m.y - MOB_H[m.type] - 30, L('คอมโบ!', 'Combo!'), '#ffd56a', 13);
     return out; }; }
 { const _us = updStatus;
@@ -154,5 +171,5 @@ const WKC = {tgt:null, chain:0};
     if (isKatana(st)) s = s.replace(/มีดคู่/g, 'คาตานะ').replace(/Twin daggers/g, 'Katana');
     const k = st && st.watk != null ? WPN_KIND(st) : null, t = k && WTRAIT[k];
     return t ? `${s} · ${L('ลักษณะเฉพาะ', 'Trait')}: ${L(t.th, t.en)}` : s; }; }
-if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'weapons2', t:['ชนิดอาวุธและลักษณะเฉพาะ', 'Weapon kinds and traits'], b:() => `<ul>${Object.entries(WTRAIT).map(([k, t]) => `<li><b>${L(...({sword:['ดาบมือเดียว', '1H sword'], gsword:['ดาบสองมือ', 'Greatsword'], rod:['คทามือเดียว', 'Rod'], lstaff:['ไม้เท้ายาว (สองมือ)', 'Longstaff'], dagger:['มีดสั้น', 'Dagger'], katana:['คาตานะ (สองมือ)', 'Katana'], fist:['สนับมือ (สองมือ)', 'Fist weapons'], bow:['ธนู (สองมือ + ลูกธนู)', 'Bow']})[k])}</b> — ${L(t.th, t.en)}</li>`).join('')}</ul>
+if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'weapons2', t:['ชนิดอาวุธและลักษณะเฉพาะ', 'Weapon kinds and traits'], b:() => `<ul>${Object.entries(WTRAIT).map(([k, t]) => `<li><b>${L(...({sword:['ดาบมือเดียว', '1H sword'], gsword:['ดาบสองมือ', 'Greatsword'], rod:['คทามือเดียว', 'Rod'], lstaff:['ไม้เท้ายาว (สองมือ)', 'Longstaff'], dagger:['มีดสั้น', 'Dagger'], katana:['คาตานะ (สองมือ)', 'Katana'], fist:['สนับมือ (สองมือ)', 'Knuckles'], glove:['นวมคู่ (สองมือ)', 'Boxing gloves'], claw:['กรงเล็บคู่ (สองมือ)', 'Twin claws'], twin:['มีดคู่ (สองมือ)', 'Twin daggers'], axe:['ขวานมือเดียว', 'Hand axe'], gaxe:['ขวานศึกสองมือ', 'War axe'], shuriken:['ดาวกระจาย (สองมือ + ดาว)', 'Throwing stars'], kunai:['คุไน (มือเดียว + ดาว)', 'Kunai'], hexrod:['ไม้เท้ากะโหลก (ไสยเวท)', 'Skull rod'], bow:['ธนู (สองมือ + ลูกธนู)', 'Bow']})[k])}</b> — ${L(t.th, t.en)}</li>`).join('')}</ul>
   <p>${L('ค่าพื้นฐานของไอเท็มไม่สุ่ม (ชิ้นเดียวกันเกรดเดียวกันได้เท่ากัน) · ออปชั่นยังสุ่ม · CRIT เกิน 35% นับครึ่ง สูงสุด 70% · หลบแน่นอนสูงสุด 25% · ลดดาเมจสูงสุด 60%', 'Base stats are fixed (same item and grade = same numbers) · options still roll · CRIT past 35% counts half, 70% at most · Perfect Dodge 25% at most · damage reduction 60% at most')}</p>`});

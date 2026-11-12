@@ -44,7 +44,7 @@ function menuPop(rl, mn){
   mn.style.translate = `${Math.round(dx / k)}px ${Math.round(dy / k)}px`;
   if (fresh){ mn.classList.remove('popin'); void mn.offsetWidth; mn.classList.add('popin'); }
 }
-{ const _sr = setRail; setRail = function(f){ const r = _sr.apply(this, arguments); setTimeout(menuFit, 0); return r; }; }
+{ const _sr = setRail; setRail = function(f){ const r = _sr.apply(this, arguments); menuFit(); setTimeout(menuFit, 0); return r; }; }   // (v255) at once too: one frame of the menu open in its old place made the button jump on a phone
 { const _lh = layoutHud; layoutHud = function(){ const out = _lh.apply(this, arguments); menuFit(); return out; }; }
 window.addEventListener('resize', () => setTimeout(menuFit, 120));
 /* a tap outside the open menu folds it */
@@ -62,5 +62,9 @@ document.addEventListener('pointerdown', e => {
   #ui .rail.mpop:not(.folded) .menu .mb .tip{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .ui .rail.mpop .menu.mscroll{overflow-y:auto}
   .ui .rail.mpop:not(.folded) .menu{top:calc(100% + 6px)!important;transform-origin:top right}
-  .ui .rail.mpop .menu.popin{animation:mpopin .18s ease-out}
-  @keyframes mpopin{from{scale:.9}to{scale:1}}`; document.head.appendChild(st); }
+  /* (v255) the owner on a phone: the menu button blinked and bounced. Opening it no longer pops the menu in (it was
+     scaled up from 90%), the arrow flips without spinning, and the frame keeps the closed padding so the button does
+     not jump 2-3 px every time it is tapped */
+  html body #ui.ui .rail.mpop .menu.popin{animation:none!important}
+  html body #ui.ui .railtog svg{transition:none!important}
+  html body #ui.ui.moba .rail.mpop{padding:5px!important}`; document.head.appendChild(st); }

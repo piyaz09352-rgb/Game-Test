@@ -81,7 +81,8 @@ function updMob(m, dt){
     } else {
       if (d.boss && bossHunt(m, dt, dp, rooted)) { m.moving = m.moved; return; }
       if (d.boss && updBoss(m, dt)) { m.moving = m.moved; return; }
-      const reach = d.range ? d.range : (d.reach || d.r + 12), fury = d.boss ? 1 + Math.min(.7, (m.flee || 0) * .18) : 1;
+      // (v280) the owner: monsters with a ranged attack do not keep their distance — only bosses stand off; the rest walk in and shoot from close by
+      const reach = d.range && d.boss ? d.range : (d.reach || d.r + 12 + (d.range && typeof MSP_GAP !== 'undefined' ? MSP_GAP : 0)), fury = d.boss ? 1 + Math.min(.7, (m.flee || 0) * .18) : 1;
       const fo = m.foe && !m.foe.dead && (SUMMONS.includes(m.foe) || (typeof petIsFoe === 'function' && petIsFoe(m.foe))) ? m.foe : (m.foe = null), tg = fo || P, dt0 = fo ? dist(m, fo) : dp;   // a bound beast that hit it pulls it away from you
       if (dt0 > reach + (fo ? 8 : 0)){ if (!rooted) moveTo(m, tg.x, tg.y, d.speed * 1.3 * spd * (m.enraged ? 1.3 : 1) * fury, dt); }
       else { m.dir = SPR.dirFromVec(tg.x - m.x, tg.y - m.y); if (m.atkCd <= 0){ if (fo){ m.lunge = .2; m.atkT = 0; SFX.mob('atk', m); if (fo === PET) petHurt(m); else hitBeast(fo, m); } else if (d.range) mobShoot(m); else mobAttack(m); m.atkCd = d.delay * (m.enraged ? .7 : 1); } }
@@ -102,15 +103,22 @@ function updMob(m, dt){
   m.moving = m.moved;
 }
 
+/* (v291) did the last mobAttack land? Its add-ons (a skill's bleed, poison, burn, stun) only follow a hit that landed:
+   they used to come even after a Miss or a Perfect Dodge, so a dodging hero kept bleeding and burning */
+let MOB_HIT_LANDED = false;
+/* (v292) the owner: monsters a little weaker (melee heroes died often, Lv 60 against Lv 30). Ordinary monsters hit 15% softer; bosses unchanged */
+const MOB_DMG_MUL = .85;
 function mobAttack(m, mult = 1, noDodge = false){
+  MOB_HIT_LANDED = false;
   const d = m.def, nightMul = 1, st = m.st || {};
-  const mhit = 95 + d.lvl * 1.55, chance = clamp(mhit - DER.flee + 80, 5, 95);   // (v100) Flee never dodges more than 95%
+  // (v100) Flee never dodges more than 95% · (v292) noDodge 'half': a monster's spell — Flee counts for half (it used to count for nothing)
+  const mhit = 95 + d.lvl * 1.55, chance = clamp(mhit - DER.flee * (noDodge === 'half' ? .5 : 1) + 80, 5, 95);
   m.lunge = .2; m.atkT = 0;
   if (!m.def.range && !noDodge) SFX.mob('atk', m);
   if (P.roll){ addText(P.x, P.y - 48, 'Dodge!', '#9fd8ff'); return; }
-  if (!noDodge && Math.random() * 100 > chance){ addText(P.x, P.y - 48, 'Miss', '#9fd8ff'); return; }
+  if ((!noDodge || noDodge === 'half') && Math.random() * 100 > chance){ addText(P.x, P.y - 48, 'Miss', '#9fd8ff'); return; }
   if (DER.pas.dodge && Math.random() < DER.pas.dodge){ addText(P.x, P.y - 48, 'Perfect Dodge', '#d8f0ff', 13); SFX.play('pdodge'); VFX.play('blink', {x:P.x, y:P.y, x2:P.x, y2:P.y}); return; }
-  const raw = rand(d.atk[0], d.atk[1]) * mult * (m.enraged ? 1.5 : 1) * nightMul * (st.atkDown > 0 ? 1 - st.atkDownPct : 1);
+  const raw = rand(d.atk[0], d.atk[1]) * mult * (d.boss ? 1 : MOB_DMG_MUL) * (m.enraged ? 1.5 : 1) * nightMul * (st.atkDown > 0 ? 1 - st.atkDownPct : 1);
   // (v100) two-layer defence: hard DEF (gear, buffs) takes a share off, less and less per point (70% at most), then soft DEF (VIT) a flat amount.
   // Early on the old flat subtraction is kinder, so the hero takes whichever of the two is smaller: low levels feel the same, high DEF keeps paying off
   const flat = raw - DER.def - buffDef(), layered = typeof bhRed === 'function' ? raw * (1 - bhRed(bhHardDef())) - bhSoftDef() : flat;
@@ -120,7 +128,7 @@ function mobAttack(m, mult = 1, noDodge = false){
   const rfl = Math.min(.5, buffSum('reflect')); if (rfl > 0){ const r = Math.max(1, Math.round(dmg * rfl)); applyDamage(m, {dmg:r}); }   // every reflect buff counts (Golden Shield, Bastion …)
   const bk = P.buffs.barrier ? 'barrier' : Object.keys(P.buffs).find(k => P.buffs[k].barrier > 0), br = bk && P.buffs[bk];   // any shield buff (Mana Barrier, Sacred Ward, a friend's shield)
   if (br){ const a = Math.min(br.barrier, dmg); br.barrier -= a; dmg -= a; VFX.play('barrierHit', {x:P.x, y:P.y}); SFX.play('shieldhit'); if (br.barrier <= 0){ delete P.buffs[bk]; renderBuffs(); } if (dmg <= 0){ addText(P.x, P.y - 48, 'Absorbed', '#9fd0ff', 13); return; } }
-  S.hp -= dmg; if (!DER.pas.noFlinch) P.hurt = .25; P.sit = false; SFX.play('hurt');
+  S.hp -= dmg; if (!DER.pas.noFlinch) P.hurt = .25; P.sit = false; SFX.play('hurt'); MOB_HIT_LANDED = true;
   addText(P.x, P.y - 48, String(dmg), '#ff8a80');
   if (S.hp <= 0 && DER.pas.lastStand && P.lastStandCd <= 0){ S.hp = Math.max(1, Math.round(DER.maxhp * DER.pas.lastStand)); P.lastStandCd = 300; SFX.play('laststand'); VFX.play('laststand', {x:P.x, y:P.y}); banner(L('ยืนหยัดจนวาระสุดท้าย!', 'Last Stand!')); return; }
   if (S.hp <= 0) playerDie();
@@ -177,7 +185,7 @@ function bossCast(m, id){
     case 'meteor': {
       say();
       for (let i = 0; i < 5; i++){ const x = at.x + (i ? rand(-90, 90) : 0), y = at.y + (i ? rand(-50, 50) : 0), wt = 1 + i * .18;
-        VFX.play('warnCircle', {x, y, r:46, t:wt});
+        VFX.play('warnCircle', {x, y, r:46, t:wt, kind:'fall'});
         later(wt, () => { if (m.dead) return; VFX.play('boom', {x, y, big:false}); if (e === 'fire') VFX.play('groundFire', {x, y, r:20, life:2.4}); if (inHit(x, y, 46)) mobAttack(m, 1.5, true); }); }
       return 2;
     }
@@ -221,16 +229,7 @@ function bossHunt(m, dt, dp, rooted){
   m.flee = dp > 200 ? (m.flee || 0) + dt : Math.max(0, (m.flee || 0) - dt * .6);
   if (m.flee > 1.5 && !m.furyMsg){ m.furyMsg = true; addText(m.x, m.y - MOB_H[m.type] - 30, L('คลั่ง! ไล่ล่า', 'Frenzy! Hunting you'), '#ff7a5a', 15); SFX.play('roar'); VFX.play('enrage', {m}); }
   if (m.flee < .2) m.furyMsg = false;
-  m.leapCd = (m.leapCd ?? 4) - dt;
-  if (m.leapT > 0){ m.leapT -= dt; return true; }
-  if (!rooted && dp > 260 && m.leapCd <= 0 && !m.charge){
-    m.leapCd = m.enraged ? 4.5 : 7; const tx = P.x, ty = P.y, wait = .75; m.leapT = wait + .15;
-    VFX.play('warnCircle', {x:tx, y:ty, r:64, t:wait}); VFX.play('dustPuff', {x:m.x, y:m.y});
-    later(wait, () => { if (m.dead) return; const x0 = m.x, y0 = m.y; m.x = clamp(tx, 40, W - 40); m.y = clamp(ty, 60, H - 40); pushOut(m, d.r * .6);
-      VFX.play('blink', {x:x0, y:y0, x2:m.x, y2:m.y}); VFX.play('earthsplitBoom', {x:m.x, y:m.y, r:64}); VFX.shake(5); SFX.play('boom');
-      if (inHit(m.x, m.y, 64) && !P.roll) mobAttack(m, 1.4, true); });
-    return true;
-  }
+  // (v283) the owner: no boss jumps onto the hero any more. A boss left far behind just runs after you (mobs.js moveTo, with its fury speed)
   return false;
 }
 function updBoss(m, dt){

@@ -35,7 +35,7 @@ test('cook N dishes from monster materials, pay the fee, eat one for the buff', 
     await enterWorld(page);
     const rid = 'ck_meat0';
     const before = await page.evaluate(rid => { const r = CK_R[rid], ids = r.need[0].ids; for (const id of ids) delete S.inv[id];
-      S.inv[ids[0]] = 10; S.inv[ids[1]] = 5; S.bia = 10000; delete S.inv[rid]; for (const k of Object.keys(P.buffs)) if (k.startsWith('food')) delete P.buffs[k];
+      S.inv[ids[0]] = 10; S.inv[ids[1]] = 5; S.bia = 1e6; delete S.inv[rid]; for (const k of Object.keys(P.buffs)) if (k.startsWith('food')) delete P.buffs[k];
       return { ids, per: r.need[0].n, fee: r.fee }; }, rid);
     await visit(page, 'cook', 0);
     assert.ok(await page.$(`#dialog [data-ckmake="${rid}"]`), 'the dish is on the menu');
@@ -44,7 +44,7 @@ test('cook N dishes from monster materials, pay the fee, eat one for the buff', 
     const st = await page.evaluate(([rid, ids]) => ({ have: S.inv[rid] || 0, mats: ids.reduce((a, id) => a + (S.inv[id] || 0), 0), bia: S.bia, open: !document.getElementById('dialog').hidden }), [rid, before.ids]);
     assert.strictEqual(st.have, 4, 'four dishes made');
     assert.strictEqual(st.mats, 15 - 4 * before.per, 'materials used: 4 × the recipe');
-    assert.strictEqual(st.bia, 10000 - 4 * before.fee, 'paid 4 × the fee');
+    assert.strictEqual(st.bia, 1e6 - 4 * before.fee, 'paid 4 × the fee');
     assert.ok(st.open, 'the dialog stays open');
     // MAX = as many as materials and Bia allow
     await page.click(`#dialog [data-ckmax="${rid}"]`);
@@ -70,11 +70,11 @@ test('the herbalist brews tonics and the potions moved from Crafting; a tonic st
     await enterWorld(page);
     const rid = 'ap_stone1';
     const info = await page.evaluate(rid => { const r = CK_R[rid], ids = r.need[0].ids; for (const id of ids) delete S.inv[id];
-      S.inv[ids[0]] = r.need[0].n * 3; S.bia = 50000; delete S.inv[rid]; P.buffs = {}; S.inv.ck_meat0 = 1; return { per: r.need[0].n, fee: r.fee, ids }; }, rid);
+      S.inv[ids[0]] = r.need[0].n * 3; S.bia = 1e6; delete S.inv[rid]; P.buffs = {}; S.inv.ck_meat0 = 1; return { per: r.need[0].n, fee: r.fee, ids }; }, rid);
     await visit(page, 'herbal', 1);
     await make(page, rid, 3);
     const st = await page.evaluate(([rid, ids]) => ({ have: S.inv[rid] || 0, mats: ids.reduce((a, id) => a + (S.inv[id] || 0), 0), bia: S.bia }), [rid, info.ids]);
-    assert.deepStrictEqual(st, { have: 3, mats: 0, bia: 50000 - 3 * info.fee }, 'three remedies, materials and fee taken');
+    assert.deepStrictEqual(st, { have: 3, mats: 0, bia: 1e6 - 3 * info.fee }, 'three remedies, materials and fee taken');
     // drink: resistance up, an affliction cured, and the dish buff keeps running beside it
     const dr = await page.evaluate(rid => { const r0 = afRes(); useItem('ck_meat0'); afflict('poison', 5, { dps: 1, force: true }); const pois = afHas('poison'); useItem(rid);
       return { pois, cured: !afHas('poison'), res: afRes() - r0, food: Object.keys(P.buffs).some(k => k.startsWith('food')), tonic: !!P.buffs.tonic, eff: buffEffect(P.buffs.tonic) }; }, rid);
@@ -83,7 +83,7 @@ test('the herbalist brews tonics and the potions moved from Crafting; a tonic st
     assert.ok(dr.food && dr.tonic, 'a dish and a tonic run together');
     assert.ok(/%/.test(dr.eff), 'the buff bar explains the tonic');
     // a potion brew on the Potions tab
-    await page.evaluate(() => { S.inv.jelly = 6; S.inv.redpot = 0; S.bia = 50000; });
+    await page.evaluate(() => { S.inv.jelly = 6; S.inv.redpot = 0; S.bia = 1e6; });
     await visit(page, 'herbal', 'pot');
     await make(page, 'ap_brew_redpot', 2);
     const pot = await page.evaluate(() => ({ red: S.inv.redpot || 0, jelly: S.inv.jelly || 0 }));
@@ -104,7 +104,7 @@ test('short of materials or Bia: a message, and nothing changes', { skip, timeou
     await enterWorld(page);
     const rid = 'ck_fowl0';
     const snap = () => page.evaluate(rid => JSON.stringify({ inv: S.inv, z: S.bia, d: S.inv[rid] || 0 }), rid);
-    await page.evaluate(rid => { const r = CK_R[rid]; for (const id of r.need[0].ids) delete S.inv[id]; S.inv[r.need[0].ids[0]] = r.need[0].n * 2 - 1; S.bia = 100000; toastMsg = ''; }, rid);
+    await page.evaluate(rid => { const r = CK_R[rid]; for (const id of r.need[0].ids) delete S.inv[id]; S.inv[r.need[0].ids[0]] = r.need[0].n * 2 - 1; S.bia = 1e6; toastMsg = ''; }, rid);
     await visit(page, 'cook', 0);
     let s0 = await snap();
     await make(page, rid, 2);

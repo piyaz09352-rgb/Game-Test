@@ -182,9 +182,9 @@ function hud(){
   const setH = (id, h) => { const n = el(id); if (n.dataset.h !== h){ n.dataset.h = h; n.innerHTML = h; } };
   setH('hpT', `<b>HP</b><em>${Math.max(0, Math.round(S.hp)).toLocaleString()} / ${DER.maxhp.toLocaleString()}</em>`); setH('spT', `<b>SP</b><em>${Math.round(S.sp).toLocaleString()} / ${DER.maxsp.toLocaleString()}</em>`);
   el('hpBar').classList.toggle('low', S.hp / DER.maxhp < .25 && !P.dead);
-  const nb = nextBase(S.lvl), nj = nextJob(S.jlvl), jm = S.jlvl >= JOBS[S.job].jobMax, bm = S.lvl >= LV_MAX;
+  const nb = nextBase(S.lvl), nj = nextJob(S.jlvl), jm = S.jlvl >= JOBS[S.job].jobMax, pc = typeof patchCap === 'function' ? patchCap() : LV_MAX, bm = S.lvl >= pc;
   setW('bxI', bm ? 1 : S.exp / nb); setW('jxI', jm ? 1 : S.jexp / nj);
-  setT('bxT', bm ? 'Base MAX' : `Base ${(Math.min(S.exp / nb, .999) * 100).toFixed(1)}%`); setT('jxT', jm ? 'Job MAX' : `Job ${(S.jexp / nj * 100).toFixed(1)}%`);
+  setT('bxT', bm ? (S.lvl < LV_MAX ? L(`เพดาน Lv ${pc} · สะสม EXP`, `Cap Lv ${pc} · EXP stored`) : 'Base MAX') : `Base ${(Math.min(S.exp / nb, .999) * 100).toFixed(1)}%`); setT('jxT', jm ? 'Job MAX' : `Job ${(S.jexp / nj * 100).toFixed(1)}%`);
   { const a = el('ammoT'), on = usesArrows(); if (a.hidden === on) a.hidden = !on; if (on){ const n = arrowCount(); setT('ammoT', `${ammoWant() === 'star' ? '✦' : '➶'} ${n}`); a.classList.toggle('low', n < 50); } }
   setT('cJob', nm(JOBS[S.job])); setT('cLv', `Base ${S.lvl} · Job ${S.jlvl}`); setT('lvBadge', String(S.lvl));
   document.querySelectorAll('.cdv').forEach(c => {
@@ -252,9 +252,14 @@ function placeChat(){
   if (moba){
     // joystick mode: chat sits bottom-centre, in the free lane between the left thumb (stick + potions) and the right one (skills)
     const R = id => { const e = el(id); if (!e || e.hidden || !e.offsetWidth) return null; const r = brect(e); return {l:r.left - u.left, r:r.right - u.left, t:r.top - u.top}; };
-    const lefts = ['joy'].map(R).filter(Boolean), rights = ['mobaAct', 'mobaUtil', 'mobaPot'].map(R).filter(Boolean);
+    // (v259) the v244 layout stretches the button groups over the whole screen and places each button itself: measure
+    // the buttons, not the groups (the groups made the lane look empty and the chat opened above the top of the screen)
+    const ml = ui.classList.contains('ml244'), RB = e => { const r = brect(e); return {l:r.left - u.left, r:r.right - u.left, t:r.top - u.top}; }, shown = e => e && !e.hidden && e.offsetWidth > 0;
+    const lefts = ['joy'].map(R).filter(Boolean), rights = ml ? [...document.querySelectorAll('#mobaAct .mo')].filter(shown).map(RB) : ['mobaAct', 'mobaUtil', 'mobaPot'].map(R).filter(Boolean);
     const L0 = Math.max(12, ...lefts.map(o => o.r)) + 10, R0 = Math.min(u.width - 12, ...rights.map(o => o.l)) - 10, span = R0 - L0;
-    if (span >= 220){ w = Math.min(360, Math.round(span / k)); l = Math.round((L0 + (span - w * k) / 2) / k); b = 10; }
+    if (span >= 220){ w = Math.min(360, Math.round(span / k)); l = Math.round((L0 + (span - w * k) / 2) / k); b = 10;
+      if (ml){ const row = [...document.querySelectorAll('#mobaPot .mo, #mobaUtil .mu, #chatBtn')].filter(shown).map(RB).filter(o => o.r > L0 && o.l < R0);   // above the bottom row of potions and small buttons
+        if (row.length) b = Math.round((u.height - Math.min(...row.map(o => o.t))) / k + 8); } }
     else { // narrow (upright phone): above the controls, beside the column of small buttons if it stands on the right
       const mu = R('mobaUtil'), col = mu && el('mobaUtil') && !el('mobaUtil').classList.contains('row'), xr = col ? mu.l - 10 : u.width - 12, avail = xr - 12;
       w = Math.min(340, Math.round(avail / k)); l = Math.round((12 + (avail - w * k) / 2) / k);

@@ -91,7 +91,7 @@ function botPick(t){
     if (!e.on) continue; const sk = SKILLS[e.id];
     if (botKind(sk) !== 'buff' || !botReady(e.id, keep)) continue;
     if (sk.type === 'petcall'){ if (S.pet && t && !(P.petBuff > 0)) return e.id; continue; }
-    if (sk.type === 'bond'){ if (S.bound && !SUMMONS.some(s => s.beast === 'bound')) return e.id; continue; }
+    if (sk.type === 'bond'){ if (S.bound && !SUMMONS.some(s => s.beast === 'bound') && !(typeof bondRest === 'function' && bondRest() > 0) && !P.cds[e.id]) return e.id; continue; }   // (v274) not while it rests
     if (sk.type === 'conjure' || sk.type === 'summon'){
       // a summoned beast: out and not nearly over → wait; gone (died or ran out) → call it again right away
       const live = SUMMONS.filter(s => (sk.type === 'summon' ? s.kind === 'tiger' : s.kind === 'beast' && s.beast === sk.beast) && !s.dead && s.dur - s.t > 0);
@@ -131,7 +131,7 @@ function updBot(dt){
   closeDialog();
   const hp = S.hp / DER.maxhp, sp = S.sp / DER.maxsp, th = threats();
   // potions
-  const B = S.bot || {}, hpPot = ['elixirpot', 'whitepot', 'orangepot', 'redpot'].find(k => S.inv[k]), spPot = ['bigbluepot', 'bluepot'].find(k => S.inv[k]);
+  const B = S.bot || {}, hpPot = S.inv[potPick('hp')] ? potPick('hp') : null, spPot = S.inv[potPick('sp')] ? potPick('sp') : null;   // (v290) the slot's own potion, or the strongest in the bag
   if (B.potHpOn !== false && hp < (B.potHp ?? 45) / 100 && hpPot && P.itemCd <= 0){ useItem(hpPot); return; }
   if (B.potSpOn !== false && sp < (B.potSp ?? 20) / 100 && spPot && P.itemCd <= 0){ useItem(spPot); return; }
   { const h = botPick(null); if (h && (botKind(SKILLS[h]) === 'heal' || botKind(SKILLS[h]) === 'sp')){ botFire(h); return; } }
@@ -144,7 +144,7 @@ function updBot(dt){
     if (safe){
       if (P.sit){ P.sit = false; renderHotbar(); } BOT.resting = false;
       P.target = null; P.pending = null; BOT.roam = null; P.tx = safe.x; P.ty = safe.y;
-      if (!P.ride){ P.ride = true; renderHotbar(); }
+      if (!P.ride && canRideNow()){ P.ride = true; renderHotbar(); }
       BOT.state = 'flee'; renderBotChip(); return;
     }
     if (near && !inVillage(P) && dist(near, P) < 140 && !th.some(m => m !== near)){   // a calm boss only makes Auto step away when it is right on top of you, and never in the middle of a fight
@@ -154,15 +154,19 @@ function updBot(dt){
       let go = null;
       for (const a of [0, .6, -.6, 1.2, -1.2, 1.8, -1.8]){ const c = Math.cos(a), s2 = Math.sin(a), q = {x:P.x + (ux * c - uy * s2) * 260, y:P.y + (ux * s2 + uy * c) * 260};
         if (walkable(q.x, q.y, 18)){ go = q; break; } }
-      if (go){ P.tx = go.x; P.ty = go.y; if (!P.ride){ P.ride = true; renderHotbar(); } }
+      if (go){ P.tx = go.x; P.ty = go.y; if (!P.ride && canRideNow()){ P.ride = true; renderHotbar(); } }
       BOT.state = 'flee'; renderBotChip(); return;
     }
   }
   // out of potions and hurt → back to the village
-  if (hp < BOT_CFG.retreatHp && !hpPot && MAP_ID !== 0 && S.inv.talisman && P.itemCd <= 0 && !threats().length){ useItem('talisman'); return; }
+  // (v273) no Return Talisman any more: walk to this map's Shrine Keeper and warp home for free
+  if (hp < BOT_CFG.retreatHp && !hpPot && MAP_ID !== 0){ const k = NPCS.find(x => x.id === 'warp');
+    if (k && !threats().length){ BOT.state = 'retreat'; if (P.sit) P.sit = false; P.target = null; P.pending = null;
+      if (Math.hypot(k.x - P.x, k.y - P.y) < 70){ warpTo(0); return; }
+      if (!P.ride && canRideNow()){ P.ride = true; renderHotbar(); } P.tx = k.x; P.ty = k.y + 40; renderBotChip(); return; } }
   if (hp < BOT_CFG.retreatHp && !hpPot && MAP_ID === 0 && !inVillage(P)){
     BOT.state = 'retreat'; if (P.sit) P.sit = false;
-    P.target = null; P.pending = null; if (!P.ride && th.length === 0){ P.ride = true; renderHotbar(); }
+    P.target = null; P.pending = null; if (!P.ride && canRideNow() && th.length === 0){ P.ride = true; renderHotbar(); }
     P.tx = 300; P.ty = 860; renderBotChip(); return;
   }
   // rest until topped up
@@ -196,7 +200,7 @@ function updBot(dt){
     if (!BOT.roam){ renderBotChip(); return; }
   }
   P.tx = BOT.roam.x; P.ty = BOT.roam.y;
-  if (!P.ride && Math.hypot(BOT.roam.x - P.x, BOT.roam.y - P.y) > 400){ P.ride = true; renderHotbar(); }
+  if (!P.ride && canRideNow() && Math.hypot(BOT.roam.x - P.x, BOT.roam.y - P.y) > 400){ P.ride = true; renderHotbar(); }
   renderBotChip();
 }
 function renderBotChip(){
@@ -210,7 +214,37 @@ function renderBotChip(){
 }
 
 /* ---------- Auto setup window ---------- */
+/* (v274) the owner: the skill set as tables, one per group (heal → SP → buff → attack, the order Auto uses them);
+   ↑↓ move a skill within its own group */
+const BOT_GROUPS = [['heal', 'ฟื้นฟู HP', 'Healing'], ['sp', 'ฟื้นฟู SP', 'SP'], ['buff', 'บัฟ · เรียกสัตว์', 'Buffs · summons'], ['atk', 'โจมตี', 'Attacks']];
+function botTables(b){
+  return BOT_GROUPS.map(([k, th, en]) => { const rows = b.list.filter(e => SKILLS[e.id] && botKind(SKILLS[e.id]) === k); if (!rows.length) return '';
+    const up = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 10l4-4 4 4"/></svg>', dn = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 6l4 4 4-4"/></svg>';
+    return `<table class="atab atab-${k}"><caption><em class="ak ak-${k}">${L(th, en)}</em> <small>${rows.filter(e => e.on).length}/${rows.length}</small></caption>
+      <thead><tr><th class="c-n">#</th><th class="c-on">${L('ใช้', 'On')}</th><th class="c-sk">${L('สกิล', 'Skill')}</th><th class="c-lv">Lv</th><th class="c-sp">SP</th><th class="c-or">${L('ลำดับ', 'Order')}</th></tr></thead>
+      <tbody>${rows.map((e, i) => { const sk = SKILLS[e.id];
+        return `<tr class="${e.on ? '' : 'off'}"><td class="c-n">${i + 1}</td><td class="c-on"><label class="achk"><input type="checkbox" data-aon="${e.id}" ${e.on ? 'checked' : ''}><i class="sw"></i></label></td>
+          <td class="c-sk"><span class="aico">${skillIcon(e.id)}</span><b>${skName(sk)}</b></td><td class="c-lv">${skl(e.id)}</td><td class="c-sp">${sk.sp(skl(e.id))}</td>
+          <td class="c-or"><button class="ibtn" data-agmove="${e.id}" data-d="-1" ${i ? '' : 'disabled'} aria-label="${L('เลื่อนขึ้น', 'Move up')}">${up}</button><button class="ibtn" data-agmove="${e.id}" data-d="1" ${i < rows.length - 1 ? '' : 'disabled'} aria-label="${L('เลื่อนลง', 'Move down')}">${dn}</button></td></tr>`; }).join('')}</tbody></table>`; }).join('');
+}
+document.addEventListener('click', e => { const t = e.target.closest && e.target.closest('[data-agmove]'); if (!t || t.disabled) return;
+  const b = botSet(), id = t.dataset.agmove, d = +t.dataset.d, i = b.list.findIndex(x => x.id === id); if (i < 0) return; const k = botKind(SKILLS[id]);
+  for (let j = i + d; j >= 0 && j < b.list.length; j += d) if (SKILLS[b.list[j].id] && botKind(SKILLS[b.list[j].id]) === k){ [b.list[i], b.list[j]] = [b.list[j], b.list[i]]; break; }
+  dirty = true; renderAuto(); });
+{ const st = document.createElement('style'); st.textContent = `
+#pane-auto .atab{width:100%;border-collapse:separate;border-spacing:0;margin:6px 0 10px;background:#fffaf0;border-radius:10px;overflow:hidden;box-shadow:inset 0 0 0 1.5px #e3c486;font-size:13px}
+#pane-auto .atab caption{text-align:left;padding:2px 2px 5px;font-weight:800}#pane-auto .atab caption small{color:#8a6a3a;font-weight:700}
+#pane-auto .atab th{background:linear-gradient(#f6e2b4,#ecd096);color:#5a3a10;font-size:11px;font-weight:800;padding:5px 6px;text-align:center;white-space:nowrap}
+#pane-auto .atab td{padding:4px 6px;border-top:1px solid rgba(201,154,58,.25);text-align:center;vertical-align:middle;color:#3a2206}
+#pane-auto .atab tbody tr:nth-child(even) td{background:rgba(246,226,180,.28)}
+#pane-auto .atab tr.off td{opacity:.55}#pane-auto .atab tr.off td.c-on{opacity:1}
+#pane-auto .atab .c-n{width:26px;color:#8a6a3a;font-weight:800}#pane-auto .atab .c-on{width:52px}#pane-auto .atab .c-lv,#pane-auto .atab .c-sp{width:44px;font-variant-numeric:tabular-nums}
+#pane-auto .atab td.c-sk{text-align:left}#pane-auto .atab td.c-sk b{font-weight:700;vertical-align:middle}
+#pane-auto .atab .aico{display:inline-block;width:26px;height:26px;vertical-align:middle;margin-right:6px}#pane-auto .atab .aico svg{width:100%;height:100%}
+#pane-auto .atab .c-or{width:72px;white-space:nowrap}#pane-auto .atab .c-or .ibtn{display:inline-grid}#pane-auto .atab .c-or .ibtn{width:28px;height:28px}
+#pane-auto .atab .achk{display:inline-flex}`; document.head.appendChild(st); }
 function renderAuto(){
+  if (typeof PHI_WIDE !== 'undefined' && !PHI_WIDE.includes('auto')) PHI_WIDE.push('auto');   // (v274) the standard wide window (phi237.js): room for the table
   const pane = document.getElementById('pane-auto'); if (!pane) return;
   const b = botSet();
   const row = (e, i) => { const sk = SKILLS[e.id], k = botKind(sk);
@@ -238,7 +272,7 @@ function renderAuto(){
     <label class="set"><span><b>${L('นั่งเมื่อ SP ต่ำกว่า', 'Sit below SP')}</b><small id="a-sitSp-v">${b.sitSp}%</small></span><input type="range" data-arng="sitSp" min="0" max="90" step="5" value="${b.sitSp}"></label>` : ''}
     <div class="sec">${L('ชุดสกิล · เรียงตามลำดับที่ใช้', 'Skill set · used top to bottom')}</div>
     ${noAtk ? `<p class="awarn">${L('ยังไม่ได้ติ๊กสกิลโจมตี และปิดตีปกติ — Auto จะตีปกติแทน', 'No attack skill ticked and Basic Attack is off — Auto will swing normally')}</p>` : ''}
-    ${b.list.length ? `<div class="alist">${b.list.map(row).join('')}</div>` : `<p class="empty">${L('ยังไม่มีสกิลกดใช้ · ลงแต้มในหน้าต่างสกิล (S) ก่อน', 'No active skills yet · learn some in the Skill window (S)')}</p>`}
+    ${b.list.length ? botTables(b) : `<p class="empty">${L('ยังไม่มีสกิลกดใช้ · ลงแต้มในหน้าต่างสกิล (S) ก่อน', 'No active skills yet · learn some in the Skill window (S)')}</p>`}
     <p class="hint">${L('Auto ฟื้นก่อน → Buff → สกิลโจมตีตัวแรกที่พร้อม', 'Auto heals first → buffs → the first ready attack skill')}</p>
     <p class="hint">${L('เปิด/ปิด Auto ที่ปุ่ม Auto บนแถบล่าง (B)', 'Turn Auto on/off with the Auto button on the bar (B)')}</p>`;
 }

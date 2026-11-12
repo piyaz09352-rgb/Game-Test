@@ -41,7 +41,10 @@ test('tower party: invite, shared floors, both paid, host hand-over', { skip, ti
     await M.waitForFunction(() => TW.f === 2 && S.bia > 0 && S.tower.best === 1, null, { timeout: 15000 });
     assert.ok(await M.evaluate(() => twkMine().f === 1), 'the floor counts for the mate\'s week too');
 
-    // floor 2 for both, the mate's clock follows the host's
+    // floor 2 for both, the mate's clock follows the host's. (v272–v273) the next floor starts when you walk through the
+    // open door yourself: both step onto its sill
+    for (const pg of [H, M]){ await pg.waitForFunction(() => typeof TWM !== 'undefined' && TWM.open, null, { timeout: 20000 }).catch(() => {});
+      await pg.evaluate(() => { if (typeof twmStairs === 'function'){ const s = twmStairs(); P.x = s.x; P.y = s.y; P.tx = null; } }); }
     await M.waitForFunction(() => TW.phase === 'fight' && TW.f === 2, null, { timeout: 30000 });
     const [th, tm] = await Promise.all([H.evaluate(() => TW.t), M.evaluate(() => TW.t)]);
     assert.ok(Math.abs(th - tm) < 4, `clocks agree (${th.toFixed(1)} vs ${tm.toFixed(1)})`);

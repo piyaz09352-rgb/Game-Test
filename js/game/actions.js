@@ -13,6 +13,7 @@ const PET = {x:0, y:0, dir:0, moving:false, t:0, atkCd:1, target:null};
 const dirVec = d => { const a = (90 + d * 45) * Math.PI / 180; return [Math.cos(a), Math.sin(a)]; };
 
 function doRoll(){
+  return;   // (v279) the owner removed the dodge roll from the game: no button, no key, never rolls
   if (P.dead || P.roll || P.cast || (P.cds.roll || 0) > 0) return;
   if (P.ride){ toast(L('ลงจากพาหนะก่อนจึงกลิ้งได้', 'Dismount before rolling')); return; }
   let vx, vy;
@@ -31,7 +32,7 @@ function toggleRide(){
   if (P.dead || P.roll || P.cast) return;
   P.sit = false;
   P.ride = !P.ride; P.act = null;
-  if (P.ride){ P.target = null; P.pending = null; toast(S.job === 'warlord' ? L('ขึ้นช้างศึก', 'Mounted the war elephant') : L('ขึ้นขี่กวางทอง · เร็วขึ้น 70%', 'Riding the golden deer · 70% faster')); }
+  if (P.ride){ P.target = null; P.pending = null; toast(S.job === 'warlord' ? L('ขึ้นช้างศึก', 'Mounted the war elephant') : L('ขึ้นขี่กวางทอง · เร็วขึ้น 30%', 'Riding the golden deer · 30% faster')); }
   else toast(L('ลงจากพาหนะ', 'Dismounted'));
   renderHotbar();
 }

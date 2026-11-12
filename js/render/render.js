@@ -159,7 +159,7 @@ function drawMobW(g, m){
   if (m.dead) g.globalAlpha = m.vanish ? Math.max(0, 1 - m.deadT * 2) : (m.deadT > .8 ? Math.max(0, 1 - (m.deadT - .8) * 2.5) : 1);
   else if (T - m.born < .4) g.globalAlpha = (T - m.born) / .4;
   shadowW(g, x, y, (m.type === 'lantern' ? 6 : m.def.r * .95) * (lift ? Math.max(.4, 1 - lift / 160) : 1));
-  if (fz || m.def.boss){ const bz = m.def.boss ? m.def.bsz || (typeof BOSS_SZ !== 'undefined' ? BOSS_SZ : 1) : 1, k = bz * (fz ? 1 + ((fz.phase || 1) - 1) * .04 + (fz.berserk > 0 ? .05 : 0) : 1); g.translate(x, y - lift); { const br = !m.dead && act === 'idle' ? Math.sin(T * 1.9 / Math.sqrt(bz) + (m.id || 0)) : 0; g.scale(k * (1 - br * .01), k * (1 + br * .022)); }   /* (v117) a big chest breathes slowly */
+  if (fz || m.def.boss){ const bz = m.def.boss ? m.def.bsz || (typeof BOSS_SZ !== 'undefined' ? BOSS_SZ : 1) : 1, k = bz * (fz ? 1 + ((fz.phase || 1) - 1) * .04 + (fz.berserk > 0 ? .05 : 0) : 1); g.translate(x, y - lift); { const br = !m.dead && act === 'idle' ? Math.sin(T * 1.9 / Math.sqrt(bz) + (m.id || 0)) : 0; const sq = fz && fz.sq; g.scale(k * (1 - br * .01) * (sq ? sq[0] : 1), k * (1 + br * .022) * (sq ? sq[1] : 1)); }   /* (v117) a big chest breathes slowly · (v276) squash and stretch in a leap */
     SPR.draw(g, SHEETS[m.type], act, m.dir || 0, t, 0, 0);
     if (fz && (fz.phase >= 3 || fz.berserk > 0)){ g.globalCompositeOperation = 'lighter'; g.globalAlpha = fz.berserk > 0 ? .26 : .14; /* (v117) a steady glow, no pulsing */ SPR.draw(g, SHEETS[m.type], act, m.dir || 0, t, 0, 0); } }
   else if (m.elite){ g.translate(x, y); g.scale(1.3, 1.3); SPR.draw(g, SHEETS[m.type], act, m.dir || 0, t, 0, 0);
@@ -196,6 +196,7 @@ function drawPetW(g){
   shadowW(g, x, y, MOB[S.pet].r * .8);
   SPR.draw(g, SHEETS[S.pet], PET.moving ? 'walk' : 'idle', PET.dir || 0, PET.t, x, y);
 }
+const TREE_VAR = new Set(['tree', 'palm', 'pine', 'himtree', 'bamboo', 'banana', 'treefern', 'araucaria', 'deadtree', 'thorntree', 'cycad', 'bush', 'rock', 'flowerbush', 'mushroom', 'cactus', 'fern', 'willow', 'bodhi', 'rubber', 'tamarind', 'rain']);
 function drawPropW(g, p, im, x, y){
   // trees and houses fade when the player walks behind them
   // (v59) no save()/restore() per prop: on phones that pair alone was a third of the frame. State is set and put back by hand.
@@ -203,7 +204,9 @@ function drawPropW(g, p, im, x, y){
   const sm = g.imageSmoothingEnabled, a0 = g.globalAlpha; if (!sm) g.imageSmoothingEnabled = true;
   if (behind) g.globalAlpha = a0 * .55;
   const sk = typeof LIVE !== 'undefined' ? LIVE.sway(p) : 0;   // wind: the crown leans, the foot stays put
-  if (sk){ const m = g.getTransform(); g.translate(x, y); g.transform(1, 0, -sk, 1, 0, 0); g.drawImage(im.img, -im.ax, -im.ay, im.w, im.h); g.setTransform(m); }
+  // (v286) the owner: rows of the very same tree. Each tree now has its own size (82–118 %) and faces its own way
+  if (p.vk === undefined){ const h = Math.abs(Math.sin(p.x * 12.9898 + p.y * 78.233) * 43758.5453) % 1; p.vk = TREE_VAR.has(p.type) ? (.82 + (h * 10 % 1) * .36) * (h < .5 ? -1 : 1) : 0; }
+  if (sk || p.vk){ const m = g.getTransform(), k = p.vk || 1; g.translate(x, y); if (sk) g.transform(1, 0, -sk, 1, 0, 0); g.scale(k, Math.abs(k)); g.drawImage(im.img, -im.ax, -im.ay, im.w, im.h); g.setTransform(m); }
   else g.drawImage(im.img, x - im.ax, y - im.ay, im.w, im.h);
   if (behind) g.globalAlpha = a0;
   if (!sm) g.imageSmoothingEnabled = false;
@@ -446,6 +449,9 @@ function render(){
     cam.x = GFX.smooth ? CAMS.x + shx : Math.round(CAMS.x + shx); cam.y = GFX.smooth ? CAMS.y + shy : Math.round(CAMS.y + shy); }
   // painted ground (2 px per world unit) straight to the screen
   ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.imageSmoothingEnabled = true; ctx.imageSmoothingQuality = GFX.preset === 'ultra' ? 'high' : 'medium';   // (v105) 'high' only at the sharpest preset
+  // (v260) a view wider or taller than the map (far zoom in a small map, the tower's halls): fill the rest first, or the
+  // last frame (the town you came from) shows through at the edges
+  if (VW > W || VH > H){ ctx.fillStyle = typeof twmOn === 'function' && twmOn() && typeof twmT === 'function' ? twmT().sky[1] : '#0b0d12'; ctx.fillRect(0, 0, cv.width, cv.height); }
   ctx.drawImage(terr, cam.x * TS, cam.y * TS, VW * TS, VH * TS, 0, 0, VW * PX * DPR, VH * PX * DPR);
   let g = ctx; g.setTransform(PX * DPR, 0, 0, PX * DPR, 0, 0);
   g.translate(-.5, -.5);
@@ -479,7 +485,7 @@ function render(){
   }
   VFX.drawOver(g, cam.x, cam.y);
   if (typeof LIVE !== 'undefined') LIVE.drawOver(g);   // birds, butterflies, fireflies, leaves, smoke, cloud shadows
-  const target = isNight() ? .58 : 0;
+  const target = isNight() && !(typeof twmOn === 'function' && twmOn()) ? .58 : 0;   // (v264) indoors in the tower: no night veil (it dulled the hall's own fire and light)
   nightA += ((SETTINGS.nightFx ? target : 0) - nightA) * .02;
   if (nightA > .01){
     nctx.setTransform(1, 0, 0, 1, 0, 0); nctx.globalCompositeOperation = 'source-over'; nctx.clearRect(0, 0, night.width, night.height); nctx.setTransform(night.width / VW, 0, 0, night.height / VH, 0, 0);
