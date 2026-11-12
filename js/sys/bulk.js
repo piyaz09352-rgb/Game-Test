@@ -101,7 +101,7 @@ document.addEventListener('change', e => { const t = e.target; if (!t || !t.data
 { const _ml = mkList; mkList = async function(){ if (typeof MK !== 'undefined' && isLocked(MK.sel)){ toast(L('ชิ้นนี้ล็อคอยู่ · ปลดล็อคก่อนวางขาย', 'This piece is locked · unlock it to list it')); return; } return _ml.apply(this, arguments); }; }
 
 /* ---------- auto: sell or salvage low-grade gear the moment you pick it up (uses that mode's grade settings) ---------- */
-const bkAuto = () => (S && S.bulk && S.bulk.auto) || 'off';
+const bkAuto = () => 'off';   // (v292) the owner removed the bag's «⚙ ขายอัตโนมัติ» button: selling / salvaging on pick-up is off for everyone (a saved setting no longer sells anything)
 EV.on('pickup', id => {
   const mode = bkAuto(); if (mode === 'off' || !S.inv[id] || !ITEMS[id] || ITEMS[id].kind !== 'gear' || !bkAllowed(mode, id)) return;
   const v = bkValue(mode, id); delete S.inv[id]; if (typeof instPrune === 'function') instPrune();
@@ -119,7 +119,7 @@ function bkPopHTML(){ const a = bkAuto(), st = a === 'off' ? null : bkSet(a);
     <select data-bkauto="1"><option value="off" ${a === 'off' ? 'selected' : ''}>${L('ปิด', 'Off')}</option><option value="sell" ${a === 'sell' ? 'selected' : ''}>${L('ขายตามเกรด', 'Sell by grade')}</option><option value="salv" ${a === 'salv' ? 'selected' : ''}>${L('ย่อยตามเกรด', 'Salvage by grade')}</option></select>
     ${st ? `<span class="bkpl">${L('เกรดที่จะ' + (a === 'sell' ? 'ขาย' : 'ย่อย'), `Grades to ${a === 'sell' ? 'sell' : 'salvage'}`)}</span>${chips}` : ''}</div>`; }
 function bkFoot(){ const foot = el('bagFoot'); if (!foot || !S) return; const a = bkAuto();
-  foot.querySelectorAll('.bkautob,#bkPop').forEach(x => x.remove());
+  foot.querySelectorAll('.bkautob,#bkPop').forEach(x => x.remove()); return;   // (v292) no auto-sell button any more
   foot.insertAdjacentHTML('afterbegin', `<button class="btn sm bkautob${a !== 'off' ? ' on' : ''}" data-bkpop="1" aria-expanded="${BKP.open}">⚙ ${L('ขายอัตโนมัติ', 'Auto-sell')}: <b>${a === 'off' ? L('ปิด', 'Off') : a === 'sell' ? L('ขาย', 'Sell') : L('ย่อย', 'Salvage')}</b></button>${BKP.open ? bkPopHTML() : ''}`); }
 EV.on('tick', function bkWrap(){ if (BKP.wrapped || typeof bagDraw !== 'function') return; BKP.wrapped = true;
   const _bd = bagDraw; bagDraw = function(){ const r = _bd.apply(this, arguments); try { bkFoot(); } catch (e) {} return r; }; });

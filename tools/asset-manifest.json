@@ -214,7 +214,7 @@
 "js/sys/mage2.js":{"v":111,"sha":"3af44c807e0f483a"},
 "js/sys/polish.js":{"v":160,"sha":"a9391cc0ed88d5d4"},
 "js/sys/groundtarget.js":{"v":111,"sha":"4c5ca7fceed84482"},
-"js/sys/bulk.js":{"v":274,"sha":"285edbc39d21b453"},
+"js/sys/bulk.js":{"v":313,"sha":"4f4274ade96ea4ce"},
 "js/sys/sfx2.js":{"v":111,"sha":"98a05c8dbe89eeaf"},
 "js/sys/warpgate.js":{"v":111,"sha":"20c969b8e481954d"},
 "js/sys/tgtstatus.js":{"v":111,"sha":"c259751e383006ec"},
@@ -302,7 +302,7 @@
 "js/sys/jobfx.js":{"v":126,"sha":"ac13b74234494a83"},
 "js/sys/tutfold.js":{"v":127,"sha":"1e510ee1ed4ec762"},
 "js/sys/changelog.js":{"v":127,"sha":"0509d4ccdd277a38"},
-"js/sys/changelog272.js":{"v":313,"sha":"f59fb5cce25ff9a7"},
+"js/sys/changelog272.js":{"v":314,"sha":"f3da7c2a52b6abb4"},
 "js/sys/bossnature.js":{"v":279,"sha":"dab626b53dac17e4"},
 "js/sys/inspect.js":{"v":125,"sha":"7bfd122f80df54a5"},
 "js/sys/petnet.js":{"v":136,"sha":"3f84ce0bd40d9a52"},
@@ -437,4 +437,5 @@
 "js/sys/bagsell279.js":{"v":288,"sha":"f14afc350f624903"},
 "js/sys/mount279.js":{"v":288,"sha":"ec1f621417a732ff"},
 "js/ui/skicons283.js":{"v":302,"sha":"d2386e16c87b343a"},
-"js/sys/skfit286.js":{"v":306,"sha":"eb7132fd195cfddc"}}
+"js/sys/skfit286.js":{"v":314,"sha":"73f96e80f7d7350e"},
+"js/sys/steadywin292.js":{"v":315,"sha":"61de88d79369fa90"}}
