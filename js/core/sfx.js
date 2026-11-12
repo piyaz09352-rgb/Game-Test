@@ -214,7 +214,7 @@ const SFX = (() => {
     if (last[name] && now - last[name] < .04) return; last[name] = now; FX[name](now + .005, o); }
   /* monster voice: body type decides the sound, size and boss decide pitch and weight */
   const MOB_ARCH = {dewblob:'slime', hare:'quad', boar:'quad', lantern:'floater', boss:'slime'};
-  function mob(kind, m){ if (!m || !m.def) return; const a0 = (typeof SPECIES_ARCH !== 'undefined' && SPECIES_ARCH[m.type]) || MOB_ARCH[m.type] || 'quad', arch = a0 === 'fish' ? 'serpent' : a0 === 'cave' ? 'quad' : a0 === 'sky' ? 'floater' : a0;   // (v294) fish use the serpent voice
+  function mob(kind, m){ if (!m || !m.def) return; const a0 = (typeof SPECIES_ARCH !== 'undefined' && SPECIES_ARCH[m.type]) || MOB_ARCH[m.type] || 'quad', arch = a0 === 'fish' ? 'serpent' : a0 === 'cave' ? 'quad' : a0 === 'sky' ? 'floater' : a0 === 'land' ? 'quad' : a0;   // (v294) fish use the serpent voice
     const sz = m.def.size, p = (sz === 'l' ? .7 : sz === 'm' ? .88 : 1.1) * (m.def.boss ? .75 : 1), v = m.def.boss ? 1.4 : 1;
     const name = (kind === 'atk' ? 'ma_' : kind === 'shot' ? 'm_shot' : 'mh_') + (kind === 'shot' ? '' : arch); play(name, {p, v}); }
   /* which voices to use: weapon type for basic attacks, element for spells */

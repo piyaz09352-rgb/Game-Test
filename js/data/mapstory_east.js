@@ -52,18 +52,18 @@ const MS_CH = {
       say:['ขลุ่ยอยู่ที่จ่าฝูงหางขาว! มันตัวใหญ่ ดุมาก ระวังด้วยนะ', 'White-tail, the alpha, has my flute! He\'s big and mean — be careful.'],
       done:['ขลุ่ยข้ากลับมาแล้ว! ในกระบอกขลุ่ยมีกระดาษม้วนเล็ก ๆ… «ทุ่งดอกไม้สีทองจะหันหน้าบอกทาง» นี่ ผ้าโพกลายไผ่ของข้า ให้เจ้าเป็นที่ระลึก', 'My flute\'s back! There\'s a tiny scroll inside… «The golden flowers will turn to show the way.» Here, my bamboo-print head wrap — a keepsake.']}
   ]},
+  // (v298) a new adventure for the land
   31:{npc:{id:'ms_tawan', name:'น้องทานตะวัน', en:'Nong Tawan', role:['สาวชาวไร่ทานตะวัน', 'Sunflower farm girl'], sex:'f', hair:8, color:'hairBlonde', eye:'irisBr', gear:{armor:'s_lotus', head:'ms_h_ngob', mask:'f_blushs'}},
-    title:['ทานตะวันที่หันผิดทาง', 'The Sunflowers That Face the Night'], cos:'ms_h_ngob',
-    kh:['ทานตะวันที่นี่หันหน้าไปทางตะวันออกทั้งที่เป็นกลางคืน… แปลกจัง', 'The sunflowers face east even at night… how strange.'], steps:[
-    {k:'kill', t:'sunflower_beetle', n:12,
-      say:['เดือดร้อนแล้ว! ด้วงทานตะวันกินเมล็ดในไร่จนเกือบหมด เมล็ดพวกนี้คุณตาช่างโคมฝากไว้ บอกว่าเป็น «เมล็ดรุ่งอรุณ» ช่วยไล่ด้วง 12 ตัวหน่อยนะ', 'Disaster! Sunflower beetles are eating nearly every seed. The lantern maker left these seeds with us — «dawn seeds», he called them. Please chase off 12 beetles!'],
-      done:['เมล็ดที่เหลือเรืองแสงอ่อน ๆ ในมือ… อุ่นเหมือนแสงแดดยามเช้าเลย', 'The seeds that are left glow softly in my hand… warm as morning sun.']},
-    {k:'item', t:'m_sunflower_finch', n:5,
-      say:['ข้าจะทำหุ่นไล่กาตัวใหม่ แต่ต้องใช้ขนนกฟินช์ 5 ชิ้นมาประดับให้มันดูน่ากลัว… ไม่สิ น่ารัก!', "I'm making a new scarecrow, but I need five finch feathers to make it look scary… no — cute!"],
-      done:['หุ่นไล่กาน่ารักที่สุดในทุ่ง! เอ๊ะ… หุ่นไล่กาตัวเก่าตรงขอบไร่หายไปไหน', 'The cutest scarecrow in the fields! Huh… where did the old scarecrow at the edge of the farm go?']},
-    {k:'elite', t:'sunflower_golem', name:['หุ่นไล่กายักษ์ที่ตื่นขึ้น', 'The Woken Scarecrow Giant'],
-      say:['หุ่นไล่กาตัวเก่าดูดแสงจากเมล็ดรุ่งอรุณจนตื่นขึ้นมาอาละวาด! ช่วยหยุดมันที', 'The old scarecrow drank the light of the dawn seeds and woke up raging! Please stop it!'],
-      done:['ในอกหุ่นไล่กามีเมล็ดรุ่งอรุณเม็ดใหญ่ที่สุด กับโน้ตของตาเทียน «ข้าทิ้งรอยไว้ที่บึงบัวแดง» นี่ งอบทานตะวันของข้า สวมแล้วแดดไม่แผดเผาเลยนะ', "Inside the scarecrow's chest: the biggest dawn seed, and a note from Ta Thian — «I left a trail at the Red Lotus Marsh.» Take my sunflower ngob hat; the sun can't scorch you in it."]}
+    title:['ทุ่งแห่งความอุดมสมบูรณ์', 'The Fields of Plenty'], cos:'ms_h_ngob',
+    kh:['ทุ่งเขียวไปทั้งทุ่ง ต้นไม้ผลไม้ออกลูกเต็มต้น ดอกไม้บานทั่วไปหมดเลย', 'Green as far as I can see, fruit trees heavy with fruit, flowers everywhere.'], steps:[
+    {k:'kill', t:'meadowram', n:12, say:['ปีนี้ทุ่งอุดมสมบูรณ์มาก แกะเขาเกลียวเลยลงมากินดอกทานตะวันจนเกือบหมด ช่วยไล่ 12 ตัวกลับขึ้นเขาทีนะ', 'The fields are so rich this year that the rams came down to eat nearly all the sunflowers. Drive 12 of them back up the hills.'],
+      done:['ขอบใจจ้ะ! เมล็ดพันธุ์ทองคำ 3 เมล็ดที่จะปลูกปีหน้าตกหล่นอยู่ในทุ่ง ช่วยหาให้หน่อย', 'Thank you! Three golden seeds for the planting next year fell somewhere in the field. Please find them.']},
+    {k:'find', n:3, what:['เมล็ดพันธุ์ทองคำ', 'Golden seed'], say:['เมล็ดพันธุ์ทองคำเรืองแสงอยู่ใต้ต้นไม้ผล', 'The golden seeds glow under the fruit trees.'],
+      done:['ครบแล้ว! ฉันอยากทอผ้าห่มอุ่น ๆ ไว้ห่มเมล็ดตอนหน้าหนาว ขนแกะดีที่สุด', 'All three! I want to weave a warm blanket to keep the seeds through the winter, and ram wool is the best.']},
+    {k:'item', t:'m_meadowram', n:5, say:['ขอขนแกะ 5 กระจุกนะ ฉันจะทอผ้าห่มให้เมล็ดพันธุ์', 'Five tufts of ram wool, please. I will weave a blanket for the seeds.'],
+      done:['ผ้าห่มเสร็จแล้ว! แต่กระทิงตัวใหญ่วิ่งเข้ามาในทุ่งแล้ว!', 'The blanket is done! But a great gaur is charging into the field!']},
+    {k:'elite', t:'sunflower_gaur', name:['กระทิงทุ่งทานตะวัน', 'The Sunflower Gaur'], say:['กระทิงทุ่งทานตะวันจะเหยียบแปลงเมล็ดพันธุ์! ช่วยด้วย!', 'The sunflower gaur will trample the seed beds! Help!'],
+      done:['ทุ่งปลอดภัยแล้ว ปีหน้าดอกทานตะวันจะบานเต็มทุ่งอีก ขอบคุณมากนะ', 'The field is safe, and next year the sunflowers will fill it again. Thank you so much.']}
   ]},
   2:{npc:{id:'ms_buaphan', name:'บัวผัน', en:'Bua Phan', role:['แม่ค้าบัวสาว', 'Lotus seller'], sex:'f', hair:11, color:'hairBlack', eye:'irisPk', gear:{armor:'ms_t_lotus', head:'f_clip'}, wing:'a_sakura'},
     title:['พรายบัวผู้รอคอย', 'The Wraith Who Waits'], cos:'ms_t_lotus',

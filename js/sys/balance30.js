@@ -62,7 +62,7 @@ const MSK_SHOT = {fire:'fire', water:'ice', holy:'holy', wind:'bolt', shadow:'da
 function mskFor(k){
   const d = MOB[k]; if (!d || d.boss) return []; const a = d.nature || 'quad', wp = d.natWp, race = d.race, out = [];
   const byBody = {quad:['maul', 'rend'], rock:['slam', 'harden'], squat:['slam', 'blind'], slime:['spit', 'mend'], bug:['web', 'bite'], bird:['gale', 'volley'],
-    serpent:['spit', 'coil'], fish:['bite', 'frost'], cave:['rend', 'slam'], sky:['nova', 'gale'], floater:['nova', 'hex']}[a] || ['rend'];   // (v294) fish
+    serpent:['spit', 'coil'], fish:['bite', 'frost'], cave:['rend', 'slam'], sky:['nova', 'gale'], land:['maul', 'slam'], floater:['nova', 'hex']}[a] || ['rend'];   // (v294) fish
   const byWeapon = {sword:['rend', 'slam'], bow:['snare', 'volley'], staff:['bolt', 'mend'], fist:['slam', 'maul']}[wp];
   out.push(...(byWeapon || byBody));
   if (a === 'bug' && typeof SPECIES !== 'undefined'){ const r = SPECIES.find(x => x[0] === k); if (r && /^(hornet|wasp|bee)$/.test(r[5].kind || '')) out[0] = 'bite'; }   // (v274) hornets and wasps sting, no webs · (v283) a sting, not a dive
@@ -135,7 +135,7 @@ if (typeof WIKI_SYS !== 'undefined') WIKI_SYS.push({id:'balance30', t:['สเ�
 const MTRAIT = {evasive:['หลบเก่ง', 'Evasive', '#9fd8ff'], swift:['ว่องไว', 'Swift', '#7dffb0'], brute:['ช้าแต่แรง', 'Brute', '#ff8a6a'], critproof:['ต้านคริ', 'Crit-proof', '#e8e0ff'],
   armored:['เกราะหนา', 'Armoured', '#c8b890'], warded:['ต้านเวท', 'Warded', '#c9a0ff'], tough:['อึด', 'Tough', '#ffcf6a'], regen:['ฟื้นตัว', 'Regenerates', '#9cffb0']};
 const MTRAIT_BY = {rock:['armored', 'tough', 'critproof'], squat:['armored', 'tough', 'regen'], slime:['regen', 'warded', 'critproof'], floater:['warded', 'evasive', 'critproof'],
-  bird:['evasive', 'swift', 'swift'], bug:['armored', 'swift', 'critproof'], serpent:['evasive', 'swift', 'regen'], fish:['swift', 'evasive', 'tough'], cave:['armored', 'tough', 'swift'], sky:['warded', 'evasive', 'swift'], quad:['swift', 'brute', 'tough'], human:['brute', 'evasive', 'warded']};
+  bird:['evasive', 'swift', 'swift'], bug:['armored', 'swift', 'critproof'], serpent:['evasive', 'swift', 'regen'], fish:['swift', 'evasive', 'tough'], cave:['armored', 'tough', 'swift'], sky:['warded', 'evasive', 'swift'], land:['tough', 'armored', 'brute'], quad:['swift', 'brute', 'tough'], human:['brute', 'evasive', 'warded']};
 for (const k in MOB){ const d = MOB[k]; if (!d || d.boss || !d.lvl || k === 'dummy' || k === 'crowncrystal' || d.trait !== undefined) continue;
   let h = 0; for (const c of k) h = (h * 31 + c.charCodeAt(0)) >>> 0; const pool = MTRAIT_BY[d.nature || 'quad'] || MTRAIT_BY.quad;
   const t = d.lvl < 6 || h % 6 === 0 ? null : pool[h % pool.length]; d.trait = t;

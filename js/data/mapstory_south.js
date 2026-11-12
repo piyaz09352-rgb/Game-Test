@@ -45,15 +45,18 @@ Object.assign(MS_CH, {
     {k:'elite', t:'oasis_shaman', name:['หมอผีลัทธิเปลวแล้ง', 'Shaman of the Dry Flame'], say:['หมอผีของลัทธิยังทำพิธีอยู่ที่ริมสระ หยุดมันที!', "The cult's shaman is still chanting by the pool. Stop him!"],
       done:['น้ำในสระกลับมาใสแล้ว ตักไปผสมดินบั้งไฟได้เลย ชุดนักบวชโอเอซิสนี้ ให้เจ้าใส่กันแดดทะเลทรายนะ', 'The pool runs clear again — take some for your rocket powder. Wear this oasis priest robe against the desert sun.']}
   ]},
+  // (v298) a new adventure for the land
   10:{npc:msN('ms_sila', 'ศิลา', 'Sila', 'ช่างแกะหินฝึกหัด', 'Apprentice stone carver', 'm', 4, 'hairBrown', 'irisBr', {armor:'s_rune', mask:'ms_k_dust'}),
-    title:['ค้างคาวในปราสาทหิน', 'Bats in the Stone Sanctuary'], cos:'ms_k_dust',
-    kh:['ปราสาทใหญ่จัง… พ่อบอกว่าดินประสิวที่ดีที่สุดมาจากถ้ำค้างคาวในปราสาทเก่า', 'What a temple… Father said the best saltpetre comes from the bat caves of old sanctuaries.'], steps:[
-    {k:'kill', t:'sanctuarybat', n:12, say:['ค้างคาวรบกวนจนข้าแกะสลักไม่ได้เลย! ช่วยไล่ 12 ตัว แล้วข้าจะพาไปเก็บดินประสิว', "The bats won't let me carve! Chase off 12 and I'll take you to the saltpetre."],
-      done:['มูลค้างคาวในซอกหินคือดินประสิวชั้นดี แต่ระวังนะ ภาพสลักบางชิ้นขยับได้', 'The bat droppings in the cracks are the finest saltpetre. But careful — some of the carvings move.']},
-    {k:'item', t:'m_carvedmonkey', n:5, say:['ลิงหินแกะสลักที่ตื่นขึ้นมาขโมยเศษหินไปหมด เอาคืนมา 5 ชิ้น ข้าจะซ่อมนางอัปสรที่ผุพัง', "The carved monkeys woke and ran off with the stone chips. Bring back 5 and I'll mend the crumbling apsara."],
-      done:['นางอัปสรกลับมาสวยแล้ว! เอ๊ะ ใต้ฐานมีจารึกเรื่องบั้งไฟโบราณ… «แบบบั้งไฟแสนถูกเก็บไว้ในหอสมุดใต้ทราย»', 'The apsara is beautiful again! Wait — the base has an inscription about ancient rockets… «The plan of the great rocket lies in the library under the sand.»']},
-    {k:'elite', t:'stonenaga', name:['นาคศิลาพิทักษ์ถ้ำ', 'The Stone Naga of the Cave'], say:['นาคศิลาตื่นมาเฝ้าถ้ำค้างคาว ไม่ยอมให้ใครเอาดินประสิวไป', 'The stone naga woke to guard the bat cave and lets no one take the saltpetre.'],
-      done:['ได้ดินประสิวแล้ว! ผ้าปิดจมูกช่างแกะหินผืนนี้กันฝุ่นได้ดีที่สุด ใส่ไว้นะ', "We have the saltpetre! Wear this stone carver's dust mask — nothing keeps the dust out better."]}
+    title:['ช่างหลวงแห่งยุครุ่งเรือง', 'The Royal Craftsman of the Golden Age'], cos:'ms_k_dust',
+    kh:['เมืองนี้สวยจัง ถนนปูหินขอบทอง ธงหลวงโบกไปทั้งเมือง', 'This city is beautiful: stone streets edged with gold, royal banners flying everywhere.'], steps:[
+    {k:'kill', t:'brassautomaton', n:12, say:['ข้าเป็นช่างแกะหินฝึกหัดของเมืองนี้ หุ่นกลทองเหลืองที่ช่างหลวงรุ่นก่อนสร้างไว้เฝ้าเมืองเฟืองเพี้ยน มันทุบรูปปั้นใหม่ที่เราเพิ่งแกะเสร็จ ช่วยหยุด 12 ตัวที', 'I am an apprentice stone carver here. The brass automatons the old royal craftsmen built to guard the city have slipped a gear and smash the statues we just finished. Stop 12 of them.'],
+      done:['ขอบใจ! อาจารย์ช่างหลวงทิ้งแบบพิมพ์เขียว 3 แผ่นไว้ ถ้าหาเจอ ข้าจะซ่อมหุ่นให้กลับมาเฝ้าเมืองได้', 'Thank you! The royal master left three blueprints. If I can find them I can mend the automatons so they guard the city again.']},
+    {k:'find', n:3, what:['แบบพิมพ์เขียวของช่างหลวง', 'Blueprint of the royal craftsman'], say:['แบบพิมพ์เขียวซ่อนอยู่ใต้ฐานรูปปั้นทองตามถนนใหญ่', 'The blueprints are hidden under the gilded statues along the great avenues.'],
+      done:['ครบแล้ว! ต้องใช้เฟืองทองเหลืองของหุ่นเก่ามาเปลี่ยน', 'All three! Now I need brass gears from the old automatons.']},
+    {k:'item', t:'m_brassautomaton', n:5, say:['เก็บเฟืองทองเหลืองมา 5 ชิ้น ข้าจะประกอบหุ่นตัวใหม่', 'Bring me 5 brass gears and I will build a new automaton.'],
+      done:['หุ่นตัวใหม่เดินเวรยามแล้ว! แต่สิงห์หินหน้าประตูเมืองยังไม่ยอมให้มันผ่าน', 'The new automaton walks its watch! But the stone lion at the city gate will not let it pass.']},
+    {k:'elite', t:'khmerlion', name:['สิงห์หินผู้เฝ้าประตูเมือง', 'The Stone Lion of the Gate'], say:['สิงห์หินผู้เฝ้าประตูเมืองเห็นหุ่นใหม่เป็นศัตรู มันกระโจนเข้ามาแล้ว!', 'The stone lion of the gate takes the new automaton for an enemy and is coming for it!'],
+      done:['สิงห์หินยอมรับหุ่นใหม่แล้ว เมืองของเราจะรุ่งเรืองต่อไป ชุดช่างหลวงนี้ข้าให้เจ้านะ', 'The stone lion accepts the new automaton, and our city will go on flourishing. This outfit of a royal craftsman is yours.']}
   ]},
   38:{npc:msN('ms_chanpha', 'จันทร์ผา', 'Chanpha', 'นักล่าสมบัติสาว', 'Treasure hunter', 'f', 16, 'hairBlack', 'irisGd', {armor:'s_desert', head:'ms_h_explorer', mask:'f_round'}),
     title:['หอสมุดใต้ทราย', 'The Library Under the Sand'], cos:'ms_h_explorer',
@@ -85,15 +88,18 @@ Object.assign(MS_CH, {
     {k:'elite', t:'galegorge_wolf', name:['หมาป่าหอนลม', 'The Wind-howling Wolf'], say:['หมาป่าหอนลมคาบหางบั้งไฟไปแล้ว! ตามไปเร็ว!', 'The wind-howling wolf ran off with the tail! After it!'],
       done:['หางบั้งไฟเสร็จแล้ว ผูกด้วยเชือกว่าวที่เหนียวที่สุด! คาดผมสายลมนี้ ใส่แล้วจะได้ยินเสียงลมพูดนะ', 'The tail is done, tied with my toughest kite string! Wear this wind headband — you will hear the wind talk.']}
   ]},
+  // (v298) a new adventure for the land
   21:{npc:msN('ms_dara', 'ดารา', 'Dara', 'หัวหน้ากองคาราวาน', 'Caravan leader', 'f', 10, 'hairBlack', 'irisGd', {armor:'ms_t_caravan', mask:'k_veil'}),
-    title:['กองคาราวานกลางทะเลทราย', 'The Caravan in the Dunes'], cos:'ms_t_caravan',
-    kh:['ร้อนจนไม่มีเหงื่อจะออกแล้ว… บั้งไฟของเราหนักขึ้นทุกวันเลย', 'So hot I have no sweat left… and our rocket gets heavier every day.'], steps:[
-    {k:'kill', t:'sandworm', n:12, say:['หนอนทรายลากอูฐข้าลงไปแล้วสามตัว! ช่วยไล่ 12 ตัวนะ แล้วกองคาราวานจะช่วยขนบั้งไฟให้', 'Sandworms dragged three of my camels under! Drive off 12 and the caravan will carry your rocket.'],
-      done:['ขอบใจ! อูฐของข้าแบกบั้งไฟได้สบาย… แต่ภาพลวงตาทำให้เราหลงวนอยู่ที่เดิม', 'Thank you! My camels carry the rocket with ease… but mirages keep leading us in circles.']},
-    {k:'find', n:3, what:['หมุดทองนำทางทะเลทราย', 'Golden desert waymarker'], say:['บรรพบุรุษปักหมุดทองนำทางไว้ 3 จุด หาให้เจอ เราจะไม่หลงอีก', 'Our ancestors set three golden waymarkers. Find them and we will never be lost.'],
-      done:['ทางกลับมาแล้ว! หมุดทองชี้ไปทางป่ากระบองเพชร ที่นั่นมียางที่ใช้ติดหางบั้งไฟ', 'The way is back! The markers point to the Cactus Barrens — they have sap that will glue on the rocket tail.']},
-    {k:'elite', t:'mirage', name:['ภาพลวงราชาทะเลทราย', 'The Mirage King'], say:['ภาพลวงนั่นไม่ใช่ภาพธรรมดา มันคือภูตที่หลอกกองคาราวานมาหลายปี!', "That mirage is no trick of the light — it's a spirit that has fooled caravans for years!"],
-      done:['ภาพลวงหายไปแล้ว! ชุดกองคาราวานนี้ระบายลมได้ดี ใส่ข้ามทะเลทรายสบายแน่', 'The mirage is gone! This caravan robe lets the breeze through — perfect for the dunes.']}
+    title:['คาราวานกลางพายุทราย', 'The Caravan in the Sandstorm'], cos:'ms_t_caravan',
+    kh:['ร้อนจนอากาศสั่นไหว… ทรายปลิวเข้าตาตลอดเลย', 'So hot the air shimmers… and the sand keeps blowing into my eyes.'], steps:[
+    {k:'kill', t:'dungbeetle', n:12, say:['พายุทรายพัดคาราวานกระจัดกระจาย ด้วงกลิ้งลูกหินก็กลิ้งไหน้ำของเราไปด้วย ช่วยไล่ 12 ตัวที', 'The sandstorm scattered the caravan, and the dung beetles rolled away our water jars. Drive off 12 of them.'],
+      done:['ขอบใจ! ถุงน้ำ 3 ใบยังหายอยู่กลางทะเลทราย ถ้าไม่มีน้ำ อูฐกับคนในคาราวานไปต่อไม่ได้', 'Thank you! Three water skins are still lost out in the desert. Without water neither the camels nor the people can go on.']},
+    {k:'find', n:3, what:['ถุงน้ำที่หายในพายุทราย', 'Water skin lost in the storm'], say:['ถุงน้ำน่าจะตกอยู่ข้างหินที่ลมกัดเป็นรูปเห็ด ทรายกลบไปครึ่งหนึ่งแล้ว', 'The water skins probably fell beside the mushroom-shaped rocks, half buried in sand.'],
+      done:['เจอแล้ว! แต่ต้องมีโล่กันทรายไว้ให้อูฐเดินฝ่าพายุ เปลือกด้วงแข็งพอ', 'Found them! But the camels need sand shields to walk through the storm, and beetle shell is hard enough.']},
+    {k:'item', t:'m_dungbeetle', n:5, say:['เปลือกด้วงกลิ้งลูกหิน 5 ชิ้น พอทำโล่ให้ทั้งขบวน', 'Five dung-beetle shells are enough for shields for the whole train.'],
+      done:['คาราวานพร้อมออกเดินทางแล้ว แต่มีบางอย่างเคลื่อนไหวอยู่ใต้เนินทราย…', 'The caravan is ready to go, but something is moving under the dunes…']},
+    {k:'elite', t:'sandworm', name:['หนอนทรายใต้เนินมรณะ', 'The Worm Beneath the Dunes'], say:['หนอนทรายยักษ์โผล่จากใต้เนิน จะกลืนอูฐทั้งตัว! ปกป้องคาราวาน!', 'A giant sandworm has burst from the dune to swallow a camel whole! Protect the caravan!'],
+      done:['คาราวานรอดแล้ว! ชุดเดินทางนี้กันทรายกันแดดได้ดี ข้าให้เจ้านะ', 'The caravan is safe! This travelling outfit keeps out sand and sun. It is yours.']}
   ]},
   40:{npc:msN('ms_namkaew', 'หนามแก้ว', 'Nam Kaew', 'สาวเจ้าของไร่กระบองเพชร', 'Cactus farmer', 'f', 3, 'hairRose', 'irisPk', {armor:'s_forest', head:'ms_h_cactus', mask:'f_blush'}),
     title:['ยางกระบองเพชร', 'Cactus Sap'], cos:'ms_h_cactus',
@@ -105,15 +111,18 @@ Object.assign(MS_CH, {
     {k:'elite', t:'cactus_crocodile', name:['ตะกวดหนามเหล็ก', 'The Iron-spined Monitor'], say:['ตะกวดหนามเหล็กกินกระบองเพชรของข้าไปครึ่งไร่ ช่วยข้าด้วย!', 'The iron-spined monitor has eaten half my farm! Help!'],
       done:['เจ้ากล้าหาญมาก! กิ๊บดอกกระบองเพชรนี้ ข้าทำจากดอกที่บานแค่คืนเดียว', 'So brave! This cactus-flower pin is made from a bloom that opens for only one night.']}
   ]},
+  // (v298) a new adventure for the land
   22:{npc:msN('ms_sueanoi', 'เสือน้อย', 'Suea Noi', 'อดีตโจรกลับใจ', 'Reformed bandit', 'm', 11, 'hairCrimson', 'irisRd', {armor:'s_shadow', mask:'ms_k_bandana'}),
-    title:['เสือน้อยกลับใจ', "The Little Bandit's Change of Heart"], cos:'ms_k_bandana',
-    kh:['ระวังนะ ได้ยินว่าแถวนี้มีโจรผี', 'Careful — they say there are ghost bandits around here.'], steps:[
-    {k:'kill', t:'banditghost', n:12, say:['ข้าเคยเป็นโจร แต่ข้าเลิกแล้ว! โจรผีของยักษ์ผาแดงบังคับคนมาขุดดินแดง ช่วยปราบ 12 ตน', 'I was a bandit once, but no more! The Red Cliff Giant\'s ghost bandits force people to dig red clay. Defeat 12.'],
-      done:['คนงานเป็นอิสระแล้ว… ดินแดงที่นี่อัดบั้งไฟได้แน่นที่สุด แต่ลัทธิเปลวแล้งยึดหลุมดินไว้', 'The diggers are free… this red clay packs a rocket tighter than any other, but the Cult of the Dry Flame holds the pits.']},
-    {k:'find', n:3, what:['หลุมดินแดงที่ลัทธิยึดไว้', 'Clay pit held by the cult'], say:['หลุมดินแดง 3 หลุมมีตราลัทธิปักไว้ ไปถอนตราออกให้หมด', 'Three clay pits carry cult banners. Go pull them all down.'],
-      done:['เราได้ดินแดงคืนแล้ว ข้าอัดลงบั้งไฟให้เลย แน่นเปรี๊ยะ!', 'We have the red clay! I will pack the rocket myself — tight as a drum!']},
-    {k:'elite', t:'redgolem', name:['ยักษ์ดินแดงของลัทธิ', "The Cult's Red Clay Golem"], say:['ลัทธิปลุกยักษ์ดินแดงขึ้นมาเอาดินคืน! สู้มันด้วยกัน!', 'The cult raised a clay golem to take the clay back! Let\'s fight it together!'],
-      done:['ข้าจะไม่กลับไปเป็นโจรอีกแล้ว ผ้าปิดหน้านี้ข้าใส่ตอนทำความดีครั้งแรก ให้เจ้าเก็บไว้', 'I will never be a bandit again. I wore this face cloth for my first good deed — keep it.']}
+    title:['ค่ายชนเผ่าแห่งหุบเขาต้องห้าม', 'The Tribal Camp of the Forbidden Valley'], cos:'ms_k_bandana',
+    kh:['หุบเขาหินแดงนี้มีชนเผ่าอยู่จริงด้วย… ทุกคนจ้องเรามาจากเต็นท์หนังสัตว์', 'Tribes really do live in this red rock valley… everyone is watching us from their hide tents.'], steps:[
+    {k:'kill', t:'rockpangolin', n:12, say:['ข้าเคยปล้นคนผ่านทาง แต่ตอนนี้ชนเผ่ารับข้าไว้ ตัวลิ่นหินผาขุดอุโมงค์ใต้เต็นท์จนพังไปหลายหลัง ชนเผ่าโทษคนนอก ช่วยไล่ 12 ตัวให้เขาเห็นว่าเราเป็นมิตร', 'I used to rob travellers, but the tribe took me in. Cliff pangolins have dug under their tents and brought several down, and the tribe blames outsiders. Drive off 12 so they see we are friends.'],
+      done:['หัวหน้าเผ่ายอมคุยแล้ว! ขนนกศักดิ์สิทธิ์ 3 เส้นของเสาโทเทมปลิวหายไปกับลมกรด ถ้าหาเจอ เผ่าจะยอมรับเรา', 'The chief will talk now! Three sacred feathers blew off the totem in the gale. Find them and the tribe will accept us.']},
+    {k:'find', n:3, what:['ขนนกศักดิ์สิทธิ์ของเผ่า', 'Sacred feather of the tribe'], say:['ขนนกศักดิ์สิทธิ์ติดอยู่ตามเสาหินที่ลมกัดเซาะ ระวังตกหน้าผานะ', 'The sacred feathers caught on the wind-carved pillars. Mind the cliff edge.'],
+      done:['ครบแล้ว! แต่เสาโทเทมแตกร้าว ต้องเอาเกล็ดหินของตัวลิ่นมาปะ', 'All three! But the totem has cracked, and only pangolin scales can mend it.']},
+    {k:'item', t:'m_rockpangolin', n:5, say:['เกล็ดตัวลิ่นแข็งเหมือนหินผา เอามา 5 ชิ้น ช่างของเผ่าจะปะเสาโทเทมให้', 'Pangolin scales are as hard as the cliffs. Bring 5 and the carver of the tribe will mend the totem.'],
+      done:['เสาโทเทมกลับมาตั้งตรงแล้ว ชนเผ่าร้องเพลงต้อนรับเรา!', 'The totem stands tall again and the tribe sings to welcome us!']},
+    {k:'elite', t:'redpuma', name:['ราชาเสือแห่งหน้าผาแดง', 'King of the Red Cliffs'], say:['เสือภูเขาแดงตัวใหญ่ที่สุดลงมาจากหน้าผาจะจู่โจมค่าย! ช่วยเผ่าด้วย', 'The greatest red puma is coming down the cliffs to attack the camp! Help the tribe.'],
+      done:['ชนเผ่ายกให้เราเป็นพี่น้องแล้ว ข้าเองก็ได้บ้านใหม่ ชุดนี้ช่างเผ่าเย็บให้เจ้านะ', 'The tribe calls us kin now, and I have found a home at last. The tailor of the tribe sewed this outfit for you.']}
   ]},
   41:{npc:msN('ms_thongdaeng', 'ทองแดง', 'Thongdaeng', 'เด็กชายคนงานเหมือง', 'Young miner', 'm', 15, 'hairChestnut', 'irisBr', {armor:'s_knight', head:'ms_h_miner'}),
     title:['กำมะถันในเหมืองลึก', 'Sulphur in the Deep Mine'], cos:'ms_h_miner',

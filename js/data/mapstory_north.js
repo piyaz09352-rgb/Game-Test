@@ -33,15 +33,18 @@ Object.assign(MS_CH, {
     {k:'item', t:'m_offeringsquirrel', n:5, say:['กระรอกที่ขโมยของถวายวัดไปเก็บไว้เยอะเลย ขอคืนมา 5 ชิ้น ข้าจะแบ่งเป็นน้ำมันจุดประทีป', 'The squirrels have hoarded the temple offerings. Bring back 5 and I will share them out as lamp oil.'],
       done:['ประทีปดวงแรกสว่างแล้ว! แสงพุ่งไปทางเหนือเหมือนชี้ทาง… เจ้าไปจุดดวงต่อไปกับข้านะ นี่ ปิ่นประทีปของข้า ทำเพิ่มให้เจ้าอันหนึ่ง', 'The first lamp is lit! Its light points north like a road… come and light the next one with me. Here, a copy of my lamp hairpin.']}
   ]},
+  // (v298) a new adventure for the land
   51:{npc:msNN('ms_maen', 'ป้าแม้น', 'Auntie Maen', 'แม่ค้าพายเรือในบึงเงา', 'Mire boatwoman', 'f', 0, 'hairSilver', 'irisBr', {armor:'s_bloodmoon', mask:'ms_k_shadow'}),
-    title:['คนถือโคมผู้จมน้ำ', 'The Drowned Lantern-bearer'], cos:'ms_k_shadow',
-    kh:['บึงนี้มืดจนมองไม่เห็นมือตัวเองเลย… ข้าจะถือประทีปไว้ใกล้ ๆ นะ', 'This mire is so dark I can\'t see my own hand… I\'ll keep the lamp close.'], steps:[
-    {k:'kill', t:'gloom_jelly', n:12, say:['วุ้นเงาเกาะเรือข้าจนพายไม่ไป ช่วยกำจัด 12 ก้อนนะ', 'Shadow jellies cling to my boat so I can\'t pole it. Clear 12 of them.'],
-      done:['ขอบใจ… มีวิญญาณคนถือโคมจมอยู่ในบึงนี้มาร้อยปี เขาตามหาโคมที่ทำหายตอนเรือล่ม', 'Thank you… a lantern-bearer\'s spirit has been drowned in this mire for a hundred years, searching for the lamps he lost when his boat sank.']},
-    {k:'find', n:3, what:['โคมที่จมอยู่ในบึง', 'Sunken lantern'], say:['โคมของเขา 3 ดวงจมอยู่ตามกอหญ้า ลองหาดูนะ', 'His three lanterns lie sunk among the reeds. See if you can find them.'],
-      done:['เขาได้โคมคืนแล้ว ยิ้มก่อนจางหายไป… ประทีปดวงที่สองติดเองในมือประทีป!', 'He has his lanterns back and smiles as he fades… the second lamp lights by itself in Prathip\'s hands!']},
-    {k:'elite', t:'gloom_elephant', name:['ช้างเงาแห่งบึงมรณะ', 'The Shadow Elephant of the Mire'], say:['ช้างเงาได้กลิ่นแสงประทีปแล้ว มันเกลียดแสงที่สุด!', 'The shadow elephant has smelled the lamplight — it hates light above all!'],
-      done:['บึงสว่างขึ้นนิดหนึ่งแล้ว ผ้าคลุมหน้านี้ป้าใส่พายเรือในหมอกมาทั้งชีวิต ให้เจ้านะ', 'The mire is a little brighter. I have worn this veil poling through the fog all my life — it is yours.']}
+    title:['เมืองที่ไม่มีใครอยู่', 'The City Where No One Lives'], cos:'ms_k_shadow',
+    kh:['ไม่มีใครอยู่เลย… บ้านพังทุกหลัง เกวียนถูกทิ้งไว้กลางทาง', 'There is no one here… every house is broken and carts lie abandoned in the road.'], steps:[
+    {k:'kill', t:'hollowarmor', n:12, say:['ป้าเคยพายเรือขายของให้คนเมืองนี้ จนวันที่เมืองล่มสลาย ตอนนี้เหลือแต่ชุดเกราะร้างที่ยังเดินเวรยามอยู่ ช่วยให้พวกมันได้พักสัก 12 ชุดนะ', 'I used to paddle my boat here to sell to the townsfolk, until the day the city fell. Now only hollow armour still walks the watch. Let 12 of them rest.'],
+      done:['ขอบใจจ้ะ… คนเมืองนี้เขียนจดหมายถึงกันไว้แต่ไม่เคยได้ส่ง 3 ฉบับ ป้าอยากเอาไปให้ถึงมือลูกหลานพวกเขา', 'Thank you, dear… the people here wrote three letters to each other that were never sent. I want to bring them to their children.']},
+    {k:'find', n:3, what:['จดหมายที่ไม่เคยถูกส่ง', 'Letter that was never sent'], say:['จดหมายอยู่ในซากบ้านที่หลังคาพัง ระวังกำแพงจะล้มทับนะ', 'The letters are in the roofless houses. Mind the walls do not fall on you.'],
+      done:['ได้ครบแล้ว… ป้าอยากหล่อระฆังไว้ตีให้คนที่จากไป ต้องใช้เหล็กจากชุดเกราะ', 'All three… I want to cast a bell to toll for those who are gone, and it needs the iron of the armour.']},
+    {k:'item', t:'m_hollowarmor', n:5, say:['เอาชิ้นส่วนเกราะมา 5 ชิ้น ป้าจะหลอมเป็นระฆัง', 'Bring 5 pieces of the armour and I will melt them into a bell.'],
+      done:['ระฆังเสร็จแล้ว เสียงของมันดังไปทั่วเมืองร้าง เป็นประทีปดวงที่สอง', 'The bell is done. Its sound carries all through the empty city: the second lamp.']},
+    {k:'elite', t:'gloom_warrior', name:['นักรบผู้ไม่รู้ว่าศึกจบแล้ว', 'The Warrior Who Never Heard the War End'], say:['นักรบในบึงเงาไม่ยอมให้ใครตีระฆัง! มันยังคิดว่าศึกยังไม่จบ', 'The warrior of the mire will not let anyone ring the bell! It still thinks the war is not over.'],
+      done:['ระฆังดังแล้ว… ป้าว่าคนเมืองนี้คงได้ยินนะ ขอบใจมากจ้ะ', 'The bell has rung… I think the people of this city heard it. Thank you so much, dear.']}
   ]},
   6:{npc:msNN('ms_lungmuang', 'ลุงเหมือง', 'Uncle Mueang', 'วิญญาณคนขุดแร่ใจดี', 'Kind miner\'s ghost', 'm', 2, 'hairAsh', 'irisBr', {armor:'s_knight', head:'ms_h_minerwrap'}),
     title:['ตะเกียงของคนขุดแร่', "The Miner's Lamp"], cos:'ms_h_minerwrap',

@@ -24,7 +24,7 @@ function statsFor(L, k = {}, XL = L){
 }
 /* loot part names by archetype */
 const PART = {quad:['หนัง', 'Hide'], bird:['ขนนก', 'Feather'], serpent:['เกล็ด', 'Scale'], bug:['กระดอง', 'Carapace'], squat:['ผิวมัน', 'Slick Skin'],
-  floater:['เถ้าวิญญาณ', 'Spirit Ash'], slime:['เมือก', 'Ooze'], rock:['เศษหิน', 'Rubble'], human:['เครื่องราง', 'Charm'], fish:['ครีบ', 'Fin'], cave:['เปลือกหินร้อน', 'Hot Rock Hide'], sky:['ประกายสวรรค์', 'Heavenly Shard']};
+  floater:['เถ้าวิญญาณ', 'Spirit Ash'], slime:['เมือก', 'Ooze'], rock:['เศษหิน', 'Rubble'], human:['เครื่องราง', 'Charm'], fish:['ครีบ', 'Fin'], cave:['เปลือกหินร้อน', 'Hot Rock Hide'], sky:['ประกายสวรรค์', 'Heavenly Shard'], land:['ชิ้นส่วน', 'Part']};
 
 /* ---------- species ----------
    [id, th, en, lvl, archetype, look, elem, race, size, extra]
@@ -413,6 +413,16 @@ SPECIES.push(
   ['heavenlotus', 'บัวเทวา', 'Deva Lotus', 0, 'sky', {kind:'lotus', col:'#f8a8c8', belly:'#fff0f6', acc:'#5a9a5a', glow:'#fff4c0', eyeGlow:'#e3b04b'}, 'holy', 'plant', 'm', {range:130, shot:'holy'}],
   ['devachakra', 'จักรเทพ', 'Divine Chakra', 0, 'sky', {kind:'chakra', col:'#d8e0f0', acc:'#e3b04b', glow:'#fff8c8', eyeGlow:'#3a8af0'}, 'holy', 'formless', 'm', {aggro:true, k:{atk:1.25, spd:12}}]
 );
+/* (v298) the last five lands' own creatures (gfx/beasts.js 'land'), appended the same way */
+for (const id of ['rockpangolin', 'hollowarmor', 'desertcamel', 'dungbeetle', 'brassautomaton', 'meadowram']) SPECIES_LATE.add(id);
+SPECIES.push(
+  ['rockpangolin', 'ตัวลิ่นหินผา', 'Cliff Pangolin', 0, 'land', {kind:'pangolin', col:'#8a5a3a', belly:'#c8a080', dark:'#2a1a10', eyeGlow:'#1e1410'}, 'earth', 'brute', 'm', {k:{def:2.2, hp:1.3}}],
+  ['hollowarmor', 'ชุดเกราะร้าง', 'Hollow Armour', 0, 'land', {kind:'armor', col:'#7a7a80', acc:'#8a4a2a', dark:'#141418', glow:'#7ad0ff'}, 'shadow', 'undead', 'm', {aggro:true, k:{def:1.8, atk:1.2}}],
+  ['desertcamel', 'อูฐทะเลทราย', 'Desert Camel', 0, 'land', {kind:'camel', col:'#c8a06a', belly:'#e0c494', dark:'#3a2a1a', eyeGlow:'#2a1a10'}, 'earth', 'brute', 'l', {k:{hp:1.6, spd:6}}],
+  ['dungbeetle', 'ด้วงกลิ้งลูกหิน', 'Boulder Dung Beetle', 0, 'land', {kind:'dungbeetle', col:'#2a3a2e', acc:'#b89a68', dark:'#14140e', eyeGlow:'#d8c060'}, 'earth', 'insect', 'm', {k:{def:1.6, atk:1.15}}],
+  ['brassautomaton', 'หุ่นกลทองเหลือง', 'Brass Automaton', 0, 'land', {kind:'automaton', col:'#c8963a', acc:'#e8c060', belly:'#e8eef0', dark:'#3a2a1a', glow:'#7ae0ff', eyeGlow:'#ff6a3a'}, 'neutral', 'formless', 'm', {aggro:true, k:{def:2, atk:1.2, spd:-8}}],
+  ['meadowram', 'แกะเขาเกลียวทุ่งหญ้า', 'Meadow Ram', 0, 'land', {kind:'sheep', col:'#f4efe4', acc:'#c8a878', dark:'#2a2420', eyeGlow:'#1e1a14', horns:true}, 'earth', 'brute', 'm', {k:{hp:1.4, def:1.3}}]
+);
 MAPS[17].mobs = ['abyssshark', 'mantaray', 'giantpuffer', 'abyssangler', 'seahorseknight', 'lionfish', 'swordfish', 'abyssoctopus', 'armorlobster', 'abyssjelly', 'thundereel', 'abyssturtle'];
 const ROAD_LV = Object.fromEntries(Object.entries(ROAD_LV_RAW).map(([d, a]) => [d, a.map(([lo, hi]) => [LVMAP(lo), Math.max(LVMAP(lo) + 2, LVMAP(hi))])]));
 const ROAD_LAND = {e:() => 'fertile', s:k => k < Math.round(ROADS.s.filter(i => !MAPS[i].landFix).length * 5 / 8) ? 'arid' : 'volcanic', w:() => 'frozen', n:k => k < Math.round(ROADS.n.length * 2 / 3) ? 'dark' : 'light'};
@@ -439,6 +449,9 @@ MAPS[65].mobs.push('lavamole', 'obsidianmantis', 'volcanosnail'); MAPS[66].mobs.
 /* (v297) heaven's own creatures join maps 30 and 60 the same way */
 MAPS[30].mobs.push('skywhale', 'heavenlotus', 'devachakra'); MAPS[60].mobs.push('devachakra', 'skywhale', 'heavenlotus');
 { const lvOf = {skywhale:[30, .5], heavenlotus:[30, .3], devachakra:[30, .75]}; for (const id in lvOf){ const sp = SPECIES.find(x => x[0] === id), mp = MAPS[lvOf[id][0]]; if (sp && mp) sp[3] = Math.round(mp.lv[0] + lvOf[id][1] * (mp.lv[1] - mp.lv[0])); } }
+/* (v298) the last five lands' creatures join their maps the same way, at those maps' levels */
+{ const home = {rockpangolin:[22, 39], hollowarmor:[51, 9], desertcamel:[21, 40], dungbeetle:[40, 21], brassautomaton:[10, 13], meadowram:[31, 32]};
+  for (const id in home){ for (const m of home[id]) if (MAPS[m] && !MAPS[m].mobs.includes(id)) MAPS[m].mobs.push(id); const sp = SPECIES.find(x => x[0] === id), mp = MAPS[home[id][0]]; if (sp && mp) sp[3] = Math.round((mp.lv[0] + mp.lv[1]) / 2); } }
 for (const [id, to] of [['nagaretainer', 55], ['spiritpearl', 55], ['nagawarrior', 54], ['emeraldcrab', 54]]){ const sp = SPECIES.find(x => x[0] === id), mp = MAPS[to];
   if (!sp || !mp) continue; if (!mp.mobs.includes(id)) mp.mobs.push(id); sp[3] = Math.round((mp.lv[0] + mp.lv[1]) / 2); }
 
