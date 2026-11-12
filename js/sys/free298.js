@@ -9,7 +9,7 @@ function free298Grant(){ if (!S || !S.inv) return; if (!(S.inv.mount1 > 0)){ S.i
 { let last = null; EV.on('tick', () => { if (S && S !== last){ last = S; free298Grant(); } }); }
 
 /* robots: «use free» instead of rent prices, wherever they are offered */
-function free298Bot(k){ if (!HELPERS[k]) return; S.helper = {k, left:FREE298.forever}; S.helperFree = S.helperFree || null; dirty = true;
+function free298Bot(k){ if (!HELPERS[k]) return; S.helper = {k, left:FREE298.forever}; S.helperFree = S.helperFree || null; if (typeof hlpPlace === "function") hlpPlace(); if (typeof derive === "function") derive(); dirty = true;
   if (typeof toast === 'function') toast(L(`${HELPERS[k].en} มาอยู่กับคุณแล้ว (ฟรี)`, `${HELPERS[k].en} is with you now (free)`)); if (typeof save === 'function') save(); }
 const free298Fix = root => { if (!root) return; for (const box of root.querySelectorAll('.rentbtns, .cshit.bot .cshb')){ const b0 = box.querySelector('[data-rentpet]'); if (!b0) continue; const k = b0.dataset.rentpet;
     const mine = S.helper && S.helper.k === k; box.innerHTML = mine ? `<span class="pr">✓ ${L('อยู่กับคุณ', 'With you')}</span>` : `<button class="btn sm gold" data-botuse="${k}">${L('ใช้ฟรี', 'Use free')}</button>`; } };

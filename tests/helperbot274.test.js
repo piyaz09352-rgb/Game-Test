@@ -6,7 +6,7 @@ const test = require('node:test'), assert = require('node:assert');
 const { chromium, openGame, enterWorld } = require('./browser');
 const skip = !chromium && 'playwright not installed (run npm install)';
 
-test('helper robots: free and rented, pick-up speed, EXP bonus, old rentals refunded', { skip, timeout: 180000 }, async () => {
+test('helper robots: all free (v299), premium ones faster, pick-up speed, EXP bonus, old rentals refunded', { skip, timeout: 180000 }, async () => {
   const { page, errors, close } = await openGame();
   try {
     await enterWorld(page);
@@ -14,14 +14,14 @@ test('helper robots: free and rented, pick-up speed, EXP bonus, old rentals refu
     const old = await page.evaluate(async () => { S.helper = {k:'ridgeback', left:43200, until:Date.now() + 43200e3}; const z = S.bia; await new Promise(r => setTimeout(r, 300)); return {h:S.helper, z:S.bia - z}; });
     assert.ok(!old.h, 'the old rental is gone'); assert.ok(old.z > 0, 'and refunded: ' + old.z);
     const shop = await page.evaluate(() => { const n = NPCS.find(x => x.id === 'beastkeeper'); P.x = n.x + 30; P.y = n.y + 10; ACC.coins = 30; openNpc(n);
-      const d = document.getElementById('dialog'); const free = d.querySelectorAll('[data-botfree]').length, paid = new Set([...d.querySelectorAll('[data-rentpet]')].map(b => b.dataset.rentpet)).size;
+      const d = document.getElementById('dialog'); const free = d.querySelectorAll('[data-botfree]').length, paid = new Set([...d.querySelectorAll('[data-botuse]')].map(b => b.dataset.botuse)).size, rent = d.querySelectorAll('[data-rentpet]').length;
       d.querySelector('[data-botfree="byte"]').click(); const h1 = {...S.helper};
-      const atk0 = DER.atk; d.querySelector('[data-rentpet="titan"][data-rt="0"]').click();
-      return {free, paid, h1, h2:{...S.helper}, coins:ACC.coins, atk0, atk1:DER.atk, pics:[...document.querySelectorAll('#dialog .botic img')].every(i => (i.src.startsWith('data:image/png') || /assets\/helpers\/\w+\.(png|gif)/.test(i.src))), names:Object.keys(HELPERS)}; });
-    assert.strictEqual(shop.free, 3, 'three free robots'); assert.strictEqual(shop.paid, 9, 'nine to rent');
+      const atk0 = DER.atk; d.querySelector('[data-botuse="titan"]').click();
+      return {free, paid, rent, h1, h2:{...S.helper}, coins:ACC.coins, atk0, atk1:DER.atk, pics:[...document.querySelectorAll('#dialog .botic img')].every(i => (i.src.startsWith('data:image/png') || /assets\/helpers\/\w+\.(png|gif)/.test(i.src))), names:Object.keys(HELPERS)}; });
+    assert.strictEqual(shop.free, 3, 'three free robots'); assert.strictEqual(shop.paid, 9, 'nine premium ones, free to use'); assert.strictEqual(shop.rent, 0, 'nothing to rent');
     assert.ok(!shop.names.some(k => ['ridgeback', 'hare', 'hawk', 'elephant'].includes(k)), 'no old animals left');
     assert.deepStrictEqual(shop.h1, {k:'byte', free:1}, 'the free one is taken');
-    assert.strictEqual(shop.h2.k, 'titan'); assert.ok(shop.h2.left > 86300, 'rented for a day'); assert.strictEqual(shop.coins, 25, '◈ 5 for a day');
+    assert.strictEqual(shop.h2.k, 'titan'); assert.ok(shop.h2.left > 86300 * 365, 'kept with no time limit'); assert.strictEqual(shop.coins, 30, 'no coins taken');
     assert.ok(shop.atk1 > shop.atk0, 'TITAN adds ATK'); assert.ok(shop.pics, 'every robot has a picture');
     // EXP +10% while rented
     const ex = await page.evaluate(() => { const one = () => { const e0 = S.exp, j0 = S.jexp; gainExp(1000, 1000); const r = [S.exp - e0, S.jexp - j0]; S.exp = e0; S.jexp = j0; return r; };

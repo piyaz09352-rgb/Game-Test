@@ -302,7 +302,7 @@
 "js/sys/jobfx.js":{"v":126,"sha":"ac13b74234494a83"},
 "js/sys/tutfold.js":{"v":127,"sha":"1e510ee1ed4ec762"},
 "js/sys/changelog.js":{"v":127,"sha":"0509d4ccdd277a38"},
-"js/sys/changelog272.js":{"v":328,"sha":"01183bb24d78d5b1"},
+"js/sys/changelog272.js":{"v":329,"sha":"01183bb24d78d5b1"},
 "js/sys/bossnature.js":{"v":279,"sha":"dab626b53dac17e4"},
 "js/sys/inspect.js":{"v":125,"sha":"7bfd122f80df54a5"},
 "js/sys/petnet.js":{"v":136,"sha":"3f84ce0bd40d9a52"},
@@ -444,4 +444,4 @@
 "js/world/naraka296.js":{"v":321,"sha":"f3a5ab309523d25a"},
 "js/world/heaven297.js":{"v":325,"sha":"f451017643dd5f35"},
 "js/world/lands298.js":{"v":327,"sha":"40b1c8ddfd735351"},
-"js/sys/free298.js":{"v":328,"sha":"b5f42fe56c80ebee"}}
+"js/sys/free298.js":{"v":329,"sha":"bdd352195f0467fa"}}
