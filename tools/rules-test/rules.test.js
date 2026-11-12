@@ -131,6 +131,13 @@ test('server, version, fame, tower, MVP', async () => {
   await assertFails(db(A).doc('server/version').set({ v: 9999, at: now(), by: A }));
   await assertFails(db(A).doc('server/version').set({ v: 200, at: now(), by: A }));
   await assertFails(db(A).doc('backups/x').get());
+  await seed(async f => { await f.doc('server/gmkey').set({ h: 'ab'.repeat(32), s: 'salt', at: 1 }); await f.doc('server/gmlog/entries/e1').set({ a: 'x' }); await f.doc('server/patch').set({ p: 1 }); });
+  await assertFails(db(A).doc('server/gmkey').get());                                   // the GM code's hash stays with the GM
+  await assertFails(db(A).doc('server/gmlog/entries/e1').get());
+  await assertFails(db(A).doc('server/gmkey').set({ h: 'cd'.repeat(32), s: '', at: 2 }));
+  await assertSucceeds(db(GM).doc('server/gmkey').get());
+  await assertSucceeds(db(A).doc('server/patch').get());
+  await assertSucceeds(db(GM).collection('server/gmlog/entries').add({ a: 'y' }));
   // fame: created once, by one of the named players; speed only faster
   await assertSucceeds(db(A).doc('fame/spd_boss1').set({ names: ['Alice'], uids: [A], party: false, t: 60000, at: now() }));
   await assertFails(db(B).doc('fame/clr_boss1').set({ names: ['Alice'], uids: [A], party: false, at: now() }));

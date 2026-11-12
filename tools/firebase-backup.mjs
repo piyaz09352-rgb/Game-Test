@@ -13,6 +13,9 @@
          Writes every document of the file back (overwrites docs with the same path; never deletes others).
      node tools/firebase-backup.mjs gms [--key …]
          Copies GM_UIDS from js/net/firebase-config.js into the Realtime Database /gms (lets GMs send the 'gm' topic).
+     node tools/firebase-backup.mjs privacy [--key …]
+         (v284) Removes the log-in IDs older versions published: `acc` on players/* and guilds/*/members/*, `sa` on
+         market/*. The game no longer writes them on the Firebase site; this clears the copies already there.
    The database URL and project come from js/net/firebase-config.js (override with --db <url>). */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -22,7 +25,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const argv = process.argv.slice(2), cmd = argv[0];
 const opt = (k, d = null) => { const i = argv.indexOf(`--${k}`); return i < 0 ? d : (argv[i + 1] && !argv[i + 1].startsWith('--') ? argv[i + 1] : true); };
 const die = m => { console.error(m); process.exit(1); };
-if (!['backup', 'restore', 'gms'].includes(cmd)) die('usage: node tools/firebase-backup.mjs backup|restore <file> --yes|gms [--key service-account.json] [--db <url>]');
+if (!['backup', 'restore', 'gms', 'privacy'].includes(cmd)) die('usage: node tools/firebase-backup.mjs backup|restore <file> --yes|gms|privacy [--key service-account.json] [--db <url>]');
 
 /* config from the game's own file (no need to repeat it here) */
 const cfgSrc = fs.readFileSync(path.join(ROOT, 'js/net/firebase-config.js'), 'utf8');
@@ -76,5 +79,13 @@ if (cmd === 'gms'){
   if (!rtdb) die('no databaseURL in js/net/firebase-config.js');
   await rtdb.ref('gms').set(Object.fromEntries(GM_UIDS.map(u => [u, true])));
   console.log(`gms: ${GM_UIDS.length ? GM_UIDS.join(', ') : '(none: GM_UIDS is empty)'}`);
+}
+if (cmd === 'privacy'){
+  const del = admin.fs.FieldValue.delete(); let n = 0;
+  const strip = async (snap, field) => { for (const d of snap.docs) if (d.get(field) !== undefined){ await d.ref.update({[field]:del}); n++; } };
+  await strip(await fsdb.collection('players').get(), 'acc');
+  await strip(await fsdb.collectionGroup('members').get(), 'acc');
+  await strip(await fsdb.collection('market').get(), 'sa');
+  console.log(`privacy: removed ${n} published log-in ID(s)`);
 }
 process.exit(0);

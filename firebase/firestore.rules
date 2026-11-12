@@ -89,9 +89,16 @@ service cloud.firestore {
     }
 
     // ---------- server state: season (world reset), GM list, GM log — everyone reads, only a GM writes
-    match /server/{rest=**} {
-      allow read: if signedIn();
+    match /server/{doc} {
+      allow read: if signedIn() && doc != 'gmkey' && doc != 'gmlog';
       allow write: if isGM();
+    }
+    // the GM code's hash and the GM log: only a GM reads them (nobody can try codes against the hash offline)
+    match /server/gmkey {
+      allow read, write: if isGM();
+    }
+    match /server/gmlog/{rest=**} {
+      allow read, write: if isGM();
     }
     // the newest game version (newver.js): any player may raise it a little, so everyone hears of an update
     match /server/version {

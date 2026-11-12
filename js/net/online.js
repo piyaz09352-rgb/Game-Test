@@ -36,6 +36,10 @@ const netName = () => (S.name || (NET.me && NET.me.name) || nm(JOBS[S.job])).sli
 /* (v284) everything other players send passes through clean(): it also turns the characters HTML is made of into look-alikes,
    so a name, a letter or a guild name can never become markup (a stored XSS: a name like <img onerror=…> ran code in
    every player's game that showed it in the log, a banner or a list) */
+/* (v284) on the Firebase site the account ID is also the log-in name: it is never published (ranking, guild roster,
+   market), so nobody can collect everyone's log-in names to guess passwords. Firebase Authentication already keeps IDs
+   unique there. On claude.ai (no passwords) the ID still shows, as before. */
+const accPublic = () => (typeof ACC !== 'undefined' && ACC.name && !(window.claude && window.claude.firebase)) ? ACC.name : '';
 const CLEAN_HTML = {'<':'‹', '>':'›', '&':'＆', '"':'”', "'":'’', '`':'ˋ'};
 const clean = (s, n = 120) => String(s || '').replace(/[\u0000-\u001f\u007f​-‏‪-‮⁦-⁩]/g, '').replace(/[<>&"'`]/g, c => CLEAN_HTML[c]).slice(0, n);
 
@@ -91,7 +95,7 @@ function netTick(dt){
     if (!ch && lp.h !== last.h && lp.pt && now - at > 6000) ch = true;
     if (ch || now - at > 20000){ NET.lastLobby = lp; NET.lastLobbyAt = now; NET.room.presence(lp).catch(() => {}); } }
   // players directory (for the ranking), only when something changed
-  if (NET.db && NET.uid && NET.dirT <= 0 && !S.gmLocal){ NET.dirT = 30; const acc = typeof ACC !== 'undefined' ? ACC.name : '', sig = `${netName()}|${S.job}|${S.lvl}|${MAP_ID}|${S.shards || 0}|${acc}|${S.title || ''}|${(S.guild && S.guild.id) || ''}|${S.pvp ? S.pvp.r : 1000}|${Object.keys(S.ach || {}).length}|${(S.tower && S.tower.best) || 0}|${typeof housePub === 'function' ? JSON.stringify(housePub()) : ''}`;
+  if (NET.db && NET.uid && NET.dirT <= 0 && !S.gmLocal){ NET.dirT = 30; const acc = accPublic(), sig = `${netName()}|${S.job}|${S.lvl}|${MAP_ID}|${S.shards || 0}|${acc}|${S.title || ''}|${(S.guild && S.guild.id) || ''}|${S.pvp ? S.pvp.r : 1000}|${Object.keys(S.ach || {}).length}|${(S.tower && S.tower.best) || 0}|${typeof housePub === 'function' ? JSON.stringify(housePub()) : ''}`;
     if (sig !== NET.dirSig){ NET.dirSig = sig; NET.db.doc(`players/${NET.uid}`).set({name:netName(), job:S.job, lvl:S.lvl, map:MAP_ID, shards:S.shards || 0, acc, title:S.title || '', guild:(S.guild && S.guild.id) || '', ach:Object.keys(S.ach || {}).length, pvp:S.pvp ? S.pvp.r : 1000, house:typeof housePub === 'function' ? housePub() : null, tower:(S.tower && S.tower.best) || 0, at:Date.now()}).catch(() => {}); } }
   // smooth everyone else toward their latest position
   if (NET.mapRoom) for (const pe of NET.mapRoom.peers()){

@@ -61,7 +61,7 @@ async function mkList(){
   MK.busy = true; const it = ITEMS[id], inst = it.base ? instStore()[id] : null;
   S.inv[id] -= n; if (!S.inv[id]) delete S.inv[id]; S.bia -= fee; if (inst) delete instStore()[id];
   const key = `${NET.uid.slice(-6)}${Date.now().toString(36)}`;
-  try { await NET.db.doc(`market/${key}`).set({s:NET.uid, sn:netName(), sa:ACC.name || '', i:id, n, x:inst || null, p, at:Date.now(), sold:null, paid:false}); toast(L('วางขายแล้ว', 'Listed')); SFX.play('coin'); MK.sel = null; MK.price = ''; }
+  try { await NET.db.doc(`market/${key}`).set({s:NET.uid, sn:netName(), sa:accPublic(), i:id, n, x:inst || null, p, at:Date.now(), sold:null, paid:false}); toast(L('วางขายแล้ว', 'Listed')); SFX.play('coin'); MK.sel = null; MK.price = ''; }
   catch (e){ addItem(id, n); if (inst) instStore()[id] = inst; S.bia += fee; toast(L('วางขายไม่สำเร็จ', 'Could not list')); }
   MK.busy = false; dirty = true; save(); mkMine();
 }

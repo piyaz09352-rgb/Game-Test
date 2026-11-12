@@ -91,7 +91,8 @@ async function start(data){
 function showFatal(msg){
   const t = document.getElementById('title'); if (!t) return;
   t.hidden = false; t.classList.remove('out');
-  t.querySelector('.title-card').innerHTML = `<p class="t-eyebrow">${L('เกิดข้อผิดพลาด', 'Something went wrong')}</p><p class="t-sub" style="margin:10px 0">${String(msg).slice(0, 300)}</p><div class="t-btns"><button class="tbtn gold" onclick="location.reload()">โหลดใหม่</button></div>`;
+  t.querySelector('.title-card').innerHTML = `<p class="t-eyebrow">${L('เกิดข้อผิดพลาด', 'Something went wrong')}</p><p class="t-sub" style="margin:10px 0">${String(msg).slice(0, 300).replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';')}</p><div class="t-btns"><button class="tbtn gold" data-reload="1">โหลดใหม่</button></div>`;
+  const rb = t.querySelector('[data-reload]'); if (rb) rb.addEventListener('click', () => location.reload());
 }
 window.addEventListener('error', e => { if (!window.__vay) showFatal(e.message); });
 window.addEventListener('unhandledrejection', e => { if (!window.__vay) showFatal(e.reason && e.reason.message || e.reason); });

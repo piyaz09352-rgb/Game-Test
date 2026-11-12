@@ -5,7 +5,7 @@ const { serve } = require('./serve');
 let chromium = null;
 try { ({ chromium } = require('playwright')); } catch (e) {}
 
-async function openGame({ width = 1280, height = 720, path = '', ctx = {} } = {}){   // ctx: extra page options (a phone: isMobile, hasTouch)
+async function openGame({ width = 1280, height = 720, path = '', ctx = {}, headers = null } = {}){   // headers: added to every answer from the game's server (the site's _headers)   // ctx: extra page options (a phone: isMobile, hasTouch)
   const { srv, url } = await serve();
   const browser = await chromium.launch(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {});
   const page = await browser.newPage({ viewport: { width, height }, ...ctx });
@@ -13,6 +13,7 @@ async function openGame({ width = 1280, height = 720, path = '', ctx = {} } = {}
   page.on('pageerror', e => errors.push('pageerror: ' + (e.stack || e.message)));
   page.on('console', m => { if (m.type() === 'error' && !/Failed to load resource|net::ERR_/.test(m.text())) errors.push('console.error: ' + m.text()); });
   await page.route(u => !u.href.startsWith(url), r => r.abort());   // offline: no Firebase, no web fonts
+  if (headers) await page.route(u => u.href.startsWith(url), async r => { const res = await r.fetch(); await r.fulfill({ response: res, headers: { ...res.headers(), ...headers } }); });
   await page.addInitScript(() => { window.__VTEST__ = 1; });   // (v272) the hourly world boss / invasion do not turn up by the real clock in a test (a test can still force one)
   await page.goto(url + path);
   await page.waitForFunction(() => !!window.__vay, null, { timeout: 60000 });
@@ -47,7 +48,10 @@ async function enterWorld(page, name = 'Tester', acc = 'smoketest'){
   if (slot) await page.evaluate(n => { S.name = n; const c = el('confirm'); if (c) c.hidden = true; }, name);
 }
 
-module.exports = { chromium, openGame, enterWorld, signIn, TEST_PASS };
+/* (v284) the website's security headers, as _headers gives them to Netlify */
+function siteHeaders(){ const out = {}; for (const line of require('fs').readFileSync(require('path').join(__dirname, '..', '_headers'), 'utf8').split('\n')){ const m = /^\s+([A-Za-z-]+):\s*(.+)$/.exec(line); if (m) out[m[1]] = m[2]; } return out; }
+
+module.exports = { chromium, openGame, enterWorld, signIn, TEST_PASS, siteHeaders };
 
 /* two (or more) players in separate browsers, sharing one fake online backend (tests/mock-net.js) */
 async function openPlayers(n = 2, { merge = false, db = false } = {}){

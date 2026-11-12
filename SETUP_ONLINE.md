@@ -124,6 +124,11 @@ const FIREBASE_CONFIG = {
 
 ทดสอบกฎกับฐานข้อมูลจำลองได้ด้วย `npm run test:rules` (ต้องมี Java) ชุดนี้ลองโจมตีจริงทุกแบบข้างบน แล้วรันเกมจริงด้วยผู้เล่น 2 คน นำทุกคำสั่งที่เกมเขียนไปเล่นซ้ำ เพื่อยืนยันว่าผู้เล่นสุจริตยังเล่นได้ครบ
 
+### 1.5 ไฟล์ `_headers` (Netlify) · ล้างไอดีเก่า
+- แพ็กเต็มของเกมมีไฟล์ `_headers` อยู่ข้าง `index.html` ต้องลากขึ้นไปด้วย Netlify อ่านไฟล์นี้แล้วส่ง Content-Security-Policy กับ header ความปลอดภัยอื่น ๆ ส่วน Firebase Hosting ใช้ค่าเดียวกันจาก `firebase.json`
+- ถ้าเปลี่ยนสคริปต์สั้น ๆ ที่เขียนอยู่ใน `index.html` ต้องอัปเดตแฮชใน `_headers` และ `firebase.json` ด้วย ไม่งั้นสคริปต์นั้นจะไม่รัน (`npm run test:fast` จะบอกแฮชใหม่ให้)
+- ไอดีล็อกอินที่เวอร์ชันเก่าเคยเผยแพร่ไว้: รัน `node tools/firebase-backup.mjs backup` ก่อน แล้วค่อยรัน `node tools/firebase-backup.mjs privacy`
+
 ### 2. เปิด App Check (กันสคริปต์และบอทที่ไม่ได้มาจากเว็บเกม)
 1. ไปที่ https://www.google.com/recaptcha/admin → สร้างแบบ **reCAPTCHA v3** → ใส่โดเมนเว็บเกม (เช่น `vayrathen.netlify.app`) → จะได้ **site key** และ **secret key**
 2. Firebase Console → **App Check** → **Apps** → เลือกแอปเว็บ → **reCAPTCHA** → วาง **secret key** → Save

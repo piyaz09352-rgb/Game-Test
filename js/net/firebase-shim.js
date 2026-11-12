@@ -27,8 +27,12 @@
        from this website, not from scripts or copies elsewhere (switch on "Enforce" in Firebase Console → App Check) */
     const ACK = typeof APPCHECK_KEY === 'string' ? APPCHECK_KEY.trim() : '';
     if (ACK) try { await load(SDK + 'firebase-app-check-compat.js'); fb.appCheck().activate(new fb.appCheck.ReCaptchaV3Provider(ACK), true); } catch (e) { console.warn('App Check did not start', e); }
-    auth = fb.auth(); fs = fb.firestore(); try { fs.settings({ignoreUndefinedProperties:true, merge:true}); } catch (e) {}
+    auth = fb.auth();
+    /* the end-to-end test (tools/rules-test/e2e.test.js) runs the real Firebase code against the local emulators */
+    const EMU = window.__VAY_EMU; if (EMU && /^(127\.0\.0\.1|localhost)$/.test(location.hostname)){ auth.useEmulator(`http://127.0.0.1:${EMU.auth}`); } fs = fb.firestore(); try { fs.settings({ignoreUndefinedProperties:true, merge:true}); } catch (e) {}
+    if (EMU && /^(127\.0\.0\.1|localhost)$/.test(location.hostname)) fs.useEmulator('127.0.0.1', EMU.fs);
     rtdb = C.databaseURL ? fb.database() : null;
+    if (rtdb && EMU && /^(127\.0\.0\.1|localhost)$/.test(location.hostname)) rtdb.useEmulator('127.0.0.1', EMU.db);
     if (rtdb) await new Promise(res => { const t = setTimeout(res, 2500); rtdb.ref('.info/serverTimeOffset').on('value', s => { offset = s.val() || 0; clearTimeout(t); res(); }); });   // server clock, so a phone with a wrong clock still hears chat
     await new Promise(res => { let first = true; auth.onAuthStateChanged(u => {   // the log-in itself is js/sys/auth.js's panel; this only reports who is signed in
       if (first){ first = false; if (state === 'init') state = 'fb'; res(); }

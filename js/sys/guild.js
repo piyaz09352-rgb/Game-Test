@@ -20,7 +20,7 @@ async function guildCreate(name){
   bump('guild'); EV.emit('guild', id); SFX.play('quest'); banner(L(`ก่อตั้งกิลด์ ${name} แล้ว!`, `Guild ${name} founded!`)); log(L(`ก่อตั้งกิลด์ ${name}`, `Founded the guild ${name}`), 'g');
   dirty = true; save(); guildWatch(); NET.presT = 0; return '';
 }
-function guildJoinDb(){ if (!NET.db || !NET.uid || !S.guild) return; NET.db.doc(`guilds/${S.guild.id}/members/${NET.uid}`).set({n:netName(), j:S.job, l:S.lvl, at:Date.now(), acc:ACC.name || ''}).catch(() => {}); }
+function guildJoinDb(){ if (!NET.db || !NET.uid || !S.guild) return; NET.db.doc(`guilds/${S.guild.id}/members/${NET.uid}`).set({n:netName(), j:S.job, l:S.lvl, at:Date.now(), acc:accPublic()}).catch(() => {}); }
 function guildLeave(){
   if (!S.guild) return; const g = S.guild;
   if (NET.db && NET.uid) NET.db.doc(`guilds/${g.id}/members/${NET.uid}`).delete().catch(() => {});
