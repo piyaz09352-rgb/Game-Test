@@ -196,15 +196,18 @@ Object.assign(MS_CH, {
     {k:'elite', t:'gempalace_serpent', name:['งูแก้วผู้กลืนแสง', 'The Light-swallowing Crystal Serpent'], say:['งูแก้วกลืนแสงประทีปแล้ว! ต้องทำให้มันคายออกมา!', 'The crystal serpent has swallowed the lamplight! Make it spit it out!'],
       done:['วังแก้วสว่างไสวแล้ว ชุดนางแก้วนี้ ทอจากแสงที่สะท้อนในวัง', 'The crystal palace is radiant again. This crystal gown is woven from light reflected in its halls.']}
   ]},
+  // (v297) สวรรค์: a new adventure on the island of heaven at the top of the world tree
   30:{npc:msNN('ms_gatedeva', 'ทวารเทวี', 'The Gate Devi', 'เทวีผู้เฝ้าประตูสวรรค์', 'Devi of the heavenly gate', 'f', 4, 'hairWhite', 'irisGd', {armor:'s_seraph', head:'ms_h_gate'}, 'w_angel'),
-    title:['ประตูสวรรค์ที่ถูกปิด', 'The Closed Gate of Heaven'], cos:'ms_h_gate',
-    kh:['ประตูสวรรค์… ทางประทีปของเรามาถึงที่นี่แล้วนะ', 'The gate of heaven… our road of lamps has come all the way here.'], steps:[
-    {k:'kill', t:'starwisp', n:12, say:['ราชาอสูรบุกถึงประตูสวรรค์ ภูตดาวถูกเสียงอสูรครอบงำ ช่วยปลดปล่อยพวกมัน 12 ดวง', 'The Asura King has stormed the gate of heaven and the star wisps are under his whisper. Free 12 of them.'],
-      done:['ประตูถูกปิดตายเพื่อกันอสูร แต่ทางประทีปของเจ้าสว่างพอจะเปิดได้ ถ้ามีขนหงส์สวรรค์ทำกุญแจ', 'The gate was sealed against the asuras, but your road of lamps shines bright enough to open it — if we have heavenly hamsa feathers for a key.']},
-    {k:'item', t:'m_heavenhamsa', n:5, say:['เก็บขนหงส์สวรรค์มา 5 ชิ้น ข้าจะสานเป็นกุญแจแสง', 'Bring me 5 heavenly hamsa feathers and I will weave a key of light.'],
-      done:['ประตูสวรรค์เปิดแล้ว! แสงจากประทีปทุกดวงไหลเข้าไปข้างใน เป็นประทีปดวงที่สิบแปด', 'The gate of heaven opens! The light of every lamp flows inside — the eighteenth lamp.']},
-    {k:'elite', t:'airavata', name:['ไอราวตะผู้ถูกเสียงอสูรครอบงำ', 'The Whisper-bound Airavata'], say:['ช้างทรงแห่งสวรรค์ถูกเสียงอสูรครอบงำ มันขวางทางไปบัลลังก์สุริยะ!', 'Heaven\'s royal elephant is bound by the whisper — it bars the way to the Throne of the Sun!'],
-      done:['ไอราวตะได้สติแล้ว มงกุฎทวารสวรรค์นี้ ข้ามอบให้ผู้เปิดประตูสวรรค์', 'The Airavata is itself again. I give this heavenly-gate crown to the one who opened the gate of heaven.']}
+    title:['ทางแสงบนต้นไม้โลก', 'The Path of Light on the World Tree'], cos:'ms_h_gate',
+    kh:['เราปีนต้นไม้โลกขึ้นมาถึงเกาะลอยฟ้าแล้ว! ข้างล่างเป็นทะเลเมฆทั้งนั้นเลย', 'We climbed the world tree all the way to the floating island! There is nothing but a sea of clouds below.'], steps:[
+    {k:'kill', t:'devachakra', n:12, say:['ยินดีต้อนรับสู่ดาวดึงส์ ผู้เดินทางขึ้นต้นไม้โลก! ราชาอสูรปลุกจักรเทพให้หมุนคลั่ง มันตัดกิ่งต้นไม้โลกจนทางแสงขาด ช่วยหยุด 12 วงนะ', 'Welcome to Tavatimsa, you who climbed the world tree! The Asura King woke the divine chakras into a frenzy, and they cut the branches of the world tree until the path of light broke. Stop 12 of them.'],
+      done:['ขอบใจ! ใบทองของต้นไม้โลก 3 ใบร่วงลงบนเกาะ ถ้าเก็บมาได้ ข้าจะต่อทางแสงขึ้นมาใหม่ให้คนข้างล่างปีนตามมาได้', 'Thank you! Three golden leaves of the world tree fell onto the island. Bring them and I will join the path of light again, so those below can climb up after you.']},
+    {k:'find', n:3, what:['ใบทองของต้นไม้โลก', 'Golden leaf of the world tree'], say:['ใบทองเรืองแสงอยู่บนเกาะ ระวังอย่าเดินตกช่องเมฆนะ ข้างล่างลึกจนมองไม่เห็นพื้นโลก', 'The golden leaves glow somewhere on the island. Mind the gaps in the clouds: they drop so far you cannot see the earth.'],
+      done:['ครบสามใบ! แต่ทางแสงจะสว่างได้ต้องมีแสงจากดอกบัวเทวาเติมให้ก่อน', 'All three! But the path will only shine once the light of the deva lotus is poured into it.']},
+    {k:'item', t:'m_heavenlotus', n:5, say:['บัวเทวามีดวงแสงอยู่กลางดอก เก็บประกายของมันมา 5 ชิ้นนะ ข้าจะเติมลงในใบทอง', 'The deva lotus holds a spirit of light in its heart. Bring me 5 shards of its glow and I will pour them into the golden leaves.'],
+      done:['ทางแสงพันรอบต้นไม้โลกลงไปถึงพื้นดินแล้ว แสงจากประทีปทุกดวงไหลขึ้นมาตาม เป็นประทีปดวงที่สิบแปด', 'The path of light winds round the world tree all the way down to the earth, and the light of every lamp flows up along it: the eighteenth lamp.']},
+    {k:'elite', t:'skywhale', name:['วาฬเมฆผู้ถูกเสียงอสูรครอบงำ', 'The Whisper-bound Cloud Whale'], say:['วาฬเมฆที่เคยร้องเพลงกล่อมเกาะสวรรค์ถูกเสียงอสูรครอบงำ มันจะพุ่งชนต้นไม้โลก! ช่วยปลุกมันที', 'The cloud whale that used to sing the island to sleep is bound by the Asura\'s whisper. It means to ram the world tree! Wake it.'],
+      done:['วาฬเมฆร้องเพลงอีกครั้งแล้ว มงกุฎทวารสวรรค์นี้ ข้ามอบให้ผู้ปีนต้นไม้โลกขึ้นมาถึงสวรรค์', 'The cloud whale sings again. I give this heavenly-gate crown to the one who climbed the world tree to heaven.']}
   ]},
   60:{npc:MS_PRATHIP, title:['ประทีปดวงที่พัน', 'The Thousandth Lamp'], cos:'ms_t_sun', finale:true, steps:[
     {k:'kill', t:'suncourt_fiend', n:12, say:['บัลลังก์สุริยะ… ความมืดสุดท้ายของอสูรมาขวางอยู่ที่นี่ ช่วยข้าฝ่าไป 12 ตน!', 'The Throne of the Sun… the Asura\'s last darkness waits here. Help me break through twelve of them!'],

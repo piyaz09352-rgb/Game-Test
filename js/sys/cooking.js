@@ -21,7 +21,7 @@ const CK_CAT = {meat:['เนื้อสัตว์', 'Meat'], fowl:['สั�
 const CK_POOL = {};
 for (const id in SPECIES_ARCH){ const m = MOB[id]; if (!m || m.boss || !ITEMS['m_' + id]) continue; const a = SPECIES_ARCH[id], r = m.race;
   const inedible = r === 'formless' || r === 'undead' || ['floater', 'rock', 'human'].includes(a);
-  const cat = !inedible ? {quad:'meat', squat:'meat', bird:'fowl', serpent:'scale', fish:'scale', cave:'meat', bug:'yum', slime:'yum'}[a] : a === 'human' ? 'charm' : a === 'floater' || r === 'undead' ? 'ash' : 'stone';
+  const cat = !inedible ? {quad:'meat', squat:'meat', bird:'fowl', serpent:'scale', fish:'scale', cave:'meat', sky:'yum', bug:'yum', slime:'yum'}[a] : a === 'human' ? 'charm' : a === 'floater' || r === 'undead' ? 'ash' : 'stone';
   const k = cat + ckBand(m.lvl); (CK_POOL[k] = CK_POOL[k] || []).push('m_' + id); }
 CK_POOL.meat0.push('hide', 'tusk'); CK_POOL.ash0.push('wick');
 for (const k in CK_POOL) CK_POOL[k].sort((a, b) => ckMob(a).lvl - ckMob(b).lvl);

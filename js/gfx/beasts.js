@@ -10,6 +10,7 @@
      floater  wisps, krasue, haunted jars, squid, lanterns
      slime    jellies with toppers (mushroom cap, lotus, spikes, crown)
      rock     stalagmites and coral that walk
+     sky      (v297) heavenly bodies of their own: a sky whale, a heavenly lotus, a divine chakra
      cave     (v296) lava-cavern bodies of their own: a star-nosed mole, an obsidian mantis, a volcano snail
      fish     (v294) fish, shark, swordfish, lionfish, anglerfish, pufferfish, seahorse, manta ray, octopus (they swim above the sea floor)
      human    (yaksha, monkeys, ghosts, warriors…) uses the hero model with a monster costume (MOBS[k].human)
@@ -1423,7 +1424,64 @@ const BEAST = (() => {
     };
   }
 
-  const KINDS = {quad, bird, serpent, bug, squat, floater, slime, rock:rock2, fish, cave};
+  /* ---------------- (v297) creatures of heaven, each its own body ----------------
+     whale   a sky whale swimming through the air: a long body, pleated throat, long winged flippers, flukes that lie flat
+     lotus   a heavenly lotus: tiers of petals round a spirit of light, on a stem with floating leaf pads
+     chakra  a divine discus: a golden ring of blades spinning round a jewelled hub */
+  function sky(key, s){
+    const SK = mat(key, 'skin', s.col), BE = mat(key, 'belly', s.belly) ?? SK, AC = mat(key, 'acc', s.acc) ?? SK, GL = emis(key, 'glow', s.glow || '#fff0b0'),
+      EY = s.eyeGlow ? emis(key, 'eye', s.eyeGlow) : M.slimeE, GD = M.gold;
+    const kind = s.kind || 'whale', sz = s.size ?? 1;
+    return (cx, act, f, n) => {
+      const o = motion(act, f, n), dim = act === 'die' ? [.25, .55, .8, 1][f] : 0;
+      if (kind === 'whale'){
+        const hov = 20 + Math.sin(o.ph) * 2.4 - dim * 14, wav = act === 'walk' ? Math.sin(o.ph * 2) : act === 'attack' ? [0, -.5, .8, .2][f] : Math.sin(o.ph) * .5;
+        cx.pre = dim ? p => { const q = rotZ([p[0], p[1] - hov, p[2]], dim * 2.4); return [q[0], Math.max(.5, q[1] + hov), q[2]]; } : null;
+        const P = p => [p[0] * sz, hov + p[1] * sz, p[2] * sz + o.lun], L = 40, R0 = 8.5, N = 12;
+        const sp = k => [0, wav * 2.6 * (1 - k) ** 1.5 - (1 - k) * 1.5, -L * .5 + k * L], rad = k => R0 * (k > .8 ? .92 - (k - .8) * 1.6 : Math.max(.14, Math.sin(Math.pow(k / .8, .7) * Math.PI / 2) ** .6 * .92));   // a blunt broad head, tapering to the tail
+        let prev = null, pr = 0;
+        for (let i = 0; i <= N; i++){ const k = i / N, p = P(sp(k)), r = rad(k) * sz;
+          if (prev){ cx.gid = 1 + i; cap(cx, prev, p, pr, r, SK, {step:.35, tex:(nn, lo, q, t) => { const kk = (i - 1 + t) / N; if (nn[1] < -.3) return kk > .55 && Math.sin(nn[0] * 26) > .2 ? {m:BE, dt:1} : {m:BE};   // the pleated throat
+            if (kk > .86 && nn[1] < .05 && nn[1] > -.18) return {m:M.mouth, t:2};   // the long mouth line
+            return Math.sin(nn[0] * 9 + kk * 30) * Math.sin(nn[2] * 11) > .82 ? {m:AC} : {dt:nn[1] > .55 ? 1 : 0}; }}); }   // cloud-white mottling
+          prev = p; pr = r; }
+        const at = k => P(sp(k));
+        for (const sd of [-1, 1]){ const b = add(at(.62), [sd * rad(.62) * .8 * sz, -rad(.62) * .35 * sz, 0]), beat = Math.sin(o.ph * 2 + (sd > 0 ? 0 : .4)) * 3;   // the long flippers
+          let pp = b; for (let i = 1; i <= 6; i++){ const t = i / 6, q = add(b, [sd * t * 21 * sz, (beat * t - t * 3) * sz, -t * 8 * sz]); cx.gid = 30 + i + (sd > 0 ? 10 : 0); cap(cx, pp, q, (2.8 - t * 1.7) * sz, (2.5 - t * 1.7) * sz, BE, {tex:nn => (Math.sin(t * 20 + nn[0] * 4) > .7 ? {dt:1} : undefined)}); pp = q; }   // long white flippers, knobbed
+          cx.gid = 52 + (sd > 0 ? 1 : 0); ell(cx, pp, 1.4 * sz, 1.4 * sz, GD, {}); }   // a gold band at each tip
+        const tb = at(0); for (const sd of [-1, 1]) for (let j = 0; j < 3; j++){ cx.gid = 60 + j + (sd > 0 ? 3 : 0); cap(cx, add(tb, [0, 0, -j * .8 * sz]), add(tb, [sd * (13 - j * 2.5) * sz, (wav * 2.4 + 1) * sz, (-3 - j * 2.6) * sz]), (2.4 - j * .4) * sz, .7 * sz, SK, {}); }   // broad flukes lying flat
+        for (const sd of [-1, 1]){ const e = add(at(.8), [sd * rad(.8) * .9 * sz, -rad(.8) * .12 * sz, 0]); cx.gid = 70 + (sd > 0 ? 1 : 0); ell(cx, e, 1.9 * sz, 1.9 * sz, M.white, {}); ell(cx, add(e, [sd * .7 * sz, 0, .3 * sz]), 1.2 * sz, 1.2 * sz, EY, {}); }
+        for (let i = 0; i < 4; i++){ const k = (o.ph / 6.283 + i / 4) % 1; cx.gid = 80 + i; ell(cx, add(tb, [Math.sin(i * 2 + o.ph) * 3 * sz, 1 * sz, -k * 14 * sz]), (2 + k * 3) * sz, (1.6 + k * 2) * sz, BE, {}); }   // wisps of cloud in its wake
+        cx.pre = null; return; }
+      if (kind === 'lotus'){
+        const open = act === 'attack' ? [.7, .85, 1, .8][f] : .62 + Math.sin(o.ph) * .06 - dim * .3, sway = Math.sin(o.ph) * .6, P = p => [p[0] * sz, p[1] * sz, p[2] * sz + o.lun * .4];
+        fallPre(cx, o, 8 * sz);
+        for (let i = 0; i < 3; i++){ const a = i * 2.2 + .6; cx.gid = 1 + i; ell(cx, P([Math.cos(a) * 9, .6, Math.sin(a) * 7]), 7 * sz, 2.4 * sz, AC, {rz:1.6, tex:nn => (nn[1] > .3 && Math.abs(Math.atan2(nn[0], nn[2]) - a) < .25 ? false : undefined)}); }   // floating leaf pads
+        cx.gid = 5; cap(cx, P([0, .5, 0]), P([sway, 10, 0]), 1.2, 1, AC, {});   // the stem
+        const c = P([sway, 12, 0]);
+        for (const [tier, nP, len, wid, lift] of [[0, 10, 11, 3.2, -.05], [1, 9, 9, 2.8, .3], [2, 8, 6.6, 2.3, .65]]) for (let i = 0; i < nP; i++){ const a = i / nP * 6.283 + tier * .35, op = open * (1 - tier * .2), el = lift + (1 - op) * 1.05;
+          const tip = add(c, [Math.cos(a) * len * Math.cos(el) * sz, len * Math.sin(el) * sz, Math.sin(a) * len * Math.cos(el) * sz]); cx.gid = 10 + tier * 10 + i;
+          cap(cx, add(c, [Math.cos(a) * 1.4 * sz, .6 * sz, Math.sin(a) * 1.4 * sz]), tip, wid * sz, .5 * sz, tier === 2 ? BE : SK, {tex:(nn, lo, q, t) => ({t:t > .7 ? 0 : t > .35 ? 1 : 2})}); }   // tiers of petals
+        cx.gid = 50; ell(cx, add(c, [0, 3.4 * sz, 0]), 3.6 * sz, 3.6 * sz, GL, {});   // the spirit of light within
+        cx.gid = 51; ell(cx, add(c, [0, 3.6 * sz, 2.6 * sz]), 2.6 * sz, 2.2 * sz, GL, {tex:nn => eyesTex(nn, o, EY, {glow:true, sp:.36, y:.1, rx:.13, ry:.16, front:.2})});
+        for (let i = 0; i < 6; i++){ const a = o.ph * 1.2 + i * 1.047; cx.gid = 52 + i; ell(cx, add(c, [Math.cos(a) * 12 * sz, (6 + Math.sin(o.ph * 2 + i) * 2) * sz, Math.sin(a) * 12 * sz]), .9, .9, GL, {}); }   // seeds of light circling
+        return; }
+      // the chakra
+      const hov = 16 + Math.sin(o.ph) * 1.6 - dim * 12, spin = o.ph * 2 + (act === 'attack' ? f * .9 : 0), tilt = act === 'attack' ? [0, .3, -.6, -.1][f] : .15, P = p => [p[0] * sz, hov + p[1] * sz, p[2] * sz + o.lun];
+      cx.pre = p => { const q = rotX([p[0], p[1] - hov, p[2]], tilt); return [q[0], Math.max(.5, q[1] + hov), q[2]]; };
+      const Rr = 10;
+      for (let i = 0; i < 16; i++){ const a0 = i / 16 * 6.283 + spin, a1 = (i + 1) / 16 * 6.283 + spin; cx.gid = 1 + i;
+        cap(cx, P([Math.cos(a0) * Rr, Math.sin(a0) * Rr, 0]), P([Math.cos(a1) * Rr, Math.sin(a1) * Rr, 0]), 1.7, 1.7, GD, {tex:nn => (Math.abs(nn[2]) > .7 ? {dt:-1} : undefined)}); }   // the golden ring, upright
+      for (let i = 0; i < 8; i++){ const a = i / 8 * 6.283 + spin, b0 = [Math.cos(a) * Rr, Math.sin(a) * Rr, 0], b1 = [Math.cos(a + .32) * (Rr + 6.5), Math.sin(a + .32) * (Rr + 6.5), 0];
+        cx.gid = 20 + i; cap(cx, P(b0), P(b1), 1.4, .2, SK, {tex:nn => (nn[0] * Math.cos(a) + nn[1] * Math.sin(a) > .3 ? {m:GL, t:0} : undefined)}); }   // blades of light-edged steel, swept back
+      for (let i = 0; i < 6; i++){ const a = i / 6 * 6.283 - spin * .5; cx.gid = 30 + i; cap(cx, P([0, 0, 0]), P([Math.cos(a) * Rr * .9, Math.sin(a) * Rr * .9, 0]), .7, .5, GD, {}); }   // spokes turning the other way
+      cx.gid = 40; ell(cx, P([0, 0, .6]), 3.6 * sz, 3.6 * sz, AC, {rz:2.4, tex:nn => (nn[2] > .55 ? {m:GL, t:0} : undefined)});   // the jewelled hub
+      cx.gid = 41; ell(cx, P([0, 0, 2.6]), 1.6 * sz, 1.6 * sz, EY, {});
+      cx.pre = null;
+    };
+  }
+
+  const KINDS = {quad, bird, serpent, bug, squat, floater, slime, rock:rock2, fish, cave, sky};
   const POINTY_HATS = ['lomphok', 'wizard'];   // no tall pointed hats on monsters (the owner's call): they are dropped here
   function make(key, spec){
     if (POINTY_HATS.includes(spec.hat)) spec = {...spec, hat:undefined};

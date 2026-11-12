@@ -24,7 +24,7 @@ function statsFor(L, k = {}, XL = L){
 }
 /* loot part names by archetype */
 const PART = {quad:['หนัง', 'Hide'], bird:['ขนนก', 'Feather'], serpent:['เกล็ด', 'Scale'], bug:['กระดอง', 'Carapace'], squat:['ผิวมัน', 'Slick Skin'],
-  floater:['เถ้าวิญญาณ', 'Spirit Ash'], slime:['เมือก', 'Ooze'], rock:['เศษหิน', 'Rubble'], human:['เครื่องราง', 'Charm'], fish:['ครีบ', 'Fin'], cave:['เปลือกหินร้อน', 'Hot Rock Hide']};
+  floater:['เถ้าวิญญาณ', 'Spirit Ash'], slime:['เมือก', 'Ooze'], rock:['เศษหิน', 'Rubble'], human:['เครื่องราง', 'Charm'], fish:['ครีบ', 'Fin'], cave:['เปลือกหินร้อน', 'Hot Rock Hide'], sky:['ประกายสวรรค์', 'Heavenly Shard']};
 
 /* ---------- species ----------
    [id, th, en, lvl, archetype, look, elem, race, size, extra]
@@ -406,6 +406,13 @@ SPECIES.push(
   ['obsidianmantis', 'ตั๊กแตนตำข้าวออบซิเดียน', 'Obsidian Mantis', 0, 'cave', {kind:'mantis', col:'#1a1420', belly:'#2e2436', acc:'#3a2a4a', glow:'#ff8a3a', eyeGlow:'#ff5a2a'}, 'fire', 'insect', 'm', {aggro:true, k:{atk:1.25, spd:14}}],
   ['volcanosnail', 'หอยทากภูเขาไฟ', 'Volcano Snail', 0, 'cave', {kind:'snail', col:'#5a3a2e', belly:'#7a5040', acc:'#2a201c', glow:'#ff7a1a', dark:'#3a3230', eyeGlow:'#ffd04a', size:1.1}, 'fire', 'brute', 'l', {range:120, shot:'fire', k:{hp:1.6, def:1.6, spd:-25}}]
 );
+/* (v297) สวรรค์: creatures of heaven on bodies of their own (gfx/beasts.js 'sky'), appended the same way */
+for (const id of ['skywhale', 'heavenlotus', 'devachakra']) SPECIES_LATE.add(id);
+SPECIES.push(
+  ['skywhale', 'วาฬเมฆสวรรค์', 'Heavenly Cloud Whale', 0, 'sky', {kind:'whale', col:'#5a7ea8', belly:'#f4f8ff', acc:'#dce8f6', eyeGlow:'#1e3a5a', size:1.15}, 'wind', 'fish', 'l', {k:{hp:1.7, spd:-5}}],
+  ['heavenlotus', 'บัวเทวา', 'Deva Lotus', 0, 'sky', {kind:'lotus', col:'#f8a8c8', belly:'#fff0f6', acc:'#5a9a5a', glow:'#fff4c0', eyeGlow:'#e3b04b'}, 'holy', 'plant', 'm', {range:130, shot:'holy'}],
+  ['devachakra', 'จักรเทพ', 'Divine Chakra', 0, 'sky', {kind:'chakra', col:'#d8e0f0', acc:'#e3b04b', glow:'#fff8c8', eyeGlow:'#3a8af0'}, 'holy', 'formless', 'm', {aggro:true, k:{atk:1.25, spd:12}}]
+);
 MAPS[17].mobs = ['abyssshark', 'mantaray', 'giantpuffer', 'abyssangler', 'seahorseknight', 'lionfish', 'swordfish', 'abyssoctopus', 'armorlobster', 'abyssjelly', 'thundereel', 'abyssturtle'];
 const ROAD_LV = Object.fromEntries(Object.entries(ROAD_LV_RAW).map(([d, a]) => [d, a.map(([lo, hi]) => [LVMAP(lo), Math.max(LVMAP(lo) + 2, LVMAP(hi))])]));
 const ROAD_LAND = {e:() => 'fertile', s:k => k < Math.round(ROADS.s.filter(i => !MAPS[i].landFix).length * 5 / 8) ? 'arid' : 'volcanic', w:() => 'frozen', n:k => k < Math.round(ROADS.n.length * 2 / 3) ? 'dark' : 'light'};
@@ -429,6 +436,9 @@ const OPP = {n:'s', s:'n', e:'w', w:'e'}, DIRV = {n:[0, -1], s:[0, 1], e:[1, 0],
 /* (v296) the cavern's own creatures join maps 65 and 66 after the roads' levels are dealt (the older species keep theirs), at those maps' levels */
 MAPS[65].mobs.push('lavamole', 'obsidianmantis', 'volcanosnail'); MAPS[66].mobs.push('obsidianmantis', 'volcanosnail', 'lavamole');
 { const lvOf = {lavamole:[65, .3], obsidianmantis:[65, .65], volcanosnail:[66, .4]}; for (const id in lvOf){ const sp = SPECIES.find(x => x[0] === id), mp = MAPS[lvOf[id][0]]; if (sp && mp) sp[3] = Math.round(mp.lv[0] + lvOf[id][1] * (mp.lv[1] - mp.lv[0])); } }
+/* (v297) heaven's own creatures join maps 30 and 60 the same way */
+MAPS[30].mobs.push('skywhale', 'heavenlotus', 'devachakra'); MAPS[60].mobs.push('devachakra', 'skywhale', 'heavenlotus');
+{ const lvOf = {skywhale:[30, .5], heavenlotus:[30, .3], devachakra:[30, .75]}; for (const id in lvOf){ const sp = SPECIES.find(x => x[0] === id), mp = MAPS[lvOf[id][0]]; if (sp && mp) sp[3] = Math.round(mp.lv[0] + lvOf[id][1] * (mp.lv[1] - mp.lv[0])); } }
 for (const [id, to] of [['nagaretainer', 55], ['spiritpearl', 55], ['nagawarrior', 54], ['emeraldcrab', 54]]){ const sp = SPECIES.find(x => x[0] === id), mp = MAPS[to];
   if (!sp || !mp) continue; if (!mp.mobs.includes(id)) mp.mobs.push(id); sp[3] = Math.round((mp.lv[0] + mp.lv[1]) / 2); }
 
