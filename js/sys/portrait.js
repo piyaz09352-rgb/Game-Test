@@ -22,7 +22,7 @@ drawPortrait = function(){
   g.drawImage(PORT.c, fs / 2 - size / 2 * K, sh.anchor[1] - top * K, size * K, size * K, 0, 0, cv.width, cv.height); PORT.drawn = PORT.key + cv.width;
 };
 { const p = el('portrait'), box = p && p.closest('.portrait');
-  if (box){ box.style.cursor = 'pointer'; box.title = L('สถานะ (A)', 'Status (A)'); box.setAttribute('role', 'button');
+  if (box){ box.style.cursor = 'pointer'; box.title = L('สถานะ (C)', 'Status (C)'); box.setAttribute('role', 'button');
     box.addEventListener('click', e => { e.stopPropagation(); if (typeof winOpen === 'function' && winOpen('stat')) closeWin('stat'); else openWin('stat'); }); } }
 { const st = document.createElement('style');
   st.textContent = `.char .lvb{display:none !important}

@@ -52,7 +52,7 @@ window.addEventListener('keydown', e => {
   if (typing(e)) return;
   if (e.key === 'Escape'){ if (!$('#dialog').hidden) closeDialog(); else { const t = topWin(); if (t) closeWin(t); } return; }
   if (!plainKey(e)) return;
-  const wk = {a:'stat', s:'skill', e:'bag', l:'log', o:'settings', q:'equip', m:'world', n:'social', j:'quest', k:'wiki', y:'ach', g:'guild', i:'craft', f:'friends', p:'arena', u:'market', '/':'help'}[k];
+  const wk = {c:'stat', k:'skill', f1:'wiki', e:'bag', l:'log', o:'settings', q:'equip', m:'world', n:'social', j:'quest', y:'ach', g:'guild', i:'craft', f:'friends', p:'arena', u:'market', '/':'help'}[k];
   if (wk){ toggleWin(wk); return; }
   if (k === 'h'){ setHideUI(!UIS.hide); return; }
   if (k === 'b' && e.shiftKey){ botSettings(); return; }   // Shift+B: Auto settings (D is a WASD move key)

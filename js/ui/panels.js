@@ -150,8 +150,8 @@ function renderHotbar(){
 }
 function renderGoal(){
   const j = JOBS[S.job]; let g = '';
-  if (S.statPts >= 2 && S.lvl <= 3) g = L(`<b>เริ่มต้น:</b> แจก Stat Point ในหน้าต่างสถานะ (A)`, `<b>Start:</b> spend Stat Points in Status (A)`);
-  else if (S.skPts > 0 && ownedSkillIds().some(canRaise)) g = L(`<b>Skill Point:</b> มี ${S.skPts} แต้ม เปิดหน้าต่างสกิล (S)`, `<b>Skill Points:</b> ${S.skPts} to spend — open Skills (S)`);
+  if (S.statPts >= 2 && S.lvl <= 3) g = L(`<b>เริ่มต้น:</b> แจก Stat Point ในหน้าต่างสถานะ (C)`, `<b>Start:</b> spend Stat Points in Status (C)`);
+  else if (S.skPts > 0 && ownedSkillIds().some(canRaise)) g = L(`<b>Skill Point:</b> มี ${S.skPts} แต้ม เปิดหน้าต่างสกิล (K)`, `<b>Skill Points:</b> ${S.skPts} to spend — open Skills (K)`);
   else if (j.next && !jobChangeBlock()) g = L(`<b>เปลี่ยน Job ได้แล้ว:</b> คุยกับครูวายราที่หมู่บ้าน`, `<b>Job change ready:</b> talk to Master Vayra in the village`);
   const qt = questTracker(), bs = boss && !boss.dead ? '' :(typeof bossClockText === 'function' && bossClockText() ? `<span class="qboss">${bossClockText()}</span>` : '');
   $('#goal').innerHTML = [g, qt, bs].filter(Boolean).join('<br>');
@@ -234,10 +234,22 @@ document.addEventListener('click', e => {
     if (!canWield(it)){ toast(!lineOk(it.st) || !WTYPE[it.wtype] ? L(`${nm(JOBS[S.job])} ใช้ชิ้นนี้ไม่ได้ (ของเฉพาะสาย)`, `${nm(JOBS[S.job])} cannot use this (class gear)`) : L(`${nm(JOBS[S.job])} ใช้${L(...WTYPE[it.wtype])}ไม่ได้`, `${nm(JOBS[S.job])} cannot use a ${WTYPE[it.wtype][1]}`)); return; } S.gear = S.gear || {}; const wsl = typeof wearSlot === 'function' ? wearSlot(it) : it.slot; if (!wsl) return; const old = S.gear[wsl]; if (old) addItem(old, 1);
     S.inv[ds.wear]--; if (!S.inv[ds.wear]) delete S.inv[ds.wear]; S.gear[wsl] = ds.wear; derive(); log(L(`สวม ${nm(it)}`, `Wearing ${nm(it)}`)); dirty = true; save(); return; }
   if (ds.unwear){ const sl = ds.unwear, id = S.gear && S.gear[sl]; if (!id) return; S.gear[sl] = null; if (sl !== 'ammo') addItem(id, 1); derive(); dirty = true; save(); return; }
-  if (ds.warp != null){ const id = +ds.warp, fee = warpFee(id); if (!S.visited[id] || S.bia < fee || id === MAP_ID) return; S.bia -= fee; closeDialog(); closeWin('world'); warpTo(id); return; }
+  if (ds.warp != null){ const id = +ds.warp, fee = warpFee(id); if (!S.visited[id] || S.bia < fee || id === MAP_ID || WARPING) return; S.bia -= fee; closeDialog(); closeWin('world');
+    // (v298) the owner: «pressing the warp keeper hangs». The board closes and a «warping…» card shows at once; the new map is
+    // painted on the next frames (painting a map takes a second or two on a phone, and a screen that froze with the board
+    // still open looked stuck)
+    WARPING = true; const wg = el('warpGrid'); if (wg) wg.hidden = true; warpCard(true);
+    requestAnimationFrame(() => setTimeout(() => { try { warpTo(id); } finally { WARPING = false; warpCard(false); } }, 30)); return; }
   if (ds.qaccept){ questAccept(ds.qaccept); return; }
   if (ds.qturnin){ questTurnIn(); return; }
   if (ds.btake){ bountyTake(+ds.btake); return; }
   if (ds.bclaim){ bountyClaim(+ds.bclaim); return; }
   if (ds.close){ closeDialog(); return; }
 });
+
+/* (v298) the «warping…» card shown while a warp paints the new map */
+let WARPING = false;
+function warpCard(on){ let c = el('warpCard'); if (!c){ c = document.createElement('div'); c.id = 'warpCard'; c.hidden = true; c.innerHTML = `<span class="wcspin"></span><b>${L('กำลังวาร์ป…', 'Warping…')}</b>`; (el('ui') || document.body).appendChild(c);
+    const st = document.createElement('style'); st.textContent = '#warpCard{position:absolute;inset:0;z-index:400;display:flex;align-items:center;justify-content:center;gap:10px;background:rgba(20,16,30,.35);color:#fff4d0;font:700 18px Sarabun,sans-serif;pointer-events:auto}#warpCard[hidden]{display:none}#warpCard .wcspin{width:22px;height:22px;border-radius:50%;border:3px solid rgba(255,240,200,.3);border-top-color:#ffe08a;animation:wcspin .8s linear 9999}@keyframes wcspin{to{transform:rotate(360deg)}}'; document.head.appendChild(st); }
+  c.querySelector('b').textContent = L('กำลังวาร์ป…', 'Warping…'); c.hidden = !on; }
+

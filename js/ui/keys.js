@@ -31,14 +31,15 @@ const KEYMAP = [
   [['Z'], 'เก็บของที่ใกล้ที่สุด', 'Pick up the nearest loot'],
   [['Tab'], 'เลือกมอนตัวถัดไป · Shift+Tab ยกเลิกเป้า', 'Target the next monster · Shift+Tab clears it'],               // js/sys/tlock.js
   [['B'], 'เปิด/ปิด Auto · Shift+B ตั้งค่า Auto', 'Auto on/off · Shift+B Auto settings'],
-  [['A', 'S', 'E', 'Q'], 'สถานะ · Skill · กระเป๋า · อุปกรณ์', 'Status · Skills · Bag · Equipment'],
+  [['W', 'A', 'S', 'D'], 'เดิน (เหมือนปุ่มลูกศร)', 'Move (like the arrow keys)'],
+  [['C', 'K', 'E', 'Q'], 'สถานะ · Skill · กระเป๋า · อุปกรณ์', 'Status · Skills · Bag · Equipment'],
   [['J', 'M', 'N', 'L'], 'เควสต์ · แผนที่โลก · ผู้เล่นออนไลน์ · บันทึก', 'Quests · World map · Players online · Log'],
-  [['K', 'Y', 'G', 'I'], 'วิกิ · ความสำเร็จและฉายา · กิลด์ · หลอมของ', 'Wiki · Achievements & titles · Guild · Crafting'],
+  [['F1', 'Y', 'G', 'I'], 'วิกิ · ความสำเร็จและฉายา · กิลด์ · หลอมของ', 'Wiki · Achievements & titles · Guild · Crafting'],
   [['F', 'P', 'U', 'Alt+Z'], 'เพื่อน · สนามประลอง · ตลาดผู้เล่น · ปาร์ตี้', 'Friends · Arena · Player market · Party'],   // Alt+Z: js/sys/party.js
   [['O', '?'], 'ตั้งค่า · คู่มือนี้', 'Settings · this guide'],
   [['V', 'F2'], 'วงล้ออีโมต · โหมดถ่ายรูป', 'Emote wheel · photo mode'],                                                       // js/sys/cosx.js
   [['Enter'], 'เปิดแชต · Enter อีกครั้งเพื่อส่ง (ช่องว่าง = ปิดแชต) · Esc ออกจากช่องแชต', 'Open chat · Enter again sends (empty = closes the chat) · Esc leaves the chat box'],  // js/ui/hud.js, js/net/online.js
-  [['↑', '↓', '←', '→'], 'เดินด้วยปุ่มลูกศร · โหมดจอยใช้ W A S D ได้ด้วย (A กับ S จึงเป็นปุ่มเดิน)', 'Move with the arrows · joystick mode adds W A S D (A and S then move)'],   // js/ui/joystick.js
+  [['↑', '↓', '←', '→'], 'เดินด้วยปุ่มลูกศร (หรือ W A S D)', 'Move with the arrows (or W A S D)'],
   [['H'], 'ซ่อน/แสดง UI ทั้งหมด', 'Hide/show all UI'],
   [['Esc'], 'ปิดหน้าต่างบนสุด', 'Close the top window'],
   [['+', '−'], 'ซูมเข้า/ออก · ล้อเมาส์ · บีบนิ้ว', 'Zoom in/out · mouse wheel · pinch']];
