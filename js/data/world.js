@@ -152,7 +152,7 @@ const SPECIES = [
   ['nagawarrior', 'ทหารนาคา', 'Naga Warrior', 152, 'human', {skin:'#3a8a7a', top:'#e3b04b', pants:'#1a4a4a', hair:'#0a2a2a', hat:'lomphok', hatCol:'#e3b04b', weapon:'sword', tail:'#3a8a7a', tailW:2.2, iris:'irisGr'}, 'water', 'dragon', 'm', {aggro:true, k:{atk:1.2}}],
   ['abyssjelly', 'แมงกะพรุนบาดาล', 'Abyssal Jelly', 147, 'slime', {col:'#3ac8c0', emissive:true, jelly:true, topCol:'#7af0e0'}, 'water', 'fish', 's', {range:110, shot:'ice'}],
   ['emeraldcrab', 'ปูมรกต', 'Emerald Crab', 150, 'bug', {shell:'#2aa86a', leg:'#1a7a4a', acc:'#7af0b0', kind:'crab', bigClaw:true}, 'water', 'fish', 'm', {k:{def:2}}],
-  ['thundereel', 'ปลาไหลไฟฟ้า', 'Thunder Eel', 154, 'serpent', {skin:'#e8d040', belly:'#3a3a2a', stripe:'#3a3a2a', len:1.4, eyeGlow:'#7ae0ff'}, 'wind', 'fish', 'm', {aggro:true, range:120, shot:'bolt'}],
+  ['thundereel', 'ปลาไหลไฟฟ้า', 'Thunder Eel', 154, 'serpent', {skin:'#e8d040', belly:'#3a3a2a', stripe:'#3a3a2a', len:1.4, eyeGlow:'#7ae0ff', swim:9, fin:'#c8a830', spark:'#9af0ff'}, 'wind', 'fish', 'm', {aggro:true, range:120, shot:'bolt'}],
   ['spiritpearl', 'ไข่มุกวิญญาณ', 'Spirit Pearl', 149, 'floater', {col:'#f0f4ff', kind:'pearl', ring:'#a8e0ff', glow:'#c8f0ff', dark:'#4a5a7a'}, 'holy', 'formless', 's', {range:130, shot:'holy'}],
   ['abyssturtle', 'เต่าบาดาล', 'Abyss Turtle', 156, 'squat', {skin:'#2a4a5a', shell:'#1a3a4a', belly:'#7ab0c0', kind:'turtle', size:1.2, scute:'#5af0d0', eyeGlow:'#7af0d0'}, 'water', 'dragon', 'l', {k:{hp:1.7, def:2, spd:-12}}],
   // 18 ป่าหิมพานต์ชั้นใน
@@ -205,7 +205,7 @@ const BOSSES = [
   ['lordkotchasi', 'พญาคชสีห์', 'Lord Kotchasi', 129, 'quad', {skin:'#e8c050', belly:'#c8902a', acc:'#fff8e8', mane:'#c83a2a', ruff:true, head:'elephant', tusks:true, crown:true, girth:1.25, tuft:true}, 'earth', 'dragon', ['charge', 'roar', 'quake', 'enrage']],
   ['waterelephantking', 'วารีกุญชรราชา', 'King of the Water Elephants', 138, 'quad', {skin:'#2a5a9a', belly:'#7ab0e0', acc:'#f8f8ff', head:'elephant', tusks:true, crown:true, girth:1.35, fishTail:'#e3b04b', stripe:'#e3b04b', spots:true}, 'water', 'dragon', ['meteor', 'charge', 'heal', 'field']],
   ['laplaelord', 'เจ้าเมืองลับแล', 'Lord of Laplae', 147, 'human', {skin:'#d8c8c0', top:'#4a2a5a', pants:'#2a1a3a', hair:'#e8e0d8', hat:'lomphok', hatCol:'#c8a8e8', beard:true, weapon:'staff', cape:'#3a1a4a', iris:'irisVi'}, 'shadow', 'human', ['teleport', 'summon', 'barrage', 'field']],
-  ['nagaking', 'พญานาคราช', 'The Naga King', 160, 'serpent', {skin:'#1f6e52', belly:'#e8d27a', hood:'#d9a63a', crown:true, heads:7, spread:2.4, len:1.55, rise:16, thick:1.3, eyeGlow:'#ffd36a'}, 'water', 'dragon', ['barrage', 'field', 'quake', 'enrage']],
+  ['nagaking', 'พญานาคราช', 'The Naga King', 160, 'serpent', {skin:'#1f6e52', belly:'#e8d27a', hood:'#d9a63a', crown:true, naga7:true, heads:7, spread:2.4, len:1.55, rise:16, thick:1.3, eyeGlow:'#ffd36a'}, 'water', 'dragon', ['barrage', 'field', 'quake', 'enrage']],
   ['tenfacedogre', 'ยักษ์ทศพักตร์', 'The Ten-faced Ogre King', 172, 'human', {skin:'#3a7a4a', top:'#e3b04b', pants:'#a82a2a', hair:'#1a1a1a', hat:'lomphok', hatCol:'#e3b04b', fangs:true, horns:'#f0e8d0', weapon:'sword', cape:'#a82a2a', iris:'irisGr'}, 'shadow', 'demon', ['summon', 'meteor', 'slam', 'enrage']],
   ['garudaking', 'พญาครุฑ', 'The Garuda King', 186, 'bird', {body:'#c82a1a', wing:'#e3b04b', belly:'#f0d070', beak:'#e3b04b', crest:'#e3b04b', hook:true, crown:true, size:1.4, tail:'fan', tailCol:'#c82a1a', mantle:'#e3b04b'}, 'wind', 'angel', ['charge', 'barrage', 'roar', 'enrage']],
   ['vessavana', 'ท้าวเวสสุวรรณ', 'Vessavana, Lord of Giants', 205, 'human', {skin:'#2a5aa8', top:'#e3b04b', pants:'#a82a2a', hair:'#1a1a1a', hat:'lomphok', hatCol:'#f0d070', fangs:true, weapon:'sword', cape:'#e3b04b', iris:'irisVi'}, 'holy', 'demon', ['meteor', 'summon', 'slam', 'wave', 'heal', 'enrage']]
@@ -397,7 +397,7 @@ SPECIES.push(
   ['lionfish', 'ปลาสิงโต', 'Lionfish', 149, 'fish', {kind:'lionfish', col:'#c8503a', belly:'#f4e8e0', stripe:'#f8f0ea', fin:'#e07a5a'}, 'shadow', 'fish', 's', {aggro:true, k:{atk:1.15}}],
   ['swordfish', 'ปลากระโทงดาบ', 'Swordfish', 153, 'fish', {kind:'swordfish', col:'#1a3aa0', belly:'#d8e4ee', fin:'#142a70', size:.95}, 'water', 'fish', 'm', {aggro:true, k:{spd:20, atk:1.2}}],
   ['abyssoctopus', 'ปลาหมึกยักษ์ห้วงลึก', 'Abyssal Octopus', 156, 'fish', {kind:'octopus', col:'#a84a5a', belly:'#f0c8c8', spot:'#7a2a3a', size:1.1}, 'water', 'fish', 'l', {range:120, shot:'dark', part:['หนวด', 'Tentacle'], k:{hp:1.4}}],
-  ['armorlobster', 'กุ้งมังกรเกราะ', 'Armored Lobster', 152, 'bug', {kind:'shrimp', shell:'#c8402a', leg:'#a8301e', acc:'#f0c040', bigClaw:true, size:1.25}, 'water', 'fish', 'm', {k:{def:2.2}}]
+  ['armorlobster', 'กุ้งมังกรเกราะ', 'Armored Lobster', 152, 'bug', {kind:'shrimp', shell:'#c8402a', leg:'#a8301e', acc:'#f0c040', bigClaw:true, size:1.25, legLen:.55}, 'water', 'fish', 'm', {k:{def:2.2}}]
 );
 MAPS[17].mobs = ['abyssshark', 'mantaray', 'giantpuffer', 'abyssangler', 'seahorseknight', 'lionfish', 'swordfish', 'abyssoctopus', 'armorlobster', 'abyssjelly', 'thundereel', 'abyssturtle'];
 const ROAD_LV = Object.fromEntries(Object.entries(ROAD_LV_RAW).map(([d, a]) => [d, a.map(([lo, hi]) => [LVMAP(lo), Math.max(LVMAP(lo) + 2, LVMAP(hi))])]));

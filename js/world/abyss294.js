@@ -252,7 +252,7 @@ if (typeof BIOME_MOOD !== 'undefined') BIOME_MOOD.badan = 'water';
 
 /* ---------- the travellers' camp on the sea floor ----------
    The camp keeps its place and its people, but its land plants become sea plants, the great tree a great coral tree hung
-   with glowing pearls, and the campfire a pearl that glows over a warm vent (fire does not burn under the sea). */
+   with glowing pearls; the fire pit is covered with sand (v295: its middle is a giant clam, further down). */
 PROP_TYPES.coraltree = (seed, v = 0) => makeProp({w:200, h:230, ax:100, ay:220, seed, shadow:[60, 16], collide:22, glow:[0, -120, 70], paint(g, rng){
   const [d, m, l] = [['#b03a5a', '#e0607a', '#ffa8b8'], ['#c0602a', '#f08a3a', '#ffc890'], ['#7a3ab0', '#a868e0', '#d8b0ff']][v % 3];
   const br = (x, y, a, len, w, dep) => { if (dep > 6 || len < 4) return; const x2 = x + Math.cos(a) * len, y2 = y + Math.sin(a) * len;
@@ -264,22 +264,14 @@ PROP_TYPES.coraltree = (seed, v = 0) => makeProp({w:200, h:230, ax:100, ay:220, 
   for (let i = 0; i < 9; i++){ const x = (rng() - .5) * 140, y = -70 - rng() * 120; g.fillStyle = 'rgba(200,240,255,.5)'; g.beginPath(); g.arc(x, y, 6, 0, 7); g.fill(); g.fillStyle = '#f4fbff'; g.beginPath(); g.arc(x, y, 3.6, 0, 7); g.fill(); g.fillStyle = '#ffffff'; g.beginPath(); g.arc(x - 1.2, y - 1.2, 1.2, 0, 7); g.fill(); }   // pearls
   for (let i = 0; i < 14; i++){ g.fillStyle = ['#e8784a', '#f0b040', '#40c0a0'][i % 3]; g.beginPath(); g.ellipse((rng() - .5) * 60, -rng() * 8, 3 + rng() * 3, 1.6 + rng(), 0, 0, 7); g.fill(); }   // sea life at its foot
 }});
-{ const SWAP = {worldtree:'coraltree', camptree:'coraltree', deadtree:'seafan', bush:'anemone', flowerbed:'brainc', hedge:'anemone', frangipani:'seafan', tree:'kelp', pine:'kelp', palm:'kelp', himtree:'seafan'};
+{ const SWAP = {worldtree:'coraltree', camptree:'coraltree', deadtree:'seafan', bush:'anemone', flowerbed:'brainc', hedge:'anemone', frangipani:'seafan', tree:'kelp', pine:'kelp', palm:'kelp', himtree:'seafan', bedroll:'anemone', packs:'brainc', logseat:'brainc', stakelamp:'crystal'};   // (v295) no bedrolls, packs or burning lamps under the sea
   const _cp = campPlace; campPlace = function(){ const r = _cp.apply(this, arguments); if (!abyssHere() || !CAMP) return r;
     for (const p of PROPS){ const to = SWAP[p.type]; if (!to || Math.hypot(p.x - CAMP.x, p.y - CAMP.y) > 360) continue;
       for (let j = obstacles.length - 1; j >= 0; j--) if (obstacles[j].prop === p) obstacles.splice(j, 1);
       p.type = to; p.variant = to === 'coraltree' ? MAP_ID % 3 : Math.floor((p.x + p.y) % 4); delete p.vk; const im = propImg(p.type, p.variant); if (im.collide) obstacles.push({x:p.x, y:p.y, r:im.collide, prop:p}); }
+    { const g = terr.getContext('2d'); g.save(); g.setTransform(TS, 0, 0, TS, 0, 0);   // sand drifted over the old fire pit
+      for (const [rx, ry, a] of [[30, 15, .55], [24, 12, .8], [18, 9, 1]]){ g.fillStyle = `rgba(104,150,148,${a})`; g.beginPath(); g.ellipse(CAMP.x, CAMP.y + 18, rx, ry, 0, 0, 7); g.fill(); } g.restore(); }
     NAV.grid = null; return r; }; }
-{ const _cf = campFire; campFire = function(g, x, y, t){ if (!abyssHere()) return _cf.apply(this, arguments);
-    const k = .85 + Math.sin(t * 1.4) * .15;
-    g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y - 10, 0, x, y - 10, 80); gr.addColorStop(0, `rgba(120,220,255,${.35 * k})`); gr.addColorStop(1, 'rgba(80,180,255,0)');
-    g.fillStyle = gr; g.fillRect(x - 80, y - 90, 160, 160); g.restore();
-    g.fillStyle = '#2a3a44'; g.beginPath(); g.ellipse(x, y, 12, 5, 0, 0, 7); g.fill();   // the vent
-    const pg = g.createRadialGradient(x - 2, y - 14, 1, x, y - 11, 8); pg.addColorStop(0, '#ffffff'); pg.addColorStop(.6, '#cfefff'); pg.addColorStop(1, '#7ab8d8');
-    g.fillStyle = pg; g.beginPath(); g.arc(x, y - 11 + Math.sin(t * 2) * 1.5, 7, 0, 7); g.fill();   // the pearl, bobbing on the warm water
-    g.strokeStyle = 'rgba(220,250,255,.75)'; g.lineWidth = .9;
-    for (let i = 0; i < 6; i++){ const ph = (t * .5 + i / 6) % 1; g.globalAlpha = Math.sin(ph * Math.PI); g.beginPath(); g.arc(x + Math.sin(i * 2.3 + t * 2) * 5, y - 18 - ph * 50, 1.2 + ph * 1.4, 0, 7); g.stroke(); }
-    g.globalAlpha = 1; }; }
 /* the little ground decorations: no glowing toadstools or will-o'-wisps on the sea floor */
 if (typeof cuteBuild === 'function'){ const _cb = cuteBuild; cuteBuild = function(){ const r = _cb.apply(this, arguments); if (abyssHere()) CUTE.decor = CUTE.decor.filter(d => d.k === 'pebble'); return r; }; }
 
@@ -318,3 +310,66 @@ function wpAbove(ctx, gt, cx, cy){
 }
 if (typeof wgGround === 'function'){ const _g = wgGround; wgGround = function(ctx, gt){ return abyssGate(gt) ? wpGround.apply(this, arguments) : _g.apply(this, arguments); }; }
 if (typeof wgAbove === 'function'){ const _a = wgAbove; wgAbove = function(ctx, gt){ return abyssGate(gt) ? wpAbove.apply(this, arguments) : _a.apply(this, arguments); }; }
+
+/* ---------- the trenches, painted as holes in the sea floor (no shore foam, no surface ripples) ---------- */
+{ const _wb = waterBody; waterBody = function(g, x, y, rx, ry){ if (!abyssHere()) return _wb.apply(this, arguments);
+    // a crumbling rim of rock and sand sloping down into the dark
+    for (let i = 0; i < 46; i++){ const a = i / 46 * 6.283 + R() * .1, rr = 1.04 + R() * .12, px = x + Math.cos(a) * rx * rr, py = y + Math.sin(a) * ry * rr, s = 4 + R() * 6;
+      g.fillStyle = 'rgba(20,40,50,.35)'; g.beginPath(); g.ellipse(px + 1, py + 2, s, s * .55, 0, 0, 7); g.fill();
+      g.fillStyle = R() < .5 ? '#4e6e74' : '#6a8a88'; g.beginPath(); g.ellipse(px, py, s * .9, s * .5, a, 0, 7); g.fill(); }
+    const gr = g.createRadialGradient(x, y + ry * .15, 2, x, y, Math.max(rx, ry) * 1.08); gr.addColorStop(0, '#000208'); gr.addColorStop(.45, '#04121e'); gr.addColorStop(.8, '#123444'); gr.addColorStop(1, '#3a6066');
+    g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, rx + 6, ry + 2, 0, 0, 7); g.fill();
+    // ledges on the near wall: the drop is lit from above on the far side
+    g.strokeStyle = 'rgba(120,170,175,.35)'; g.lineWidth = 2; for (let k = 0; k < 3; k++){ g.beginPath(); g.ellipse(x, y - ry * .06 * k, rx * (.95 - k * .14), ry * (.9 - k * .14), 0, Math.PI * 1.08, Math.PI * 1.92); g.stroke(); }
+  }; }
+
+/* ---------- (v295) the owner: «where would a fire burn under water? think!» — no cook on a sea-floor map, and the warp
+   keeper is a submarine. The camp's middle is a great open clam holding a glowing pearl (no fire, no logs, no pit). ---------- */
+{ const _sn = setupNpcs; setupNpcs = function(id){ const r = _sn.apply(this, arguments); if (!abyssHere()) return r;
+    for (let i = NPCS.length - 1; i >= 0; i--) if (NPCS[i].id === 'campcook' || NPCS[i].id === 'quarter') NPCS.splice(i, 1);   // nobody cooks down here
+    const w = NPCS.find(n => n.id === 'warp'); if (w) Object.assign(w, {name:'เรือดำน้ำนาคา', en:'Naga Submarine', role:'วาร์ป · กลับเมือง', roleEn:'Warp · back to town', sub:true});
+    return r; }; }
+function abySub(g, x, y, t, near){
+  const bob = Math.sin(t * 1.3) * 2.2, yy = y - 26 + bob, tilt = Math.sin(t * .7) * .04;
+  g.save(); g.fillStyle = 'rgba(4,20,36,.28)'; g.beginPath(); g.ellipse(x, y + 2, 34, 8, 0, 0, 7); g.fill();   // its shadow on the sand
+  g.translate(x, yy); g.rotate(tilt);
+  // the hull: a brass-gold body with a darker keel, riveted
+  const hg = g.createLinearGradient(0, -16, 0, 16); hg.addColorStop(0, '#ffe08a'); hg.addColorStop(.45, '#e3b04b'); hg.addColorStop(1, '#8a5a1a');
+  g.fillStyle = hg; g.strokeStyle = '#4a2c0a'; g.lineWidth = 1.6; g.beginPath(); g.ellipse(0, 0, 34, 15, 0, 0, 7); g.fill(); g.stroke();
+  g.fillStyle = 'rgba(255,255,255,.35)'; g.beginPath(); g.ellipse(-6, -8, 22, 3.4, 0, 0, 7); g.fill();
+  g.fillStyle = '#6a3e10'; for (let i = -4; i <= 4; i++){ g.beginPath(); g.arc(i * 7, 9, .9, 0, 7); g.fill(); }
+  // a naga figurehead at the bow and a turning propeller at the stern
+  g.fillStyle = '#2f8a6a'; g.beginPath(); g.moveTo(32, -4); g.quadraticCurveTo(44, -16, 40, -24); g.quadraticCurveTo(36, -14, 30, -8); g.closePath(); g.fill(); g.stroke();
+  g.fillStyle = '#ffd36a'; g.beginPath(); g.arc(40, -23, 2.2, 0, 7); g.fill();
+  const pr = Math.sin(t * 14); g.fillStyle = '#c89a3a'; g.beginPath(); g.ellipse(-37, -6 * pr, 2.4, 7 * Math.abs(pr) + 1, 0, 0, 7); g.fill(); g.beginPath(); g.ellipse(-37, 6 * pr, 2.4, 7 * Math.abs(pr) + 1, 0, 0, 7); g.fill();
+  g.fillStyle = '#8a5a1a'; g.fillRect(-36, -2, 5, 4);
+  // the conning tower with a periscope
+  g.fillStyle = '#e3b04b'; g.beginPath(); g.roundRect(-8, -26, 18, 13, 3); g.fill(); g.stroke();
+  g.strokeStyle = '#4a2c0a'; g.lineWidth = 2; g.beginPath(); g.moveTo(5, -26); g.lineTo(5, -36); g.lineTo(10, -36); g.stroke();
+  // portholes, the keeper looking out of the middle one
+  for (const px of [-16, 0, 16]){ g.fillStyle = '#4a2c0a'; g.beginPath(); g.arc(px, 1, 5.4, 0, 7); g.fill();
+    const pg = g.createRadialGradient(px - 1.5, -.5, .5, px, 1, 4.4); pg.addColorStop(0, '#e8fbff'); pg.addColorStop(1, '#3a8ab0'); g.fillStyle = pg; g.beginPath(); g.arc(px, 1, 4.2, 0, 7); g.fill(); }
+  g.fillStyle = '#f2d6c0'; g.beginPath(); g.arc(0, 2, 2.4, 0, 7); g.fill(); g.fillStyle = '#e8eef4'; g.beginPath(); g.arc(0, -.4, 2.6, Math.PI, 0); g.fill();   // the keeper's face, white hair
+  g.restore();
+  // bubbles from the propeller
+  g.strokeStyle = 'rgba(220,250,255,.7)'; g.lineWidth = .8;
+  for (let i = 0; i < 5; i++){ const k = (t * .7 + i / 5) % 1; g.globalAlpha = 1 - k; g.beginPath(); g.arc(x - 40 - k * 10 + Math.sin(i * 3 + t * 3) * 2, yy - k * 36, 1 + k * 1.6, 0, 7); g.stroke(); }
+  g.globalAlpha = 1;
+  if (near){ g.fillStyle = 'rgba(255,240,180,.9)'; g.beginPath(); g.arc(x, yy - 44 + Math.sin(t * 4) * 1.5, 2.6, 0, 7); g.fill(); }
+}
+{ const _d = drawNpcW; drawNpcW = function(g, n){ if (!n || !n.sub || !abyssHere()) return _d.apply(this, arguments);
+    const x = n.x - cam.x, y = n.y - cam.y; if (x < -80 || x > VW + 80 || y < -90 || y > VH + 40) return; abySub(g, x, y, T, dist(n, P) < 110); }; }
+// the middle of the camp: an open giant clam with a great glowing pearl, where the fire used to be
+{ const _cf2 = campFire; campFire = function(g, x, y, t){ if (!abyssHere()) return _cf2.apply(this, arguments);
+    const k = .85 + Math.sin(t * 1.4) * .15;
+    g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y - 12, 0, x, y - 12, 80); gr.addColorStop(0, `rgba(150,230,255,${.3 * k})`); gr.addColorStop(1, 'rgba(80,180,255,0)');
+    g.fillStyle = gr; g.fillRect(x - 80, y - 92, 160, 160); g.restore();
+    const shell = (up, col) => { g.fillStyle = col; g.strokeStyle = '#6a5a48'; g.lineWidth = 1; g.beginPath(); g.moveTo(x - 19, y - 4);
+      for (let i = 0; i <= 8; i++){ const a = Math.PI - i / 8 * Math.PI; g.lineTo(x + Math.cos(a) * 19, y - 4 - up * Math.sin(a) * (up > 0 ? 16 : 7) - (i % 2) * up * 2); } g.closePath(); g.fill(); g.stroke(); };
+    shell(1, '#d8cdb4'); g.fillStyle = '#6a4ab0'; g.beginPath(); g.ellipse(x, y - 5, 16, 4, 0, 0, 7); g.fill();   // the far half and the mantle
+    const pg = g.createRadialGradient(x - 3, y - 13, 1, x, y - 10, 8); pg.addColorStop(0, '#ffffff'); pg.addColorStop(.6, '#dff4ff'); pg.addColorStop(1, '#8ac0dc');
+    g.fillStyle = pg; g.beginPath(); g.arc(x, y - 10, 7.5, 0, 7); g.fill();   // the pearl
+    shell(-1, '#c8bca2');   // the near half
+    g.strokeStyle = 'rgba(220,250,255,.75)'; g.lineWidth = .9;
+    for (let i = 0; i < 6; i++){ const ph = (t * .5 + i / 6) % 1; g.globalAlpha = Math.sin(ph * Math.PI); g.beginPath(); g.arc(x + Math.sin(i * 2.3 + t * 2) * 6, y - 22 - ph * 50, 1.2 + ph * 1.4, 0, 7); g.stroke(); }
+    g.globalAlpha = 1; }; }

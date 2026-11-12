@@ -29,6 +29,10 @@ const AMB = (() => {
       else { const d = Math.hypot(P.x - w.x, P.y - w.y) - w.rx; wat = Math.max(wat, Math.max(0, 1 - d / 160) * .3); } }
     const out = !(MAP_ID && BIOME[MAPS[MAP_ID].biome] && BIOME[MAPS[MAP_ID].biome].fx === 'dark'), wxw = typeof wxNow === 'function' ? wxNow() : 'clear', wk = typeof WXS !== 'undefined' ? WXS.k : 0;
     const gust = .55 + .3 * Math.sin(T * .23) + .15 * Math.sin(T * .71 + 1);
+    const uw = !!(MAP_ID && BIOME[MAPS[MAP_ID].biome] && BIOME[MAPS[MAP_ID].biome].underwater);   // (v294) under the sea: a deep hum, a soft wash, no wind and no rain
+    if (uw){ set('fall', 0); set('fall2', 0); set('rain', 0); set('wind', 0); set('lava', (.07 + .025 * Math.sin(T * .3)) * k); set('water', (.018 + .01 * Math.sin(T * .17 + 1)) * k);
+      if (nodes) nodes.lava.fl.frequency.setTargetAtTime(180 + 60 * Math.sin(T * .21), A.ac.currentTime, .8); return; }
+    if (nodes) nodes.lava.fl.frequency.setTargetAtTime(260, A.ac.currentTime, .3);
     set('fall', wf * .32 * k); set('fall2', wf * .1 * k); set('water', wat * .12 * k); set('lava', lava * .2 * k);
     set('wind', out ? (.018 + gust * .02 + (wxw === 'storm' ? .05 : 0)) * k : .008 * k);
     set('rain', (wxw === 'rain' ? .05 : wxw === 'storm' ? .09 : 0) * wk * k);
@@ -37,8 +41,12 @@ const AMB = (() => {
   // birds by day, crickets by night
   function critters(dt){
     if (!nodes || !A) return; const sv = A.vol ? A.vol.s : .6; if (sv <= 0 || document.hidden) return; const kv = inVillage(P) ? 1.2 : 2.2;
-    const out = !(MAP_ID && BIOME[MAPS[MAP_ID].biome] && BIOME[MAPS[MAP_ID].biome].fx === 'dark'), wxw = typeof wxNow === 'function' ? wxNow() : 'clear'; if (!out || wxw === 'storm') return;
     const ac = A.ac, now = ac.currentTime;
+    if (MAP_ID && BIOME[MAPS[MAP_ID].biome] && BIOME[MAPS[MAP_ID].biome].underwater){ if ((chirpT -= dt) > 0) return; chirpT = .6 + Math.random() * 2.2;   // (v294) bubbles rising, not birds
+      const n = 1 + Math.floor(Math.random() * 3); for (let i = 0; i < n; i++){ const o = ac.createOscillator(), g = ac.createGain(), t = now + i * (.07 + Math.random() * .08), f = 380 + Math.random() * 500;
+        o.type = 'sine'; o.frequency.setValueAtTime(f, t); o.frequency.exponentialRampToValueAtTime(f * 2.4, t + .07); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.02 * kv, t + .01); g.gain.exponentialRampToValueAtTime(.0001, t + .09);
+        o.connect(g); g.connect(A.out); o.start(t); o.stop(t + .1); } return; }
+    const out = !(MAP_ID && BIOME[MAPS[MAP_ID].biome] && BIOME[MAPS[MAP_ID].biome].fx === 'dark'), wxw = typeof wxNow === 'function' ? wxNow() : 'clear'; if (!out || wxw === 'storm') return;
     if (isNight()){ if ((cricketT -= dt) > 0) return; cricketT = .5 + Math.random() * 1.5;
       const f = 4100 + Math.random() * 600, n = 3 + Math.floor(Math.random() * 4);
       for (let i = 0; i < n; i++){ const o = ac.createOscillator(), g = ac.createGain(), t = now + i * .055; o.type = 'sine'; o.frequency.value = f; g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(.012 * kv, t + .006); g.gain.exponentialRampToValueAtTime(.0003, t + .04); o.connect(g); g.connect(A.out); o.start(t); o.stop(t + .05); }

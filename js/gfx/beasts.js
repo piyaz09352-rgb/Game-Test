@@ -191,12 +191,47 @@ const BEAST = (() => {
   }
 
   /* ---------------- serpent / naga / eel / millipede ---------------- */
+  /* (v294) the Naga King: a thick coil on the sea floor, a trunk rising from it that fans out into seven heads in an arc,
+     the middle one tallest and crowned, a great hood spread behind them all */
+  function naga7(key, s, SK, BE, HO, EY){
+    const th = s.thick ?? 1, H = s.heads || 7, GD = M.gold, GM = M.gem;
+    return (cx, act, f, n) => {
+      const o = motion(act, f, n), die = act === 'die' ? o.fall / 1.55 : 0, sway = act === 'walk' ? Math.sin(o.ph * 2) * .6 : Math.sin(o.ph) * .35;
+      const strike = act === 'attack' ? [0, -1.5, 5, 1.5][f] : 0;
+      const scale = nn => (nn[1] < -.3 ? {m:BE} : Math.sin(nn[0] * 9 + nn[2] * 9) > .82 ? {dt:1} : undefined);
+      // the coil: two turns, wide at the bottom
+      let prev = null, pr = 0;
+      for (let i = 0; i <= 26; i++){ const t = i / 26, a = t * Math.PI * 4 + .4, R = (13 - t * 7) * th, p = [Math.cos(a) * R, (2.6 + t * 4.5) * th * (1 - die * .5), Math.sin(a) * R * .8 - 2], r = (3.6 - t * .6) * th;
+        if (prev){ cx.gid = 1 + i; cap(cx, prev, p, pr, r, SK, {step:.4, tex:scale}); } prev = p; pr = r; }
+      // the tail tip trailing out of the coil
+      { let q = [Math.cos(.4) * 13 * th, 2.4 * th, Math.sin(.4) * 10.4 * th - 2]; for (let i = 1; i <= 4; i++){ const nq = [q[0] + 3.4 * th, Math.max(.8, q[1] - .5), q[2] - 2.6 * th + Math.sin(o.ph * 2 + i) * .8]; cx.gid = 30 + i; cap(cx, q, nq, (3 - i * .55) * th, (2.5 - i * .55) * th, SK, {tex:scale}); q = nq; } }
+      // the trunk rising out of the coil
+      const base = [0, 7 * th, -1], top = [sway * 2, (22 - die * 14) * th, 1 + strike * .3];
+      cx.gid = 40; cap(cx, base, top, 4.2 * th, 3.6 * th, SK, {step:.4, tex:nn => (nn[2] > .4 ? {m:BE} : scale(nn))});
+      // seven necks in an arc, the hood spread behind them
+      const tips = [];
+      for (let h = 0; h < H; h++){ const u = H > 1 ? h / (H - 1) - .5 : 0, a = u * 2.3, mid = 1 - Math.abs(u) * 2;
+        const tip = add(top, [Math.sin(a) * 11 * th + Math.sin(o.ph + h) * .5, (Math.cos(a) * 9 + 1 + mid * 3) * th - die * 6, 2 + mid * 1.5 + strike * (.4 + mid * .6)]);
+        tips.push(tip); cx.gid = 50 + h; cap(cx, top, tip, 2.6 * th, 1.9 * th, SK, {tex:nn => (nn[2] > .45 ? {m:BE} : undefined)}); }
+      for (let h = 0; h < H - 1; h++){ cx.gid = 60 + h; const m0 = lerp3(top, tips[h], .55), m1 = lerp3(top, tips[h + 1], .55);
+        cap(cx, add(lerp3(tips[h], tips[h + 1], .5), [0, -.6, -1.6]), add(lerp3(m0, m1, .5), [0, 0, -1.6]), 2.4 * th, 2.2 * th, HO, {tex:nn => (nn[2] > .3 ? {m:BE, t:1} : {t:nn[1] > .3 ? 1 : 2})}); }   // the hood
+      // the heads: a snake's flat head looking forward, glowing eyes, a crest; the middle one crowned
+      for (let h = 0; h < H; h++){ const tip = tips[h], mid = h === (H - 1) >> 1, k = mid ? 1.55 : 1.3, hc = add(tip, [0, .8 * th, 1.4 * th]);
+        cx.gid = 80 + h; ell(cx, hc, 2.4 * th * k, 1.7 * th * k, SK, {rz:2.6 * th * k, tex:nn => eyesTex(nn, o, EY, {glow:true, sp:.6, y:.3, rx:.13, ry:.15, front:-.15}) || (nn[1] < -.3 ? {m:BE} : undefined)});
+        cap(cx, add(hc, [0, -.3, .8 * k]), add(hc, [0, -.7 * th, 3.1 * th * k]), 1.6 * th * k, 1 * th * k, SK, {tex:nn => (nn[1] < -.3 ? {m:BE} : undefined)});   // the snout
+        if (act === 'attack' && f === 2){ cx.gid = 100 + h; cap(cx, add(hc, [0, -1.2, 3 * th * k]), add(hc, [0, -1.6, 4.6 * th * k]), .3, .15, M.mouth, {}); }   // the forked tongue
+        cx.gid = 110 + h; for (let i = 0; i < 3; i++) cap(cx, add(hc, [0, 1.6 * th * k, 1 - i * 1.6]), add(hc, [0, (3.6 - i * .6) * th * k, -1 - i * 1.8]), .7 * th, .2, GD, {});   // the crest (หงอน)
+        if (mid){ cx.gid = 120; frustum(cx, add(hc, [0, 0, -.4]), hc[1] + 6.4 * th, hc[1] + 2 * th, .4, 2.2 * th, GD, {tex:(nn, kk) => (kk > .7 && kk < .82 ? {m:GM} : undefined)}); } }   // the pointed crown (ชฎา)
+    };
+  }
   function serpent(key, s){
     const SK = mat(key, 'skin', s.skin), BE = mat(key, 'belly', s.belly) ?? SK, ST = mat(key, 'stripe', s.stripe), HO = mat(key, 'hood', s.hood),
       EY = s.eyeGlow ? emis(key, 'eye', s.eyeGlow) : M.slimeE, WG = mat(key, 'wing', s.wing), TT = mat(key, 'tip', s.tailTip), CS = mat(key, 'crest', s.crest);
     const len = s.len ?? 1, th = s.thick ?? 1, heads = s.heads || 1;
+    if (s.naga7) return naga7(key, s, SK, BE, HO, EY);
     return (cx, act, f, n) => {
       const o = motion(act, f, n), N = Math.round(10 * len), wav = act === 'walk' ? o.ph * 2 : o.ph * .5;
+      if (s.swim){ const hv = s.swim + Math.sin(o.ph) * 1.2 - (act === 'die' ? o.fall * s.swim * .6 : 0); cx.pre = p => [p[0], p[1] + hv, p[2]]; }   // (v294) an eel swims above the sea floor
       const rise = (s.rise ?? (s.hood ? 9 : 4)) + (act === 'attack' ? [0, 3, -2, 0][f] : 0) - (act === 'die' ? o.fall * 6 : 0);
       // body segments from tail (k=0) to neck (k=1)
       let prev = null;
@@ -213,6 +248,11 @@ const BEAST = (() => {
         p.r = r;
         if (s.legs){ for (const sd of [-1, 1]){ cx.gid = 100 + i * 2 + sd; cap(cx, p, [p[0] + sd * 4, .4, p[2] + Math.sin(o.ph * 3 + i) * 1.4], .7, .5, BE, {}); } }
         prev = p; }
+      if (s.fin){ const FN = mat(key, 'efin', s.fin), SPK = s.spark ? emis(key, 'spark', s.spark) : null;   // (v294) an eel's ribbon fin along the back, sparks of light down its sides
+        let fp = null;
+        for (let i = 1; i < N; i++){ const k = i / N, x = Math.sin(wav + k * 5) * 4 * (1 - k * .6), z = -14 * len + k * 22 * len, y = 1.5 * th + Math.max(0, k - .7) / .3 * rise, r = (1.45 + Math.sin(Math.min(1, k * 1.15) * Math.PI) * .95) * Math.min(1, .3 + k * 2.4) * th;
+          const q = [x, y + r * .75 + .9 * th * Math.min(1, k * 3), z + o.lun * k]; if (fp && k < .85){ cx.gid = 160 + i; cap(cx, fp, q, .95 * th, .95 * th, FN, {}); } fp = q;
+          if (SPK && i % 2 === 0) for (const sd of [-1, 1]){ cx.gid = 180 + i + (sd > 0 ? 40 : 0); ell(cx, [x + sd * r * .8, y + r * .1, z + o.lun * k], .55, .55, SPK, {}); } } }
       if (WG){ for (const sd of [-1, 1]){ cx.gid = 60 + sd; for (let i = 0; i < 4; i++){ const k = i / 3; ell(cx, [prev[0] + sd * (3 + k * 8), prev[1] + 2 + k * 4 + o.flap * k * 3, prev[2] - 6 - k * 2], 4.6 - k * 1.4, 1.6, WG, {rz:4 - k}); } } }
       // heads (a fan of necks for many-headed nagas)
       for (let h = 0; h < heads; h++){
