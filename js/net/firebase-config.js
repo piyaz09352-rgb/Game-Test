@@ -18,7 +18,7 @@ const FIREBASE_CONFIG = {
    ใส่โดเมนเว็บเกม แล้วนำ "site key" มาใส่ตรงนี้ จากนั้น Firebase Console → App Check → ลงทะเบียนแอปเว็บด้วย secret key
    ดูยอดคำขอสัก 1–2 วันว่าเป็น "verified" ทั้งหมด แล้วกด Enforce ทั้ง Firestore, Realtime Database และ Authentication
    ปล่อยว่าง = ปิด (เกมทำงานเหมือนเดิม). Site key is public (it is meant to sit in the page). See SETUP_ONLINE.md. */
-const APPCHECK_KEY = '';
+const APPCHECK_KEY = '6LdfNhwuAAAAACDeF-mu-BNd5_iSFSwrOguetlB_';   // (v288) the site key (public by design); the secret key lives only in Firebase Console → App Check
 
 const GM_UIDS = ['fo6F3IFoT0d3htberU9x13RKAhr1'];   // (v184) the owner's GM account
 /* ซีซัน: เพิ่มเลขนี้แล้ว deploy ใหม่ = บังคับรีเซตทุกคนเริ่มจาก 0 (สำรองข้อมูลเก่าไว้ในเครื่อง/คลาวด์ส่วนตัวก่อนลบ) แม้ไม่มีสิทธิ์ GM
