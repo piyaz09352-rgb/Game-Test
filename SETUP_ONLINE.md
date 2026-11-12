@@ -130,6 +130,8 @@ const FIREBASE_CONFIG = {
 - ไอดีล็อกอินที่เวอร์ชันเก่าเคยเผยแพร่ไว้: รัน `node tools/firebase-backup.mjs backup` ก่อน แล้วค่อยรัน `node tools/firebase-backup.mjs privacy`
 
 ### 2. เปิด App Check (กันสคริปต์และบอทที่ไม่ได้มาจากเว็บเกม)
+
+> (v289) Firebase เลิกรับ reCAPTCHA v3 แบบเดิมสำหรับแอปใหม่แล้ว ใช้ **Fraud Defense (reCAPTCHA Enterprise)** แทน: Google Cloud Console → Security → Fraud Defense → สร้าง key แบบ Website ใส่โดเมนเกม → Firebase Console → App Check → Apps → **Fraud Defense** → วาง key → Save → ใส่ key เดียวกันใน `APPCHECK_ENTERPRISE_KEY` (อาจต้องผูกบัญชีชำระเงินกับโปรเจกต์ ใช้ฟรีได้ถึงโควตารายเดือนของ Google) ขั้นตอนแบบ v3 ด้านล่างใช้ได้เฉพาะแอปที่ลงทะเบียนไว้ก่อนแล้ว
 1. ไปที่ https://www.google.com/recaptcha/admin → สร้างแบบ **reCAPTCHA v3** → ใส่โดเมนเว็บเกม (เช่น `vayrathen.netlify.app`) → จะได้ **site key** และ **secret key**
 2. Firebase Console → **App Check** → **Apps** → เลือกแอปเว็บ → **reCAPTCHA** → วาง **secret key** → Save
 3. ใส่ **site key** ใน `js/net/firebase-config.js` → `const APPCHECK_KEY = 'site key';` แล้วอัปเกมขึ้นเว็บ

@@ -18,7 +18,11 @@ const FIREBASE_CONFIG = {
    ใส่โดเมนเว็บเกม แล้วนำ "site key" มาใส่ตรงนี้ จากนั้น Firebase Console → App Check → ลงทะเบียนแอปเว็บด้วย secret key
    ดูยอดคำขอสัก 1–2 วันว่าเป็น "verified" ทั้งหมด แล้วกด Enforce ทั้ง Firestore, Realtime Database และ Authentication
    ปล่อยว่าง = ปิด (เกมทำงานเหมือนเดิม). Site key is public (it is meant to sit in the page). See SETUP_ONLINE.md. */
-const APPCHECK_KEY = '6LdfNhwuAAAAACDeF-mu-BNd5_iSFSwrOguetlB_';   // (v288) the site key (public by design); the secret key lives only in Firebase Console → App Check
+const APPCHECK_KEY = '';   // (v289) off: Firebase no longer registers new apps with classic reCAPTCHA v3 (the owner's v3 site key could not be registered)
+/* (v289) App Check with Fraud Defense (reCAPTCHA Enterprise): create a key in Google Cloud Console → Security → Fraud Defense
+   (type Website, the game's domain), register it in Firebase Console → App Check → Fraud Defense, then put its key here.
+   Leave empty = App Check off (the game works the same; the Firestore / Realtime Database rules still protect the data). */
+const APPCHECK_ENTERPRISE_KEY = '';
 
 const GM_UIDS = ['fo6F3IFoT0d3htberU9x13RKAhr1'];   // (v184) the owner's GM account
 /* ซีซัน: เพิ่มเลขนี้แล้ว deploy ใหม่ = บังคับรีเซตทุกคนเริ่มจาก 0 (สำรองข้อมูลเก่าไว้ในเครื่อง/คลาวด์ส่วนตัวก่อนลบ) แม้ไม่มีสิทธิ์ GM

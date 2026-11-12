@@ -19,6 +19,12 @@
 
 
 
+## ปิด App Check ชั่วคราว (v289, 2026-11-12)
+
+- Firebase เลิกรับลงทะเบียนแอปใหม่ด้วย reCAPTCHA v3 แบบเดิมแล้ว (ช่อง secret key กรอกไม่ได้ ขึ้นว่า "reCAPTCHA Classic is deprecated") เลยลงทะเบียน key ของ v288 ไม่ได้ จึงปิด App Check ไว้ก่อน (`APPCHECK_KEY = ''`) เกมทำงานเหมือนเดิม ข้อมูลยังได้รับการป้องกันด้วยกฎ Firestore / Realtime Database
+- รองรับ Fraud Defense (reCAPTCHA Enterprise) แล้ว: ถ้าสร้าง key แบบ Enterprise และลงทะเบียนใน App Check ได้ ใส่ key ใน `APPCHECK_ENTERPRISE_KEY` (`js/net/firebase-config.js`) ก็เปิดใช้ได้ทันที
+- key ของ reCAPTCHA v3 ชุดเดิมไม่ได้ใช้แล้ว ลบทิ้งได้ที่ https://www.google.com/recaptcha/admin
+
 ## เปิด App Check (v288, 2026-11-12)
 
 - ใส่ Site key ของ reCAPTCHA v3 ใน `APPCHECK_KEY` (`js/net/firebase-config.js`) แล้ว · เกมจะแนบหลักฐานว่ามาจากเว็บเกมจริงไปกับทุกคำขอที่ส่งถึง Firebase

@@ -25,12 +25,12 @@
     fb = window.firebase; fb.initializeApp(C);
     /* (v284) App Check: with a reCAPTCHA v3 site key in firebase-config.js (APPCHECK_KEY), Firebase only answers requests
        from this website, not from scripts or copies elsewhere (switch on "Enforce" in Firebase Console → App Check) */
-    const ACK = typeof APPCHECK_KEY === 'string' ? APPCHECK_KEY.trim() : '';
+    const ACE = typeof APPCHECK_ENTERPRISE_KEY === 'string' ? APPCHECK_ENTERPRISE_KEY.trim() : '', ACK = ACE || (typeof APPCHECK_KEY === 'string' ? APPCHECK_KEY.trim() : '');   // (v289) Fraud Defense (Enterprise) first
     /* (v288) only when Google's reCAPTCHA really loads on this device (an ad blocker, a school network or a country that
        blocks google.com would otherwise leave log-in waiting for a token forever): 6 seconds, then the game goes on without */
     if (ACK) try {
-      const rc = await Promise.race([load('https://www.google.com/recaptcha/api.js?render=' + encodeURIComponent(ACK)).then(() => true, () => false), new Promise(r => setTimeout(() => r(false), 6000))]);
-      if (rc){ await load(SDK + 'firebase-app-check-compat.js'); fb.appCheck().activate(new fb.appCheck.ReCaptchaV3Provider(ACK), true); }
+      const rc = await Promise.race([load(`https://www.google.com/recaptcha/${ACE ? 'enterprise' : 'api'}.js?render=` + encodeURIComponent(ACK)).then(() => true, () => false), new Promise(r => setTimeout(() => r(false), 6000))]);
+      if (rc){ await load(SDK + 'firebase-app-check-compat.js'); fb.appCheck().activate(ACE ? new fb.appCheck.ReCaptchaEnterpriseProvider(ACK) : new fb.appCheck.ReCaptchaV3Provider(ACK), true); }
       else console.warn('App Check: reCAPTCHA did not load, playing without it');
     } catch (e) { console.warn('App Check did not start', e); }
     auth = fb.auth();
