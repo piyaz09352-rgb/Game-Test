@@ -80,7 +80,7 @@ for (const k in MOB){ const d = MOB[k]; if (d && !d.boss && k !== 'dummy' && k !
 const mskName = (m, s) => { addText(m.x, m.y - (MOB_H[m.type] || 30) - 16, L(s.th, s.en), s.kind === 'heal' || s.kind === 'rally' || s.kind === 'harden' ? '#b8ffc8' : '#ffb070', 13); };
 const mskOk = m => !m.dead && !m.vanish && !(m.st && (m.st.stun > 0 || m.st.freeze > 0 || m.st.stop > 0)) && !m.dummy;
 const mskDot = () => Math.max(1, Math.round(DER.maxhp * .012));
-function mskHit(m, s, mul){ if (P.dead || !mskOk(m)) return; mobAttack(m, mul, !!s.magic);
+function mskHit(m, s, mul){ if (P.dead || !mskOk(m)) return; mobAttack(m, mul, !!s.magic); if (!MOB_HIT_LANDED) return;   // (v291) missed, dodged or absorbed: no bleed, poison, burn or stun either
   const af = s.af || (s.magic ? MSK_ELEM_AF[m.def.elem] : null); if (af && !P.dead && typeof afflict === 'function' && Math.random() < (s.af ? .75 : .45)) afflict(af[0], af[1], {dps:mskDot(), amt:.35});
   if (s.stun && !P.roll && !(P.stunT > 0)){ P.stunT = s.stun; P.cast = null; VFX.play('stunStars', {}); } }
 function mskShot(m, s, mul, delay = 0){ later(delay, () => { if (!mskOk(m) || P.dead) return; const h = (MOB_H[m.type] || 30) * .55, d = Math.hypot(P.x - m.x, P.y - m.y), t = d / 280;

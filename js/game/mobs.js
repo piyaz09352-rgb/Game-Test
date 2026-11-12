@@ -103,7 +103,11 @@ function updMob(m, dt){
   m.moving = m.moved;
 }
 
+/* (v291) did the last mobAttack land? Its add-ons (a skill's bleed, poison, burn, stun) only follow a hit that landed:
+   they used to come even after a Miss or a Perfect Dodge, so a dodging hero kept bleeding and burning */
+let MOB_HIT_LANDED = false;
 function mobAttack(m, mult = 1, noDodge = false){
+  MOB_HIT_LANDED = false;
   const d = m.def, nightMul = 1, st = m.st || {};
   const mhit = 95 + d.lvl * 1.55, chance = clamp(mhit - DER.flee + 80, 5, 95);   // (v100) Flee never dodges more than 95%
   m.lunge = .2; m.atkT = 0;
@@ -121,7 +125,7 @@ function mobAttack(m, mult = 1, noDodge = false){
   const rfl = Math.min(.5, buffSum('reflect')); if (rfl > 0){ const r = Math.max(1, Math.round(dmg * rfl)); applyDamage(m, {dmg:r}); }   // every reflect buff counts (Golden Shield, Bastion …)
   const bk = P.buffs.barrier ? 'barrier' : Object.keys(P.buffs).find(k => P.buffs[k].barrier > 0), br = bk && P.buffs[bk];   // any shield buff (Mana Barrier, Sacred Ward, a friend's shield)
   if (br){ const a = Math.min(br.barrier, dmg); br.barrier -= a; dmg -= a; VFX.play('barrierHit', {x:P.x, y:P.y}); SFX.play('shieldhit'); if (br.barrier <= 0){ delete P.buffs[bk]; renderBuffs(); } if (dmg <= 0){ addText(P.x, P.y - 48, 'Absorbed', '#9fd0ff', 13); return; } }
-  S.hp -= dmg; if (!DER.pas.noFlinch) P.hurt = .25; P.sit = false; SFX.play('hurt');
+  S.hp -= dmg; if (!DER.pas.noFlinch) P.hurt = .25; P.sit = false; SFX.play('hurt'); MOB_HIT_LANDED = true;
   addText(P.x, P.y - 48, String(dmg), '#ff8a80');
   if (S.hp <= 0 && DER.pas.lastStand && P.lastStandCd <= 0){ S.hp = Math.max(1, Math.round(DER.maxhp * DER.pas.lastStand)); P.lastStandCd = 300; SFX.play('laststand'); VFX.play('laststand', {x:P.x, y:P.y}); banner(L('ยืนหยัดจนวาระสุดท้าย!', 'Last Stand!')); return; }
   if (S.hp <= 0) playerDie();
