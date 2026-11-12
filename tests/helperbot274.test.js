@@ -30,14 +30,14 @@ test('helper robots: free and rented, pick-up speed, EXP bonus, old rentals refu
     // pick-up speed: rented one a second
     const t1 = await page.evaluate(async () => { closeDialog(); loadMap(1); const cheap = Object.keys(ITEMS).find(k => ITEMS[k].kind === 'etc' && ITEMS[k].sell > 0);
       LOOT.length = 0; for (let i = 0; i < 3; i++) dropLoot(cheap, P.x + 60 + i * 20, P.y); HLP.cd = 0; HLP.tgt = null; HLP.x = P.x; HLP.y = P.y;
-      const t0 = performance.now(); while (LOOT.length && performance.now() - t0 < 9000) await new Promise(r => setTimeout(r, 50)); return performance.now() - t0; });
+      const t0 = T, w0 = performance.now(); while (LOOT.length && performance.now() - w0 < 20000) await new Promise(r => setTimeout(r, 50)); return (T - t0) * 1000; });   // (v292) game time, not wall time: a slow machine (CI) runs fewer frames a second
     assert.ok(t1 > 1700 && t1 < 4500, 'rented: about 1 s an item (' + Math.round(t1) + ' ms for 3)');
     // the rental ends → the free robot comes back, and it is slower (2 s an item)
     await page.evaluate(() => { S.helper.left = .2; S.helper.until = Date.now() + 200; });
     await page.waitForFunction(() => S.helper && S.helper.free, null, { timeout: 5000 });
     const t2 = await page.evaluate(async () => { const cheap = Object.keys(ITEMS).find(k => ITEMS[k].kind === 'etc' && ITEMS[k].sell > 0);
       LOOT.length = 0; for (let i = 0; i < 3; i++) dropLoot(cheap, P.x + 60 + i * 20, P.y); HLP.cd = 0; HLP.tgt = null;
-      const t0 = performance.now(); while (LOOT.length && performance.now() - t0 < 12000) await new Promise(r => setTimeout(r, 50)); return {t:performance.now() - t0, h:S.helper}; });
+      const t0 = T, w0 = performance.now(); while (LOOT.length && performance.now() - w0 < 30000) await new Promise(r => setTimeout(r, 50)); return {t:(T - t0) * 1000, h:S.helper}; });   // game time (see above)
     assert.strictEqual(t2.h.k, 'byte', 'the free robot is back');
     assert.ok(t2.t > 3700, 'free: about 2 s an item (' + Math.round(t2.t) + ' ms for 3)');
   } finally { await close(); }

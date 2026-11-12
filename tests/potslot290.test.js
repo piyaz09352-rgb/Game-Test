@@ -28,7 +28,9 @@ test('PC hotbar: tap drinks, hold picks, slide toggles Auto', { skip, timeout: 1
     assert.strictEqual(await page.evaluate(() => { const B = botSet(); return S.inv[potPick('hp')] ? potPick('hp') : null; }), 'orangepot');
     // hold + slide down → Auto off, badge gone; again → on
     const was = await page.evaluate(() => S.bot.potSpOn !== false);
-    [x, y] = await center(page, spSel); await page.mouse.move(x, y); await page.mouse.down(); await page.mouse.move(x, y + 20, { steps: 3 }); await page.mouse.move(x, y + 50, { steps: 4 }); await page.mouse.up();
+    // the slide as one quick pointer sequence (a slow test machine delivered real mouse moves after the hold timer had already fired)
+    await page.evaluate(s => { const b = document.querySelector(s), r = b.getBoundingClientRect(), x = r.x + r.width / 2, y = r.y + r.height / 2, o = (yy) => ({ pointerId: 3, pointerType: 'mouse', bubbles: true, clientX: x, clientY: yy });
+      b.dispatchEvent(new PointerEvent('pointerdown', o(y))); for (const dy of [10, 25, 40, 50]) b.dispatchEvent(new PointerEvent('pointermove', o(y + dy))); b.dispatchEvent(new PointerEvent('pointerup', o(y + 50))); b.click(); }, spSel);
     assert.strictEqual(await page.evaluate(() => S.bot.potSpOn !== false), !was, 'sliding down switches Auto');
     assert.strictEqual(await page.evaluate(s => !!document.querySelector(s + ' .autob'), spSel), !was, 'the A badge follows');
     assert.strictEqual(await page.evaluate(() => S.inv.skypot), 1, 'sliding does not drink');
