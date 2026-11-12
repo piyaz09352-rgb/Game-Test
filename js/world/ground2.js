@@ -128,7 +128,7 @@ const G2_ROAD = {grass:['#6a5638', '#7a6442', '#86704c'], forest:['#4e3e28', '#5
 { const _pm2 = paintMap;
   paintMap = function(mapId){ const mp = MAPS[mapId]; if (!mp || !mapId || !BIOME[mp.biome]) return _pm2.apply(this, arguments);
     const k = mp.biome, keep = BIOME[k], kind = G2_KIND(k), nat = G2_GROUND[kind];
-    const props = (keep.props || []).map(([t, n, v]) => (t === 'crystal' && !/^(cave|icecave|badan|demonthrone)$/.test(k) ? [t, Math.max(1, Math.round(n / 3)), v] : [t, n, v]));   // (v157) outcrops are rare outside caves
+    const props = (keep.props || []).map(([t, n, v, ...more]) => (t === 'crystal' && !/^(cave|icecave|badan|demonthrone)$/.test(k) ? [t, Math.max(1, Math.round(n / 3)), v, ...more] : [t, n, v, ...more]));   // (v286) keep the 4th field ('green' pines)   // (v157) outcrops are rare outside caves
     BIOME[k] = {...keep, props, base:nat, road:G2_ROAD[kind], plank:false, floor:keep.floor && keep.floor.kind === 'gold' ? {...keep.floor, kind:'stone'} : keep.floor, mottle:['rgba(20,16,10,.16)', 'rgba(255,250,235,.1)'], blades:kind in G2_BLADES ? G2_BLADES[kind] : keep.blades,
       flowers:/^(grass|marble)$/.test(kind) ? keep.flowers : null, flowerN:Math.round((keep.flowerN || 200) * .25)};
     try { return _pm2.apply(this, arguments); } finally { BIOME[k] = keep; } }; }

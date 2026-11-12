@@ -305,7 +305,19 @@ function iaPick(id){
 /* gradient / clip ids must be unique per copy: a copy inside a hidden panel (display:none) would otherwise
    blank out every other copy that points at the same id */
 const IA_CACHE = {}; let IA_N = 0;
-function itemArt(id, bare = false){ return iaTpl(id, bare).replace(/\u00a7/g, '_' + (++IA_N).toString(36)); }
+function itemArt(id, bare = false){ return iaTpl(id, bare).replace(/\u00a7/g, '_' + (++IA_N).toString(36) + '\u01c0'); }
+/* (v286) …but a fresh number on every draw made every redraw different: the bag, rebuilt on each kill or pick-up,
+   was replaced wholesale (10,000 DOM changes in 3 seconds of play) and its icons blinked blank while their gradients
+   were swapped. artIds() renumbers the art in a piece of markup by order of appearance, under a name of the element
+   it goes into: the same contents give exactly the same markup (so the guards skip the redraw), and two windows never
+   share an id. js/sys/artids286.js applies it to every innerHTML. The \u01c0 after the number marks art ids. */
+const ART_NS = new WeakMap(); let ART_NSN = 0;
+function artIds(el, v){
+  if (typeof v !== 'string' || v.indexOf('\u01c0') < 0) return v;
+  let ns = el && ART_NS.get(el); if (!ns){ ns = (el && el.id ? el.id.replace(/[^A-Za-z0-9]/g, '') : 'e') + (++ART_NSN).toString(36); if (el) ART_NS.set(el, ns); }
+  const map = new Map(), occ = new Map();   // keyed by the art's own name (ia<item>) and how many of it came before: other items around it do not shift its ids
+  return v.replace(/([A-Za-z0-9~-]*)_([0-9a-z]+)\u01c0/g, (m, pre, n) => { let k = map.get(n); if (!k){ const c = (occ.get(pre) || 0) + 1; occ.set(pre, c); k = `_${ns}o${c.toString(36)}`; map.set(n, k); } return pre + k; });
+}
 function iaTpl(id, bare){
   const key = id + (bare ? '|b' : ''); if (IA_CACHE[key]) return IA_CACHE[key];
   const {p, art, frame, glow} = iaPick(id), [defs, body] = art, fc = IA_FRAME[frame] || IA_FRAME[0];

@@ -82,10 +82,23 @@ partyShareExp = function(be, je, x, y){
 { const _g = gainExp;
   gainExp = function(b, j){ const c = PEXP.cut; if (c && b === c.be && j === c.je){ PEXP.cut = null; b = c.e; j = c.j; addText(P.x, P.y - 70, L(`แบ่ง EXP ปาร์ตี้`, 'Party EXP split'), '#9ff0c8', 11); } return _g(b, j); };
 }
+/* (v286) shared EXP is what someone else's game says it earned, so it is held to what a kill on this map can give:
+   the best monster here (the map's own, its boss, anything alive now: invasions, world bosses) × the event rate ×
+   the level-gap bonus × a pet × the party bonus. And at most 6 shares a second from one teammate. A cheater can no
+   longer hand a friend a level in one message. */
+function pexpCap(){
+  const M = typeof MAPS !== 'undefined' && MAPS[MAP_ID] || {}, types = new Set([...(M.mobs || []), M.boss, ...(typeof mobs !== 'undefined' ? mobs.map(m => m.type) : [])]);
+  let e = 0, j = 0; for (const t of types){ const d = t && MOB[t]; if (!d) continue; e = Math.max(e, +d.exp || 0); j = Math.max(j, +d.jexp || 0); }
+  const k = (typeof RATE === 'number' ? RATE : 1) * (typeof EVENT_MUL === 'number' ? EVENT_MUL : 1.5) * 1.2 * 2 * 1.6;
+  return {e:Math.ceil(e * k) + 50, j:Math.ceil(j * k) + 50};
+}
+const PEXP_RL = new Map();
+function pexpRate(by){ const now = performance.now(), a = (PEXP_RL.get(by) || []).filter(t => now - t < 1000); if (a.length >= 6) return false; a.push(now); PEXP_RL.set(by, a); return true; }
 onPartyExp = function(msg){
   const d = msg.data || {}; if (msg.isMe || !NET.party || d.pt !== NET.party || d.m !== MAP_ID || P.dead || d.mode !== 'even') return;
   if (Array.isArray(d.to) && !d.to.includes(ptyMe())) return;
-  const e = Math.max(0, Math.min(1e9, Math.round(+d.e || 0))), j = Math.max(0, Math.min(1e9, Math.round(+d.j || 0)));
+  if (!pexpRate(msg.by)) return;   // (v286) one teammate cannot pour EXP in faster than kills happen
+  const cap = pexpCap(), e = Math.max(0, Math.min(cap.e, Math.round(+d.e || 0))), j = Math.max(0, Math.min(cap.j, Math.round(+d.j || 0)));
   if (e || j){ gainExp(e, j); addText(P.x, P.y - 70, `+${fmtN(e)} EXP (${L('ปาร์ตี้', 'party')})`, '#9ff0c8', 12); }
 };
 

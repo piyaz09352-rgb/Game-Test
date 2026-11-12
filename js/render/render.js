@@ -196,6 +196,7 @@ function drawPetW(g){
   shadowW(g, x, y, MOB[S.pet].r * .8);
   SPR.draw(g, SHEETS[S.pet], PET.moving ? 'walk' : 'idle', PET.dir || 0, PET.t, x, y);
 }
+const TREE_VAR = new Set(['tree', 'palm', 'pine', 'himtree', 'bamboo', 'banana', 'treefern', 'araucaria', 'deadtree', 'thorntree', 'cycad', 'bush', 'rock', 'flowerbush', 'mushroom', 'cactus', 'fern', 'willow', 'bodhi', 'rubber', 'tamarind', 'rain']);
 function drawPropW(g, p, im, x, y){
   // trees and houses fade when the player walks behind them
   // (v59) no save()/restore() per prop: on phones that pair alone was a third of the frame. State is set and put back by hand.
@@ -203,7 +204,9 @@ function drawPropW(g, p, im, x, y){
   const sm = g.imageSmoothingEnabled, a0 = g.globalAlpha; if (!sm) g.imageSmoothingEnabled = true;
   if (behind) g.globalAlpha = a0 * .55;
   const sk = typeof LIVE !== 'undefined' ? LIVE.sway(p) : 0;   // wind: the crown leans, the foot stays put
-  if (sk){ const m = g.getTransform(); g.translate(x, y); g.transform(1, 0, -sk, 1, 0, 0); g.drawImage(im.img, -im.ax, -im.ay, im.w, im.h); g.setTransform(m); }
+  // (v286) the owner: rows of the very same tree. Each tree now has its own size (82–118 %) and faces its own way
+  if (p.vk === undefined){ const h = Math.abs(Math.sin(p.x * 12.9898 + p.y * 78.233) * 43758.5453) % 1; p.vk = TREE_VAR.has(p.type) ? (.82 + (h * 10 % 1) * .36) * (h < .5 ? -1 : 1) : 0; }
+  if (sk || p.vk){ const m = g.getTransform(), k = p.vk || 1; g.translate(x, y); if (sk) g.transform(1, 0, -sk, 1, 0, 0); g.scale(k, Math.abs(k)); g.drawImage(im.img, -im.ax, -im.ay, im.w, im.h); g.setTransform(m); }
   else g.drawImage(im.img, x - im.ax, y - im.ay, im.w, im.h);
   if (behind) g.globalAlpha = a0;
   if (!sm) g.imageSmoothingEnabled = false;

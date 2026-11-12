@@ -8,5 +8,5 @@
 { const d = Object.getOwnPropertyDescriptor(Element.prototype, 'innerHTML');
   const guard = id => { const e = document.getElementById(id); if (!e || e.__pg) return; e.__pg = true;
     Object.defineProperty(e, 'innerHTML', {configurable:true, get(){ return d.get.call(this); },
-      set(v){ v = String(v); if (v === this.__pgLast && this.childNodes.length) return; this.__pgLast = v; d.set.call(this, v); }}); };
+      set(v){ v = typeof artIds === 'function' ? artIds(this, String(v)) : String(v); if (v === this.__pgLast && this.childNodes.length) return; this.__pgLast = v; d.set.call(this, v); }}); };
   for (const id of ['pane-equip', 'pane-stat', 'pane-skill', 'pane-quest', 'pane-log', 'bagGrid', 'bagInfo', 'hotbar', 'goal']) guard(id); }

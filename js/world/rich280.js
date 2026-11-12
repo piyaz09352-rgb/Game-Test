@@ -15,7 +15,39 @@
     lavafield:'deadtree', crater:'deadtree', ashforest:'deadtree', dragonvale:'deadtree', dragonroost:'araucaria', naraka:'thorntree', demonthrone:'thorntree', badan:null, cave:null, icecave:null,
     beach:'palm', isle:'palm', khmer:'tree', ayodhya:'tree', templeruins:'tree', cemetery:'deadtree', laplae:'tree', floatmarket:'palm', himmapan:'himtree', innerhim:'himtree'};
   const SKIP = new Set(['fields', 'oasis', 'town', 'tower', 'dungeon']);
+  const SNOWY = new Set(['glacier', 'frostcitadel', 'frozenlake', 'kailash', 'icecave', 'snowpeak', 'tundra']);
+  const MIX = {desert:['palm', 'cycad', 'deadtree'], dryplain:['palm', 'cycad', 'tree'], canyon:['deadtree', 'thorntree', 'cycad'],
+    glacier:['pine', 'araucaria', 'deadtree'], frostcitadel:['pine', 'araucaria', 'deadtree'], frozenlake:['pine', 'deadtree', 'araucaria'], kailash:['pine', 'araucaria', 'himtree'],
+    meru:['himtree', 'tree', 'treefern'], tavatimsa:['himtree', 'tree', 'banana'], anodat:['himtree', 'treefern', 'tree'], himmapan:['himtree', 'tree', 'bamboo'], innerhim:['himtree', 'treefern', 'deadtree'],
+    lavafield:['deadtree', 'thorntree', 'araucaria'], crater:['deadtree', 'thorntree'], ashforest:['deadtree', 'thorntree', 'araucaria'], dragonvale:['deadtree', 'araucaria', 'treefern'], dragonroost:['araucaria', 'deadtree', 'treefern'],
+    naraka:['thorntree', 'deadtree'], demonthrone:['thorntree', 'deadtree'], beach:['palm', 'banana', 'tree'], isle:['palm', 'banana', 'treefern'], floatmarket:['palm', 'banana', 'tree'],
+    khmer:['tree', 'banana', 'palm', 'bamboo'], ayodhya:['tree', 'palm', 'banana'], templeruins:['tree', 'bamboo', 'banana', 'treefern'], laplae:['tree', 'bamboo', 'banana'], cemetery:['deadtree', 'tree', 'thorntree'],
+    highland:['pine', 'tree', 'araucaria', 'bamboo'], bamboo:['bamboo', 'tree', 'banana'], marsh:['tree', 'banana', 'treefern'], river:['tree', 'palm', 'banana', 'bamboo'], cave:[], icecave:[], badan:[]};
+  function treeMix(k, B){
+    if (typeof PROP_TYPES !== 'undefined' && Array.isArray(B.props)){
+      const mix = (MIX[k] || []).filter(t => PROP_TYPES[t]); const trees = () => B.props.filter(p => TREEY.has(p[0]) && PROP_TYPES[p[0]]);
+      const tw = trees().reduce((a, p) => a + p[1], 0);
+      for (const t of mix) if (!B.props.some(p => p[0] === t)) B.props.push([t, Math.max(1, Math.round(tw * .2)), 8]);
+      const tw2 = trees().reduce((a, p) => a + p[1], 0);
+      const each = Math.max(1, Math.round(tw2 / Math.max(1, trees().length)));   // every tree kind the same share
+      for (const p of trees()){ p[1] = each; p[2] = Math.max(p[2] || 1, 8);
+        if (p[0] === 'pine' && !SNOWY.has(k)) p[3] = 'green'; }
+    }
+    // (v286) composed maps (props4.js zones) plant their edge belt, groves and scatter from their own lists: every tree
+    // kind in a list (the land's own and its mix) gets the same share, with 8 shapes each
+    if (B.zones) for (const part of ['edge', 'groves', 'scatter', 'banks']){ const Zp = B.zones[part]; if (!Zp || !Array.isArray(Zp.props)) continue;
+      const L = Zp.props.map(t => (Array.isArray(t) ? [t[0], t[1]] : [t, 4])), cnt = {};
+      for (const [nm] of L) if (TREEY.has(nm)) cnt[nm] = (cnt[nm] || 0) + 1;
+      if (!Object.keys(cnt).length || part === 'banks') { Zp.props = L; continue; }
+      for (const t of MIX[k] || []) if (PROP_TYPES[t] && !cnt[t]) cnt[t] = 0;
+      const top = Math.max(...Object.values(cnt));
+      for (const nm in cnt) for (let i = cnt[nm]; i < top; i++) L.push([nm, 8]);
+      for (const e of L) if (TREEY.has(e[0])) e[1] = Math.max(e[1], 8);
+      Zp.props = L; }
+  }
+  MIX.oasis = ['palm', 'cycad', 'banana'];
   for (const [k, B] of Object.entries(typeof BIOME !== 'undefined' ? BIOME : {})){
+    if (B && k === 'oasis' && Array.isArray(B.props)){ B.props = B.props.map(p => p.slice()); treeMix(k, B); }
     if (!B || SKIP.has(k) || !Array.isArray(B.props)) continue;
     B.props = B.props.map(p => p.slice());
     const big = BIG[k];
@@ -24,6 +56,10 @@
       if (tw < all * .4){ if (row){ row[1] = Math.max(row[1], Math.ceil(all * .45)); row[2] = Math.max(row[2] || 1, 3); } else B.props.push([big, Math.ceil(all * .45), 3]); } }
     if (B.blades){ const bush = B.props.find(p => p[0] === 'bush'); if (bush) bush[1] += 2; else if (PROP_TYPES.bush) B.props.push(['bush', 3, 3]); B.flowerN = Math.max(B.flowerN || 0, 450); }
     B.propN = Math.max(B.propN || 0, 140);
+    // (v286) the owner: "the same tree over and over". The land's big tree had 45 % of every prop with only 3 shapes.
+    // Now its share is split over a mix of trees that belong in that land, no one kind is more than 40 % of the trees,
+    // no kind outnumbers another, and every tree kind has 8 shapes (pines in green lands only take the green ones, the odd shapes are snowy)
+    treeMix(k, B);
     // (v280) the Ancient Amber Fen: a bog band ran the full width of the map and cut it in two (both gates on its bank).
     // The fen is now pools of amber and bog water spread over the land instead
     if (k === 'amberfen' && B.band){ delete B.band; B.ponds = Math.max(B.ponds || 0, 7); B.pondR = [70, 140]; }

@@ -179,7 +179,7 @@ function placeBiomeProps(B, mapId){
     const hitWater = obstacles.some(o => o.water && Math.hypot(o.x - x, o.y - y) < o.r + (water ? -6 : 18));
     if (water ? !obstacles.some(o => o.water && Math.hypot(o.x - x, o.y - y) < o.r + 34) && type[0] !== 'reed' : hitWater) continue;
     if (!water && obstacles.some(o => !o.water && Math.hypot(o.x - x, o.y - y) < o.r + 30)) continue;
-    addProp(type[0], x, y, Math.floor(R() * type[2])); n++;
+    addProp(type[0], x, y, type[3] === 'green' ? 2 * Math.floor(R() * type[2] / 2) : Math.floor(R() * type[2])); n++;   // (v286) 'green': a pine in a green land takes only the green (even) shapes
   }
 }
 

@@ -463,14 +463,29 @@ const BEAST = (() => {
         cx.pre = null; return; }
       for (const [sd, z] of [[-1, 4], [1, 4], [-1, -4], [1, -4]]){ cx.gid = 1 + sd + (z > 0 ? 4 : 0); const top = T([sd * 6, 4, z]); cap(cx, top, [top[0] + sd * 3, .5, top[2] + z * .3 + o.sw * sd * 2], 2.2 * sz, 1.8 * sz, SK, {}); }
       if (kind === 'turtle'){
-        cx.gid = 10; ell(cx, T([0, 6, -1]), 10.5, 6.6, SH, {rz:12, tex:nn => { const a = Math.atan2(nn[0], nn[2]);
-          if (s.ridges) return nn[1] < -.55 ? {m:BE} : Math.abs(Math.sin(nn[0] * 7.5)) < .14 ? (SC ? {m:SC} : {dt:1}) : spot(nn);   // leatherback: lengthwise keels
-          return Math.sin(a * 5) * Math.sin(nn[1] * 9) > .55 ? (SC ? {m:SC} : {dt:1}) : nn[1] < -.55 ? {m:BE} : spot(nn); }});
-        cx.gid = 11; const hc = T([0, 6 + (act === 'attack' ? 1 : 0), 12 + (act === 'attack' ? [0, -2, 3, 0][f] : 0)]);
-        cap(cx, T([0, 5, 7]), hc, 2.6 * sz, 3 * sz, SK, {tex:spot}); cx.gid = 12; ell(cx, hc, 3.2 * sz, 2.8 * sz, SK, {tex:nn => eyesTex(nn, o, EY, {sp:.58, y:.22, rx:.1, ry:.12, glow:!!s.eyeGlow}) || (HS && nn[2] < .85 && Math.abs(Math.sin(nn[1] * 9 + nn[2] * 2)) < .3 ? {m:HS} : spot(nn))});
-        cx.gid = 13; cap(cx, T([0, 5, -10]), T([0, 3, -14]), 1.6, .5, SK, {});
-        extra([0, 5, -10], [hc[0] / sz, (hc[1] - o.bob * .3) / sz + 2, (hc[2] - o.lun) / sz - 1], 12.4, 8);
-        if (s.lotus){ cx.gid = 14; for (let i = 0; i < 6; i++){ const a = i / 6 * Math.PI * 2; ell(cx, T([Math.cos(a) * 2.6, 13.5, -1 + Math.sin(a) * 2.6]), 1.8, 3.2, mat(key, 'lotus', '#f08ab0'), {}); } }
+        /* (v286) the owner: "a loaf of bread". The shell was one smooth egg with blotches. Now it is a turtle's shell:
+           a low dome cut flat at the bottom, a rim of marginal plates sticking out over the legs, the plates outlined by
+           dark seams (a row down the spine, a ring of side plates, small plates round the edge), a pale belly plate under
+           it, and the head on a neck well clear of the shell. */
+        const SM = mat(key, 'seam', s.seam || '#2a2016'), LT = SC || null;
+        const ang = nn => Math.atan2(nn[0], nn[2]);
+        cx.gid = 9; ell(cx, T([0, 3.2, -1]), 10, 1.5, BE, {rz:11.4});                                  // belly plate
+        cx.gid = 10; ell(cx, T([0, 3.9, -1]), 10.6, 8, SH, {rz:12.2, tex:nn => { const h = nn[1], a = ang(nn);
+          if (h < -.02) return false;                                                                // a dome, flat underneath
+          if (s.ridges) return Math.abs(Math.sin(nn[0] * 7.5)) < .14 ? {m:SM} : spot(nn);             // leatherback: lengthwise keels
+          if (Math.abs(h - .8) < .045 || Math.abs(h - .36) < .05) return {m:SM};                     // the ring seams
+          if (h > .8) return Math.abs(nn[2] * 3.2 - Math.round(nn[2] * 3.2)) < .14 ? {m:SM} : (LT ? {m:LT} : {dt:-1});   // spine plates
+          if (h > .36) return Math.abs(Math.sin(a * 2.5)) < .1 ? {m:SM} : (h > .62 ? {dt:-1} : undefined);              // side plates
+          return Math.abs(Math.sin(a * 6)) < .16 ? {m:SM} : undefined; }});                          // edge plates
+        cx.gid = 8; ell(cx, T([0, 3.9, -1]), 11.6, 1.6, SH, {rz:13.2, tex:nn => (Math.abs(Math.sin(ang(nn) * 6)) < .2 ? {m:SM} : {dt:1})});   // the rim, overhanging
+        const lift = act === 'attack' ? [0, -2, 3, 0][f] : Math.sin(o.ph) * .5;
+        cx.gid = 11; const hc = T([0, 5.6 + (act === 'attack' ? 1 : 0), 14.6 + lift]);
+        cap(cx, T([0, 4.4, 8]), hc, 2.3 * sz, 2.5 * sz, SK, {tex:nn => (Math.sin(nn[1] * 14) > .7 ? {dt:1} : spot(nn))});   // the neck, with skin folds
+        cx.gid = 12; ell(cx, hc, 3.3 * sz, 2.9 * sz, SK, {rz:3.8 * sz, tex:nn => eyesTex(nn, o, EY, {sp:.56, y:.24, rx:.11, ry:.13, glow:!!s.eyeGlow}) || (Math.abs(nn[1] + .2) < .06 && nn[2] > .4 ? {m:SM} : HS && nn[2] < .85 && Math.abs(Math.sin(nn[1] * 9 + nn[2] * 4)) < .2 ? {m:HS} : undefined)});
+        cx.gid = 13; cap(cx, T([0, 3.8, -11]), T([0, 2.6, -15]), 1.5, .4, SK, {});
+        extra([0, 4, -11], [hc[0] / sz, (hc[1] - o.bob * .3) / sz + 2, (hc[2] - o.lun) / sz - 1], 12.4, 8);
+        if (s.lotus){ cx.gid = 14; for (let i = 0; i < 7; i++){ const a = i / 7 * Math.PI * 2; ell(cx, T([Math.cos(a) * 2.4, 12.6, -1 + Math.sin(a) * 2.4]), 1.7, 3.1, mat(key, 'lotus', '#f08ab0'), {}); }
+          cx.gid = 15; ell(cx, T([0, 12.4, -1]), 1.6, 1.4, mat(key, 'lotusc', '#ffd84a'), {}); }   // the seed head in the middle
       } else {
         cx.gid = 10; ell(cx, T([0, 6, -1]), 9.6, 6.8, SK, {tex:nn => (nn[1] < -.35 || (nn[2] > .6 && nn[1] < -.05) ? {m:BE} : s.warts && Math.sin(nn[0] * 17) * Math.sin(nn[2] * 15) > .7 ? {dt:1} : s.stripe && Math.abs(nn[0]) < .12 && nn[1] > 0 ? {m:mat(key, 'stripe', s.stripe)} : undefined)});
         for (const sd of [-1, 1]){ cx.gid = 20 + sd; ell(cx, T([sd * 4.4, 12, 4.5]), 3.2 * sz, 3.2 * sz, SK, {tex:nn => (nn[2] > .2 && nn[1] > -.2 ? (o.eyes === 'closed' ? {m:SK, t:2} : {m:EY, t:nn[1] > .35 ? 0 : 1}) : undefined)}); }

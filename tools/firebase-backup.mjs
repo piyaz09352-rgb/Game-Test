@@ -14,12 +14,12 @@
      node tools/firebase-backup.mjs gms [--key …]
          Copies GM_UIDS from js/net/firebase-config.js into the Realtime Database /gms (lets GMs send the 'gm' topic).
      node tools/firebase-backup.mjs privacy [--key …]
-         (v284) Removes the log-in IDs older versions published: `acc` on players/* and guilds/*/members/*, `sa` on
-         market/*. The game no longer writes them on the Firebase site; this clears the copies already there.
+         (v284) Removes the log-in IDs older versions published: `acc` on player cards and guild member lines, `sa` on
+         market listings. The game no longer writes them on the Firebase site; this clears the copies already there.
    The database URL and project come from js/net/firebase-config.js (override with --db <url>). */
 import fs from 'node:fs';
 import path from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const argv = process.argv.slice(2), cmd = argv[0];
@@ -33,13 +33,19 @@ const cfg = k => (cfgSrc.match(new RegExp(`${k}:\\s*'([^']*)'`)) || [])[1] || ''
 const GM_UIDS = (() => { const m = cfgSrc.match(/const GM_UIDS\s*=\s*\[([^\]]*)\]/); return m ? [...m[1].matchAll(/'([^']+)'|"([^"]+)"/g)].map(x => x[1] || x[2]) : []; })();
 
 let admin;
-try { admin = { app: await import('firebase-admin/app'), fs: await import('firebase-admin/firestore'), db: await import('firebase-admin/database') }; }
-catch (e){ die('firebase-admin is not installed: run  npm install firebase-admin'); }
-const keyPath = opt('key') || process.env.GOOGLE_APPLICATION_CREDENTIALS || path.join(ROOT, 'service-account.json');
-if (!fs.existsSync(keyPath)) die(`service-account key not found: ${keyPath} (Firebase Console → Project settings → Service accounts)`);
-const key = JSON.parse(fs.readFileSync(keyPath, 'utf8'));
+{ const { createRequire } = await import('node:module'), req = createRequire(path.join(process.cwd(), 'x.js'));   // found next to this file, or where it is run from
+  const load = async m => { try { return await import(m); } catch (e) { return import(pathToFileURL(req.resolve(m)).href); } };
+  try { admin = { app: await load('firebase-admin/app'), fs: await load('firebase-admin/firestore'), db: await load('firebase-admin/database') }; }
+  catch (e){ die('firebase-admin is not installed: run  npm install firebase-admin'); } }
 const databaseURL = opt('db') || cfg('databaseURL');
-admin.app.initializeApp({ credential: admin.app.cert(key), projectId: key.project_id || cfg('projectId'), databaseURL: databaseURL || undefined });
+if (process.env.FIRESTORE_EMULATOR_HOST){   // (v286) the emulators (tools/rules-test): no key needed, nothing real is touched
+  admin.app.initializeApp({ projectId: opt('project') || cfg('projectId'), databaseURL: databaseURL || undefined });
+} else {
+  const keyPath = opt('key') || process.env.GOOGLE_APPLICATION_CREDENTIALS || path.join(ROOT, 'service-account.json');
+  if (!fs.existsSync(keyPath)) die(`service-account key not found: ${keyPath} (Firebase Console → Project settings → Service accounts)`);
+  const key = JSON.parse(fs.readFileSync(keyPath, 'utf8'));
+  admin.app.initializeApp({ credential: admin.app.cert(key), projectId: key.project_id || cfg('projectId'), databaseURL: databaseURL || undefined });
+}
 const fsdb = admin.fs.getFirestore(), rtdb = databaseURL ? admin.db.getDatabase() : null;
 const { Timestamp, GeoPoint, DocumentReference } = admin.fs;
 

@@ -57,7 +57,7 @@ const MAP_BGM_SKIP = ['village', 'battle', 'worldboss', 'title', 'camp'];
 /* a boss's own theme: starts when that boss is fighting you (or you attack it) and plays until it dies.
    Drop the song in audio/ under the name below; a boss without a file (or with a file that fails to load) keeps the normal battle music.
    To give another boss a theme: add one line here (key = monster id in data/world.js). */
-const BOSS_THEMES = {khankhak:{src:'audio/boss_khankhak.mp3', th:'เพลงประจำตัวพญาคันคาก', en:'Phaya Khankhak theme'}};
+const BOSS_THEMES = {};   // (v286) the owner: Phaya Khankhak's own theme is gone, he fights to the same battle music as every other boss
 for (const k in BOSS_THEMES) BGM_TRACKS['boss_' + k] = BOSS_THEMES[k];
 const BOSSBGM = {on:null};
 /* which boss theme (mood name) should play right now, or null. Latches: once the fight starts it stays until the boss is gone. */

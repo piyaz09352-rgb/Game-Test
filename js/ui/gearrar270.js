@@ -29,6 +29,7 @@ function gr270Slot(it){ return (it && (it.kind === 'ammo' ? 'ammo' : it.slot ===
 function gr270Tag(root){
   const q = (root && root.querySelectorAll ? root : document).querySelectorAll('.bslot[data-bagsel],.bslot[data-mksel],.bslot[data-tsel]');
   for (const b of q){ const id = b.dataset.bagsel || b.dataset.mksel || b.dataset.tsel, it = typeof ITEMS !== 'undefined' && ITEMS[id];
+    if (it && (it.kind === 'etc' || it.kind === 'mat') && typeof ia270Tier === 'function') continue;   // (v286) materials are framed by itemart270.js (by tier): both taggers fought over them, the frame flipped colour on every redraw = the bag blinked
     const want = it && (it.kind === 'gear' || it.kind === 'ammo' || (it.slot && GR270_SVG[gr270Slot(it)])) ? `gr${it.rar || 0}` : '';
     if (want ? b.classList.contains(want) && b.classList.contains('grx') && b.dataset.gs === gr270Slot(it) : !b.classList.contains('grx')) continue;   // the bag rewrites a cell's class in place: check the class itself
     b.classList.remove('gr0', 'gr1', 'gr2', 'gr3', 'grx'); if (want){ b.classList.add(want, 'grx'); b.dataset.gs = gr270Slot(it); } else delete b.dataset.gs; }

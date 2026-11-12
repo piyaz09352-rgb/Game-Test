@@ -185,7 +185,11 @@ function ghostAt(p){ const touch = typeof GFX !== 'undefined' && GFX.touch, slop
   return best; }
 
 /* ---------- chat ---------- */
+/* (v286) a flood of chat from one player (a script) is dropped on arrival: at most 5 lines in 4 seconds from one sender */
+const CHAT_RL = new Map();
+function chatRate(by){ if (!by) return true; const now = performance.now(), a = (CHAT_RL.get(by) || []).filter(t => now - t < 4000); if (a.length >= 5){ CHAT_RL.set(by, a); return false; } a.push(now); CHAT_RL.set(by, a); return true; }
 function onChat(msg){
+  if (!msg.isMe && !chatRate(msg.by)) return;
   const d = msg.data || {}; const ch = ['all', 'map', 'party', 'guild', 'w'].includes(d.c) ? d.c : 'all';
   if (ch === 'w' && !msg.isMe && (!NET.uid || d.to !== NET.uid)) return;
   if (ch === 'guild' && (!S.guild || d.g !== S.guild.id)) return;
@@ -209,6 +213,7 @@ function chatSubmit(){
 document.addEventListener('submit', e => { if (e.target && e.target.id === 'chatForm'){ e.preventDefault(); chatSubmit(); } }, true);
 async function sendChat(text, ch){
   text = clean(text); if (!text) return;
+  if (!chatRate('__me')){ NET.chat.push({ch:'sys', who:'', text:L('พิมพ์เร็วเกินไป รอสักครู่', 'Slow down a little'), at:Date.now()}); renderChat(); return; }   // (v286) the same limit others hold us to
   if (ch === 'party' && !NET.party){ NET.chat.push({ch:'sys', who:'', text:L('คุณยังไม่ได้อยู่ในปาร์ตี้', 'You are not in a party'), at:Date.now()}); renderChat(); return; }
   if (!NET.room || !NET.on){ NET.chat.push({ch:'sys', who:'', text:L('ยังไม่ได้เชื่อมต่อออนไลน์', 'Not connected'), at:Date.now()}); renderChat(); return; }
   try { if (ch === 'guild' && !S.guild){ NET.chat.push({ch:'sys', who:'', text:L('คุณยังไม่มีกิลด์', 'You are not in a guild'), at:Date.now()}); renderChat(); return; }
