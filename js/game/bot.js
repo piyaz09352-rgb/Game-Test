@@ -131,7 +131,7 @@ function updBot(dt){
   closeDialog();
   const hp = S.hp / DER.maxhp, sp = S.sp / DER.maxsp, th = threats();
   // potions
-  const B = S.bot || {}, hpPot = ['elixirpot', 'whitepot', 'orangepot', 'redpot'].find(k => S.inv[k]), spPot = ['bigbluepot', 'bluepot'].find(k => S.inv[k]);
+  const B = S.bot || {}, hpPot = S.inv[potPick('hp')] ? potPick('hp') : null, spPot = S.inv[potPick('sp')] ? potPick('sp') : null;   // (v290) the slot's own potion, or the strongest in the bag
   if (B.potHpOn !== false && hp < (B.potHp ?? 45) / 100 && hpPot && P.itemCd <= 0){ useItem(hpPot); return; }
   if (B.potSpOn !== false && sp < (B.potSp ?? 20) / 100 && spPot && P.itemCd <= 0){ useItem(spPot); return; }
   { const h = botPick(null); if (h && (botKind(SKILLS[h]) === 'heal' || botKind(SKILLS[h]) === 'sp')){ botFire(h); return; } }

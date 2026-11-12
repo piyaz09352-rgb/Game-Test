@@ -94,10 +94,9 @@ const WIKI_SYS = [
     <ul><li>${L('เริ่มเกมได้ 48 แต้ม · ขึ้นเลเวลได้ 8 แต้ม และได้มากขึ้นอีก 1 แต้มทุก 38 เลเวล (ถึง Lv 300 ได้เลเวลละ 15)', 'You start with 48 points · each level gives 8, one more every 38 levels (15 a level by Lv 300)')}</li>
     <li>${L('ยิ่งสเตตัสสูง แต่ละแต้มยิ่งแพง (ราคาขึ้นทุก 10 แต้ม)', 'The higher a stat, the more each point costs (up every 10 points)')}</li>
     <li>${L('รีเซตสเตตัสได้ฟรีทุกเมื่อ ที่หน้าต่างสถานะ', 'Reset your stats for free any time in the Status window')}</li></ul>
-    <h4>${L('เพดานสเตตัส (โตตามเลเวล)', 'Stat cap (grows with your level)')}</h4>
-    <div class="wkscroll"><table class="wkt"><tr><th>Lv</th>${capRow.map(l => `<td>${l}</td>`).join('')}</tr><tr><th>${L('เพดาน', 'Cap')}</th>${capRow.map(l => `<td>${STAT_CAP(l)}</td>`).join('')}</tr></table></div>
-    <ul><li>${L('แต้มแต่ละช่วงพอดันสเตตัสหลัก 2 ตัวถึงเพดาน และยังมีเหลือให้ตัวอื่น ที่ Lv 300 ได้ประมาณ 150 · 150 · 90 · 60 ต้องเลือกว่าจะเน้นอะไร', 'At every level the points are enough to raise two main stats to the cap with some left for others: about 150 · 150 · 90 · 60 at Lv 300, so choose what to focus on')}</li>
-    <li>${L('ค่าที่ได้จากอุปกรณ์ การ์ด และบัฟ บวกเพิ่มได้เกินเพดาน', 'Bonuses from gear, cards and buffs add on top and may go past the cap')}</li></ul>`; }},
+    <h4>${L('ไม่มีเพดานสเตตัส', 'No stat cap')}</h4>
+    <p>${L('ดันสเตตัสไหนก็ได้สูงเท่าที่แต้มพอ (แต่ละแต้มแพงขึ้นทุก 10 แต้ม)', 'Raise any stat as high as your points allow (each point costs more every 10)')}</p>
+    <ul><li>${L('ค่าที่ได้จากอุปกรณ์ การ์ด และบัฟ บวกเพิ่มจากนี้อีก', 'Bonuses from gear, cards and buffs add on top')}</li></ul>`; }},
   {id:'elem', t:['ธาตุ', 'Elements'], b:() => { const E = ELEM;
     return `<p>${L('ดาเมจ % เมื่อธาตุโจมตี (แถว) ตีใส่ธาตุมอน (คอลัมน์) · เขียว = แรง แดง = เบา', 'Damage % when an attack element (row) hits a monster element (column) · green = strong, red = weak')}</p>
       <div class="wkscroll"><table class="wkt wkel-t"><tr><th></th>${E.map(e => `<th>${wkElem(e)}</th>`).join('')}</tr>${E.map(a => `<tr><th>${wkElem(a)}</th>${ETAB[a].map(v => `<td class="${v > 100 ? 'up' : v < 100 ? 'dn' : ''}">${v}</td>`).join('')}</tr>`).join('')}</table></div>

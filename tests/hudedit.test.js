@@ -13,6 +13,7 @@ test('arrange mode: drag the skill cluster and the joystick, resize, keep it aft
     await page.click('[data-heopen]');
     assert.ok(await page.evaluate(() => HE.on && !!document.getElementById('heBar')), 'arrange mode is on');
     const box = async id => page.evaluate(id => { const r = document.getElementById(id).getBoundingClientRect(); return {x:r.left, y:r.top, w:r.width, h:r.height}; }, id);
+    await page.waitForFunction(() => { const r = document.getElementById('mobaAct').getBoundingClientRect(); return r.width > 0 && r.left > 100; }, null, { timeout: 10000, polling: 100 });   // (v290) on a busy machine the cluster was measured before it was laid out (x 0)
     const a0 = await box('mobaAct');
     // drag the skill cluster to the left middle
     await page.mouse.move(a0.x + a0.w / 2, a0.y + a0.h / 2); await page.mouse.down(); await page.mouse.move(300, 220, { steps: 8 }); await page.mouse.up();

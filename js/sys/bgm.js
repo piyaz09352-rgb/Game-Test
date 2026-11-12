@@ -54,6 +54,14 @@ Object.assign(MAP_BGM, {54:'bgm_dungeon', 56:'bgm_dungeon', 13:'bgm_thai1', 16:'
   5:'bgm_thai4', 8:'bgm_thai4', 61:'bgm_nature6', 62:'bgm_nature6', 34:'bgm_nature6', 31:'bgm_fastnature1', 36:'bgm_fastnature1', 52:'bgm_fastnature2', 32:'bgm_fastnature2',
   45:'bgm_advmap2', 46:'bgm_advmap2', 47:'bgm_advmap2', 48:'bgm_advmap3', 49:'bgm_advmap3', 50:'bgm_advmap3'});
 const MAP_BGM_SKIP = ['village', 'battle', 'worldboss', 'title', 'camp'];
+/* (v290) the owner's four songs for the crossroad cities: inside these towns they replace Aren's town song (mood 'village').
+   All four brought to −14 LUFS and 128 kbps like the others. */
+Object.assign(BGM_TRACKS, {
+  city_port:{src:'audio/city_port.mp3', th:'ท่าสำเภาทอง · Adventure MMORPG', en:'Golden Junk Port · Adventure MMORPG'},
+  city_desert:{src:'audio/city_desert.mp3', th:'นครศิลาทราย · Ancient Desert Adventure', en:'Sandstone City · Ancient Desert Adventure'},
+  city_snow:{src:'audio/city_snow.mp3', th:'เวียงหิมวันต์ · Snowy Mountain Adventure', en:'Himavanta Citadel · Snowy Mountain Adventure'},
+  city_sky:{src:'audio/city_sky.mp3', th:'นครเทวาลัยลอยฟ้า · Mystic Forest Adventure', en:'Floating Temple City · Mystic Forest Adventure'}});
+const CITY_BGM = {67:'city_port', 68:'city_desert', 69:'city_snow', 70:'city_sky'};
 /* a boss's own theme: starts when that boss is fighting you (or you attack it) and plays until it dies.
    Drop the song in audio/ under the name below; a boss without a file (or with a file that fails to load) keeps the normal battle music.
    To give another boss a theme: add one line here (key = monster id in data/world.js). */
@@ -85,7 +93,8 @@ function bgmPlay(key){
 }
 {
   const _m = SFX.music;
-  SFX.music = function(name){ const orig = name; if (typeof MAP_ID !== 'undefined' && MAP_BGM[MAP_ID] && name && !MAP_BGM_SKIP.includes(name) && !/^boss_/.test(name) && !(typeof DG !== 'undefined' && DG.active)) name = MAP_BGM[MAP_ID];   // Aren, out past the town: its own song (fights and bosses keep their music)
+  SFX.music = function(name){ const orig = name; if (name === 'village' && typeof MAP_ID !== 'undefined' && CITY_BGM[MAP_ID]) name = CITY_BGM[MAP_ID];   // (v290) a crossroad city's own song
+    if (typeof MAP_ID !== 'undefined' && MAP_BGM[MAP_ID] && name && !MAP_BGM_SKIP.includes(name) && !/^boss_/.test(name) && !(typeof DG !== 'undefined' && DG.active)) name = MAP_BGM[MAP_ID];   // Aren, out past the town: its own song (fights and bosses keep their music)
     const own = !!BGM_TRACKS[name] && !BGM_TRACKS[name].bad; if (SFX.muteMusic) SFX.muteMusic(own); bgmPlay(own ? name : null); return _m.call(SFX, orig); };
   const _v = SFX.setVolume; SFX.setVolume = function(...a){ const r = _v.apply(SFX, a); if (BGM.el && BGM.want){ BGM.cur = bgmVol(); BGM.el.volume = clamp(BGM.cur, 0, 1); } return r; };
 }

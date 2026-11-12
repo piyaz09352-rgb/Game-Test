@@ -19,7 +19,10 @@ test('no crocodile look-alikes, only the Golden Deer to ride', { skip, timeout: 
       ACC.wardrobe = {...(ACC.wardrobe || {}), [anyGone]:1}; ACC.mntGone = {}; S.cos = {...(S.cos || {}), mount:anyGone}; const c0 = ACC.coins || 0;
       mountGoneSweep(); const c1 = ACC.coins || 0; ACC.wardrobe[anyGone] = 1; mountGoneSweep(); const c2 = ACC.coins || 0;
       S.inv.mount1 = 1; P.ride = true; const rideOk = P.ride && !(SPR.CHARS.warlord || {}).mount; P.ride = false;
-      return { crocs, draws, n:NOCROC.size, mounts, tabs, refund:c1 - c0, again:c2 - c1, worn:S.cos.mount || null, rideOk, gone:Object.keys(MOUNT_GONE).length,
+      // (v290) the rewards that replaced the story / tower mounts: coins, once per account
+      ACC.mntRwd = {}; const a0 = MS_ARCS[0]; for (const m of a0.maps) msS().done[m] = 1; twSt().best = 100;
+      const r0 = ACC.coins || 0; mountRewardSweep(); const r1 = ACC.coins || 0; mountRewardSweep(); const r2 = ACC.coins || 0;
+      return { rwd:r1 - r0, rwdAgain:r2 - r1, crocs, draws, n:NOCROC.size, mounts, tabs, refund:c1 - c0, again:c2 - c1, worn:S.cos.mount || null, rideOk, gone:Object.keys(MOUNT_GONE).length,
         story:(typeof MS_ARCS === 'undefined' ? [] : MS_ARCS.filter(a => a.mount)).length, tower:(typeof TWS_MILE === 'undefined' ? [] : TWS_MILE.filter(m => MOUNT_GONE[m[1]])).length };
     });
     assert.deepStrictEqual(r.crocs, [], 'no monitor, crocodile, lizard or salamander by name');
@@ -30,6 +33,7 @@ test('no crocodile look-alikes, only the Golden Deer to ride', { skip, timeout: 
     assert.strictEqual(r.worn, null, 'it is taken off');
     assert.ok(r.rideOk, 'the Golden Deer still rides');
     assert.strictEqual(r.story + r.tower, 0, 'no story or tower reward hands one out');
+    assert.ok(r.rwd >= 80 + 150 && r.rwdAgain === 0, 'a finished road and floor 100 pay coins instead, once: ' + JSON.stringify([r.rwd, r.rwdAgain]));
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no runtime errors');
 });

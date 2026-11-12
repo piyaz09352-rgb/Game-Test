@@ -33,4 +33,17 @@ function mountGoneSweep(){
     if (typeof log === 'function') log(L(`คืนเหรียญ ◈${coins}: ${names.map(escH).join(', ')}`, `Refunded ◈${coins}: ${names.map(escH).join(', ')}`), 'g'); }
   else if (ch && typeof accSave === 'function') accSave(true);
 }
-{ let t = 0; EV.on('tick', dt => { t -= dt || .016; if (t > 0) return; t = 3; mountGoneSweep(); }); }
+/* (v290) what the retired mounts used to reward: finishing a map-story road (4 roads) now gives ◈80 Vayra Coins and
+   reaching the tower's floor 100 gives ◈150, once per account. Players who already finished them (and lost the mount)
+   get the coins too, the first time they play this version. */
+const MOUNT_RWD = {road:80, tower:150};
+function mountRewardSweep(){
+  if (typeof ACC === 'undefined' || !ACC || typeof S === 'undefined' || !S || typeof coinAdd !== 'function') return;
+  const got = ACC.mntRwd = ACC.mntRwd && typeof ACC.mntRwd === 'object' ? ACC.mntRwd : {};
+  if (typeof MS_ARCS !== 'undefined' && typeof msArcDone === 'function') for (const a of MS_ARCS){ const k = 'ms:' + (a.title_id || a.maps[0]);
+    let done = false; try { done = msArcDone(a); } catch (e) {}
+    if (done && !got[k]){ got[k] = 1; coinAdd(MOUNT_RWD.road, L(`จบเนื้อเรื่อง «${a.title[0]}»`, `«${a.title[1]}» complete`)); if (typeof banner === 'function') banner(L(`จบเนื้อเรื่อง «${a.title[0]}» · ได้ ◈${MOUNT_RWD.road}`, `«${a.title[1]}» complete · ◈${MOUNT_RWD.road}`)); } }
+  if (typeof twSt === 'function'){ let b = 0; try { b = twSt().best || 0; } catch (e) {}
+    if (b >= 100 && !got.tw100){ got.tw100 = 1; coinAdd(MOUNT_RWD.tower, L('หอคอยชั้น 100', 'Tower floor 100')); if (typeof banner === 'function') banner(L(`หอคอยชั้น 100! ได้ ◈${MOUNT_RWD.tower}`, `Tower floor 100! ◈${MOUNT_RWD.tower}`)); } }
+}
+{ let t = 0; EV.on('tick', dt => { t -= dt || .016; if (t > 0) return; t = 3; mountGoneSweep(); mountRewardSweep(); }); }

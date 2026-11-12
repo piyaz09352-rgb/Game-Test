@@ -14,7 +14,7 @@ test('monster families: parents and young, sizes and strength, the family defend
       warpTo(id); const type = MAPS[id].mobs.find(t => MOB[t] && MOB[t].race === 'brute' && !MOB[t].boss), base = MOB[type].hp;
       // an ordinary monster never brings a family
       const plain = spawnMob(type, P.x + 260, P.y, {zone:MAPZ}); await new Promise(r => setTimeout(r, 30));
-      const out = {plain:!plain.fam};
+      const out = {plain:!plain.fam || !!plain.elite || !!plain.famLead};   // (v290) a plain monster has no family; a random spawn can still roll a pack leader, which does
       FAM.mate = 1; const lead = spawnMob(type, P.x + 200, P.y, {zone:MAPZ}); if (!lead.elite) makeElite(lead); await new Promise(r => setTimeout(r, 30)); FAM.mate = .5;
       const fam = mobs.filter(m => m.fam && m.fam === lead.fam), young = fam.filter(m => m.famRole === 'young'), par = fam.filter(m => m.famRole === 'father' || m.famRole === 'mother');
       Object.assign(out, {n:fam.length, young:young.length, par:par.length, lead:!!lead.famLead && lead.elite, parHp:par[0] && par[0].maxhp > base * 1.3, youngHp:young[0] && young[0].maxhp < base * .6, sz:[par[0] && par[0].famSz, young[0] && young[0].famSz], tags:fam.filter(m => m.tagTxt).map(m => m.tagTxt[0]), noElite:young.every(m => !m.elite)});

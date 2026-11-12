@@ -39,7 +39,11 @@ const STAT_TO = [0, 0];   // points needed to raise a stat from 1 to n
 const statTo = n => { while (STAT_TO.length <= n){ const x = STAT_TO.length - 1; STAT_TO.push(STAT_TO[x] + Math.floor((x - 1) / 10) + 2); } return STAT_TO[Math.max(1, n)]; };
 const statNeed = c => 2 * statTo(c) + statTo(Math.round(c * .6)) + statTo(Math.round(c * .4));
 const STAT_CAPS = [30, 30];   // the cap at each level, filled as needed
-function STAT_CAP(lv){
+/* (v290) the owner: no stat cap ("ใครสั่ง"). STAT_CAP stays as the function every window asks, but it no longer
+   limits anything: a stat goes as high as your points take it (each point still costs more every 10). The old
+   level-based curve is kept as STAT_CAP_OLD for the balance tools. */
+function STAT_CAP(){ return 999; }
+function STAT_CAP_OLD(lv){
   lv = Math.max(1, Math.min(999, (lv != null ? lv : (typeof S !== 'undefined' && S && S.lvl) || 1) | 0));
   if (STAT_CAPS.length <= lv){ let t = 48; for (let l = 2; l < STAT_CAPS.length; l++) t += statGain(l); let c = 1;
     for (let l = STAT_CAPS.length; l <= lv; l++){ t += statGain(l); while (statNeed(c + 1) <= t) c++; STAT_CAPS[l] = Math.max(30, c); } }

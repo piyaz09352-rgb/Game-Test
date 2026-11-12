@@ -121,12 +121,18 @@ function confirmSkills(){
 /* ---------- hotbar ---------- */
 function hotbarDef(){
   const list = S.hot.map(id => (id && skl(id) ? {k:'skill', id} : null));
-  const best = (ids) => ids.find(id => S.inv[id] > 0) || ids[ids.length - 1];
-  list.push({k:'item', id:best(['elixirpot', 'whitepot', 'orangepot', 'redpot'])}, {k:'item', id:best(['bigbluepot', 'bluepot'])});
+  list.push({k:'item', id:potPick('hp')}, {k:'item', id:potPick('sp')});
   return list;
 }
-const bestHp = () => ['elixirpot', 'whitepot', 'orangepot', 'redpot'].find(id => S.inv[id] > 0) || 'redpot';
-const bestSp = () => ['bigbluepot', 'bluepot'].find(id => S.inv[id] > 0) || 'bluepot';
+/* (v290) the two potion slots: every HP / SP potion, strongest first (the old lists stopped at the Elixir and the Dark
+   Blue Potion, so the Divine Potion and the Sky Blue Potion were never put in the slot nor drunk by Auto). The owner
+   can hold a slot and pick one (S.potSel, js/sys/potslot290.js); that one is used while the bag has it, else the strongest. */
+const POT_LIST = k => Object.keys(ITEMS).filter(id => ITEMS[id].kind === 'use' && (k === 'hp' ? ITEMS[id].heal > 0 && !ITEMS[id].spheal : ITEMS[id].spheal > 0))
+  .sort((a, b) => (k === 'hp' ? ITEMS[b].heal - ITEMS[a].heal : ITEMS[b].spheal - ITEMS[a].spheal));
+function potPick(k){ const c = S.potSel && S.potSel[k], L = POT_LIST(k);
+  if (c && ITEMS[c] && S.inv[c] > 0) return c; return L.find(id => S.inv[id] > 0) || (c && ITEMS[c] ? c : L[L.length - 1]); }
+const bestHp = () => potPick('hp');
+const bestSp = () => potPick('sp');
 function useHot(h){ if (h.k === 'skill') trySkill(h.id); else useItem(h.id); }
 function renderHotbar(){
   if (typeof renderMoba === 'function') renderMoba();

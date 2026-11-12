@@ -17,6 +17,7 @@ test('fight only the chosen kinds', { skip, timeout: 90000 }, async () => {
       const rows = document.querySelectorAll('#tpick [data-ht]').length;
       const btn = document.querySelector(`#tpick [data-ht="${kinds[1]}"]`); btn.dispatchEvent(new PointerEvent('pointerup', {bubbles:true}));
       const chosen = (S.hunt || []).slice(), badge = document.querySelector('[data-mo="atk"]') && document.querySelector('[data-mo="atk"]').dataset.hunt;
+      for (const m of mobs) if (m !== a && m !== b) m.dead = true;   // (v290) anything that turned up meanwhile (a pack leader's family, an event) is not part of this test
       const bot = pickTarget(), near = nearestEnemy(400), lock = tlkPick(520);
       tpkClose(); S.hunt = []; const free = nearestEnemy(400);
       return {rows, chosen, badge, bot:bot && bot.type, near:near && near.type, lock:lock && lock.type, free:free && free.type, want:kinds[1], other:kinds[0]}; });
