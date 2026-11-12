@@ -24,7 +24,7 @@ function statsFor(L, k = {}, XL = L){
 }
 /* loot part names by archetype */
 const PART = {quad:['หนัง', 'Hide'], bird:['ขนนก', 'Feather'], serpent:['เกล็ด', 'Scale'], bug:['กระดอง', 'Carapace'], squat:['ผิวมัน', 'Slick Skin'],
-  floater:['เถ้าวิญญาณ', 'Spirit Ash'], slime:['เมือก', 'Ooze'], rock:['เศษหิน', 'Rubble'], human:['เครื่องราง', 'Charm']};
+  floater:['เถ้าวิญญาณ', 'Spirit Ash'], slime:['เมือก', 'Ooze'], rock:['เศษหิน', 'Rubble'], human:['เครื่องราง', 'Charm'], fish:['ครีบ', 'Fin']};
 
 /* ---------- species ----------
    [id, th, en, lvl, archetype, look, elem, race, size, extra]
@@ -383,6 +383,23 @@ const ROAD_LV_RAW = {e:[[5, 15], [14, 24], [23, 33], [32, 42], [41, 52], [50, 62
   n:[[210, 220], [218, 228], [226, 236], [234, 244], [242, 252], [250, 262], [260, 272], [272, 286], [286, 300]]};
 if (typeof WORLD_MORE === 'function') WORLD_MORE();   // v29: thirty more regions and three hundred more species (data/world3.js)
 if (typeof WORLD_DRAGON === 'function') WORLD_DRAGON();   // dinosaurs past the east road, dragons & demons past the south road (data/world4.js)
+/* (v294) วังบาดาล: the sea creatures of the drowned naga palace (the 'fish' body in gfx/beasts.js). They join the list only
+   after the regions of world3/world4 have been generated from the roads' monsters, and at its end, so every older species
+   keeps exactly the same generated relatives, card and order as before (saves, cards and quests stay valid) */
+const CARD_LV_KEEP = {nagaretainer:249, nagawarrior:252, emeraldcrab:251, spiritpearl:250};   // (v294) the level their cards were dealt at before they moved maps
+const SPECIES_LATE = new Set(['abyssshark', 'mantaray', 'giantpuffer', 'abyssangler', 'seahorseknight', 'lionfish', 'swordfish', 'abyssoctopus', 'armorlobster']);   // (systems that number species in turn put these last)
+SPECIES.push(
+  ['abyssshark', 'ฉลามบาดาล', 'Abyss Shark', 155, 'fish', {kind:'shark', col:'#4a6478', belly:'#e8eef2', fin:'#3e5668', size:1.1}, 'water', 'fish', 'l', {aggro:true, scale:1.15, k:{atk:1.25, spd:12}}],
+  ['mantaray', 'ปลากระเบนราหู', 'Manta Ray', 151, 'fish', {kind:'manta', col:'#26303e', belly:'#eef2f4', stripe:'#d8e0e6', size:1.05}, 'water', 'fish', 'l', {k:{hp:1.4, spd:8}}],
+  ['giantpuffer', 'ปลาปักเป้ายักษ์', 'Giant Pufferfish', 148, 'fish', {kind:'puffer', col:'#e0c060', belly:'#f8f4e0', fin:'#c89a3a', spot:'#5a4a2a'}, 'water', 'fish', 'm', {k:{def:1.8, hp:1.2, spd:-15}}],
+  ['abyssangler', 'ปลาตกเบ็ดห้วงลึก', 'Abyssal Anglerfish', 157, 'fish', {kind:'angler', col:'#4c3a46', belly:'#8a7080', fin:'#2e2230', lure:'#9af0ff', eyeGlow:'#9af0ff'}, 'shadow', 'fish', 'm', {aggro:true, range:130, shot:'ice'}],
+  ['seahorseknight', 'ม้าน้ำองครักษ์', 'Seahorse Sentinel', 150, 'fish', {kind:'seahorse', col:'#e0a040', belly:'#f4d890', fin:'#f0e0b0'}, 'water', 'fish', 's', {range:120, shot:'ice'}],
+  ['lionfish', 'ปลาสิงโต', 'Lionfish', 149, 'fish', {kind:'lionfish', col:'#c8503a', belly:'#f4e8e0', stripe:'#f8f0ea', fin:'#e07a5a'}, 'shadow', 'fish', 's', {aggro:true, k:{atk:1.15}}],
+  ['swordfish', 'ปลากระโทงดาบ', 'Swordfish', 153, 'fish', {kind:'swordfish', col:'#1a3aa0', belly:'#d8e4ee', fin:'#142a70', size:.95}, 'water', 'fish', 'm', {aggro:true, k:{spd:20, atk:1.2}}],
+  ['abyssoctopus', 'ปลาหมึกยักษ์ห้วงลึก', 'Abyssal Octopus', 156, 'fish', {kind:'octopus', col:'#a84a5a', belly:'#f0c8c8', spot:'#7a2a3a', size:1.1}, 'water', 'fish', 'l', {range:120, shot:'dark', part:['หนวด', 'Tentacle'], k:{hp:1.4}}],
+  ['armorlobster', 'กุ้งมังกรเกราะ', 'Armored Lobster', 152, 'bug', {kind:'shrimp', shell:'#c8402a', leg:'#a8301e', acc:'#f0c040', bigClaw:true, size:1.25}, 'water', 'fish', 'm', {k:{def:2.2}}]
+);
+MAPS[17].mobs = ['abyssshark', 'mantaray', 'giantpuffer', 'abyssangler', 'seahorseknight', 'lionfish', 'swordfish', 'abyssoctopus', 'armorlobster', 'abyssjelly', 'thundereel', 'abyssturtle'];
 const ROAD_LV = Object.fromEntries(Object.entries(ROAD_LV_RAW).map(([d, a]) => [d, a.map(([lo, hi]) => [LVMAP(lo), Math.max(LVMAP(lo) + 2, LVMAP(hi))])]));
 const ROAD_LAND = {e:() => 'fertile', s:k => k < Math.round(ROADS.s.filter(i => !MAPS[i].landFix).length * 5 / 8) ? 'arid' : 'volcanic', w:() => 'frozen', n:k => k < Math.round(ROADS.n.length * 2 / 3) ? 'dark' : 'light'};
 const OPP = {n:'s', s:'n', e:'w', w:'e'}, DIRV = {n:[0, -1], s:[0, 1], e:[1, 0], w:[-1, 0]};
@@ -400,6 +417,10 @@ const OPP = {n:'s', s:'n', e:'w', w:'e'}, DIRV = {n:[0, -1], s:[0, 1], e:[1, 0],
   });
   for (const d in ROADS) MAPS[0].links[d] = ROADS[d][0];
 }
+/* (v294) วังบาดาล (map 17) became a sea of fish; the palace's nagas, its pearl spirit and its crab moved next door: the
+   Crimson Lake (55) and the Cursed Spire (54), at those maps' levels */
+for (const [id, to] of [['nagaretainer', 55], ['spiritpearl', 55], ['nagawarrior', 54], ['emeraldcrab', 54]]){ const sp = SPECIES.find(x => x[0] === id), mp = MAPS[to];
+  if (!sp || !mp) continue; if (!mp.mobs.includes(id)) mp.mobs.push(id); sp[3] = Math.round((mp.lv[0] + mp.lv[1]) / 2); }
 
 /* ---------- market & shrine NPC looks ---------- */
 Object.assign(SPR.CHARS, {
@@ -415,7 +436,7 @@ const SPECIES_ARCH = {};
 for (const [id, th, en, lvl, arch, look, elem, race, size, x] of SPECIES){
   const st = statsFor(lvl, x.k, LVINV(lvl)), mat = `m_${id}`;
   BEAST.make(id, {arch, race, ...look, scale:x.scale || 1, fs:x.fs || 64});
-  ITEMS[mat] = {name:PART[arch][0] + th, en:`${en} ${PART[arch][1]}`, sell:Math.round(4 + lvl * 3.2), kind:'etc'};
+  ITEMS[mat] = {name:(x.part || PART[arch])[0] + th, en:`${en} ${(x.part || PART[arch])[1]}`, sell:Math.round(4 + lvl * 3.2), kind:'etc'};
   const pot = lvl < 30 ? 'redpot' : lvl < 70 ? 'orangepot' : lvl < 130 ? 'whitepot' : lvl < 200 ? 'elixirpot' : 'divinepot';
   MOB[id] = {name:th, en, ...st, elem, race, size, r:size === 'l' ? 18 : size === 'm' ? 14 : 11, aggro:!!x.aggro, range:x.range || 0, shot:x.shot || null, night:!!x.night,
     drops:[[mat, .55], [pot, .07], ['ore', .03 + Math.min(.06, lvl / 3000)], ['bluepot', .03]], card:null, cardRate:0, h:null};

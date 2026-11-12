@@ -103,15 +103,18 @@ Object.assign(MS_CH, {
     {k:'elite', t:'hexspire_steed', name:['อาชาคำสาป', 'The Hexed Steed'], say:['ม้าคำสาปตัวสุดท้ายที่ข้าสร้าง มันไม่ยอมให้ข้ากลับตัว!', 'The last cursed horse I made won\'t let me change my ways!'],
       done:['ข้าเริ่มต้นใหม่ได้แล้ว ลายดาวแม่มดนี้ ข้าวาดให้คนที่เชื่อว่าทุกคนเปลี่ยนแปลงได้', 'Now I can start again. I paint these witch-star marks for those who believe anyone can change.']}
   ]},
-  17:{npc:msNN('ms_nakee', 'นาคีน้อย', 'Little Nakee', 'นาคีแห่งบาดาล', 'Young naga maiden', 'f', 22, 'hairTeal', 'irisTl', {armor:'ms_t_naga', head:'f_clip'}),
-    title:['ไข่มุกวิญญาณ', 'The Spirit Pearls'], cos:'ms_t_naga',
-    kh:['ใต้น้ำแต่หายใจได้! เมืองบาดาลสวยเหมือนในนิทานเลย', 'Underwater, but we can breathe! The naga city is just like the stories.'], steps:[
-    {k:'kill', t:'abyssjelly', n:12, say:['พญานาคราชกริ้วจนบาดาลมืดมิด วุ้นห้วงลึกเลยออกมาอาละวาด ช่วยไล่ 12 ก้อนนะ', 'The Naga King\'s rage has darkened the underworld and the abyss jellies run wild. Drive off 12.'],
-      done:['บาดาลเคยสว่างด้วยไข่มุกวิญญาณ แต่เมื่อท่านพ่อกริ้ว ไข่มุกก็ดับลง', 'The underworld used to shine with spirit pearls, but when Father raged they went dark.']},
-    {k:'item', t:'m_spiritpearl', n:5, say:['เก็บแสงจากไข่มุกวิญญาณมา 5 ชิ้น ข้าจะนำไปถวายท่านพ่อให้ใจเย็นลง', 'Gather the light of 5 spirit pearls. I will offer them to Father to cool his anger.'],
-      done:['ท่านพ่อยิ้มแล้ว! ไข่มุกส่องแสงทั้งบาดาล เป็นประทีปดวงที่เก้า', 'Father smiled! The pearls light the whole underworld — the ninth lamp.']},
-    {k:'elite', t:'thundereel', name:['ปลาไหลอสนีบาต', 'The Thunder Eel'], say:['ปลาไหลอสนียังอาละวาดเพราะเสียงอสูร มันจะช็อตไข่มุกให้ดับอีก!', 'The thunder eel still rages at the Asura\'s whisper — it will shock the pearls dark again!'],
-      done:['บาดาลสงบแล้ว ชุดนาคีน้อยนี้ทอจากเกล็ดที่ข้าลอกคราบ ใส่แล้วว่ายน้ำได้เก่งนะ', 'The underworld is calm. This naga dress is woven from my shed scales — you will swim like a fish.']}
+  // (v294) วังบาดาล: a new adventure for the drowned naga palace at the bottom of the sea
+  17:{npc:msNN('ms_nakee', 'นาคีน้อย', 'Little Nakee', 'นาคีแห่งวังบาดาล', 'Young naga maiden of the sunken palace', 'f', 22, 'hairTeal', 'irisTl', {armor:'ms_t_naga', head:'f_clip'}),
+    title:['วังบาดาลใต้น้ำวน', 'The Palace Beneath the Whirlpool'], cos:'ms_t_naga',
+    kh:['กระโดดลงน้ำวนแล้วหายใจใต้น้ำได้! ปลาตัวใหญ่ว่ายอยู่เหนือหัวเต็มเลย', 'We jumped into the whirlpool and we can breathe under the sea! Huge fish are swimming right over our heads.'], steps:[
+    {k:'kill', t:'abyssshark', n:12, say:['ตั้งแต่น้ำวนเปิดขึ้นเหนือวัง ไข่มุกที่ส่องสว่างวังบาดาลก็ถูกดูดกระจายไปทั่วก้นทะเล พอวังมืด ฝูงฉลามก็มาวนรอบประตูวัง ช่วยไล่ 12 ตัวนะ', 'Since the whirlpool opened above the palace, the pearls that lit it were sucked away and scattered over the sea floor. With the palace dark, sharks circle its gates. Drive off 12 of them.'],
+      done:['ขอบใจ! ไข่มุกประจำวังมีสามเม็ด ตกอยู่ในซากเสาวังที่ล้มอยู่ตามพื้นทราย', 'Thank you! The palace had three great pearls. They fell among the toppled columns lying in the sand.']},
+    {k:'find', n:3, what:['ไข่มุกประจำวัง', 'Palace pearl'], say:['ไข่มุกสามเม็ดเรืองแสงอยู่ใต้ทราย ระวังปลาหมึกยักษ์ที่ชอบเอาของแวววาวไปซ่อนนะ', 'The three pearls glow under the sand. Watch out for the giant octopus, it loves to hide shiny things.'],
+      done:['ครบสามเม็ดแล้ว! แต่ไข่มุกจะสว่างได้ต้องมีแสงจากห้วงลึกจุดให้ก่อน', 'All three! But a pearl only shines once it is lit with light from the deep.']},
+    {k:'item', t:'m_abyssangler', n:5, say:['ปลาตกเบ็ดห้วงลึกห้อยดวงไฟไว้หน้าปาก ครีบของมันยังมีแสงติดอยู่ เก็บมาให้ข้า 5 ชิ้นนะ ข้าจะใช้จุดไข่มุก', 'The abyssal anglerfish dangle lamps before their jaws, and their fins still hold that light. Bring me 5 and I will light the pearls with them.'],
+      done:['ไข่มุกสว่างแล้ว! แสงส่องลอดน้ำวนขึ้นไปถึงผิวทะเล เป็นประทีปดวงที่เก้า', 'The pearls are shining! Their light rises through the whirlpool to the surface: the ninth lamp.']},
+    {k:'elite', t:'abyssoctopus', name:['หมึกยักษ์ผู้กลืนน้ำวน', 'The Octopus Who Swallowed the Whirlpool'], say:['น้ำวนไม่ได้เกิดเอง! หมึกยักษ์ตัวนี้สูบน้ำจนวังพังเพื่อขโมยไข่มุก มันมาเอาคืนแล้ว!', 'The whirlpool was no accident! This octopus sucked in the sea until the palace broke, to steal the pearls, and now it has come for them again!'],
+      done:['วังบาดาลสงบแล้ว ปลาทุกตัวกลับมาว่ายรอบวังเหมือนเดิม ชุดนาคีน้อยนี้ทอจากเกล็ดที่ข้าลอกคราบ ใส่แล้วว่ายน้ำได้เก่งเหมือนปลาเลย', 'The sunken palace is at peace and the fish swim round it again. This naga dress is woven from my shed scales. Wear it and you will swim like a fish.']}
   ]},
   55:{npc:msNN('ms_bualuead', 'บัวเลือด', 'Bua Lueat', 'สาวพายเรือทะเลสาบโลหิต', 'Crimson Lake boatwoman', 'f', 19, 'hairCrimson', 'irisRd', {armor:'s_bloodmoon', head:'h_crownb'}, 'ms_b_redlotus'),
     title:['ประทีปบัวแดง', 'The Red Lotus Lamps'], cos:'ms_b_redlotus',

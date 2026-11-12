@@ -16,7 +16,7 @@ for (const k in MOB){ const d = MOB[k]; if (!d || d.boss || d._m192 || k === 'du
   // a third skill from Lv 40: the first fitting one it does not have yet
   if ((d.lvl || 0) >= MOB192.third && Array.isArray(d.msk) && d.msk.length < 3){
     const pool = {quad:['slam', 'rally', 'maul'], rock:['harden', 'slam', 'blind'], squat:['blind', 'slam'], slime:['mend', 'spit', 'web'], bug:['web', 'bite', 'spit'],
-      bird:['volley', 'gale', 'blind'], serpent:['coil', 'spit', 'frost'], floater:['hex', 'nova', 'hush']}[d.nature || 'quad'] || ['slam', 'rend'];
+      bird:['volley', 'gale', 'blind'], serpent:['coil', 'spit', 'frost'], fish:['bite', 'frost', 'spit'], floater:['hex', 'nova', 'hush']}[d.nature || 'quad'] || ['slam', 'rend'];
     const fly = d.nature === 'bug' && typeof SPECIES !== 'undefined' && (() => { const r = SPECIES.find(x => x[0] === k); return !!(r && /^(hornet|wasp|bee)$/.test((r[5] || {}).kind || '')); })();   // (v274) hornets and wasps: a sting, never a web · (v283) told by their kind, not by a dive they no longer have
     const extra = (d.race === 'undead' || d.race === 'demon' ? ['hex', 'hush'] : []).concat(fly ? pool.filter(x => x !== 'web') : pool, ['slam', 'rend', 'bolt']).find(id => MSK[id] && !d.msk.includes(id));
     if (extra) d.msk = d.msk.concat(extra); }

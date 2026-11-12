@@ -17,7 +17,7 @@ const cam = {x:0, y:0}, CAMS = {x:null, y:null, t:0, map:-1};
 let nightA = 0;
 /* height of each monster (name tag, HP bar, hit point); generated species get it from their archetype and scale */
 const MOB_H0 = {dewblob:22, hare:26, boar:32, lantern:44, boss:70};
-const ARCH_H = {quad:30, bird:30, serpent:26, bug:22, squat:22, floater:42, slime:22, rock:32, human:46};
+const ARCH_H = {quad:30, bird:30, serpent:26, bug:22, squat:22, floater:42, slime:22, rock:32, human:46, fish:36};
 const MOB_H = new Proxy(MOB_H0, {get:(o, k) => o[k] ?? (o[k] = Math.round((ARCH_H[typeof SPECIES_ARCH !== 'undefined' && SPECIES_ARCH[k]] || 30) * ((SPR.MOBS[k] && SPR.MOBS[k].scale) || 1)))});
 function applyPX(px){
   const ow = SW / PX, oh = SH / PX;
