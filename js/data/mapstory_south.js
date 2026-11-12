@@ -205,15 +205,18 @@ Object.assign(MS_CH, {
     {k:'elite', t:'dragonknight', name:['อัศวินมังกรผู้ทรยศ', 'The Traitor Dragon Knight'], say:['อัศวินมังกรตนนี้ทรยศรังไปเข้ากับลัทธิ มันมาแย่งไข่มุกคืน!', 'This dragon knight betrayed the roost for the cult — he has come for the pearl!'],
       done:['บั้งไฟแสนครบทุกชิ้นแล้ว! ไข่มุกน้อย ๆ เหล่านี้จะลอยวนรอบตัวเจ้าตลอดไป', 'The great rocket is complete! These little pearls will float around you always.']}
   ]},
+  // (v296) นรกอเวจี: a new adventure in the lava cavern under the volcano
   65:{npc:msN('ms_yomthut', 'ยมทูตน้อย', 'Little Yomathut', 'เสมียนพญายม', "Yama's clerk", 'm', 8, 'hairViolet', 'irisVi', {armor:'ms_t_yama', head:'hc_hide'}),
-    title:['ใบเบิกทางผ่านนรก', 'A Pass Through Naraka'], cos:'ms_t_yama',
-    kh:['ประตูนรก… ข้ากลัว แต่นาคพิรุณอยู่ข้างหลังประตูนี้', 'The gate of hell… I am scared, but the rain naga is behind it.'], steps:[
-    {k:'kill', t:'impling', n:12, say:['หยุดตรงนั้น! อ้อ… จะไปช่วยนาคเหรอ ข้าเป็นเสมียนพญายม ปีศาจน้อยหนีออกมาวุ่นวาย ช่วยจับ 12 ตัวก่อน', "Halt! Oh… you're going to save the naga? I'm Yama's clerk. The little imps have escaped — catch 12 first."],
-      done:['เรียบร้อย! คนเป็นห้ามผ่านนรก… เว้นแต่จะมีใบเบิกทางประทับตราพญายม', 'All done! The living may not pass through hell… unless they carry a pass sealed by Yama.']},
-    {k:'item', t:'m_tormentwisp', n:5, say:['ตราประทับทำจากหมึกของภูตทรมาน 5 หยด หามาให้ข้าที', 'The seal is made from 5 drops of torment-wisp ink. Fetch them for me.'],
-      done:['ประทับตราแล้ว! ถือไว้ให้ดี ผ่านประตูไปถึงบัลลังก์จอมมารได้', 'Sealed! Hold it tight — it will carry you through the gate to the Demon Lord\'s throne.']},
-    {k:'elite', t:'hellhound', name:['สุนัขนรกเฝ้าประตู', 'The Hellhound of the Gate'], say:['สุนัขนรกไม่อ่านหนังสือ มันไม่สนใบเบิกทาง! ต้องสู้!', 'The hellhound cannot read — it does not care about passes! Fight!'],
-      done:['ผ่านได้แล้ว! ชุดเสมียนยมโลกนี้ ใส่แล้วผีไม่กล้ามองหน้าเลย', "You may pass! In this underworld clerk's robe, no ghost will dare meet your eye."]}
+    title:['บัญชีพญายมในถ้ำลาวา', "Yama's Ledger in the Lava Cave"], cos:'ms_t_yama',
+    kh:['ร้อนจนแสบหน้าเลย… ถ้ำนี้มีแต่หินดำกับลาวา นาคพิรุณอยู่ลึกเข้าไปข้างในนี่เอง', 'The heat stings my face… nothing but black rock and lava. The rain naga is somewhere deep inside.'], steps:[
+    {k:'kill', t:'lavamole', n:12, say:['หยุดก่อน! ข้าเป็นเสมียนพญายม ตุ่นหินเพลิงขุดทะลุห้องเก็บบัญชีบุญบาปของท่านพญายม ขุดหินร้อนไปทั่ว ช่วยไล่ 12 ตัวที', "Halt! I am Yama's clerk. Lava moles have dug into the vault of the ledger of good and evil and are tunnelling through the hot rock everywhere. Drive off 12 of them."],
+      done:['ขอบใจ! แต่หน้าบัญชีปลิวหายไปกับลมร้อน 3 แผ่น ถ้าหาไม่เจอ ข้าบอกไม่ได้ว่าใครควรผ่านประตูนี้', 'Thank you! But three pages of the ledger blew away on the hot wind. Without them I cannot tell who may pass the gate.']},
+    {k:'find', n:3, what:['หน้าบัญชีพญายม', "Page of Yama's ledger"], say:['หน้าบัญชีทนไฟได้ มันตกอยู่ริมบ่อลาวาสักแห่ง ระวังอย่าเดินตกลงไปนะ', 'The pages do not burn. They fell beside the lava pools somewhere. Mind you do not fall in.'],
+      done:['ครบแล้ว! ในบัญชีเขียนว่าเจ้าทำความดีมามาก ผ่านได้ แต่ต้องมีกล่องทนร้อนใส่บัญชีไปด้วย', 'All three! The ledger says you have done much good, so you may pass. But the ledger must travel in a heat-proof box.']},
+    {k:'item', t:'m_volcanosnail', n:5, say:['เปลือกหอยทากภูเขาไฟทนความร้อนได้ดีที่สุด เอามา 5 ชิ้น ข้าจะต่อเป็นกล่อง', 'The hide of the volcano snail bears heat best of all. Bring me 5 pieces and I will build the box.'],
+      done:['กล่องเสร็จแล้ว! ถือใบเบิกทางกับบัญชีไว้ ทางไปบัลลังก์จอมมารอยู่ลึกเข้าไปในถ้ำ', 'The box is done! Keep the pass and the ledger safe. The way to the Demon Lord\'s throne lies deeper in the cave.']},
+    {k:'elite', t:'obsidianmantis', name:['ตั๊กแตนตำข้าวผู้เฝ้าทางลึก', 'The Mantis of the Deep Way'], say:['ตั๊กแตนตำข้าวออบซิเดียนตัวใหญ่ที่สุดยกเคียวขวางทาง! มันไม่อ่านบัญชีหรอก ต้องสู้!', 'The greatest obsidian mantis raises its scythes to bar the way! It will not read any ledger. Fight!'],
+      done:['ผ่านได้แล้ว! ชุดเสมียนยมโลกนี้ ใส่แล้วผีไม่กล้ามองหน้าเลย ไปช่วยนาคพิรุณเถอะ', "You may pass! In this underworld clerk's robe, no ghost will dare meet your eye. Go and free the rain naga."]}
   ]},
   66:{npc:MS_PHIRUN, title:['บั้งไฟแสนส่งฟ้า', 'The Great Rocket to the Sky'], cos:'ms_t_rain', finale:true, steps:[
     {k:'kill', t:'marasoldier', n:12, say:['นาคพิรุณถูกล่ามโซ่อยู่ใต้บัลลังก์! ทหารมารเต็มไปหมด ช่วยข้าฝ่าไป 12 ตน!', 'The rain naga is chained beneath the throne! Demon soldiers everywhere — help me cut through twelve!'],

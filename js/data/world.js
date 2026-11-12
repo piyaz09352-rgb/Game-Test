@@ -24,7 +24,7 @@ function statsFor(L, k = {}, XL = L){
 }
 /* loot part names by archetype */
 const PART = {quad:['หนัง', 'Hide'], bird:['ขนนก', 'Feather'], serpent:['เกล็ด', 'Scale'], bug:['กระดอง', 'Carapace'], squat:['ผิวมัน', 'Slick Skin'],
-  floater:['เถ้าวิญญาณ', 'Spirit Ash'], slime:['เมือก', 'Ooze'], rock:['เศษหิน', 'Rubble'], human:['เครื่องราง', 'Charm'], fish:['ครีบ', 'Fin']};
+  floater:['เถ้าวิญญาณ', 'Spirit Ash'], slime:['เมือก', 'Ooze'], rock:['เศษหิน', 'Rubble'], human:['เครื่องราง', 'Charm'], fish:['ครีบ', 'Fin'], cave:['เปลือกหินร้อน', 'Hot Rock Hide']};
 
 /* ---------- species ----------
    [id, th, en, lvl, archetype, look, elem, race, size, extra]
@@ -399,6 +399,13 @@ SPECIES.push(
   ['abyssoctopus', 'ปลาหมึกยักษ์ห้วงลึก', 'Abyssal Octopus', 156, 'fish', {kind:'octopus', col:'#a84a5a', belly:'#f0c8c8', spot:'#7a2a3a', size:1.1}, 'water', 'fish', 'l', {range:120, shot:'dark', part:['หนวด', 'Tentacle'], k:{hp:1.4}}],
   ['armorlobster', 'กุ้งมังกรเกราะ', 'Armored Lobster', 152, 'bug', {kind:'shrimp', shell:'#c8402a', leg:'#a8301e', acc:'#f0c040', bigClaw:true, size:1.25, legLen:.55}, 'water', 'fish', 'm', {k:{def:2.2}}]
 );
+/* (v296) นรกอเวจี: creatures of the lava cavern on bodies of their own (gfx/beasts.js 'cave'), appended the same way */
+for (const id of ['lavamole', 'obsidianmantis', 'volcanosnail']) SPECIES_LATE.add(id);
+SPECIES.push(
+  ['lavamole', 'ตุ่นจมูกดาวหินเพลิง', 'Star-nosed Lava Mole', 0, 'cave', {kind:'mole', col:'#4a3a34', belly:'#6a5048', acc:'#ffb04a', glow:'#ff7a1a', nose:'#e88a9a', eyeGlow:'#ffd04a'}, 'earth', 'brute', 'm', {aggro:true, k:{def:1.4, hp:1.2}}],
+  ['obsidianmantis', 'ตั๊กแตนตำข้าวออบซิเดียน', 'Obsidian Mantis', 0, 'cave', {kind:'mantis', col:'#1a1420', belly:'#2e2436', acc:'#3a2a4a', glow:'#ff8a3a', eyeGlow:'#ff5a2a'}, 'fire', 'insect', 'm', {aggro:true, k:{atk:1.25, spd:14}}],
+  ['volcanosnail', 'หอยทากภูเขาไฟ', 'Volcano Snail', 0, 'cave', {kind:'snail', col:'#5a3a2e', belly:'#7a5040', acc:'#2a201c', glow:'#ff7a1a', dark:'#3a3230', eyeGlow:'#ffd04a', size:1.1}, 'fire', 'brute', 'l', {range:120, shot:'fire', k:{hp:1.6, def:1.6, spd:-25}}]
+);
 MAPS[17].mobs = ['abyssshark', 'mantaray', 'giantpuffer', 'abyssangler', 'seahorseknight', 'lionfish', 'swordfish', 'abyssoctopus', 'armorlobster', 'abyssjelly', 'thundereel', 'abyssturtle'];
 const ROAD_LV = Object.fromEntries(Object.entries(ROAD_LV_RAW).map(([d, a]) => [d, a.map(([lo, hi]) => [LVMAP(lo), Math.max(LVMAP(lo) + 2, LVMAP(hi))])]));
 const ROAD_LAND = {e:() => 'fertile', s:k => k < Math.round(ROADS.s.filter(i => !MAPS[i].landFix).length * 5 / 8) ? 'arid' : 'volcanic', w:() => 'frozen', n:k => k < Math.round(ROADS.n.length * 2 / 3) ? 'dark' : 'light'};
@@ -419,6 +426,9 @@ const OPP = {n:'s', s:'n', e:'w', w:'e'}, DIRV = {n:[0, -1], s:[0, 1], e:[1, 0],
 }
 /* (v294) วังบาดาล (map 17) became a sea of fish; the palace's nagas, its pearl spirit and its crab moved next door: the
    Crimson Lake (55) and the Cursed Spire (54), at those maps' levels */
+/* (v296) the cavern's own creatures join maps 65 and 66 after the roads' levels are dealt (the older species keep theirs), at those maps' levels */
+MAPS[65].mobs.push('lavamole', 'obsidianmantis', 'volcanosnail'); MAPS[66].mobs.push('obsidianmantis', 'volcanosnail', 'lavamole');
+{ const lvOf = {lavamole:[65, .3], obsidianmantis:[65, .65], volcanosnail:[66, .4]}; for (const id in lvOf){ const sp = SPECIES.find(x => x[0] === id), mp = MAPS[lvOf[id][0]]; if (sp && mp) sp[3] = Math.round(mp.lv[0] + lvOf[id][1] * (mp.lv[1] - mp.lv[0])); } }
 for (const [id, to] of [['nagaretainer', 55], ['spiritpearl', 55], ['nagawarrior', 54], ['emeraldcrab', 54]]){ const sp = SPECIES.find(x => x[0] === id), mp = MAPS[to];
   if (!sp || !mp) continue; if (!mp.mobs.includes(id)) mp.mobs.push(id); sp[3] = Math.round((mp.lv[0] + mp.lv[1]) / 2); }
 

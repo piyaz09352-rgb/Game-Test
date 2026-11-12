@@ -199,7 +199,7 @@ for (const k in HLP_ANIM){ const im = new Image(); im.onload = () => { const n =
   im.onerror = () => {}; im.src = `assets/helpers/${k}_anim.png?v=${typeof GAMEV !== 'undefined' && GAMEV ? GAMEV : 274}`; }
 const HLP_IMG_SZ = 24;   // (v274) about half the hero's height: a helper, not a second hero (34 was too big)
 function drawBotImg(g, k, t, opt){
-  const FR = HLP_FR[k], im = FR && !(typeof GFX !== 'undefined' && GFX.preset === 'low') ? FR[Math.floor(t / HLP_ANIM[k].dt) % FR.length] : HLP_IMG[k], R = HELPERS[k], c = R.c, sz = opt.size || HLP_IMG_SZ, k2 = sz / Math.max(im.width, im.height), w = im.width * k2, h = im.height * k2;
+  const FR = HLP_FR[k], im = FR ? FR[Math.floor(t / HLP_ANIM[k].dt) % FR.length] : HLP_IMG[k],   /* (v296) the owner's animation plays on every graphics level (it is only a frame swap) */ R = HELPERS[k], c = R.c, sz = opt.size || HLP_IMG_SZ, k2 = sz / Math.max(im.width, im.height), w = im.width * k2, h = im.height * k2;
   const still = typeof GFX !== 'undefined' && GFX.preset === 'low', ph = (k.charCodeAt(0) || 1) * .7;
   const breathe = still ? 1 : 1 + Math.sin(t * 2.4 + ph) * .035, tilt = still ? 0 : (opt.mv ? .14 * (opt.face || 1) : Math.sin(t * 1.3 + ph) * .07);
   // glow behind, in its own colour, breathing
@@ -246,7 +246,8 @@ function drawHelperW(g){
 { const _ents = LIVE.ents; LIVE.ents = function(list, g){ _ents(list, g); if (helperOf() && !P.dead) list.push({y:HLP.y, f:() => drawHelperW(g)}); }; }
 /* a still picture for the shop (cached) */
 const BOT_PIC = {};
-function botPic(k){ if (BOT_PIC[k]) return BOT_PIC[k];
+function botPic(k){ if (HLP_ANIM[k]) return `assets/helpers/${k}.gif?v=${typeof GAMEV !== 'undefined' && GAMEV ? GAMEV : 296}`;   // (v296) the owner's animated GIF itself, so the shop and the windows show it moving (it was a still picture)
+  if (BOT_PIC[k]) return BOT_PIC[k];
   if (HLP_IMG[k]) return (BOT_PIC[k] = HLP_IMG[k].src);   // the owner's picture as it is (the shop makes it float and glow)
   const cv = document.createElement('canvas'); cv.width = cv.height = 96; const g = cv.getContext('2d');
   g.translate(48, 50); g.scale(2.6, 2.6); try { drawBot(g, k, 1.1, {}); } catch (e) {} return (BOT_PIC[k] = cv.toDataURL()); }

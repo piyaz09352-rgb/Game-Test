@@ -10,6 +10,7 @@
      floater  wisps, krasue, haunted jars, squid, lanterns
      slime    jellies with toppers (mushroom cap, lotus, spikes, crown)
      rock     stalagmites and coral that walk
+     cave     (v296) lava-cavern bodies of their own: a star-nosed mole, an obsidian mantis, a volcano snail
      fish     (v294) fish, shark, swordfish, lionfish, anglerfish, pufferfish, seahorse, manta ray, octopus (they swim above the sea floor)
      human    (yaksha, monkeys, ghosts, warriors…) uses the hero model with a monster costume (MOBS[k].human)
    Opt-in details (a monster that does not set them renders exactly as before):
@@ -1366,7 +1367,63 @@ const BEAST = (() => {
     };
   }
 
-  const KINDS = {quad, bird, serpent, bug, squat, floater, slime, rock:rock2, fish};
+  /* ---------------- (v296) creatures of the lava cavern, each its own body (the owner: no recoloured copies) ----------------
+     mole    a star-nosed mole half out of a glowing hole: a round furry body, broad digging claws, a ring of pink feelers on the nose
+     mantis  an obsidian praying mantis: a raised thorax, a triangular head with great eyes, folded scythe arms, a long abdomen
+     snail   a volcano snail: a long muscular foot glowing underneath, a coiled cone of a shell smoking at its tip, eye stalks */
+  function cave(key, s){
+    const SK = mat(key, 'skin', s.col), BE = mat(key, 'belly', s.belly) ?? SK, AC = mat(key, 'acc', s.acc) ?? SK, GL = emis(key, 'glow', s.glow || '#ff8a2a'),
+      EY = s.eyeGlow ? emis(key, 'eye', s.eyeGlow) : M.slimeE, NO = mat(key, 'nose', s.nose || '#e88a9a'), DK = mat(key, 'dark', s.dark || '#141014');
+    const kind = s.kind || 'mole', sz = s.size ?? 1;
+    return (cx, act, f, n) => {
+      const o = motion(act, f, n), P = p => [p[0] * sz, p[1] * sz, p[2] * sz + o.lun];
+      fallPre(cx, o, 6 * sz);
+      if (kind === 'mole'){
+        const rise = act === 'die' ? -o.fall * 3 : act === 'attack' ? [0, 1.5, 3, 1][f] : Math.sin(o.ph) * .6, dig = act === 'walk' ? Math.sin(o.ph * 2) : act === 'attack' ? [0, -1, 1, .3][f] : Math.sin(o.ph) * .2;
+        cx.gid = 1; ell(cx, P([0, .3, 0]), 13, 4, DK, {rz:2, tex:nn => (nn[1] > .2 ? {m:GL, t:Math.sin(nn[0] * 9 + o.ph * 3) > .3 ? 0 : 1} : undefined)});   // the hole, glowing at the rim
+        cx.gid = 2; ell(cx, P([0, 7 + rise, -1]), 9.5, 8.5, SK, {rz:10, tex:nn => (nn[1] < -.35 ? {m:BE} : Math.sin(nn[0] * 21 + nn[1] * 17) * Math.sin(nn[2] * 19) > .55 ? {dt:1} : undefined)});   // the furry body
+        cx.gid = 3; ell(cx, P([0, 9 + rise, 7]), 5.6, 5, SK, {rz:5.6, tex:nn => eyesTex(nn, o, EY, {glow:!!s.eyeGlow, sp:.42, y:.32, rx:.08, ry:.08, front:.2}) || (nn[1] < -.3 ? {m:BE} : undefined)});   // the head
+        cx.gid = 4; cap(cx, P([0, 8.6 + rise, 10]), P([0, 8 + rise, 13]), 2.2, 1.6, NO, {});   // the snout
+        for (let i = 0; i < 11; i++){ const a = i / 11 * Math.PI * 2, w = Math.sin(o.ph * 4 + i) * .3; cx.gid = 5;   // the star of feelers
+          cap(cx, P([Math.cos(a) * 1.2, 8 + rise + Math.sin(a) * 1.2, 13.4]), P([Math.cos(a + w) * 3.2, 8 + rise + Math.sin(a + w) * 3.2, 14.2]), .55, .3, NO, {}); }
+        for (const sd of [-1, 1]){ const sh = P([sd * 7, 6 + rise, 5]), pw = P([sd * 11, 3 + rise + dig * sd * 1.2, 9 + dig * 2]);
+          cx.gid = 10 + (sd > 0 ? 1 : 0); cap(cx, sh, pw, 2.6, 2.2, SK, {});
+          cx.gid = 12 + (sd > 0 ? 1 : 0); ell(cx, pw, 4.2, 2.2, BE, {rz:3});   // the broad palm
+          for (let c = -2; c <= 2; c++){ cx.gid = 14; cap(cx, add(pw, [c * 1.4 * sz, -.4, 2 * sz]), add(pw, [c * 1.8 * sz, -1.4, 5.4 * sz]), .7, .25, AC, {}); } }   // the claws, worn bright on hot rock
+        return; }
+      if (kind === 'mantis'){
+        const sway = Math.sin(o.ph) * .5, strike = act === 'attack' ? [0, -.6, 1, .3][f] : 0, step = act === 'walk' ? Math.sin(o.ph * 2) : 0;
+        // four walking legs
+        for (let i = 0; i < 2; i++) for (const sd of [-1, 1]){ const z = i ? -4 : 1, ph = (i + (sd > 0 ? 1 : 0)) % 2 ? 1 : -1, hip = P([sd * 2, 7, z]), knee = P([sd * 8, 11, z + ph * step * 1.5]), ft = [knee[0] + sd * 3 * sz, .4, knee[2] + (i ? -3 : 3) * sz];
+          cx.gid = 1 + i * 2 + (sd > 0 ? 1 : 0); cap(cx, hip, knee, .9, .7, SK, {}); cap(cx, knee, ft, .7, .35, SK, {}); }
+        // the abdomen, long and curved up at the end, wings folded over it
+        let pa = P([0, 7.5, -1]); for (let i = 1; i <= 6; i++){ const t = i / 6, q = P([sway * t, 7.5 + Math.sin(t * Math.PI) * 1.4 + t * t * 2, -1 - t * 14]); cx.gid = 10 + i;
+          cap(cx, pa, q, 3.2 - t * 1.2 + Math.sin(t * Math.PI) * .8, 3 - t * 1.3 + Math.sin(t * Math.PI) * .6, SK, {tex:(nn, lo, qq, tt) => (Math.sin((i + tt) * 6) > .7 ? {m:AC} : nn[1] < -.3 ? {m:BE} : undefined)}); pa = q; }
+        for (const sd of [-1, 1]){ cx.gid = 20 + (sd > 0 ? 1 : 0); cap(cx, P([sd * 1.4, 10.4, -1]), P([sd * 2.2, 11.2 + Math.abs(sway), -13]), 1.4, .6, AC, {tex:nn => ({t:nn[1] > .3 ? 0 : 2})}); }   // folded wing cases
+        // the raised thorax and head
+        const nk = P([sway * .5, 17 + strike, 5 + strike * 3]); cx.gid = 25; cap(cx, P([0, 8, 1]), nk, 2, 1.4, SK, {tex:nn => (nn[1] < -.2 ? {m:BE} : undefined)});
+        const hd = add(nk, [0, 2.4 * sz, 1.2 * sz]); cx.gid = 26; ell(cx, hd, 3.6, 2.4, SK, {rz:2.6, tex:nn => (nn[1] < -.2 ? {m:BE} : undefined)});
+        for (const sd of [-1, 1]){ cx.gid = 27 + (sd > 0 ? 1 : 0); ell(cx, add(hd, [sd * 2.6 * sz, .8 * sz, .4]), 1.7, 1.9, EY, {}); cap(cx, add(hd, [sd * .8, 2 * sz, 0]), add(hd, [sd * 3 * sz, 7.5 * sz, -1.5 * sz]), .3, .15, SK, {}); }   // great eyes, antennae
+        // the scythe arms: folded as in prayer, flung out to strike
+        for (const sd of [-1, 1]){ const sh = add(lerp3(P([0, 8, 1]), nk, .7), [sd * 2 * sz, 0, .6 * sz]), el = add(sh, [sd * 3 * sz, (-4 + strike * 6) * sz, (6 + strike * 6) * sz]), tip = add(el, [sd * .4 * sz, (7 - strike * 9) * sz, (1 + strike * 6) * sz]);
+          cx.gid = 30 + (sd > 0 ? 2 : 0); cap(cx, sh, el, 1.9, 1.6, SK, {});   // the upper arm, thick and armoured
+          cx.gid = 31 + (sd > 0 ? 2 : 0); cap(cx, el, tip, 1.7, .35, AC, {tex:nn => (nn[2] > .2 || nn[0] * sd < -.2 ? {m:GL, t:0} : undefined)});   // the glass-edged scythe, folded up as in prayer
+          for (let i = 1; i <= 3; i++){ const b0 = lerp3(el, tip, i / 4); cap(cx, b0, add(b0, [0, -.4 * sz, 1.6 * sz]), .45, .1, GL, {}); } }   // its spines
+        return; }
+      // the snail
+      const crawl = act === 'walk' ? Math.sin(o.ph * 2) * .6 : 0, look = act === 'attack' ? [0, 1, 2.4, .8][f] : Math.sin(o.ph) * .3;
+      let pf = P([0, 2, -11]); for (let i = 1; i <= 8; i++){ const t = i / 8, q = P([Math.sin(o.ph * 2 + t * 4) * .6, 2 + (t > .75 ? (t - .75) * 18 + look : 0), -11 + t * 22 + crawl * t]); cx.gid = i;
+        cap(cx, pf, q, 2.6 + Math.sin(t * Math.PI) * 1.4, 2.6 + Math.sin(t * Math.PI) * 1.4, SK, {tex:nn => (nn[1] < -.4 ? {m:GL, t:1} : Math.sin(nn[0] * 13 + nn[2] * 9) > .8 ? {dt:1} : undefined)}); pf = q; }   // the foot, glowing beneath
+      const hd = pf; for (const sd of [-1, 1]){ const tip = add(hd, [sd * 2 * sz, (5 + look) * sz, 2.4 * sz]); cx.gid = 20 + (sd > 0 ? 1 : 0); cap(cx, add(hd, [sd * .8, 1, 0]), tip, .6, .45, SK, {}); ell(cx, tip, 1.1, 1.1, EY, {}); }   // eye stalks
+      // the shell: a coiled cone, a little volcano smoking at its peak
+      for (let i = 0; i <= 9; i++){ const t = i / 9, a = t * Math.PI * 5, r = (7.6 - t * 6) * sz, c = P([Math.cos(a) * 1.4 * (1 - t), 7 + t * 12, -2 + Math.sin(a) * 1.4 * (1 - t)]);
+        cx.gid = 40 + i; ell(cx, c, r, r * .8, AC, {rz:r, tex:nn => (Math.abs(Math.sin(Math.atan2(nn[0], nn[2]) + a + nn[1] * 2.2)) < .12 ? {m:GL, t:0} : nn[1] > .5 ? {dt:-1} : undefined)}); }
+      cx.gid = 55; ell(cx, P([0, 20, -2]), 1.8, 1.2, GL, {});   // the glowing vent
+      for (let i = 0; i < 3; i++){ const k = (o.ph / 6.283 + i / 3) % 1; cx.gid = 56 + i; ell(cx, P([Math.sin(i * 2 + o.ph) * 1.4, 21 + k * 7, -2 - k * 2]), 1.4 + k * 1.6, 1.4 + k * 1.6, DK, {}); }   // smoke puffs
+    };
+  }
+
+  const KINDS = {quad, bird, serpent, bug, squat, floater, slime, rock:rock2, fish, cave};
   const POINTY_HATS = ['lomphok', 'wizard'];   // no tall pointed hats on monsters (the owner's call): they are dropped here
   function make(key, spec){
     if (POINTY_HATS.includes(spec.hat)) spec = {...spec, hat:undefined};
