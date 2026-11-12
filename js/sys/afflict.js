@@ -84,7 +84,7 @@ function mobAfflict(m){
   if (d.race === 'insect' || VENOM.test(id)) return 'poison';
   return {fire:'burn', water:'slow', wind:'bleed', earth:'stun', holy:'silence', shadow:d.race === 'undead' ? 'blind' : 'curse', neutral:d.race === 'brute' ? 'bleed' : null}[d.elem || 'neutral'];
 }
-const afDps = (m, pct) => Math.max(1, Math.round(DER.maxhp * pct * (m.def.boss ? 1.5 : .6) + (m.def.atk ? m.def.atk[0] * .04 : 0)));
+const afDps = (m, pct) => Math.max(1, Math.round(DER.maxhp * pct * (m.def.boss ? 1.5 : .45) + (m.def.atk ? m.def.atk[0] * .04 : 0)));   // (v292) ordinary monsters' DoTs .6 → .45
 function applyMobFx(m, k, power = 1){
   if (!k) return;
   if (k === 'stun'){ if (!(P.stunT > 0)){ P.stunT = .5 * power; P.cast = null; VFX.play('stunStars', {}); afText('Stun', '#ffd56a'); } return; }

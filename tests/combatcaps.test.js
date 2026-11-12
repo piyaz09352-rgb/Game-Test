@@ -50,7 +50,7 @@ test('mobbed Flee, Perfect Dodge from LUK, status resist from stats', { skip, ti
       try { mobAttack(ms[0]); } finally { P.roll = roll; delete DER.flee; DER.flee = f0; ms.forEach(x => { [x.x, x.y, x.aggro] = x._sv; delete x._sv; }); }
       out.n = ms.length; out.f0 = f0; out.seen = seen; derive(); return out; });
     assert.ok(r.pd >= .1 && r.pd < .11, `100 LUK = 10% Perfect Dodge (${r.pd})`);
-    assert.deepStrictEqual(r.mul.map(x => +x.toFixed(2)), [1, 1, .9, .7, 0]);
+    assert.deepStrictEqual(r.mul.map(x => +x.toFixed(2)), [1, 1, 1, .9, .4], '(v292) −5% per monster past the third, never below 40%');
     assert.strictEqual(r.vit, .4); assert.ok(r.int < .02, `1 INT gives almost nothing (${r.int})`); assert.strictEqual(r.none, 0);
     assert.strictEqual(r.stunned, false, '100 VIT shrugs off a stun roll of 10%');
     assert.ok(r.n < 3 || r.seen < r.f0, `Flee drops when mobbed (${r.f0} → ${r.seen}, ${r.n} on you)`);

@@ -106,16 +106,19 @@ function updMob(m, dt){
 /* (v291) did the last mobAttack land? Its add-ons (a skill's bleed, poison, burn, stun) only follow a hit that landed:
    they used to come even after a Miss or a Perfect Dodge, so a dodging hero kept bleeding and burning */
 let MOB_HIT_LANDED = false;
+/* (v292) the owner: monsters a little weaker (melee heroes died often, Lv 60 against Lv 30). Ordinary monsters hit 15% softer; bosses unchanged */
+const MOB_DMG_MUL = .85;
 function mobAttack(m, mult = 1, noDodge = false){
   MOB_HIT_LANDED = false;
   const d = m.def, nightMul = 1, st = m.st || {};
-  const mhit = 95 + d.lvl * 1.55, chance = clamp(mhit - DER.flee + 80, 5, 95);   // (v100) Flee never dodges more than 95%
+  // (v100) Flee never dodges more than 95% · (v292) noDodge 'half': a monster's spell — Flee counts for half (it used to count for nothing)
+  const mhit = 95 + d.lvl * 1.55, chance = clamp(mhit - DER.flee * (noDodge === 'half' ? .5 : 1) + 80, 5, 95);
   m.lunge = .2; m.atkT = 0;
   if (!m.def.range && !noDodge) SFX.mob('atk', m);
   if (P.roll){ addText(P.x, P.y - 48, 'Dodge!', '#9fd8ff'); return; }
-  if (!noDodge && Math.random() * 100 > chance){ addText(P.x, P.y - 48, 'Miss', '#9fd8ff'); return; }
+  if ((!noDodge || noDodge === 'half') && Math.random() * 100 > chance){ addText(P.x, P.y - 48, 'Miss', '#9fd8ff'); return; }
   if (DER.pas.dodge && Math.random() < DER.pas.dodge){ addText(P.x, P.y - 48, 'Perfect Dodge', '#d8f0ff', 13); SFX.play('pdodge'); VFX.play('blink', {x:P.x, y:P.y, x2:P.x, y2:P.y}); return; }
-  const raw = rand(d.atk[0], d.atk[1]) * mult * (m.enraged ? 1.5 : 1) * nightMul * (st.atkDown > 0 ? 1 - st.atkDownPct : 1);
+  const raw = rand(d.atk[0], d.atk[1]) * mult * (d.boss ? 1 : MOB_DMG_MUL) * (m.enraged ? 1.5 : 1) * nightMul * (st.atkDown > 0 ? 1 - st.atkDownPct : 1);
   // (v100) two-layer defence: hard DEF (gear, buffs) takes a share off, less and less per point (70% at most), then soft DEF (VIT) a flat amount.
   // Early on the old flat subtraction is kinder, so the hero takes whichever of the two is smaller: low levels feel the same, high DEF keeps paying off
   const flat = raw - DER.def - buffDef(), layered = typeof bhRed === 'function' ? raw * (1 - bhRed(bhHardDef())) - bhSoftDef() : flat;
