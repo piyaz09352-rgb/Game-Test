@@ -200,6 +200,20 @@ async function gmRestoreNow(src){
   toast(L(`กู้คืนแล้ว ${n} รายการ`, `Restored ${n} docs`)); return n;
 }
 const gmServerBackup = (opt = {}) => gmRun('backup', {}, () => gmBackupNow(opt));
+/* (v286) versions before v285 put each player's log-in ID on their public card (players/<uid>.acc) and market listings
+   (market/<id>.sa): anyone could collect every log-in name to guess passwords. The game no longer writes them; this
+   clears the copies of players who have not played since. Guild member lines clear themselves when the member plays. */
+const gmPrivacy = () => gmRun('privacy', {}, async () => {
+  if (!NET.db) throw new Error(L('ต้องออนไลน์', 'go online first'));
+  GM.busy = true; reWin('gm'); let n = 0;
+  try {
+    for (const [col, f] of [['players', 'acc'], ['market', 'sa']]){
+      const snap = await NET.db.collection(col).get();
+      for (const d of snap.docs){ const v = d.data() || {}; if (v[f]){ await NET.db.doc(`${col}/${d.id}`).update({[f]:''}); n++; } }
+    }
+  } finally { GM.busy = false; reWin('gm'); }
+  toast(L(`ล้างไอดีล็อกอินแล้ว ${n} รายการ`, `Cleared ${n} log-in ID(s)`)); return n;
+});
 const gmRestore = (src, word) => (word === 'RESTORE' ? gmRun('restore', {id:typeof src === 'string' ? src : (src && src.id) || 'file'}, () => gmRestoreNow(src)) : Promise.resolve(false));
 const gmResetWorld = word => (word === 'RESET' ? gmRun('reset-world', {}, async () => {
   GM.busy = 'reset'; reWin('gm');
@@ -264,7 +278,7 @@ WIN_RENDER.gm = function(){
     <div class="sec">${L('ประกาศทั้งเซิร์ฟเวอร์', 'Server announcement')}</div>
     <div class="row gmrow"><input id="gmAnn" maxlength="200" placeholder="${L('ข้อความถึงทุกคน…', 'Message to everyone…')}"><button class="btn sm gold" data-gm="ann">${L('ประกาศ', 'Announce')}</button></div>
     <div class="sec">${L('เซิร์ฟเวอร์', 'Server')}</div>
-    ${online ? `<div class="row gmrow"><button class="btn sm gold" data-gm="backup"${GM.busy ? ' disabled' : ''}>${L('สำรองเซิร์ฟเวอร์', 'Backup server')}</button><button class="btn sm" data-gm="bklist">${L('รายการแบ็กอัป', 'List backups')}</button><button class="btn sm" data-gm="bkfile">${L('กู้จากไฟล์', 'Restore from file')}</button><button class="btn sm gmdanger" data-gm="reset"${GM.busy ? ' disabled' : ''}>${L('รีเซตโลก', 'Reset world')}</button></div>
+    ${online ? `<div class="row gmrow"><button class="btn sm gold" data-gm="backup"${GM.busy ? ' disabled' : ''}>${L('สำรองเซิร์ฟเวอร์', 'Backup server')}</button><button class="btn sm" data-gm="bklist">${L('รายการแบ็กอัป', 'List backups')}</button><button class="btn sm" data-gm="bkfile">${L('กู้จากไฟล์', 'Restore from file')}</button><button class="btn sm" data-gm="privacy"${GM.busy ? ' disabled' : ''} title="${L('ลบไอดีล็อกอินที่เวอร์ชันเก่าเผยแพร่ไว้ในอันดับและตลาด', 'Remove the log-in IDs older versions published in the ranking and the market')}">${L('ล้างไอดีล็อกอินเก่า', 'Clear old log-in IDs')}</button><button class="btn sm gmdanger" data-gm="reset"${GM.busy ? ' disabled' : ''}>${L('รีเซตโลก', 'Reset world')}</button></div>
       ${GM.busy ? `<p class="hint">${L('กำลังทำงาน… อย่าปิดหน้านี้', 'Working… keep this page open')}</p>` : ''}
       <div class="list" id="gmBk">${GM.list == null ? '' : GM.list.map(b => `<div class="item"><div class="nm"><b>${escH(b.id)}</b><small>${new Date(b.at || 0).toLocaleString()} · ${b.n | 0} docs · ${L('ซีซัน', 'season')} ${b.season | 0}${b.why === 'reset' ? ` · ${L('ก่อนรีเซต', 'before reset')}` : ''}</small></div><button class="btn sm" data-gm="restore" data-id="${escH(b.id)}">${L('กู้คืน', 'Restore')}</button></div>`).join('') || `<p class="hint">${L('ยังไม่มีแบ็กอัป', 'No backups yet')}</p>`}</div>`
       : `<p class="hint">${L('สำรอง/กู้คืน/รีเซตโลก ใช้ได้เมื่อออนไลน์เท่านั้น', 'Backup, restore and world reset need an online connection')}</p>`}
@@ -300,6 +314,7 @@ document.addEventListener('click', e => {
   else if (k === 'goto') gmGotoPlayer(id);
   else if (k === 'ann'){ const t = gmVal('gmAnn'); gmAnnounce(t).then(ok => { if (ok){ const i = el('gmAnn'); if (i) i.value = ''; toast(L('ประกาศแล้ว', 'Announced')); } }); }
   else if (k === 'backup') gmServerBackup();
+  else if (k === 'privacy') askConfirm(L('ล้างไอดีล็อกอินเก่า', 'Clear old log-in IDs'), L('ลบไอดีล็อกอินที่เวอร์ชันก่อน v285 เผยแพร่ไว้ ออกจากการ์ดผู้เล่นทุกใบและรายการในตลาด (ชื่อตัวละคร เลเวล และของ ไม่ถูกแตะ)', 'Remove the log-in IDs versions before v285 published from every player card and market listing (hero names, levels and items are untouched)'), L('ล้าง', 'Clear'), () => gmPrivacy());
   else if (k === 'bklist') gmVerify().then(on => on && gmBackupList());
   else if (k === 'bkfile'){ let f = el('gmFile'); if (!f){ document.body.insertAdjacentHTML('beforeend', '<input type="file" id="gmFile" accept=".json,application/json" hidden>'); f = el('gmFile'); } f.click(); }
   else if (k === 'restore') askConfirm(L('กู้คืนแบ็กอัป', 'Restore backup'), L(`เขียนข้อมูลกลาง (ผู้เล่น กิลด์ ตลาด หอเกียรติยศ) จาก ${escH(id)} ทับของปัจจุบัน?`, `Write the shared data (players, guilds, market, fame) from ${escH(id)} over what is there now?`), L('ต่อไป', 'Next'),

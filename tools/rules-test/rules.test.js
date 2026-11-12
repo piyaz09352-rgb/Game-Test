@@ -43,6 +43,9 @@ test('player cards: your own, sane values only', async () => {
   await assertFails(db(A).doc('players/' + A).set(card({ admin: true })));               // unknown fields
   await assertFails(db(A).doc('players/' + A).set(card({ lvl: '42' })));
   await assertSucceeds(db(A).doc('players/' + A).set(card({ map: 'tower' })));
+  await assertSucceeds(db(A).doc('players/' + A).set(card({ acc: 'alice_login' })));
+  await assertSucceeds(db(GM).doc('players/' + A).update({ acc: '' }));                   // (v286) the GM button clears old log-in IDs
+  await assertFails(db(B).doc('players/' + A).update({ acc: '' }));
   await assertSucceeds(db(GM).doc('players/' + A).delete());
 });
 
@@ -76,6 +79,9 @@ test('market: list, buy once, collect once, no stealing', async () => {
   await assertSucceeds(db(A).doc('market/' + id).update({ paid: true }));
   await assertFails(db(A).doc('market/' + id).update({ paid: false }));
   await assertSucceeds(db(A).doc('market/' + id).delete());
+  await assertSucceeds(db(A).doc('market/cccccc1').set(listing({ sa: 'alice_login' })));
+  await assertSucceeds(db(GM).doc('market/cccccc1').update({ sa: '' }));                  // (v286) the GM button
+  await assertFails(db(C).doc('market/cccccc1').update({ sa: '' }));
   // an unsold listing: only its seller cancels it
   await assertSucceeds(db(A).doc('market/bbbbbb1').set(listing()));
   await assertFails(db(C).doc('market/bbbbbb1').delete());
