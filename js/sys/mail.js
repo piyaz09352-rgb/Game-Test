@@ -84,11 +84,10 @@ async function mlRead(r){ if (!r || r.rd || !mlOk()) return; r.rd = 1; mlBadge()
 async function mlTake(id, quiet){
   if (!mlOk() || ML.busy) return false; ML.busy = true; let ok = false;
   try {
-    const ref = NET.db.doc(`mail/${id}`), lk = await ref.acquire({holder:NET.uid, ttlMs:4000});
-    if (!lk.acquired){ if (!quiet) toast(L('กำลังรับของอยู่ ลองใหม่อีกครั้ง', 'Busy, try again')); ML.busy = false; return false; }
-    const snap = await ref.get(), r = snap.exists ? snap.data() : null;
-    if (!r || r.to !== NET.uid || !mlHasAtt(r)){ ML.busy = false; return false; }
-    await ref.update({taken:true, rd:1});
+    const res = await dbClaim(NET.db.doc(`mail/${id}`), cur => cur && cur.to === NET.uid && mlHasAtt(cur) ? {set:{taken:true, rd:1}} : null);   // (v284) taken once, in one transaction
+    if (res.busy){ if (!quiet) toast(L('กำลังรับของอยู่ ลองใหม่อีกครั้ง', 'Busy, try again')); ML.busy = false; return false; }
+    if (!res.did){ ML.busy = false; return false; }
+    const r = res.cur;
     const got = [];
     if ((r.z | 0) > 0){ S.bia += r.z | 0; got.push(`${fmtN(r.z)} ${L('เบี้ย', 'Bia')}`); }
     if (r.i && (r.n | 0) > 0){ if (r.x && typeof sanitizeInst === 'function'){ const d = sanitizeInst(r.x); if (d){ instStore()[r.i] = d; regInst(r.i, d); } }

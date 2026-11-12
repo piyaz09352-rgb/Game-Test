@@ -1,95 +1,183 @@
 rules_version = '2';
 // VAYRATHEN — Cloud Firestore rules (copy into Firebase Console → Firestore Database → Rules → Publish)
+// (v284) hardened: every shared document is checked field by field — who may write it, which fields, what types,
+// what sizes, and which changes are allowed (a listing can be bought once, a letter's attachment taken once, a
+// counter only goes up by one). Tested against the Firestore emulator: tools/rules-test (npm run test:rules).
 service cloud.firestore {
   match /databases/{database}/documents {
     // GM (game master): put the same uids as GM_UIDS in js/net/firebase-config.js
     // (Firebase Console → Authentication → Users → User UID), e.g. return ['AbC123...', 'XyZ789...'];
     function gmUids() { return ['fo6F3IFoT0d3htberU9x13RKAhr1']; }
     function signedIn() { return request.auth != null; }
-    function isGM() { return signedIn() && request.auth.uid in gmUids(); }
+    function me() { return request.auth.uid; }
+    function isGM() { return signedIn() && me() in gmUids(); }
+    function d() { return request.resource.data; }
+    function old() { return resource.data; }
+    function now() { return request.time.toMillis(); }
+    function str(v, n) { return v is string && v.size() <= n; }
+    function intIn(v, lo, hi) { return v is int && v >= lo && v <= hi; }
+    function numIn(v, lo, hi) { return (v is int || v is float) && v >= lo && v <= hi; }
+    function recent(v) { return v is int && v > now() - 86400000 && v < now() + 86400000; }   // a client clock within a day
+    function changed() { return d().diff(old()).affectedKeys(); }
+    function uidLike(v) { return v is string && v.matches('[A-Za-z0-9]{10,64}'); }
 
-    // player cards (ranking, houses): everyone signed in reads, each player writes only their own; a GM may delete any (world reset)
+    // ---------- player cards (ranking, houses, name search): everyone signed in reads, each player writes only their own
+    function playerOk() {
+      return d().keys().hasOnly(['name', 'job', 'lvl', 'map', 'shards', 'acc', 'title', 'guild', 'ach', 'pvp', 'house', 'tower', 'at'])
+        && str(d().name, 24) && str(d().job, 24) && intIn(d().lvl, 1, 300)
+        && (d().map is int || str(d().map, 24))
+        && numIn(d().get('shards', 0), 0, 1000000000) && str(d().get('acc', ''), 24) && str(d().get('title', ''), 40)
+        && str(d().get('guild', ''), 40) && intIn(d().get('ach', 0), 0, 5000) && numIn(d().get('pvp', 1000), 0, 100000)
+        && intIn(d().get('tower', 0), 0, 1000) && (d().get('house', null) == null || d().house is map)
+        && (!('at' in d()) || d().at is int);
+    }
     match /players/{uid} {
       allow read: if signedIn();
-      allow create, update: if signedIn() && request.auth.uid == uid;
-      allow delete: if signedIn() && (request.auth.uid == uid || isGM());
+      allow create, update: if signedIn() && me() == uid && playerOk();
+      allow delete: if signedIn() && (me() == uid || isGM());
       allow write: if isGM();   // restore from a backup
     }
-    // private saves, account, 7-day backups, season + archives: only the owner (the admin script backs these up)
+    // ---------- private saves, account, 7-day backups, season + archives: only the owner (the admin script backs these up)
     match /data/users/{uid}/{doc=**} {
-      allow read, write: if signedIn() && request.auth.uid == uid;
+      allow read, delete: if signedIn() && me() == uid;
+      allow create, update: if signedIn() && me() == uid && (!('lvl' in d()) || intIn(d().lvl, 1, 300));
     }
-    // guilds (+ members, castle siege) and the player market: shared (sellers and members delete their own rows; a GM may delete all)
-    match /guilds/{rest=**} {
+
+    // ---------- guilds: the founder owns the guild card; each member writes only their own line
+    match /guilds/{gid} {
       allow read: if signedIn();
-      allow write: if signedIn();
+      allow create: if signedIn() && gid.matches('g[a-z0-9]{4,30}') && d().keys().hasOnly(['name', 'leader', 'leaderName', 'notice', 'at'])
+        && d().leader == me() && str(d().name, 24) && d().name.size() > 0 && str(d().leaderName, 24) && str(d().notice, 200) && d().at is int;
+      allow update: if signedIn() && gid != '_siege' && old().leader == me() && changed().hasOnly(['notice', 'leaderName', 'name'])
+        && str(d().notice, 200) && str(d().leaderName, 24) && str(d().name, 24);
+      allow delete: if isGM() || (signedIn() && gid != '_siege' && old().leader == me());
+      allow write: if isGM();
+      match /members/{uid} {
+        allow read: if signedIn();
+        allow create, update: if signedIn() && me() == uid && d().keys().hasOnly(['n', 'j', 'l', 'at', 'acc'])
+          && str(d().n, 24) && str(d().j, 24) && intIn(d().l, 1, 300) && d().at is int && str(d().get('acc', ''), 24);
+        allow delete: if signedIn() && (me() == uid || isGM() || get(/databases/$(database)/documents/guilds/$(gid)).data.leader == me());
+      }
     }
-    match /market/{rest=**} {
+    // the castle owner (siege.js): only a member of the winning guild may write it, and only as themselves
+    match /guilds/_siege {
       allow read: if signedIn();
-      allow write: if signedIn();
+      allow write: if isGM() || (signedIn() && d().keys().hasOnly(['gid', 'gn', 'by', 'at']) && d().gid is string && d().gid.matches('g[a-z0-9]{4,30}')
+        && str(d().gn, 24) && str(d().by, 24) && recent(d().at)
+        && exists(/databases/$(database)/documents/guilds/$(d().gid)/members/$(me())));
     }
-    // server state: season (world reset), GM list, GM log — everyone reads, only a GM writes
+
+    // ---------- the player market (social2.js): a listing is written by its seller; a buyer can only mark it sold, once,
+    // as themselves; the seller only marks it paid after it sold, and removes it unsold (cancel) or paid (collected)
+    function listingOk() {
+      return d().keys().hasOnly(['s', 'sn', 'sa', 'i', 'n', 'x', 'p', 'at', 'sold', 'paid'])
+        && d().s == me() && str(d().sn, 24) && str(d().get('sa', ''), 24) && str(d().i, 80) && d().i.size() > 0
+        && intIn(d().n, 1, 100000) && intIn(d().p, 1, 1000000000) && recent(d().at)
+        && d().sold == null && d().paid == false && (d().get('x', null) == null || d().x is map);
+    }
+    match /market/{id} {
+      allow read: if signedIn();
+      allow create: if signedIn() && id.matches('[A-Za-z0-9]{6,40}') && listingOk();
+      allow update: if signedIn() && (
+        // a buyer: only `sold`, only while unsold, never the seller, stamped with the buyer's own uid
+        (old().sold == null && old().s != me() && changed().hasOnly(['sold'])
+          && d().sold is map && d().sold.keys().hasOnly(['b', 'bn', 'at']) && d().sold.b == me() && str(d().sold.bn, 24) && recent(d().sold.at))
+        // the seller: only `paid`, only after it sold
+        || (old().s == me() && old().sold != null && changed().hasOnly(['paid']) && d().paid == true));
+      allow delete: if isGM() || (signedIn() && old().s == me() && (old().sold == null || old().paid == true));
+      allow write: if isGM();
+    }
+
+    // ---------- server state: season (world reset), GM list, GM log — everyone reads, only a GM writes
     match /server/{rest=**} {
       allow read: if signedIn();
       allow write: if isGM();
+    }
+    // the newest game version (newver.js): any player may raise it a little, so everyone hears of an update
+    match /server/version {
+      allow read: if signedIn();
+      allow create, update: if isGM() || (signedIn() && d().keys().hasOnly(['v', 'at', 'by']) && d().v is int && d().by == me() && recent(d().at)
+        && (resource == null || (d().v > old().v && d().v <= old().v + 50)) && d().v < 100000);
     }
     // server backups: GM only
     match /backups/{rest=**} {
       allow read, write: if isGM();
     }
-    // Hall of Fame (js/sys/fame.js): everyone signed in reads; a record is created once, by one of the players it
+
+    // ---------- Hall of Fame (js/sys/fame.js): everyone signed in reads; a record is created once, by one of the players it
     // names; only a speed record (spd_*) may be replaced, and only by a faster time; nobody deletes
     function fameOk(id){
-      let d = request.resource.data;
-      let now = request.time.toMillis();
       return id.matches('(disc|clr|spd|mile)_[a-z0-9_]{1,40}')
-        && d.keys().hasOnly(['names', 'uids', 'party', 't', 'at', 'lv', 'prev'])
-        && d.names is list && d.names.size() >= 1 && d.names.size() <= 12
-        && d.uids is list && d.uids.size() == d.names.size() && request.auth.uid in d.uids
-        && d.party is bool && d.at is int && d.at > now - 86400000 && d.at < now + 86400000
-        && (!('t' in d) || (d.t is int && d.t >= 1000 && d.t <= 86400000))
-        && (!id.matches('spd_.*') || ('t' in d))
-        && (!('lv' in d) || d.lv is int)
-        && (!('prev' in d) || d.prev is map);
+        && d().keys().hasOnly(['names', 'uids', 'party', 't', 'at', 'lv', 'prev'])
+        && d().names is list && d().names.size() >= 1 && d().names.size() <= 12
+        && d().uids is list && d().uids.size() == d().names.size() && me() in d().uids
+        && d().party is bool && recent(d().at)
+        && (!('t' in d()) || intIn(d().t, 1000, 86400000))
+        && (!id.matches('spd_.*') || ('t' in d()))
+        && (!('lv' in d()) || intIn(d().lv, 0, 300))
+        && (!('prev' in d()) || d().prev is map);
     }
     match /fame/{id} {
-      allow read: if request.auth != null;
-      allow create: if request.auth != null && fameOk(id);
-      allow update: if request.auth != null && id.matches('spd_.*') && fameOk(id) && request.resource.data.t < resource.data.t;
+      allow read: if signedIn();
+      allow create: if signedIn() && fameOk(id);
+      allow update: if signedIn() && id.matches('spd_.*') && fameOk(id) && d().t < old().t;
       allow write: if isGM();   // a GM deletes them at a world reset and restores them from a backup; players never delete
     }
-    // mail (js/sys/mail.js): the sender writes a letter as themselves; only the recipient (or the sender) reads it;
-    // only the recipient marks it read / takes the attachments / deletes it
+
+    // ---------- mail (js/sys/mail.js): the sender writes a letter as themselves; only the recipient (or the sender) reads it;
+    // only the recipient marks it read / takes the attachments (once) / deletes it. System letters and Vayra Coins
+    // only ever go to your own box (the game writing to you), so nobody can fake a system letter or mail coins.
+    function letterOk() {
+      return d().keys().hasOnly(['to', 'tn', 'from', 'fn', 's', 'm', 'z', 'i', 'n', 'x', 'c', 'at', 'sys', 'rd', 'taken'])
+        && d().from == me() && uidLike(d().to) && str(d().get('tn', ''), 24) && str(d().fn, 24)
+        && str(d().s, 60) && str(d().m, 600) && intIn(d().get('z', 0), 0, 1000000000)
+        && (d().get('i', null) == null || str(d().i, 80)) && intIn(d().get('n', 0), 0, 100000)
+        && (d().get('x', null) == null || d().x is map)
+        && intIn(d().get('c', 0), 0, 1000) && (d().get('c', 0) == 0 || d().to == me())
+        && (d().get('sys', 0) == 0 || d().to == me())
+        && recent(d().at) && d().get('rd', 0) == 0 && d().get('taken', false) == false;
+    }
     match /mail/{id} {
-      allow read: if isGM() || (signedIn() && (resource == null || resource.data.to == request.auth.uid || resource.data.from == request.auth.uid));
-      allow create: if signedIn() && request.resource.data.from == request.auth.uid
-        && request.resource.data.to is string && request.resource.data.s is string && request.resource.data.s.size() <= 60
-        && request.resource.data.m is string && request.resource.data.m.size() <= 600
-        && (request.resource.data.c == 0 || request.resource.data.to == request.auth.uid);
-      allow update: if signedIn() && resource.data.to == request.auth.uid
-        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rd', 'taken']);
-      allow delete: if signedIn() && (resource.data.to == request.auth.uid || isGM());
+      allow read: if isGM() || (signedIn() && (resource == null || old().to == me() || old().from == me()));
+      allow create: if signedIn() && id.matches('[A-Za-z0-9]{6,40}') && letterOk();
+      allow update: if signedIn() && old().to == me() && changed().hasOnly(['rd', 'taken'])
+        && (d().rd == 1 || d().rd == true || d().rd == old().rd)
+        && (d().taken == old().taken || (old().taken == false && d().taken == true));
+      allow delete: if signedIn() && (old().to == me() || isGM());
       allow write: if isGM();   // restore from a backup
     }
-    // the tower's weekly board (js/sys/towerweek.js): one row per player per week, written only by that player
+
+    // ---------- the tower's weekly board (js/sys/towerweek.js): one row per player per week, written only by that player
     match /towerwk/{id} {
       allow read: if signedIn();
-      allow write: if signedIn() && id == string(request.resource.data.w) + '_' + request.auth.uid && request.resource.data.uid == request.auth.uid
-        && request.resource.data.f is int && request.resource.data.f >= 0;
-      allow delete: if isGM();
-      allow write: if isGM();   // restore from a backup
+      allow create, update: if signedIn() && d().keys().hasOnly(['w', 'uid', 'f', 'name', 'job', 'lvl', 'at'])
+        && id == string(d().w) + '_' + me() && d().uid == me() && d().w is int
+        && intIn(d().f, 0, 1000) && str(d().name, 24) && str(d().job, 24) && intIn(d().lvl, 1, 300) && d().at is int;
+      allow delete, write: if isGM();   // a world reset, or a restore from a backup
     }
-    // MVP board (js/sys/mvp.js): everyone signed in reads; anyone signed in reports a region boss appearing or falling
+
+    // ---------- MVP board (js/sys/mvp.js): everyone signed in reads; anyone signed in reports a region boss appearing or
+    // falling; the kill count only ever goes up by one
+    function mvpOk() {
+      return d().keys().hasOnly(['up', 'sp', 'at', 'names', 'uids', 'map', 'n', 'lv'])
+        && (!('up' in d()) || d().up is bool) && (!('sp' in d()) || d().sp is int) && (!('at' in d()) || d().at is int)
+        && (!('names' in d()) || (d().names is list && d().names.size() <= 12))
+        && (!('uids' in d()) || (d().uids is list && d().uids.size() <= 12))
+        && (!('map' in d()) || intIn(d().map, 0, 100000)) && (!('lv' in d()) || intIn(d().lv, 0, 999))
+        && intIn(d().get('n', 0), 0, (resource == null ? 0 : old().get('n', 0)) + 1);
+    }
     match /mvp/{id} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && id.matches('[a-z0-9_]{1,40}')
-        && request.resource.data.keys().hasOnly(['up', 'sp', 'at', 'names', 'uids', 'map', 'n', 'lv'])
-        && (!('names' in request.resource.data) || (request.resource.data.names is list && request.resource.data.names.size() <= 12));
+      allow read: if signedIn();
+      allow create, update: if signedIn() && id.matches('[a-z0-9_]{1,40}') && mvpOk();
+      allow delete: if isGM();
+      allow write: if isGM();
     }
-    // MVP hunter ranking: each player writes only their own count
+    // MVP hunter ranking: each player writes only their own count, one kill at a time
     match /mvphunt/{uid} {
-      allow read: if request.auth != null;
-      allow write: if request.auth != null && request.auth.uid == uid && request.resource.data.keys().hasOnly(['name', 'n', 'at']) && request.resource.data.n is int;
+      allow read: if signedIn();
+      allow create, update: if signedIn() && me() == uid && d().keys().hasOnly(['name', 'n', 'at']) && str(d().name, 24)
+        && intIn(d().n, 0, (resource == null ? 0 : old().get('n', 0)) + 1) && (!('at' in d()) || d().at is int);
+      allow delete, write: if isGM();
     }
   }
 }

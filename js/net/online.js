@@ -33,7 +33,32 @@ async function netInit(){
   if (typeof EV !== 'undefined') EV.emit('netready');
 }
 const netName = () => (S.name || (NET.me && NET.me.name) || nm(JOBS[S.job])).slice(0, 18);
-const clean = (s, n = 120) => String(s || '').replace(/[\u0000-\u001f\u007f​-‏‪-‮⁦-⁩]/g, '').slice(0, n);
+/* (v284) everything other players send passes through clean(): it also turns the characters HTML is made of into look-alikes,
+   so a name, a letter or a guild name can never become markup (a stored XSS: a name like <img onerror=…> ran code in
+   every player's game that showed it in the log, a banner or a list) */
+const CLEAN_HTML = {'<':'‹', '>':'›', '&':'＆', '"':'”', "'":'’', '`':'ˋ'};
+const clean = (s, n = 120) => String(s || '').replace(/[\u0000-\u001f\u007f​-‏‪-‮⁦-⁩]/g, '').replace(/[<>&"'`]/g, c => CLEAN_HTML[c]).slice(0, n);
+
+/* (v284) take something from a shared document exactly once (buy a listing, take a letter's attachment, cancel a listing).
+   pick(cur) looks at the document as it is now and returns {set:{…}} (fields to change), {del:true}, or null (leave it).
+   On Firebase it is a Firestore transaction: it re-runs if someone else changed the document first, so two buyers can
+   never both buy one listing (the old code used a claude.ai lease that Firebase does not have, and every purchase there
+   failed). On claude.ai it holds the artifact's lease. Returns {cur, did} or {busy:true}. */
+async function dbClaim(ref, pick){
+  const db = NET.db;
+  if (db && typeof db.runTransaction === 'function') try { return await db.runTransaction(async tx => {
+    const s = await tx.get(ref), cur = s.exists ? s.data() : null, w = pick(cur);
+    if (w && w.del) tx.delete(ref); else if (w && w.set) tx.update(ref, w.set);
+    return {cur, did:!!w}; }); }
+  catch (e){   // someone else won the race: the rules refuse our write. Look again: if there is nothing left to take, say so
+    if (!e || e.code !== 'permission-denied') throw e;
+    const s = await ref.get(), cur = s.exists ? s.data() : null; if (pick(cur)) throw e; return {cur, did:false}; }
+  const lk = typeof ref.acquire === 'function' ? await ref.acquire({holder:NET.uid, ttlMs:4000}) : {acquired:true};
+  if (!lk || !lk.acquired) return {busy:true};
+  const s = await ref.get(), cur = s.exists ? s.data() : null, w = pick(cur);
+  if (w && w.del) await ref.delete(); else if (w && w.set) await ref.update(w.set);
+  return {cur, did:!!w};
+}
 
 /* ---------- live map room ---------- */
 async function joinMapRoom(id){

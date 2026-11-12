@@ -7,3 +7,5 @@ service-account*.json
 vayrathen-full-*.json
 # full game packs (about 70 MB each): sent to the owner, not kept in git
 updates/*-full.zip
+# Firebase emulator logs (tools/rules-test)
+*-debug.log

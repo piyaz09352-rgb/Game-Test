@@ -22,7 +22,12 @@
   let signedRes; const signedIn = new Promise(r => { signedRes = r; });   // true once someone is logged in, false when playing offline
   const boot = (async () => {
     for (const f of ['firebase-app-compat.js', 'firebase-auth-compat.js', 'firebase-firestore-compat.js', 'firebase-database-compat.js']) await load(SDK + f);
-    fb = window.firebase; fb.initializeApp(C); auth = fb.auth(); fs = fb.firestore(); try { fs.settings({ignoreUndefinedProperties:true, merge:true}); } catch (e) {}
+    fb = window.firebase; fb.initializeApp(C);
+    /* (v284) App Check: with a reCAPTCHA v3 site key in firebase-config.js (APPCHECK_KEY), Firebase only answers requests
+       from this website, not from scripts or copies elsewhere (switch on "Enforce" in Firebase Console → App Check) */
+    const ACK = typeof APPCHECK_KEY === 'string' ? APPCHECK_KEY.trim() : '';
+    if (ACK) try { await load(SDK + 'firebase-app-check-compat.js'); fb.appCheck().activate(new fb.appCheck.ReCaptchaV3Provider(ACK), true); } catch (e) { console.warn('App Check did not start', e); }
+    auth = fb.auth(); fs = fb.firestore(); try { fs.settings({ignoreUndefinedProperties:true, merge:true}); } catch (e) {}
     rtdb = C.databaseURL ? fb.database() : null;
     if (rtdb) await new Promise(res => { const t = setTimeout(res, 2500); rtdb.ref('.info/serverTimeOffset').on('value', s => { offset = s.val() || 0; clearTimeout(t); res(); }); });   // server clock, so a phone with a wrong clock still hears chat
     await new Promise(res => { let first = true; auth.onAuthStateChanged(u => {   // the log-in itself is js/sys/auth.js's panel; this only reports who is signed in

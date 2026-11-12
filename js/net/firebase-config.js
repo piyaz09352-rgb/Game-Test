@@ -14,6 +14,12 @@ const FIREBASE_CONFIG = {
 /* GM (ผู้ดูแลเกม) บนเว็บ Firebase: ใส่ uid ของบัญชีที่เป็น GM (Firebase Console → Authentication → Users → User UID)
    แล้วใส่ uid เดียวกันใน firebase/firestore.rules (ฟังก์ชัน gmUids) ด้วย ไม่งั้นปุ่มฝั่งเซิร์ฟเวอร์จะถูกปฏิเสธ
    On claude.ai the GM is the artifact's owner instead (this list is not used there). See SETUP_ONLINE.md "GM และการรีเซตโลก". */
+/* (v284) App Check (กันสคริปต์/บอทที่ไม่ได้มาจากเว็บเกมจริง): สมัคร reCAPTCHA v3 ที่ https://www.google.com/recaptcha/admin
+   ใส่โดเมนเว็บเกม แล้วนำ "site key" มาใส่ตรงนี้ จากนั้น Firebase Console → App Check → ลงทะเบียนแอปเว็บด้วย secret key
+   ดูยอดคำขอสัก 1–2 วันว่าเป็น "verified" ทั้งหมด แล้วกด Enforce ทั้ง Firestore, Realtime Database และ Authentication
+   ปล่อยว่าง = ปิด (เกมทำงานเหมือนเดิม). Site key is public (it is meant to sit in the page). See SETUP_ONLINE.md. */
+const APPCHECK_KEY = '';
+
 const GM_UIDS = ['fo6F3IFoT0d3htberU9x13RKAhr1'];   // (v184) the owner's GM account
 /* ซีซัน: เพิ่มเลขนี้แล้ว deploy ใหม่ = บังคับรีเซตทุกคนเริ่มจาก 0 (สำรองข้อมูลเก่าไว้ในเครื่อง/คลาวด์ส่วนตัวก่อนลบ) แม้ไม่มีสิทธิ์ GM
    Season: raise this number and deploy to force a world reset for everyone (each player's old data is archived first). */
