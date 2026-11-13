@@ -42,16 +42,21 @@ function outlinePass(c, width = 2){   // (v300) same pixels as before, without a
 }
 function makeProp(spec){
   const {w, h, ax, ay, paint, shadow, collide = 0} = spec, S = GFX.ps;   // painted at the quality preset's density
-  const body = document.createElement('canvas'); body.width = Math.ceil(w * S); body.height = Math.ceil(h * S);
-  const g = body.getContext('2d', {willReadFrequently:true});   // (v300) painted once and read back once for the outline: kept in memory, not on the graphics card
-  g.setTransform(S, 0, 0, S, ax * S, ay * S); g.lineJoin = 'round'; g.lineCap = 'round';
-  paint(g, propRng(spec.seed || 1));
-  outlinePass(body, 2);
-  const c = document.createElement('canvas'); c.width = body.width; c.height = body.height;
-  const cg = c.getContext('2d');
-  if (shadow){ cg.setTransform(S, 0, 0, S, ax * S, ay * S); cg.fillStyle = 'rgba(30,40,18,.30)'; ov(cg, shadow[2] || 0, 1, shadow[0], shadow[1]); cg.fill(); cg.setTransform(1, 0, 0, 1, 0, 0); }
-  cg.drawImage(body, 0, 0);
-  return {img:c, w, h, ax, ay, collide, glow:spec.glow || null};
+  // (v302) painted the first time the picture is needed (when the prop first comes on screen), not when the map is laid out:
+  // a map places 60+ kinds of prop and most are nowhere near the hero on arrival. Size, anchor and collision are known at once.
+  let pic = null;
+  const build = () => {
+    const body = document.createElement('canvas'); body.width = Math.ceil(w * S); body.height = Math.ceil(h * S);
+    const g = body.getContext('2d', {willReadFrequently:true});   // (v300) painted once and read back once for the outline: kept in memory, not on the graphics card
+    g.setTransform(S, 0, 0, S, ax * S, ay * S); g.lineJoin = 'round'; g.lineCap = 'round';
+    paint(g, propRng(spec.seed || 1));
+    outlinePass(body, 2);
+    const c = document.createElement('canvas'); c.width = body.width; c.height = body.height;
+    const cg = c.getContext('2d');
+    if (shadow){ cg.setTransform(S, 0, 0, S, ax * S, ay * S); cg.fillStyle = 'rgba(30,40,18,.30)'; ov(cg, shadow[2] || 0, 1, shadow[0], shadow[1]); cg.fill(); cg.setTransform(1, 0, 0, 1, 0, 0); }
+    cg.drawImage(body, 0, 0);
+    return c; };
+  return {get img(){ return pic || (pic = build()); }, set img(v){ pic = v; }, w, h, ax, ay, collide, glow:spec.glow || null};
 }
 
 /* ---------- painting helpers ---------- */

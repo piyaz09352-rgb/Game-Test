@@ -54,5 +54,5 @@ if (typeof toggleRide === 'function'){ const _tr = toggleRide; toggleRide = func
 if (typeof toast === 'function'){ const _to = toast; toast = function(s){ if (typeof s === 'string' && /ไม่พอ|Not enough|ไม่มีที่ว่าง|เต็มแล้ว|is full|ยังใช้ไม่ได้|not ready/i.test(s)) try { sfx301('deny', {gap:450}); } catch (e) {} return _to.apply(this, arguments); }; }
 if (typeof log === 'function'){ const _lg = log; log = function(s){ if (typeof s === 'string'){ if (/ตีบวกสำเร็จ|Refine success/.test(s)) try { sfx301('refineOk'); } catch (e) {} else if (/ตีบวกล้มเหลว|Refine failed/.test(s)) try { sfx301('refineFail'); } catch (e) {} } return _lg.apply(this, arguments); }; }
 if (typeof EV !== 'undefined') EV.on('tick', dt => { if (typeof S === 'undefined' || !S || typeof DER === 'undefined' || !DER || !DER.maxhp || P.dead){ SFX3.low = false; return; }
-  const low = S.hp > 0 && S.hp < DER.maxhp * .25; SFX3.lowT -= dt; if (low && (!SFX3.low || SFX3.lowT <= 0)){ sfx301('heart', {gap:2500}); SFX3.lowT = 6; } SFX3.low = low;
+  const low = S.hp > 0 && S.hp < DER.maxhp * .25; SFX3.lowT -= dt; if (low && (!SFX3.low || SFX3.lowT <= 0) && !(typeof SETTINGS !== 'undefined' && SETTINGS.heartbeat === false)){ sfx301('heart', {gap:2500}); SFX3.lowT = 6; } SFX3.low = low;
   const st = (P.stunT || 0) > 0; if (st && !SFX3.stun) sfx301('stun', {gap:900}); SFX3.stun = st; });

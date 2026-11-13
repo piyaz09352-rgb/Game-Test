@@ -330,9 +330,10 @@ const P4_FLIP = new Set([...P4_NATURAL, 'dragonskull', 'ribcage', 'cauldron', 's
   propImg = function(type, variant = 0){
     if (variant < 1000) return _pi(type, variant);
     const k = type + variant; if (propCache[k]) return propCache[k];
-    const src = _pi(type, variant - 1000), c = document.createElement('canvas'); c.width = src.img.width; c.height = src.img.height;
-    const g = c.getContext('2d'); g.translate(c.width, 0); g.scale(-1, 1); g.drawImage(src.img, 0, 0);
-    return (propCache[k] = {...src, img:c, ax:src.w - src.ax, glow:src.glow ? [-src.glow[0], src.glow[1], src.glow[2]] : null}); };
+    const src = _pi(type, variant - 1000); let pic = null;   // (v302) mirrored when first needed, like the picture it mirrors
+    const flip = () => { const c = document.createElement('canvas'); c.width = src.img.width; c.height = src.img.height; const g = c.getContext('2d'); g.translate(c.width, 0); g.scale(-1, 1); g.drawImage(src.img, 0, 0); return c; };
+    const o = {get img(){ return pic || (pic = flip()); }, set img(v){ pic = v; }}; for (const key of Object.keys(src)) if (key !== 'img') o[key] = src[key];
+    o.ax = src.w - src.ax; o.glow = src.glow ? [-src.glow[0], src.glow[1], src.glow[2]] : null; return (propCache[k] = o); };
   const _ap = addProp;
   addProp = function(type, x, y, variant = 0){
     let v = variant; if (P4_NATURAL.has(type)) v += 6 * Math.floor(R() * 3);

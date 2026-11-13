@@ -4,7 +4,7 @@
 'use strict';
 
 const SETKEY = 'vayrathen-settings-v1';
-const SETTINGS = {turn:false, lang:'th', gfx:'auto', showFps:false, control:'auto', dmgNumbers:true, shake:true, nightFx:true, nameTags:true, oName:true, oTitle:true, oGuild:true, oDmg:true, oPet:true, oSum:true, oFx:true, uiScale:1, botHp:45, autoSave:true, autoLoot:false, sfx:true, musicVol:35, sfxVol:60, kite:true, bgRun:true, keepAwake:true, restMin:5, sharp:2};
+const SETTINGS = {turn:false, lang:'th', gfx:'auto', showFps:false, control:'auto', dmgNumbers:true, shake:true, nightFx:true, nameTags:true, oName:true, oTitle:true, oGuild:true, oDmg:true, oPet:true, oSum:true, oFx:true, uiScale:1, botHp:45, autoSave:true, autoLoot:false, sfx:true, musicVol:35, sfxVol:60, kite:true, bgRun:true, keepAwake:true, restMin:5, sharp:2, classFx:true, heartbeat:true};
 try { Object.assign(SETTINGS, JSON.parse(localStorage.getItem(SETKEY) || '{}')); } catch (e) {}
 if (SETTINGS.rotV !== 2){ SETTINGS.rotV = 2; SETTINGS.turn = false; delete SETTINGS.autoRot; }   // start upright: no leftover turning from earlier versions
 const saveSettings = () => { try { localStorage.setItem(SETKEY, JSON.stringify(SETTINGS)); } catch (e) {} };
@@ -172,6 +172,8 @@ function renderSettings(){
     ${tg('showFps', L('แสดง FPS', 'Show FPS'), L('ดูความลื่นของเกมที่มุมจอ', 'See how smooth the game runs'))}
     ${tg('dmgNumbers', L('ตัวเลขดาเมจ', 'Damage numbers'), L('แสดงดาเมจ หลบ และ EXP ลอยบนหัว', 'Floating damage, misses and EXP'))}
     ${tg('shake', L('จอสั่น', 'Screen shake'), L('สั่นจอตอนคริติคอล ระเบิด และบอสคำราม · ปิดถ้าเวียนหัว', 'Shakes on crits, blasts and boss roars · turn off if it makes you dizzy'))}
+    ${tg('classFx', L('เอฟเฟกต์ประจำอาชีพ', 'Class skill effects'), L('ตราวงเวท สัญลักษณ์ประจำสาย และรอยโจมตีบนสกิล · ปิดถ้าอยากให้จอโล่งหรือเครื่องช้า', 'Class seals, tokens and hit marks on skills · turn off for a cleaner screen or a slow device'))}
+    ${tg('heartbeat', L('เสียงหัวใจตอน HP ต่ำ', 'Heartbeat at low HP'), L('เสียงหัวใจเต้นเตือนเมื่อ HP ต่ำกว่า 25%', 'A heartbeat warns you when HP is under 25%'))}
     ${tg('nameTags', L('ป้ายชื่อ', 'Name tags'), L('ชื่อตัวละคร NPC และมอนสเตอร์', 'Character, NPC and monster names'))}
     <div class="sec">${L('ผู้เล่นคนอื่น', 'Other players')}</div>
     ${tg('oName', L('ชื่อตัวละคร', 'Character names'), L('ชื่อและหลอดเลือดของผู้เล่นคนอื่น', "Other players' names and bars"))}

@@ -239,6 +239,7 @@ function cfxPose(sk, L, sc, tier, ang, dur){
 }
 
 function cfxCast(id, lv, t, from){
+  if (typeof SETTINGS !== 'undefined' && SETTINGS.classFx === false) return;   // (v302) Settings: class skill effects off
   const sk = SKILLS[id]; if (!sk || sk.type === 'passive') return;
   const cat = SKFX_CAT[sk.type] === 'beam' ? 'line' : SKFX_CAT[sk.type] || 'strike', tier = skfxTier(sk), L = cfxLook(sk), c = L.col, sc = .85 + tier * .1, big = tier >= 4 && (sk.cd || 0) >= 5;
   const tgt = t && typeof t.x === 'number' && !t.dead ? t : null, tx = tgt ? tgt.x : P.x, ty = tgt ? tgt.y : P.y, px = P.x, py = P.y;
@@ -274,7 +275,7 @@ function cfxCast(id, lv, t, from){
 /* ---------- wiring ---------- */
 { const _ex = execSkill;
   execSkill = function(id, lv, t){ const from = {x:P.x, y:P.y}; CFX.cur = {id, t:T, n:0}; const r = _ex.apply(this, arguments); try { cfxCast(id, lv, t, from); } catch (e) { console.warn('classfx', e); } return r; }; }
-HK.dmgAfter.push((m, res, sk) => { if (!m || !res || !(res.dmg > 0) || res.poison || res.dot) return;
+HK.dmgAfter.push((m, res, sk) => { if (!m || !res || !(res.dmg > 0) || res.poison || res.dot || (typeof SETTINGS !== 'undefined' && SETTINGS.classFx === false)) return;
   try {
     const dir = Math.atan2(m.y - P.y, m.x - P.x), c = CFX.cur;
     if (sk && sk.id && c && c.id === sk.id && T - c.t < 4){ c.n++; const def = SKILLS[sk.id] || sk, tier = skfxTier(def), L = cfxLook(def);
