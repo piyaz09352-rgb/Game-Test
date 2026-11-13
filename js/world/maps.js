@@ -109,10 +109,10 @@ function paintBiome(g, B, mapId){
   if (!NOROAD) for (const tr of TRAIL.lines) for (let i = 0; i < tr.length * 2; i++){ const [x, y] = tr[Math.floor(R() * tr.length)]; g.fillStyle = R() < .5 ? 'rgba(60,40,20,.3)' : 'rgba(255,240,200,.22)'; g.beginPath(); g.ellipse(x + (R() - .5) * 36, y + (R() - .5) * 36, .8 + R() * 1.6, .6 + R(), R() * 3, 0, 7); g.fill(); }
   // grass blades
   // (v85) one path per colour, stroked once: the same blades as before, ~80,000 fewer stroke calls on every map load
-  if (B.blades){ const paths = B.blades.map(() => new Path2D());
-    for (let i = 0; i < B.bladeN; i++){ const x = R() * W, y = R() * H;
-      const p = paths[Math.floor(R() * B.blades.length)]; p.moveTo(x, y); p.lineTo(x + (R() - .5) * 2, y - 2.4 - R() * 3.5); }
-    g.lineWidth = .7; paths.forEach((p, k) => { g.strokeStyle = B.blades[k]; g.stroke(p); }); }
+  if (B.blades){ const paths = B.blades.map(() => [new Path2D()]), cnt = B.blades.map(() => 0);   // (v300) in batches of 1500 per colour: faster to draw, same picture
+    for (let i = 0; i < B.bladeN; i++){ const x = R() * W, y = R() * H, k = Math.floor(R() * B.blades.length);
+      if (++cnt[k] > 1500){ paths[k].push(new Path2D()); cnt[k] = 1; } const p = paths[k][paths[k].length - 1]; p.moveTo(x, y); p.lineTo(x + (R() - .5) * 2, y - 2.4 - R() * 3.5); }
+    g.lineWidth = .7; paths.forEach((ps, k) => { g.strokeStyle = B.blades[k]; for (const p of ps) g.stroke(p); }); }
   // flowers
   if (B.flowers) for (let i = 0; i < (B.flowerN || 200); i++){ const cx = R() * W, cy = R() * H, col = B.flowers[Math.floor(R() * B.flowers.length)];
     g.fillStyle = col; g.beginPath(); for (let k = 0; k < 5; k++){ const x = cx + (R() - .5) * 16, y = cy + (R() - .5) * 9; g.moveTo(x + .9, y); g.arc(x, y, .9, 0, 7); } g.fill(); }
