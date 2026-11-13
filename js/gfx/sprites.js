@@ -310,8 +310,30 @@ function finish(F, K = 1){
       if (j >= 0){ const o = i * 4, a = j * 4; out[o] = prev[a]; out[o + 1] = prev[a + 1]; out[o + 2] = prev[a + 2]; out[o + 3] = 255; }
     }
   }
+  softPass(F, out, K);
   return new ImageData(out, w, h);
 }
+/* (v301) the owner asked for softer, more lifelike bodies. Two things on every character and monster, from the picture itself:
+   · the shading inside each body part is smoothed (each pixel leans a little on its neighbours of the same part), so tones
+     run into each other like on a rounded surface instead of in speckled steps; lines between parts stay sharp;
+   · the silhouette gets a soft outer edge (one more ring, half see-through), so the outline is no longer a staircase. */
+function softPass(F, out, K){ if (globalThis.SPR_NOSOFT || K < 1.5) return;
+  const {w, h} = F, n = w * h, Mm = F.m, G = F.g, iters = K >= 3.5 ? 2 : 1;
+  for (let it = 0; it < iters; it++){ const src = out.slice();
+    for (let i = 0; i < n; i++){ const m = Mm[i]; if (m < 0) continue; let sk = SOFT_SKIP[m]; if (sk === undefined) sk = SOFT_SKIP[m] = MATS[m].emissive || /^(eye|slimeE)$|_eye$/.test(MATS[m].name) ? 1 : 0; if (sk) continue;
+      const x = i % w, g = G[i], o = i * 4; let r = src[o] * 3, gg = src[o + 1] * 3, b = src[o + 2] * 3, c = 3, j;
+      if (x > 0 && Mm[j = i - 1] === m && G[j] === g){ j *= 4; r += src[j]; gg += src[j + 1]; b += src[j + 2]; c++; }
+      if (x < w - 1 && Mm[j = i + 1] === m && G[j] === g){ j *= 4; r += src[j]; gg += src[j + 1]; b += src[j + 2]; c++; }
+      if (i >= w && Mm[j = i - w] === m && G[j] === g){ j *= 4; r += src[j]; gg += src[j + 1]; b += src[j + 2]; c++; }
+      if (i < n - w && Mm[j = i + w] === m && G[j] === g){ j *= 4; r += src[j]; gg += src[j + 1]; b += src[j + 2]; c++; }
+      if (c > 3){ out[o] = r / c; out[o + 1] = gg / c; out[o + 2] = b / c; } } }
+  { const prev = out.slice();                                   // the soft outer edge
+    for (let i = 0; i < n; i++){ if (prev[i * 4 + 3]) continue; const x = i % w; let cnt = 0, j = -1;
+      if (x > 0 && prev[(i - 1) * 4 + 3] === 255){ cnt++; j = i - 1; } if (x < w - 1 && prev[(i + 1) * 4 + 3] === 255){ cnt++; j = i + 1; }
+      if (i >= w && prev[(i - w) * 4 + 3] === 255){ cnt++; j = i - w; } if (i < n - w && prev[(i + w) * 4 + 3] === 255){ cnt++; j = i + w; }
+      if (j >= 0){ const o = i * 4, a = j * 4; out[o] = prev[a]; out[o + 1] = prev[a + 1]; out[o + 2] = prev[a + 2]; out[o + 3] = cnt >= 2 ? 190 : 105; } } }
+}
+const SOFT_SKIP = [];
 
 /* (v80) detail pass: more depth in every character and monster, from the shape itself (so nothing shimmers as they move)
    · soft volume: the surface normal (from the depth buffer) lights each pixel smoothly between the 4 tones
@@ -802,7 +824,14 @@ function drawHuman(cx, cfg, P){
     if (cfg.sandals) cap(cx, knee, foot, 2.3 + bg, 1.9, M[cfg.skinM || 'skin'], {tex:(n, lo, q, t) => (t < .38 ? {m:pm} : t > .72 && t < .86 ? {m:M[cfg.sandals]} : undefined)});
     else cap(cx, knee, foot, 2.3, 2.2, bm, {tex:(n, lo, q, t) => (t < .35 && cfg.bootCuff ? {m:M[cfg.bootCuff]} : undefined)});
     G(); const toe = add(foot, toeOff); ell(cx, [toe[0], toe[1] + .3, toe[2]], 2.5, 1.9, bm);
+    // (v301) a foot, not a ball: a heel behind the ankle and a dark sole under the shoe from heel to toe
+    const hl = [foot[0] - toeOff[0] * .45, foot[1] + .2, foot[2] - toeOff[2] * .45]; ell(cx, hl, 2.05, 1.7, bm, {});
+    G(); ell(cx, [(hl[0] + toe[0]) / 2, Math.min(hl[1], toe[1]) - .55, (hl[2] + toe[2]) / 2], 2.35, .7, bm, {rz:Math.abs(toeOff[2]) > .5 ? 3.2 : 2.35, tex:() => ({dt:2})});
   };
+  // (v301) a hand, not a ball: the fingers closed together beyond the palm, the gaps between them drawn, and a thumb on the inner side
+  const handShape = (hand, d, side) => { if (cfg.glove || cfg.fistClaw) return; const hm = M[cfg.handWrap || cfg.skinM || 'skin'];
+    G(); ell(cx, add(hand, mul(d, 1.35)), 1.8, 1.55, hm, {tex:n => (Math.abs(Math.sin(n[0] * 4.6 + .4)) > .95 ? {dt:1} : undefined)});
+    G(); ell(cx, add(add(hand, mul(d, .5)), [-side * 1.25, .15, 1.15]), .95, .85, hm, {}); };
   const legLen = 8.4;
   for (const side of [-1, 1]){
     const sw = side < 0 ? P.legR : P.legL, lift = side < 0 ? P.liftR : P.liftL;
@@ -854,6 +883,7 @@ function drawHuman(cx, cfg, P){
     cap(cx, sh, el, 2.3, 2.1, M[cfg.sleeve || cfg.top], cfg.armband ? {tex:(n, lo, q, t) => (t > .62 && t < .82 ? {m:M[cfg.armband]} : undefined)} : {});
     cap(cx, el, hand, 2.1, 1.9, M[cfg.forearm || cfg.skinM || 'skin'], cfg.wrap ? {tex:(n, lo, q, t) => (t > .42 && t < .9 ? {m:M[cfg.wrap]} : undefined)} : {});
     G(); ell(cx, hand, cfg.handWrap ? 2.4 : 2.2, cfg.handWrap ? 2.4 : 2.2, M[cfg.handWrap || cfg.skinM || 'skin'], cfg.handWrap ? {tex:n => (Math.sin(n[1] * 9 + n[0] * 3) > .5 ? {dt:1} : undefined)} : {});
+    handShape(hand, nrm(fa), side);
     if (cfg.glove){ G(); ell(cx, add(hand, mul(nrm(fa), .4)), 3.5, 3.2, M[cfg.glove], {tex:n => (n[1] > .55 ? {dt:-1} : undefined)}); G(); cap(cx, add(hand, mul(nrm(fa), -1.6)), add(hand, mul(nrm(fa), -.6)), 2.4, 2.4, M[cfg.gloveCuff], {}); }
     if (cfg.fistClaw){
       // tiger-claw gauntlets (กรงเล็บคู่): a metal glove over the fist and forearm, Thai gold trim from tier 3,
@@ -883,6 +913,7 @@ function drawHuman(cx, cfg, P){
     cap(cx, sh, el, 2.3, 2.1, M[cfg.sleeve || cfg.top], cfg.armband ? {tex:(n, lo, q, t) => (t > .62 && t < .82 ? {m:M[cfg.armband]} : undefined)} : {});
     cap(cx, el, hand, 2.1, 1.9, M[cfg.forearm || cfg.skinM || 'skin'], cfg.wrap ? {tex:(n, lo, q, t) => (t > .42 && t < .9 ? {m:M[cfg.wrap]} : undefined)} : {});
     G(); ell(cx, hand, cfg.handWrap ? 2.4 : 2.2, cfg.handWrap ? 2.4 : 2.2, M[cfg.handWrap || cfg.skinM || 'skin'], {});
+    handShape(hand, nrm([hand[0] - el[0], hand[1] - el[1], hand[2] - el[2]]), side);
     return {hand, dir:nrm([hand[0] - el[0], hand[1] - el[1], hand[2] - el[2]])};
   };
   const wRot = v => (P.wRoll ? rotZ(v, P.wLeft ? -P.wRoll : P.wRoll) : v);   // (v210) a weapon cocked out to the side (a wind-up beside the head)

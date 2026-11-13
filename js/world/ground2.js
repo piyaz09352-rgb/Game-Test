@@ -46,13 +46,14 @@ function groundDetail(g, B, mapId){
   // a tuft: a few short blades fanning out of one root, dark at the base and lit at the tips
   // (v276) the blades are gathered into three paths and stroked once each: the same grass, but a map loads without the
   // phone freezing (one stroke per blade was ~100 000 strokes, several seconds on a phone, and no tap answered meanwhile)
-  const tufts = (n, cols, h, clump) => { const P0 = new Path2D(), P1 = new Path2D(), P2 = new Path2D();
+  const tufts = (n, cols, h, clump) => { const L0 = [], L1 = [], L2 = []; let P0, P1, P2, nb = 1e9;   // (v300) the same blades in batches of ~1200: a phone draws them about a third faster than as one huge path; the darks still go under all the lights
     for (let i = 0; i < n * A; i++){ const cx = R() * W, cy = R() * H, m = 1 + Math.floor(R() * clump);
       for (let j = 0; j < m; j++){ const x = cx + (R() - .5) * 18, y = cy + (R() - .5) * 8, bl = 4 + Math.floor(R() * 4), hh = h * (.6 + R() * .7);
+        if (nb > 1200){ L0.push(P0 = new Path2D()); L1.push(P1 = new Path2D()); L2.push(P2 = new Path2D()); nb = 0; } nb += bl;
         for (let b = 0; b < bl; b++){ const a = -Math.PI / 2 + (b / (bl - 1) - .5) * 1.5 + (R() - .5) * .3, L = hh * (.7 + R() * .4), ex = x + Math.cos(a) * L * .6, ey = y + Math.sin(a) * L;
           P0.moveTo(x, y); P0.quadraticCurveTo(x + (ex - x) * .3, y + (ey - y) * .6, ex, ey);
           const Q = a < -Math.PI / 2 ? P2 : P1; Q.moveTo(x + (ex - x) * .5, y + (ey - y) * .55); Q.lineTo(ex, ey); } } }
-    g.strokeStyle = cols[0]; g.lineWidth = 1.1; g.stroke(P0); g.lineWidth = .6; g.strokeStyle = cols[1]; g.stroke(P1); g.strokeStyle = cols[2]; g.stroke(P2); };
+    g.strokeStyle = cols[0]; g.lineWidth = 1.1; for (const q of L0) g.stroke(q); g.lineWidth = .6; g.strokeStyle = cols[1]; for (const q of L1) g.stroke(q); g.strokeStyle = cols[2]; for (const q of L2) g.stroke(q); };
   // stones: in drifts (several near each other), each with a contact shadow, a body and a lit top
   const stones = (n, col, smin, smax) => { const lc = g2hsl(col, .16), dc = g2hsl(col, -.18); for (let i = 0; i < n * A; i++){ const cx = R() * W, cy = R() * H, m = 1 + Math.floor(R() * 5);
       for (let j = 0; j < m; j++){ const x = cx + (R() - .5) * 26, y = cy + (R() - .5) * 12, s = smin + R() * (smax - smin), rot = R() * .8 - .4;

@@ -27,7 +27,7 @@ const BIRDS = (() => {
   const B = {sky:[], ground:[], up:[], skyT:5, gT:2, map:-1, lt:null};
   const lvl = () => Math.max(0, (typeof GFX !== 'undefined' ? GFX.fx : 1) - (typeof PERF !== 'undefined' && PERF.fps < 28 && PERF.fps > 0 ? 1 : 0));
   const biome = () => (MAP_ID && typeof BIOME !== 'undefined' && MAPS[MAP_ID] ? BIOME[MAPS[MAP_ID].biome] : null);
-  const ok = () => { const b = biome(); return !(b && b.fx === 'dark') && !(typeof isNight === 'function' && isNight()); };
+  const ok = () => { const b = biome(); return !(b && (b.fx === 'dark' || b.underwater || b.sky)) && !(typeof isNight === 'function' && isNight()); };
   const R = (a, b) => a + Math.random() * (b - a);
   const kindsHere = () => { const b = biome() || {}, n = (MAP_ID && MAPS[MAP_ID] && MAPS[MAP_ID].biome) || '';
     if (/snow|ice|frost/.test(n)) return ['crow'];

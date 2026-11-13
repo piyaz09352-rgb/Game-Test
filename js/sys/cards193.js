@@ -60,8 +60,9 @@ function c9Put(b, key, v, t){
 }
 const c9Tier = lvl => Math.min(5, c8Tier(Math.max(1, Math.ceil((lvl || 1) / 25))));
 /* rebuild every monster card */
+const c9SortLv = cid => { const k = CARD_MOB[cid]; return (typeof CARD_LV_KEEP !== 'undefined' && CARD_LV_KEEP[k]) || MOB[k].lvl || 0; };
 { const used = new Set(), list = Object.keys(CARDS).filter(c => c !== 'c_boss' && CARD_MOB[c] && MOB[CARD_MOB[c]] && CARDS[c].slot && C9_PRIMARY[CARDS[c].slot])
-    .sort((a, b) => (MOB[CARD_MOB[a]].lvl || 0) - (MOB[CARD_MOB[b]].lvl || 0));
+    .sort((a, b) => (typeof SPECIES_LATE !== 'undefined' ? SPECIES_LATE.has(CARD_MOB[a]) - SPECIES_LATE.has(CARD_MOB[b]) : 0) || c9SortLv(a) - c9SortLv(b));   // (v294) newer species after the rest: older cards keep their abilities
   list.forEach((cid, i) => { const c = CARDS[cid], d = MOB[CARD_MOB[cid]], slot = c.slot, t = c9Tier(d.lvl), boss = !!(d.boss || c.boss), k = boss ? 1.3 : 1;
     const all = C9_PRIMARY[slot](d), own = C9_MINOR[slot], minors = own.concat(Object.keys(C9_MINOR_V).filter(x => !own.includes(x)));   // its place's small stats first, then any
     // spread the abilities: the monster's own themes first, taken in turn (card i starts at a different one), then the rest in turn

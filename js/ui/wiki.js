@@ -75,9 +75,9 @@ const wkMobPic = (k, big) => { const a = typeof mobArt === 'function' ? mobArt(k
 /* ---------- system articles ---------- */
 const WIKI_SYS = [
   {id:'start', t:['เริ่มต้นเล่น', 'Getting started'], b:() => L(
-    `<p>เริ่มเป็น <b>ชาวบ้าน</b> ที่นครอาเรน ตีมอนในทุ่งสุวรรณินเพื่อเก็บ EXP · ลงแต้ม Stat (A) และสกิล (S) · ถึง Job Lv 10 และลงสกิล "พร้อมออกเดินทาง" แล้วคุยกับ <b>ครูวายรา</b> เพื่อเปลี่ยนอาชีพ</p>
+    `<p>เริ่มเป็น <b>ชาวบ้าน</b> ที่นครอาเรน ตีมอนในทุ่งสุวรรณินเพื่อเก็บ EXP · ลงแต้ม Stat (C) และสกิล (K) · ถึง Job Lv 10 และลงสกิล "พร้อมออกเดินทาง" แล้วคุยกับ <b>ครูวายรา</b> เพื่อเปลี่ยนอาชีพ</p>
      <ul><li>เดิน: คลิก/แตะพื้น หรือจอยซ้าย · แตะแผนที่ย่อเพื่อเดินไปจุดนั้น</li><li>โจมตี: คลิกมอน หรือปุ่มโจมตีใหญ่</li><li>ยา: ช่อง 7–8 หรือปุ่มยาข้างจอย</li><li>Auto (B): ให้ตัวละครล่ามอนเอง ตั้งชุดสกิลได้</li><li>บัญชีละ 3 ตัวละคร เลือกที่หน้าเริ่มเกม</li></ul>`,
-    `<p>You start as a <b>Villager</b> in Aren. Hunt in the Suwannin Fields for EXP · spend Stat (A) and Skill (S) points · at Job Lv 10 with "Ready to Journey" learned, talk to <b>Master Vayra</b> to change class.</p>
+    `<p>You start as a <b>Villager</b> in Aren. Hunt in the Suwannin Fields for EXP · spend Stat (C) and Skill (K) points · at Job Lv 10 with "Ready to Journey" learned, talk to <b>Master Vayra</b> to change class.</p>
      <ul><li>Move: click/tap the ground or use the left stick · tap the minimap to walk there</li><li>Attack: click a monster or the big attack button</li><li>Potions: slots 7–8 or the buttons by the stick</li><li>Auto (B): the hero hunts on its own with your skill set</li><li>3 characters per account, picked on the title screen</li></ul>`)},
   {id:'stats', t:['ค่าสถานะ (Stat)', 'Stats'], b:() => { const capRow = [1, 45, 70, 100, 130, 150, 180, 200, 240, 270, 300];   // (v243) current: what each stat does, the points and the cap that grows with level
     return `<table class="wkt"><tr><th>Stat</th><th>${L('ผล', 'Effect')}</th></tr>

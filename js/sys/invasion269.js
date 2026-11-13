@@ -134,7 +134,7 @@ function invChest(Lv, minR){ if (typeof GEAR_LIST === 'undefined') return '';
   const pool = GEAR_LIST.filter(g => g[1] !== 'ammo' && g[4] <= Lv && g[4] >= Lv - 30 && (typeof lineOk !== 'function' || lineOk(g[6]))); if (!pool.length) return '';
   const id = makeInst(pool[Math.floor(Math.random() * pool.length)][0], Math.max(minR, rollRarity('boss'))); addItem(id, 1); return nm(ITEMS[id]); }
 function invReward(){
-  const key = INV.key; if (!key || INV.done[key]) return; INV.done[key] = 1; S.invDone = S.invDone || {}; if (S.invDone[key]) return; S.invDone[key] = 1;
+  const key = INV.key; if (!key || INV.done[key]) return; INV.done[key] = 1; INV.doneAt = Date.now(); S.invDone = S.invDone || {}; if (S.invDone[key]) return; S.invDone[key] = 1;
   for (const m of mobs) if (m.inv === key && !m.dead && !m.invBoss){ m.dead = true; m.deadT = 0; } INV.boss = null;
   const ok = INV.my >= 3 || INV.myDmg >= .01 || invPeers() === 0;
   if (!ok){ banner(L('ทัพผู้รุกรานพ่ายแพ้! แต่คุณช่วยไม่ถึงเกณฑ์รับรางวัล', 'The invasion is beaten! You did not help enough for a reward')); return; }
@@ -155,7 +155,7 @@ function invReward(){
 }
 /* time ran out: a share by how much of the army fell, for those who helped */
 function invPartial(){
-  const key = INV.key; if (!key || INV.done[key]) return; INV.done[key] = 1; S.invDone = S.invDone || {}; if (S.invDone[key]) return; S.invDone[key] = 1;
+  const key = INV.key; if (!key || INV.done[key]) return; INV.done[key] = 1; INV.doneAt = Date.now(); S.invDone = S.invDone || {}; if (S.invDone[key]) return; S.invDone[key] = 1;
   if (INV.my < 3 && INV.myDmg < .01){ if (INV.tot > 0) banner(L('กองทัพผู้รุกรานถอยทัพไปแล้ว…', 'The invaders withdraw…')); return; }
   const f = clamp(INV.tot / invGoal(), 0, 1) * (INV.boss || INV.tot >= invGoal() ? 1 : .8), Lv = clamp(S.lvl, 1, 300), bia = Math.round(Lv * 400 * f * .6), coins = Math.max(1, Math.round(5 * f));
   S.bia += bia; if (typeof coinAdd === 'function') coinAdd(coins, L('การรุกราน (หมดเวลา)', 'invasion (time up)'));
@@ -175,7 +175,7 @@ function invBar(w){
   if (!w){ b.hidden = true; return; }
   const id = invMap(w.key), where = id >= 0 ? nm(MAPS[id]) : '';
   if (!w.active) txt = L(`⚔ การรุกรานที่${where} ในอีก ${fmt(w.soon)}`, `⚔ Invasion at ${where} in ${fmt(w.soon)}`);
-  else if (INV.done[w.key]) txt = L('🏆 ขับไล่ผู้รุกรานสำเร็จ', '🏆 The invasion was driven back');
+  else if (INV.done[w.key]){ if (Date.now() - (INV.doneAt || 0) > 8000){ b.hidden = true; return; } txt = L('🏆 ขับไล่ผู้รุกรานสำเร็จ', '🏆 The invasion was driven back'); }   // (v298) shown for a few seconds, not for the rest of the invasion's hour
   else if (MAP_ID !== id) txt = L(`⚔ กำลังมีการรุกรานที่${where} · เหลือ ${fmt(w.left)}`, `⚔ Invasion under way at ${where} · ${fmt(w.left)} left`);
   else if (INV.boss && !INV.boss.dead){ txt = L(`⚔ แม่ทัพผู้รุกราน · ${fmt(w.left)}`, `⚔ Invading Warlord · ${fmt(w.left)}`); pct = INV.boss.hp / INV.boss.maxhp; }
   else { const g = invGoal(); txt = L(`⚔ การรุกราน · ทัพ ${Math.min(INV.tot, g)}/${g} · ของคุณ ${INV.my} · ${fmt(w.left)}`, `⚔ Invasion · army ${Math.min(INV.tot, g)}/${g} · yours ${INV.my} · ${fmt(w.left)}`); pct = Math.min(1, INV.tot / g); }

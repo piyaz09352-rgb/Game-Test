@@ -31,6 +31,7 @@ test('ninja: reworked skills, ricochet, clones, smoke, four elements', { skip, t
       addItem('s_iron', 100); S.gear.ammo = 's_iron';
       let d0 = dmg(); basicAttack(m); await until(() => dmg()[2] - d0[2] > 0); await wait(.3); out.bounce = dmg().map((v, i) => v - d0[i]);
       execSkill('kagebunshin', 10, null); d0 = dmg(); basicAttack(m); await until(() => dmg()[0] - d0[0] > out.bounce[0] * 1.15); out.clone = dmg()[0] - d0[0];
+      ms.forEach((x, i) => { x.x = P.x + 60 + i * 40; x.y = P.y; x.st = {stop:999}; });   // (v302) back in their row: the hits before this can push a monster, and the third stood only 10 px inside the circle
       d0 = dmg(); execSkill('kirin', 10, m); await until(() => dmg().filter((v, i) => v - d0[i] > 0).length >= 3); out.kirin = dmg().map((v, i) => v - d0[i]);
       execSkill('smokescreen', 10, null); S.hp = DER.maxhp; mobAttack(m, 5, true); out.smoke = S.hp === DER.maxhp;
       return out;

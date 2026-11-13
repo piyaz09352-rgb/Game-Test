@@ -24,7 +24,7 @@ function statsFor(L, k = {}, XL = L){
 }
 /* loot part names by archetype */
 const PART = {quad:['หนัง', 'Hide'], bird:['ขนนก', 'Feather'], serpent:['เกล็ด', 'Scale'], bug:['กระดอง', 'Carapace'], squat:['ผิวมัน', 'Slick Skin'],
-  floater:['เถ้าวิญญาณ', 'Spirit Ash'], slime:['เมือก', 'Ooze'], rock:['เศษหิน', 'Rubble'], human:['เครื่องราง', 'Charm']};
+  floater:['เถ้าวิญญาณ', 'Spirit Ash'], slime:['เมือก', 'Ooze'], rock:['เศษหิน', 'Rubble'], human:['เครื่องราง', 'Charm'], fish:['ครีบ', 'Fin'], cave:['เปลือกหินร้อน', 'Hot Rock Hide'], sky:['ประกายสวรรค์', 'Heavenly Shard'], land:['ชิ้นส่วน', 'Part']};
 
 /* ---------- species ----------
    [id, th, en, lvl, archetype, look, elem, race, size, extra]
@@ -152,7 +152,7 @@ const SPECIES = [
   ['nagawarrior', 'ทหารนาคา', 'Naga Warrior', 152, 'human', {skin:'#3a8a7a', top:'#e3b04b', pants:'#1a4a4a', hair:'#0a2a2a', hat:'lomphok', hatCol:'#e3b04b', weapon:'sword', tail:'#3a8a7a', tailW:2.2, iris:'irisGr'}, 'water', 'dragon', 'm', {aggro:true, k:{atk:1.2}}],
   ['abyssjelly', 'แมงกะพรุนบาดาล', 'Abyssal Jelly', 147, 'slime', {col:'#3ac8c0', emissive:true, jelly:true, topCol:'#7af0e0'}, 'water', 'fish', 's', {range:110, shot:'ice'}],
   ['emeraldcrab', 'ปูมรกต', 'Emerald Crab', 150, 'bug', {shell:'#2aa86a', leg:'#1a7a4a', acc:'#7af0b0', kind:'crab', bigClaw:true}, 'water', 'fish', 'm', {k:{def:2}}],
-  ['thundereel', 'ปลาไหลไฟฟ้า', 'Thunder Eel', 154, 'serpent', {skin:'#e8d040', belly:'#3a3a2a', stripe:'#3a3a2a', len:1.4, eyeGlow:'#7ae0ff'}, 'wind', 'fish', 'm', {aggro:true, range:120, shot:'bolt'}],
+  ['thundereel', 'ปลาไหลไฟฟ้า', 'Thunder Eel', 154, 'serpent', {skin:'#e8d040', belly:'#3a3a2a', stripe:'#3a3a2a', len:1.4, eyeGlow:'#7ae0ff', swim:9, fin:'#c8a830', spark:'#9af0ff'}, 'wind', 'fish', 'm', {aggro:true, range:120, shot:'bolt'}],
   ['spiritpearl', 'ไข่มุกวิญญาณ', 'Spirit Pearl', 149, 'floater', {col:'#f0f4ff', kind:'pearl', ring:'#a8e0ff', glow:'#c8f0ff', dark:'#4a5a7a'}, 'holy', 'formless', 's', {range:130, shot:'holy'}],
   ['abyssturtle', 'เต่าบาดาล', 'Abyss Turtle', 156, 'squat', {skin:'#2a4a5a', shell:'#1a3a4a', belly:'#7ab0c0', kind:'turtle', size:1.2, scute:'#5af0d0', eyeGlow:'#7af0d0'}, 'water', 'dragon', 'l', {k:{hp:1.7, def:2, spd:-12}}],
   // 18 ป่าหิมพานต์ชั้นใน
@@ -205,7 +205,7 @@ const BOSSES = [
   ['lordkotchasi', 'พญาคชสีห์', 'Lord Kotchasi', 129, 'quad', {skin:'#e8c050', belly:'#c8902a', acc:'#fff8e8', mane:'#c83a2a', ruff:true, head:'elephant', tusks:true, crown:true, girth:1.25, tuft:true}, 'earth', 'dragon', ['charge', 'roar', 'quake', 'enrage']],
   ['waterelephantking', 'วารีกุญชรราชา', 'King of the Water Elephants', 138, 'quad', {skin:'#2a5a9a', belly:'#7ab0e0', acc:'#f8f8ff', head:'elephant', tusks:true, crown:true, girth:1.35, fishTail:'#e3b04b', stripe:'#e3b04b', spots:true}, 'water', 'dragon', ['meteor', 'charge', 'heal', 'field']],
   ['laplaelord', 'เจ้าเมืองลับแล', 'Lord of Laplae', 147, 'human', {skin:'#d8c8c0', top:'#4a2a5a', pants:'#2a1a3a', hair:'#e8e0d8', hat:'lomphok', hatCol:'#c8a8e8', beard:true, weapon:'staff', cape:'#3a1a4a', iris:'irisVi'}, 'shadow', 'human', ['teleport', 'summon', 'barrage', 'field']],
-  ['nagaking', 'พญานาคราช', 'The Naga King', 160, 'serpent', {skin:'#1f6e52', belly:'#e8d27a', hood:'#d9a63a', crown:true, heads:7, spread:2.4, len:1.55, rise:16, thick:1.3, eyeGlow:'#ffd36a'}, 'water', 'dragon', ['barrage', 'field', 'quake', 'enrage']],
+  ['nagaking', 'พญานาคราช', 'The Naga King', 160, 'serpent', {skin:'#1f6e52', belly:'#e8d27a', hood:'#d9a63a', crown:true, naga7:true, heads:7, spread:2.4, len:1.55, rise:16, thick:1.3, eyeGlow:'#ffd36a'}, 'water', 'dragon', ['barrage', 'field', 'quake', 'enrage']],
   ['tenfacedogre', 'ยักษ์ทศพักตร์', 'The Ten-faced Ogre King', 172, 'human', {skin:'#3a7a4a', top:'#e3b04b', pants:'#a82a2a', hair:'#1a1a1a', hat:'lomphok', hatCol:'#e3b04b', fangs:true, horns:'#f0e8d0', weapon:'sword', cape:'#a82a2a', iris:'irisGr'}, 'shadow', 'demon', ['summon', 'meteor', 'slam', 'enrage']],
   ['garudaking', 'พญาครุฑ', 'The Garuda King', 186, 'bird', {body:'#c82a1a', wing:'#e3b04b', belly:'#f0d070', beak:'#e3b04b', crest:'#e3b04b', hook:true, crown:true, size:1.4, tail:'fan', tailCol:'#c82a1a', mantle:'#e3b04b'}, 'wind', 'angel', ['charge', 'barrage', 'roar', 'enrage']],
   ['vessavana', 'ท้าวเวสสุวรรณ', 'Vessavana, Lord of Giants', 205, 'human', {skin:'#2a5aa8', top:'#e3b04b', pants:'#a82a2a', hair:'#1a1a1a', hat:'lomphok', hatCol:'#f0d070', fangs:true, weapon:'sword', cape:'#e3b04b', iris:'irisVi'}, 'holy', 'demon', ['meteor', 'summon', 'slam', 'wave', 'heal', 'enrage']]
@@ -383,6 +383,47 @@ const ROAD_LV_RAW = {e:[[5, 15], [14, 24], [23, 33], [32, 42], [41, 52], [50, 62
   n:[[210, 220], [218, 228], [226, 236], [234, 244], [242, 252], [250, 262], [260, 272], [272, 286], [286, 300]]};
 if (typeof WORLD_MORE === 'function') WORLD_MORE();   // v29: thirty more regions and three hundred more species (data/world3.js)
 if (typeof WORLD_DRAGON === 'function') WORLD_DRAGON();   // dinosaurs past the east road, dragons & demons past the south road (data/world4.js)
+/* (v294) วังบาดาล: the sea creatures of the drowned naga palace (the 'fish' body in gfx/beasts.js). They join the list only
+   after the regions of world3/world4 have been generated from the roads' monsters, and at its end, so every older species
+   keeps exactly the same generated relatives, card and order as before (saves, cards and quests stay valid) */
+const CARD_LV_KEEP = {nagaretainer:249, nagawarrior:252, emeraldcrab:251, spiritpearl:250};   // (v294) the level their cards were dealt at before they moved maps
+const SPECIES_LATE = new Set(['abyssshark', 'mantaray', 'giantpuffer', 'abyssangler', 'seahorseknight', 'lionfish', 'swordfish', 'abyssoctopus', 'armorlobster']);   // (systems that number species in turn put these last)
+SPECIES.push(
+  ['abyssshark', 'ฉลามบาดาล', 'Abyss Shark', 155, 'fish', {kind:'shark', col:'#4a6478', belly:'#e8eef2', fin:'#3e5668', size:1.1}, 'water', 'fish', 'l', {aggro:true, scale:1.15, k:{atk:1.25, spd:12}}],
+  ['mantaray', 'ปลากระเบนราหู', 'Manta Ray', 151, 'fish', {kind:'manta', col:'#26303e', belly:'#eef2f4', stripe:'#d8e0e6', size:1.05}, 'water', 'fish', 'l', {k:{hp:1.4, spd:8}}],
+  ['giantpuffer', 'ปลาปักเป้ายักษ์', 'Giant Pufferfish', 148, 'fish', {kind:'puffer', col:'#e0c060', belly:'#f8f4e0', fin:'#c89a3a', spot:'#5a4a2a'}, 'water', 'fish', 'm', {k:{def:1.8, hp:1.2, spd:-15}}],
+  ['abyssangler', 'ปลาตกเบ็ดห้วงลึก', 'Abyssal Anglerfish', 157, 'fish', {kind:'angler', col:'#4c3a46', belly:'#8a7080', fin:'#2e2230', lure:'#9af0ff', eyeGlow:'#9af0ff'}, 'shadow', 'fish', 'm', {aggro:true, range:130, shot:'ice'}],
+  ['seahorseknight', 'ม้าน้ำองครักษ์', 'Seahorse Sentinel', 150, 'fish', {kind:'seahorse', col:'#e0a040', belly:'#f4d890', fin:'#f0e0b0'}, 'water', 'fish', 's', {range:120, shot:'ice'}],
+  ['lionfish', 'ปลาสิงโต', 'Lionfish', 149, 'fish', {kind:'lionfish', col:'#c8503a', belly:'#f4e8e0', stripe:'#f8f0ea', fin:'#e07a5a'}, 'shadow', 'fish', 's', {aggro:true, k:{atk:1.15}}],
+  ['swordfish', 'ปลากระโทงดาบ', 'Swordfish', 153, 'fish', {kind:'swordfish', col:'#1a3aa0', belly:'#d8e4ee', fin:'#142a70', size:.95}, 'water', 'fish', 'm', {aggro:true, k:{spd:20, atk:1.2}}],
+  ['abyssoctopus', 'ปลาหมึกยักษ์ห้วงลึก', 'Abyssal Octopus', 156, 'fish', {kind:'octopus', col:'#a84a5a', belly:'#f0c8c8', spot:'#7a2a3a', size:1.1}, 'water', 'fish', 'l', {range:120, shot:'dark', part:['หนวด', 'Tentacle'], k:{hp:1.4}}],
+  ['armorlobster', 'กุ้งมังกรเกราะ', 'Armored Lobster', 152, 'bug', {kind:'shrimp', shell:'#c8402a', leg:'#a8301e', acc:'#f0c040', bigClaw:true, size:1.25, legLen:.55}, 'water', 'fish', 'm', {k:{def:2.2}}]
+);
+/* (v296) นรกอเวจี: creatures of the lava cavern on bodies of their own (gfx/beasts.js 'cave'), appended the same way */
+for (const id of ['lavamole', 'obsidianmantis', 'volcanosnail']) SPECIES_LATE.add(id);
+SPECIES.push(
+  ['lavamole', 'ตุ่นจมูกดาวหินเพลิง', 'Star-nosed Lava Mole', 0, 'cave', {kind:'mole', col:'#4a3a34', belly:'#6a5048', acc:'#ffb04a', glow:'#ff7a1a', nose:'#e88a9a', eyeGlow:'#ffd04a'}, 'earth', 'brute', 'm', {aggro:true, k:{def:1.4, hp:1.2}}],
+  ['obsidianmantis', 'ตั๊กแตนตำข้าวออบซิเดียน', 'Obsidian Mantis', 0, 'cave', {kind:'mantis', col:'#1a1420', belly:'#2e2436', acc:'#3a2a4a', glow:'#ff8a3a', eyeGlow:'#ff5a2a'}, 'fire', 'insect', 'm', {aggro:true, k:{atk:1.25, spd:14}}],
+  ['volcanosnail', 'หอยทากภูเขาไฟ', 'Volcano Snail', 0, 'cave', {kind:'snail', col:'#5a3a2e', belly:'#7a5040', acc:'#2a201c', glow:'#ff7a1a', dark:'#3a3230', eyeGlow:'#ffd04a', size:1.1}, 'fire', 'brute', 'l', {range:120, shot:'fire', k:{hp:1.6, def:1.6, spd:-25}}]
+);
+/* (v297) สวรรค์: creatures of heaven on bodies of their own (gfx/beasts.js 'sky'), appended the same way */
+for (const id of ['skywhale', 'heavenlotus', 'devachakra']) SPECIES_LATE.add(id);
+SPECIES.push(
+  ['skywhale', 'วาฬเมฆสวรรค์', 'Heavenly Cloud Whale', 0, 'sky', {kind:'whale', col:'#5a7ea8', belly:'#f4f8ff', acc:'#dce8f6', eyeGlow:'#1e3a5a', size:1.15}, 'wind', 'fish', 'l', {k:{hp:1.7, spd:-5}}],
+  ['heavenlotus', 'บัวเทวา', 'Deva Lotus', 0, 'sky', {kind:'lotus', col:'#f8a8c8', belly:'#fff0f6', acc:'#5a9a5a', glow:'#fff4c0', eyeGlow:'#e3b04b'}, 'holy', 'plant', 'm', {range:130, shot:'holy'}],
+  ['devachakra', 'จักรเทพ', 'Divine Chakra', 0, 'sky', {kind:'chakra', col:'#d8e0f0', acc:'#e3b04b', glow:'#fff8c8', eyeGlow:'#3a8af0'}, 'holy', 'formless', 'm', {aggro:true, k:{atk:1.25, spd:12}}]
+);
+/* (v298) the last five lands' own creatures (gfx/beasts.js 'land'), appended the same way */
+for (const id of ['rockpangolin', 'hollowarmor', 'desertcamel', 'dungbeetle', 'brassautomaton', 'meadowram']) SPECIES_LATE.add(id);
+SPECIES.push(
+  ['rockpangolin', 'ตัวลิ่นหินผา', 'Cliff Pangolin', 0, 'land', {kind:'pangolin', col:'#8a5a3a', belly:'#c8a080', dark:'#2a1a10', eyeGlow:'#1e1410'}, 'earth', 'brute', 'm', {k:{def:2.2, hp:1.3}}],
+  ['hollowarmor', 'ชุดเกราะร้าง', 'Hollow Armour', 0, 'land', {kind:'armor', col:'#7a7a80', acc:'#8a4a2a', dark:'#141418', glow:'#7ad0ff'}, 'shadow', 'undead', 'm', {aggro:true, k:{def:1.8, atk:1.2}}],
+  ['desertcamel', 'อูฐทะเลทราย', 'Desert Camel', 0, 'land', {kind:'camel', col:'#c8a06a', belly:'#e0c494', dark:'#3a2a1a', eyeGlow:'#2a1a10'}, 'earth', 'brute', 'l', {k:{hp:1.6, spd:6}}],
+  ['dungbeetle', 'ด้วงกลิ้งลูกหิน', 'Boulder Dung Beetle', 0, 'land', {kind:'dungbeetle', col:'#2a3a2e', acc:'#b89a68', dark:'#14140e', eyeGlow:'#d8c060'}, 'earth', 'insect', 'm', {k:{def:1.6, atk:1.15}}],
+  ['brassautomaton', 'หุ่นกลทองเหลือง', 'Brass Automaton', 0, 'land', {kind:'automaton', col:'#c8963a', acc:'#e8c060', belly:'#e8eef0', dark:'#3a2a1a', glow:'#7ae0ff', eyeGlow:'#ff6a3a'}, 'neutral', 'formless', 'm', {aggro:true, k:{def:2, atk:1.2, spd:-8}}],
+  ['meadowram', 'แกะเขาเกลียวทุ่งหญ้า', 'Meadow Ram', 0, 'land', {kind:'sheep', col:'#f4efe4', acc:'#c8a878', dark:'#2a2420', eyeGlow:'#1e1a14', horns:true}, 'earth', 'brute', 'm', {k:{hp:1.4, def:1.3}}]
+);
+MAPS[17].mobs = ['abyssshark', 'mantaray', 'giantpuffer', 'abyssangler', 'seahorseknight', 'lionfish', 'swordfish', 'abyssoctopus', 'armorlobster', 'abyssjelly', 'thundereel', 'abyssturtle'];
 const ROAD_LV = Object.fromEntries(Object.entries(ROAD_LV_RAW).map(([d, a]) => [d, a.map(([lo, hi]) => [LVMAP(lo), Math.max(LVMAP(lo) + 2, LVMAP(hi))])]));
 const ROAD_LAND = {e:() => 'fertile', s:k => k < Math.round(ROADS.s.filter(i => !MAPS[i].landFix).length * 5 / 8) ? 'arid' : 'volcanic', w:() => 'frozen', n:k => k < Math.round(ROADS.n.length * 2 / 3) ? 'dark' : 'light'};
 const OPP = {n:'s', s:'n', e:'w', w:'e'}, DIRV = {n:[0, -1], s:[0, 1], e:[1, 0], w:[-1, 0]};
@@ -400,6 +441,19 @@ const OPP = {n:'s', s:'n', e:'w', w:'e'}, DIRV = {n:[0, -1], s:[0, 1], e:[1, 0],
   });
   for (const d in ROADS) MAPS[0].links[d] = ROADS[d][0];
 }
+/* (v294) วังบาดาล (map 17) became a sea of fish; the palace's nagas, its pearl spirit and its crab moved next door: the
+   Crimson Lake (55) and the Cursed Spire (54), at those maps' levels */
+/* (v296) the cavern's own creatures join maps 65 and 66 after the roads' levels are dealt (the older species keep theirs), at those maps' levels */
+MAPS[65].mobs.push('lavamole', 'obsidianmantis', 'volcanosnail'); MAPS[66].mobs.push('obsidianmantis', 'volcanosnail', 'lavamole');
+{ const lvOf = {lavamole:[65, .3], obsidianmantis:[65, .65], volcanosnail:[66, .4]}; for (const id in lvOf){ const sp = SPECIES.find(x => x[0] === id), mp = MAPS[lvOf[id][0]]; if (sp && mp) sp[3] = Math.round(mp.lv[0] + lvOf[id][1] * (mp.lv[1] - mp.lv[0])); } }
+/* (v297) heaven's own creatures join maps 30 and 60 the same way */
+MAPS[30].mobs.push('skywhale', 'heavenlotus', 'devachakra'); MAPS[60].mobs.push('devachakra', 'skywhale', 'heavenlotus');
+{ const lvOf = {skywhale:[30, .5], heavenlotus:[30, .3], devachakra:[30, .75]}; for (const id in lvOf){ const sp = SPECIES.find(x => x[0] === id), mp = MAPS[lvOf[id][0]]; if (sp && mp) sp[3] = Math.round(mp.lv[0] + lvOf[id][1] * (mp.lv[1] - mp.lv[0])); } }
+/* (v298) the last five lands' creatures join their maps the same way, at those maps' levels */
+{ const home = {rockpangolin:[22, 39], hollowarmor:[51, 9], desertcamel:[21, 40], dungbeetle:[40, 21], brassautomaton:[10, 13], meadowram:[31, 32]};
+  for (const id in home){ for (const m of home[id]) if (MAPS[m] && !MAPS[m].mobs.includes(id)) MAPS[m].mobs.push(id); const sp = SPECIES.find(x => x[0] === id), mp = MAPS[home[id][0]]; if (sp && mp) sp[3] = Math.round((mp.lv[0] + mp.lv[1]) / 2); } }
+for (const [id, to] of [['nagaretainer', 55], ['spiritpearl', 55], ['nagawarrior', 54], ['emeraldcrab', 54]]){ const sp = SPECIES.find(x => x[0] === id), mp = MAPS[to];
+  if (!sp || !mp) continue; if (!mp.mobs.includes(id)) mp.mobs.push(id); sp[3] = Math.round((mp.lv[0] + mp.lv[1]) / 2); }
 
 /* ---------- market & shrine NPC looks ---------- */
 Object.assign(SPR.CHARS, {
@@ -415,7 +469,7 @@ const SPECIES_ARCH = {};
 for (const [id, th, en, lvl, arch, look, elem, race, size, x] of SPECIES){
   const st = statsFor(lvl, x.k, LVINV(lvl)), mat = `m_${id}`;
   BEAST.make(id, {arch, race, ...look, scale:x.scale || 1, fs:x.fs || 64});
-  ITEMS[mat] = {name:PART[arch][0] + th, en:`${en} ${PART[arch][1]}`, sell:Math.round(4 + lvl * 3.2), kind:'etc'};
+  ITEMS[mat] = {name:(x.part || PART[arch])[0] + th, en:`${en} ${(x.part || PART[arch])[1]}`, sell:Math.round(4 + lvl * 3.2), kind:'etc'};
   const pot = lvl < 30 ? 'redpot' : lvl < 70 ? 'orangepot' : lvl < 130 ? 'whitepot' : lvl < 200 ? 'elixirpot' : 'divinepot';
   MOB[id] = {name:th, en, ...st, elem, race, size, r:size === 'l' ? 18 : size === 'm' ? 14 : 11, aggro:!!x.aggro, range:x.range || 0, shot:x.shot || null, night:!!x.night,
     drops:[[mat, .55], [pot, .07], ['ore', .03 + Math.min(.06, lvl / 3000)], ['bluepot', .03]], card:null, cardRate:0, h:null};

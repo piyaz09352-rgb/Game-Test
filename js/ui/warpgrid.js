@@ -9,7 +9,7 @@ const WG_Z = 7;   // world map painting shown at 7× the picture's width: one re
 function wgPicPos(id){ const [x, y] = wmPic(id), r = 9 / 16;
   const px = (WG_Z * x - .5) / (WG_Z - 1), py = (WG_Z * y - r / 2) / (WG_Z - r);
   return `${(clamp(px, 0, 1) * 100).toFixed(2)}% ${(clamp(py, 0, 1) * 100).toFixed(2)}%`; }
-const wgArt = k => `<img alt="" data-mart="${k}" src="${mobArt(k) || MART_NONE}">`;
+const wgArt = k => `<img alt="" data-mart="${k}" src="${(typeof MOB_ART !== 'undefined' && MOB_ART[k]) || MART_NONE}">`;   // (v298) a picture is asked for only when its card scrolls into view (asking for ~500 at once froze phones for seconds)
 
 function wgHTML(n){
   const boat = n.id === 'boatman', list = MAPS.slice().sort((a, b) => a.lv[0] - b.lv[0] || a.lv[1] - b.lv[1] || a.id - b.id);
@@ -35,7 +35,7 @@ function wgOpen(n){
   const here = b.querySelector('.wgc.here'); if (here) here.scrollIntoView({block:'center'});
   // (v153) the monster pictures of the cards on screen are painted first (they used to wait behind every card above them)
   if (typeof IntersectionObserver === 'function' && typeof MARTQ !== 'undefined'){ const io = new IntersectionObserver(es => { for (const e of es){ if (!e.isIntersecting) continue; io.unobserve(e.target);
-      for (const im of e.target.querySelectorAll('img[data-mart]')){ const k = im.dataset.mart, i = MARTQ.q.indexOf(k); if (i > 0){ MARTQ.q.splice(i, 1); MARTQ.q.unshift(k); } } } }, {root:b.querySelector('.wggrid')});
+      for (const im of e.target.querySelectorAll('img[data-mart]')){ const k = im.dataset.mart; if (MOB_ART[k]) { im.src = MOB_ART[k]; continue; } mobArt(k); const i = MARTQ.q.indexOf(k); if (i > 0){ MARTQ.q.splice(i, 1); MARTQ.q.unshift(k); } } } }, {root:b.querySelector('.wggrid')});
     b.querySelectorAll('.wgc').forEach(c => io.observe(c)); }
 }
 function wgClose(){ const b = el('warpGrid'); if (b && !b.hidden){ b.hidden = true; b.innerHTML = ''; } }

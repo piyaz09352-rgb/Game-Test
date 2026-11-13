@@ -36,7 +36,7 @@ for (const k in MOB){
     else d.reach = d.r + (POLE.has(k) ? 28 : n.wp === 'sword' ? 24 : 15);
   }
   else if (n.a === 'floater'){ d.range = 110; d.shot = ELEM_SHOT[d.elem] || 'dark'; }
-  else d.reach = d.r + ({serpent:26, bird:20, rock:18, quad:d.size === 'l' ? 22 : 16, squat:14, bug:14, slime:10}[n.a] || 14);
+  else d.reach = d.r + ({serpent:26, bird:20, rock:18, quad:d.size === 'l' ? 22 : 16, squat:14, bug:14, slime:10, fish:20, cave:16, sky:18, land:18}[n.a] || 14);
 }
 const mobReach = d => (d.range ? d.range : d.reach || d.r + 12);
 

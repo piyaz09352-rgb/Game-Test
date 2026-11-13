@@ -121,7 +121,7 @@ function keyVec(){ let x = 0, y = 0; for (const k of JOY.keys){ x += KEYDIR[k][0
 window.addEventListener('keydown', e => {
   if (PAUSED || typing(e) || !plainKey(e)) return;
   const k = keyOf(e);   // by position: W A S D work with the Thai layout too
-  if (!(k in KEYDIR) || !el('ui').classList.contains('moba') && !k.startsWith('arrow')) return;
+  if (!(k in KEYDIR)) return;   // (v298) the owner: W A S D move the hero on a PC too (not only in joystick mode)
   JOY.keys.add(k); e.preventDefault(); e.stopImmediatePropagation();
 }, true);
 window.addEventListener('keyup', e => { const k = keyOf(e); if (JOY.keys.delete(k) && !JOY.keys.size && !JOY.active) P.tx = null; });

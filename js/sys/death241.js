@@ -187,3 +187,14 @@ function dthHide(){ DTH.shown = false; const d = el('dth'); if (d){ d.hidden = t
     #dth .dthb{min-height:52px;font-size:15px}#dth .dthico{width:34px;height:34px}
   }
   @media (prefers-reduced-motion:reduce){#dth *,#dth{animation-duration:.01s!important;animation-iteration-count:1!important}}`; document.head.appendChild(st); }
+
+/* (v294) the owner: fallen, then sent out of the server for idling (the sign waits for a button), and entering again
+   put the hero back on that map at 0 HP — and dead once more. A hero saved fallen (0 HP) now wakes in town with half
+   HP/SP, the way «เกิดที่เมือง» would have (the EXP for that fall was already lost: nothing is taken twice). */
+{ const _lm = loadMap; loadMap = function(id){
+    if (typeof S !== 'undefined' && S && S.hp <= 0 && !P.dead && !(typeof TW !== 'undefined' && TW.active)){ id = 0; S.map = 0; S.x = VSPAWN.x; S.y = VSPAWN.y; S.hp = 1; DTH.wake = true; }
+    const r = _lm.call(this, id);
+    if (DTH.wake){ P.x = VSPAWN.x; P.y = VSPAWN.y; } return r; }; }
+EV.on('tick', () => { if (!DTH.wake || !S || typeof DER === 'undefined' || !DER || !DER.maxhp || P.dead) return; DTH.wake = false; P.x = VSPAWN.x; P.y = VSPAWN.y; S.x = P.x; S.y = P.y;
+  S.hp = Math.max(1, Math.round(DER.maxhp * .5)); S.sp = Math.max(S.sp || 0, Math.round(DER.maxsp * .5)); dirty = true;
+  if (typeof toast === 'function') toast(L('คุณล้มไว้ก่อนออกจากเกม · ฟื้นที่เมืองแล้ว', 'You had fallen before leaving · you woke in town')); });

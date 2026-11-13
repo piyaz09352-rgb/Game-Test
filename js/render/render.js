@@ -17,7 +17,7 @@ const cam = {x:0, y:0}, CAMS = {x:null, y:null, t:0, map:-1};
 let nightA = 0;
 /* height of each monster (name tag, HP bar, hit point); generated species get it from their archetype and scale */
 const MOB_H0 = {dewblob:22, hare:26, boar:32, lantern:44, boss:70};
-const ARCH_H = {quad:30, bird:30, serpent:26, bug:22, squat:22, floater:42, slime:22, rock:32, human:46};
+const ARCH_H = {quad:30, bird:30, serpent:26, bug:22, squat:22, floater:42, slime:22, rock:32, human:46, fish:36, cave:30, sky:38, land:32};
 const MOB_H = new Proxy(MOB_H0, {get:(o, k) => o[k] ?? (o[k] = Math.round((ARCH_H[typeof SPECIES_ARCH !== 'undefined' && SPECIES_ARCH[k]] || 30) * ((SPR.MOBS[k] && SPR.MOBS[k].scale) || 1)))});
 function applyPX(px){
   const ow = SW / PX, oh = SH / PX;
@@ -485,7 +485,7 @@ function render(){
   }
   VFX.drawOver(g, cam.x, cam.y);
   if (typeof LIVE !== 'undefined') LIVE.drawOver(g);   // birds, butterflies, fireflies, leaves, smoke, cloud shadows
-  const target = isNight() && !(typeof twmOn === 'function' && twmOn()) ? .58 : 0;   // (v264) indoors in the tower: no night veil (it dulled the hall's own fire and light)
+  const target = isNight() && !(typeof twmOn === 'function' && twmOn()) && !(typeof heavenHere === 'function' && heavenHere()) ? .58 : 0;   // (v297) heaven has no night: it shines by its own light   // (v264) indoors in the tower: no night veil (it dulled the hall's own fire and light)
   nightA += ((SETTINGS.nightFx ? target : 0) - nightA) * .02;
   if (nightA > .01){
     nctx.setTransform(1, 0, 0, 1, 0, 0); nctx.globalCompositeOperation = 'source-over'; nctx.clearRect(0, 0, night.width, night.height); nctx.setTransform(night.width / VW, 0, 0, night.height / VH, 0, 0);

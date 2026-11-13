@@ -49,7 +49,8 @@ const helperOf = () => (S && S.helper && HELPERS[S.helper.k] && (S.helper.free |
 const helperPaid = () => { const h = helperOf(); return h && !h.free ? h : null; };
 const isHunter = () => !!(S && JOBS[S.job] && jobChain().includes('ranger'));
 const needPet = () => isHunter() && !S.pet;
-const rentLeft = s => { s = Math.max(0, Math.ceil(s)); if (s >= 86400){ const dd = Math.floor(s / 86400), hh = Math.floor(s % 86400 / 3600); return L(`${dd} วัน ${hh} ชม.`, `${dd}d ${hh}h`); } const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return h ? L(`${h} ชม. ${m} นาที`, `${h}h ${m}m`) : m ? L(`${m} นาที`, `${m} min`) : L(`${s} วินาที`, `${s}s`); };
+const rentLeft = s => { if (s > 1e8) return L("ไม่จำกัด (ฟรี)", "no limit (free)"); s = Math.max(0, Math.ceil(s));   // (v300) a free robot never runs out
+  if (s >= 86400){ const dd = Math.floor(s / 86400), hh = Math.floor(s % 86400 / 3600); return L(`${dd} วัน ${hh} ชม.`, `${dd}d ${hh}h`); } const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60); return h ? L(`${h} ชม. ${m} นาที`, `${h}h ${m}m`) : m ? L(`${m} นาที`, `${m} min`) : L(`${s} วินาที`, `${s}s`); };
 
 /* how much a drop matters: gear by rarity, then value; the helper always fetches the highest score first */
 function helperScore(id){
@@ -199,7 +200,7 @@ for (const k in HLP_ANIM){ const im = new Image(); im.onload = () => { const n =
   im.onerror = () => {}; im.src = `assets/helpers/${k}_anim.png?v=${typeof GAMEV !== 'undefined' && GAMEV ? GAMEV : 274}`; }
 const HLP_IMG_SZ = 24;   // (v274) about half the hero's height: a helper, not a second hero (34 was too big)
 function drawBotImg(g, k, t, opt){
-  const FR = HLP_FR[k], im = FR && !(typeof GFX !== 'undefined' && GFX.preset === 'low') ? FR[Math.floor(t / HLP_ANIM[k].dt) % FR.length] : HLP_IMG[k], R = HELPERS[k], c = R.c, sz = opt.size || HLP_IMG_SZ, k2 = sz / Math.max(im.width, im.height), w = im.width * k2, h = im.height * k2;
+  const FR = HLP_FR[k], im = FR ? FR[Math.floor(t / HLP_ANIM[k].dt) % FR.length] : HLP_IMG[k],   /* (v296) the owner's animation plays on every graphics level (it is only a frame swap) */ R = HELPERS[k], c = R.c, sz = opt.size || HLP_IMG_SZ, k2 = sz / Math.max(im.width, im.height), w = im.width * k2, h = im.height * k2;
   const still = typeof GFX !== 'undefined' && GFX.preset === 'low', ph = (k.charCodeAt(0) || 1) * .7;
   const breathe = still ? 1 : 1 + Math.sin(t * 2.4 + ph) * .035, tilt = still ? 0 : (opt.mv ? .14 * (opt.face || 1) : Math.sin(t * 1.3 + ph) * .07);
   // glow behind, in its own colour, breathing
@@ -246,7 +247,8 @@ function drawHelperW(g){
 { const _ents = LIVE.ents; LIVE.ents = function(list, g){ _ents(list, g); if (helperOf() && !P.dead) list.push({y:HLP.y, f:() => drawHelperW(g)}); }; }
 /* a still picture for the shop (cached) */
 const BOT_PIC = {};
-function botPic(k){ if (BOT_PIC[k]) return BOT_PIC[k];
+function botPic(k){ if (HLP_ANIM[k]) return `assets/helpers/${k}.gif?v=${typeof GAMEV !== 'undefined' && GAMEV ? GAMEV : 296}`;   // (v296) the owner's animated GIF itself, so the shop and the windows show it moving (it was a still picture)
+  if (BOT_PIC[k]) return BOT_PIC[k];
   if (HLP_IMG[k]) return (BOT_PIC[k] = HLP_IMG[k].src);   // the owner's picture as it is (the shop makes it float and glow)
   const cv = document.createElement('canvas'); cv.width = cv.height = 96; const g = cv.getContext('2d');
   g.translate(48, 50); g.scale(2.6, 2.6); try { drawBot(g, k, 1.1, {}); } catch (e) {} return (BOT_PIC[k] = cv.toDataURL()); }
@@ -293,8 +295,8 @@ NPC_OPEN.beastkeeper = n => {
       <div class="rentbtns">${RENT_TIME.map((t, i) => `<button class="btn sm cgo" data-rentpet="${k}" data-rt="${i}" ${coins >= rentPrice(k, i) ? '' : 'disabled'}>${L(t.th, t.en)}<br><small>◈ ${rentPrice(k, i)}</small></button>`).join('')}</div></div>`; };
   npcFrame(n, L('สมัยนี้ลุงเลี้ยงหุ่นยนต์แล้วนะ! หุ่นผู้ช่วยไม่สู้กับใคร แต่บินไปเก็บของที่ดรอปมาให้ เลือกของสำคัญก่อนเสมอ · มือใหม่รับฟรีได้ 1 ตัว', 'These days I keep robots! A helper never fights, but it flies off to fetch your drops, always the most important first · newcomers get one free.'),
     `${h ? `<div class="sec">${L('หุ่นที่อยู่กับคุณ', 'With you now')}</div><div class="shop"><div class="srow owned">${hlpPic(h.k)}<div class="nm"><b>${cur.en} <span class="ct">${cur.th}</span></b><small><b class="hlpbuff">${h.free ? L(...cur.buff) : `EXP +10% · JOB +10% · ${L(...cur.buff)}`}</b> · ${h.free ? L('ฟรี ใช้ได้ตลอด', 'free, for keeps') : `${L('เหลือ', 'left')} ${rentLeft(h.left)}`}</small></div>${h.free ? '' : `<button class="btn sm" data-rentback="1">${L('คืนหุ่น', 'Hand back')}</button>`}</div></div>` : ''}
-     <div class="sec">${L('หุ่นผู้ช่วยรุ่นพรีเมียม (เช่าด้วยเหรียญวายรา)', 'Premium helper robots (Vayra Coins)')} <span class="ct">${L('เก็บวินาทีละ 1 ชิ้น', '1 item a second')} · ◈ ${fmtN(coins)}</span></div><div class="shop">${HLP_PAID.map(paidRow).join('')}</div>
-     <p class="hint">${L('ทุกตัว EXP +10% และ JOB +10% พร้อมบัฟเล็ก ๆ ของตัวเอง · เวลานับตามนาฬิกาจริง · เช่าตัวเดิมซ้ำ = ต่อเวลา · เช่าตัวใหม่ = แทนตัวเดิม · หมดเวลาแล้วหุ่นฟรีของคุณกลับมาเอง', 'Each gives EXP +10% and Job EXP +10% plus a small buff of its own · real-clock time · rent the same one again to extend · a new one replaces the old · when it ends, your free robot comes back')}</p>
+     <div class="sec">${L('หุ่นผู้ช่วยรุ่นพรีเมียม (ใช้ฟรี)', 'Premium helper robots (free)')} <span class="ct">${L('เก็บวินาทีละ 1 ชิ้น', '1 item a second')}</span></div><div class="shop">${HLP_PAID.map(paidRow).join('')}</div>
+     <p class="hint">${L('ทุกตัว EXP +10% และ JOB +10% พร้อมบัฟเล็ก ๆ ของตัวเอง · ใช้ฟรี ไม่หมดเวลา · เลือกตัวใหม่ = แทนตัวเดิม', 'Each gives EXP +10% and Job EXP +10% plus a small buff of its own · free, with no time limit · picking another replaces the one with you')}</p>
      <div class="sec">${L('หุ่นผู้ช่วยฟรีสำหรับมือใหม่ (เลือก 1 ตัว ใช้ได้ตลอด)', 'Free starter robots (pick one, for keeps)')} <span class="ct">${L('เก็บ 2 วินาทีต่อชิ้น · ไม่มีบัฟ', '2 s per item · no buff')}</span></div><div class="shop">${HLP_FREE.map(freeRow).join('')}</div>
      <div class="sec">${L('ที่จับสัตว์', 'Capture gear')} <span class="ct">${L('ระดับสูง = จับง่ายขึ้น ได้เกรดสูงบ่อยขึ้น', 'higher tier = easier catch, better grades')}</span></div><div class="shop">${CAP_NETS.map(netRow).join('')}</div>
      <p class="hint">${L('กดจับ (T) เมื่อมอน HP ไม่เกิน 30% · ใช้ที่จับชิ้นที่ดีที่สุดในกระเป๋าเอง หมดเมื่อจับสำเร็จ · ไม่มีก็จับได้ แต่โอกาสต่ำกว่า', 'Press Catch (T) when a monster is under 30% HP · the best gear in your bag is used, used up on success · you can catch without it, at lower odds')}</p>

@@ -71,7 +71,7 @@ function cshBots(){
     <div class="cshgrid bots">${HLP_PAID.map(k => { const R = HELPERS[k];
       return `<div class="cshit bot"><span class="cshic botic"><img src="${botPic(k)}" alt=""></span><b>${R.en} <span class="ct">${R.th}</span></b><small><b class="hlpbuff">EXP +10% · JOB +10% · ${L(...R.buff)}</b></small>
         <div class="cshb">${RENT_TIME.map((t, i) => `<button class="btn sm cgo" data-rentpet="${k}" data-rt="${i}" ${cshCoins() >= rentPrice(k, i) ? '' : 'disabled'}>${L(t.th, t.en)} ◈${rentPrice(k, i)}</button>`).join('')}</div></div>`; }).join('')}</div>
-    <p class="hint">${L('หุ่นไม่สู้ บินไปเก็บของให้วินาทีละชิ้น ของสำคัญก่อน · หุ่นฟรี (เก็บ 2 วินาทีต่อชิ้น) รับได้ที่ลุงบุญมา นครอาเรน · หมดเวลาเช่าแล้วหุ่นฟรีกลับมาเอง', 'Robots never fight; they fetch a drop a second, the most important first · free robots (2 s an item) from Uncle Boonma in Aren · your free robot returns when a rental ends')}</p>`;
+    <p class="hint">${L('หุ่นไม่สู้ บินไปเก็บของให้วินาทีละชิ้น ของสำคัญก่อน · ทุกตัวใช้ฟรี ไม่หมดเวลา · เปลี่ยนตัวได้ตลอด ที่นี่หรือที่ลุงบุญมา นครอาเรน', 'Robots never fight; they fetch a drop a second, the most important first · every robot is free with no time limit · swap any time, here or with Uncle Boonma in Aren')}</p>`;
 }
 function cshServices(){
   const n = (S.bagX | 0), max = typeof BAGX !== 'undefined' && n >= BAGX.max, fee = typeof BAGX !== 'undefined' ? BAGX.price(n) : 0;

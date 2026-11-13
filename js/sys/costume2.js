@@ -69,7 +69,7 @@ const WINGS = {
 };
 const COS_TRIAL = {on:true, days:0};   // free trial of every costume and wing; days 0 = no limit (for now)
 const XCOS = {};   // cosmetic mounts and pets (filled by sys/cosx.js): {id: {slot:'mount'|'pet', th, en, price, c:[c1, c2]}}
-const cosHave = id => (COSTUME[id] ? (COSTUME[id].src === 'free' || !!(ACC.wardrobe || {})[id]) : (WINGS[id] || XCOS[id]) ? !!(ACC.wardrobe || {})[id] : false);
+const cosHave = id => !!(COSTUME[id] || WINGS[id] || XCOS[id]);   // (v298) the owner: fashion is free again: every outfit, wing and piece can be worn by everyone
 const cosUsable = id => cosHave(id) || (COS_TRIAL.on && !!(COSTUME[id] || WINGS[id] || XCOS[id]) && (COSTUME[id] || {}).src !== 'event');   // festival costumes: no trial
 const cosTrial = id => !cosHave(id) && cosUsable(id);
 const itemName2 = id => (WINGS[id] ? L(WINGS[id].th, WINGS[id].en) : XCOS[id] ? L(XCOS[id].th, XCOS[id].en) : cosName(id));

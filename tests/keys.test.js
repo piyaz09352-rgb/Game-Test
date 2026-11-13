@@ -11,11 +11,15 @@ test('keys: Thai layout shortcuts, number keys, typing and the guide', { skip, t
     await page.evaluate(() => { if (typeof REST !== 'undefined'){ if (REST.on) leaveRest(); REST.lastIn = Date.now(); } });   // the rest screen eats the first key
     const press = (key, code, opt = {}) => page.evaluate(([key, code, opt]) => { if (REST.on) leaveRest(); REST.lastIn = Date.now(); const t = opt.on ? document.querySelector(opt.on) : document.body;
       t.dispatchEvent(new KeyboardEvent('keydown', {key, code, bubbles:true, cancelable:true, shiftKey:!!opt.shift})); }, [key, code, opt]);
-    // Thai layout: A types "ฟ", but it is still the Status key
-    await press('ฟ', 'KeyA');
-    assert.ok(await page.evaluate(() => !!UIS.open.stat), 'A (ฟ) opens Status');
-    await press('ฟ', 'KeyA');
+    // Thai layout: C types "แ", but it is still the Status key (v298: W A S D walk, so Status moved from A to C)
+    await press('แ', 'KeyC');
+    assert.ok(await page.evaluate(() => !!UIS.open.stat), 'C (แ) opens Status');
+    await press('แ', 'KeyC');
     assert.ok(await page.evaluate(() => !UIS.open.stat), 'and closes it');
+    // A (ฟ) walks instead of opening anything
+    await press('ฟ', 'KeyA');
+    assert.ok(await page.evaluate(() => !UIS.open.stat && JOY.keys.has('a')), 'A walks (it opens nothing)');
+    await page.evaluate(() => window.dispatchEvent(new KeyboardEvent('keyup', {key:'ฟ', code:'KeyA'})));
     // Thai layout: 3 types "-" and 2 types "/": they are hotbar keys, not zoom or the guide
     const z0 = await page.evaluate(() => ZOOM.target);
     await press('-', 'Digit3'); await press('/', 'Digit2');

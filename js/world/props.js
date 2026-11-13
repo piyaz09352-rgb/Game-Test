@@ -22,33 +22,41 @@ const pv = (g, pts) => { g.beginPath(); g.moveTo(pts[0], pts[1]); for (let i = 2
 const ov = (g, x, y, rx, ry, rot = 0) => { g.beginPath(); g.ellipse(x, y, rx, ry, rot, 0, 7); };
 
 /* 1px dark outline around the painted shape (same treatment as the sprites) */
-function outlinePass(c, width = 2){
-  const g = c.getContext('2d'), w = c.width, h = c.height, img = g.getImageData(0, 0, w, h), d = img.data;
+function outlinePass(c, width = 2){   // (v300) same pixels as before, without a new array per pixel: a map's props drew in half the time
+  const g = c.getContext('2d'), w = c.width, h = c.height, img = g.getImageData(0, 0, w, h), d = img.data, src = new Uint8ClampedArray(d.length);
   for (let pass = 0; pass < width; pass++){
-    const src = d.slice();
-    for (let y = 0; y < h; y++) for (let x = 0; x < w; x++){
-      const i = (y * w + x) * 4; if (src[i + 3] > 40) continue;
-      let best = -1, ba = 0;
-      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]){
-        const xx = x + dx, yy = y + dy; if (xx < 0 || yy < 0 || xx >= w || yy >= h) continue;
-        const j = (yy * w + xx) * 4; if (src[j + 3] > ba){ ba = src[j + 3]; best = j; }
+    src.set(d); const k = pass ? .55 : .38, a1 = pass ? 200 : 255;
+    for (let y = 0; y < h; y++){ const row = y * w;
+      for (let x = 0; x < w; x++){
+        const i = (row + x) * 4; if (src[i + 3] > 40) continue;
+        let best = -1, ba = 0, j;
+        if (x + 1 < w){ j = i + 4; if (src[j + 3] > ba){ ba = src[j + 3]; best = j; } }   // the old order: right, left, below, above (the first strongest wins)
+        if (x > 0){ j = i - 4; if (src[j + 3] > ba){ ba = src[j + 3]; best = j; } }
+        if (y + 1 < h){ j = i + w * 4; if (src[j + 3] > ba){ ba = src[j + 3]; best = j; } }
+        if (y > 0){ j = i - w * 4; if (src[j + 3] > ba){ ba = src[j + 3]; best = j; } }
+        if (ba > 160){ d[i] = src[best] * k; d[i + 1] = src[best + 1] * k * .95; d[i + 2] = src[best + 2] * k * 1.05; d[i + 3] = a1; }
       }
-      if (best >= 0 && ba > 160){ const k = pass ? .55 : .38; d[i] = src[best] * k; d[i + 1] = src[best + 1] * k * .95; d[i + 2] = src[best + 2] * k * 1.05; d[i + 3] = pass ? 200 : 255; }
     }
   }
   g.putImageData(img, 0, 0);
 }
 function makeProp(spec){
   const {w, h, ax, ay, paint, shadow, collide = 0} = spec, S = GFX.ps;   // painted at the quality preset's density
-  const body = document.createElement('canvas'); body.width = Math.ceil(w * S); body.height = Math.ceil(h * S);
-  const g = body.getContext('2d'); g.setTransform(S, 0, 0, S, ax * S, ay * S); g.lineJoin = 'round'; g.lineCap = 'round';
-  paint(g, propRng(spec.seed || 1));
-  outlinePass(body, 2);
-  const c = document.createElement('canvas'); c.width = body.width; c.height = body.height;
-  const cg = c.getContext('2d');
-  if (shadow){ cg.setTransform(S, 0, 0, S, ax * S, ay * S); cg.fillStyle = 'rgba(30,40,18,.30)'; ov(cg, shadow[2] || 0, 1, shadow[0], shadow[1]); cg.fill(); cg.setTransform(1, 0, 0, 1, 0, 0); }
-  cg.drawImage(body, 0, 0);
-  return {img:c, w, h, ax, ay, collide, glow:spec.glow || null};
+  // (v302) painted the first time the picture is needed (when the prop first comes on screen), not when the map is laid out:
+  // a map places 60+ kinds of prop and most are nowhere near the hero on arrival. Size, anchor and collision are known at once.
+  let pic = null;
+  const build = () => {
+    const body = document.createElement('canvas'); body.width = Math.ceil(w * S); body.height = Math.ceil(h * S);
+    const g = body.getContext('2d', {willReadFrequently:true});   // (v300) painted once and read back once for the outline: kept in memory, not on the graphics card
+    g.setTransform(S, 0, 0, S, ax * S, ay * S); g.lineJoin = 'round'; g.lineCap = 'round';
+    paint(g, propRng(spec.seed || 1));
+    outlinePass(body, 2);
+    const c = document.createElement('canvas'); c.width = body.width; c.height = body.height;
+    const cg = c.getContext('2d');
+    if (shadow){ cg.setTransform(S, 0, 0, S, ax * S, ay * S); cg.fillStyle = 'rgba(30,40,18,.30)'; ov(cg, shadow[2] || 0, 1, shadow[0], shadow[1]); cg.fill(); cg.setTransform(1, 0, 0, 1, 0, 0); }
+    cg.drawImage(body, 0, 0);
+    return c; };
+  return {get img(){ return pic || (pic = build()); }, set img(v){ pic = v; }, w, h, ax, ay, collide, glow:spec.glow || null};
 }
 
 /* ---------- painting helpers ---------- */
