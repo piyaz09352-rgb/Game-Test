@@ -84,7 +84,14 @@ const BEAST = (() => {
         // (v119) a cat strikes with a fore paw: on the blow the front foot on the striking side lifts and reaches
         const paw = hd === 'cat' && act === 'attack' && z > 0 && sd > 0 ? (f === 2 ? 1 : f === 1 ? .4 : 0) : 0;
         const top = T([sd * (R * .55), by - R * .3, z]), foot = add(add(top, rotX([sd * splay, -(by - R * .3) + .6, 0], o.sw * k)), [0, paw * 6, paw * 4]);
-        cap(cx, top, foot, 2.6 * gir * (hd === 'elephant' ? 1.5 : 1), 2.1 * gir * (hd === 'elephant' ? 1.4 : 1), SK, {tex:(nn, lo, q, t) => (t > .8 ? {m:s.hoof ? AC : SK, t:2} : SO && t > .5 ? {m:SO} : undefined)});
+        if (hd === 'elephant' || splay){ cap(cx, top, foot, 2.6 * gir * (hd === 'elephant' ? 1.5 : 1), 2.1 * gir * (hd === 'elephant' ? 1.4 : 1), SK, {tex:(nn, lo, q, t) => (t > .8 ? {m:s.hoof ? AC : SK, t:2} : SO && t > .5 ? {m:SO} : undefined)}); continue; }
+        // (v301) a leg from life: a thick upper leg, a joint (the knee in front, the hock bent back behind), a slim lower leg,
+        // then a hoof or a paw with toes — not one straight post
+        const fore = z > 0, jt = add(lerp3(top, foot, fore ? .5 : .46), [0, 0, (fore ? .7 : -1.5) * leg * (1 - Math.min(1, paw))]), tk = gir;
+        cap(cx, top, jt, 2.9 * tk, 2 * tk, SK, {}); cap(cx, jt, foot, 1.9 * tk, 1.55 * tk, SK, {tex:(nn, lo, q, t) => (SO && t > .15 ? {m:SO} : undefined)});
+        ell(cx, jt, 2.05 * tk, 2.05 * tk, SK, {});
+        if (s.hoof){ cap(cx, add(foot, [0, .9, .2]), add(foot, [0, -.3, .7]), 1.75 * tk, 2 * tk, AC, {tex:nn => (Math.abs(nn[0]) < .12 && nn[2] > 0 ? {dt:2} : undefined)}); }   // a cloven hoof
+        else { ell(cx, add(foot, [0, 0, .9]), 2.1 * tk, 1.35 * tk, SO || SK, {rz:2.5 * tk, tex:nn => (nn[2] > .25 && Math.abs(Math.sin(nn[0] * 5.2)) > .93 ? {dt:2} : undefined)}); }   // a paw, the toes parted
       }
       // body
       cx.gid = 1; ell(cx, T([0, by, -L * .7]), R, R * .88, SK, {tex:skinTex});
@@ -1529,7 +1536,8 @@ const BEAST = (() => {
         cx.gid = 7; cap(cx, add(hd, [0, -.4 * sz, 1.6 * sz]), add(hd, [0, -1.6 * sz, 5.4 * sz]), 2 * sz, 1.6 * sz, BE, {tex:nn => (nn[1] < -.35 ? {m:DK} : undefined)});   // the muzzle and drooping lip
         for (const sd of [-1, 1]){ cx.gid = 8 + (sd > 0 ? 1 : 0); cap(cx, add(hd, [sd * 1.6 * sz, 2 * sz, -1 * sz]), add(hd, [sd * 2.2 * sz, 3.6 * sz, -2 * sz]), .7 * sz, .3, SK, {}); }   // ears
         for (const [zz, ph] of [[6, 0], [-6, Math.PI]]) for (const sd of [-1, 1]){ const sw = Math.sin(st + ph + (sd > 0 ? Math.PI : 0)) * (act === 'walk' ? 3 : 0), hip = P([sd * 3.6, H0 - 3, zz]), kn = P([sd * 3.8, H0 * .5, zz + sw * .6]), ft = P([sd * 3.8, .8, zz + sw]);
-          cx.gid = 10 + (zz > 0 ? 0 : 2) + (sd > 0 ? 1 : 0); cap(cx, hip, kn, 2 * sz, 1.3 * sz, SK, {}); cap(cx, kn, ft, 1.3 * sz, 1 * sz, SK, {}); ell(cx, ft, 1.8 * sz, 1 * sz, BE, {rz:1.4}); }   // long legs, broad pads
+          cx.gid = 10 + (zz > 0 ? 0 : 2) + (sd > 0 ? 1 : 0); kn[2] += (zz > 0 ? .8 : -1.6) * sz; cap(cx, hip, kn, 2.5 * sz, 1.5 * sz, SK, {}); cap(cx, kn, ft, 1.35 * sz, 1.05 * sz, SK, {}); ell(cx, kn, 1.75 * sz, 1.75 * sz, zz > 0 ? BE : SK, {});   // (v301) thick thighs, knobbly knees (callused in front), the hock bent back
+          ell(cx, add(ft, [0, 0, .9 * sz]), 2 * sz, 1 * sz, BE, {rz:2.5 * sz, tex:nn => (Math.abs(nn[0]) < .13 && nn[2] > 0 ? {m:DK} : undefined)}); }   // a broad two-toed pad
         cx.gid = 20; cap(cx, P([0, H0 + 2, -8.6]), P([Math.sin(o.ph * 2) * 1.2, H0 - 6, -10.4]), .8 * sz, .5 * sz, SK, {});   // the tail
         return; }
       if (kind === 'dungbeetle'){ fallPre(cx, o, 6 * sz);
@@ -1564,7 +1572,8 @@ const BEAST = (() => {
       for (const sd of [-1, 1]){ cx.gid = 22 + (sd > 0 ? 1 : 0); cap(cx, add(hd, [sd * 2.6 * sz, 1.2 * sz, -1 * sz]), add(hd, [sd * 4.6 * sz, .2 * sz, -1.6 * sz]), 1 * sz, .7 * sz, DK, {}); }   // ears
       if (s.horns){ for (const sd of [-1, 1]){ let p0 = add(hd, [sd * 2 * sz, 2.4 * sz, -.6 * sz]); for (let k = 1; k <= 5; k++){ const a = k / 5 * Math.PI * 1.4, p1 = add(hd, [sd * (2.6 + Math.sin(a) * 2.6) * sz, (2.4 + Math.cos(a) * 2.4 - k * .2) * sz, (-.6 - Math.sin(a) * 2) * sz]); cx.gid = 24 + (sd > 0 ? 1 : 0); cap(cx, p0, p1, (1.2 - k * .12) * sz, (1.1 - k * .12) * sz, AC, {tex:nn => (Math.sin(k * 6 + nn[1] * 9) > .6 ? {dt:1} : undefined)}); p0 = p1; } } }   // curled horns
       for (const [zz, ph] of [[5, 0], [-5, Math.PI]]) for (const sd of [-1, 1]){ const sw = Math.sin(st + ph + (sd > 0 ? Math.PI : 0)) * (act === 'walk' ? 1.8 : 0); cx.gid = 30 + (zz > 0 ? 0 : 2) + (sd > 0 ? 1 : 0);
-        cap(cx, P([sd * 3.4, 6, zz]), P([sd * 3.4, .8, zz + sw]), 1.1 * sz, .8 * sz, DK, {}); ell(cx, P([sd * 3.4, .6, zz + sw + .3]), 1 * sz, .7 * sz, DK, {}); }   // slim dark legs and hooves
+        const hk = P([sd * 3.4, 3.6, zz + sw * .5 + (zz > 0 ? .4 : -.9)]), ft = P([sd * 3.4, .9, zz + sw]); cap(cx, P([sd * 3.4, 6.4, zz]), hk, 1.5 * sz, 1 * sz, DK, {}); cap(cx, hk, ft, .95 * sz, .8 * sz, DK, {}); ell(cx, hk, 1.1 * sz, 1.1 * sz, DK, {});
+        cap(cx, add(ft, [0, .5 * sz, .1]), add(ft, [0, -.3, .5 * sz]), 1 * sz, 1.2 * sz, AC, {tex:nn => (Math.abs(nn[0]) < .14 && nn[2] > 0 ? {dt:2} : undefined)}); }   // (v301) slim dark legs with a hock, and cloven hooves
       cx.gid = 40; ell(cx, P([0, 12, -10.4]), 2 * sz, 2 * sz, SK, {tex:wool});   // a stub of a tail
     };
   }
