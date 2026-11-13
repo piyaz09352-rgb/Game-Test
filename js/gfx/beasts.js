@@ -240,7 +240,8 @@ const BEAST = (() => {
     const len = s.len ?? 1, th = s.thick ?? 1, heads = s.heads || 1;
     if (s.naga7) return naga7(key, s, SK, BE, HO, EY);
     return (cx, act, f, n) => {
-      const o = motion(act, f, n), N = Math.round(10 * len), wav = act === 'walk' ? o.ph * 2 : o.ph * .5;
+      const snake = !s.grub && !s.legs, o = motion(act, f, n), N = Math.round((snake ? 16 : 10) * len), wav = act === 'walk' ? o.ph * 2 : o.ph * .5, bend = (k, w) => (snake ? Math.sin(w + k * 7.4) * 5.6 * (1 - k * .55) * Math.min(1, k * 4 + .35) : Math.sin(w + k * 5) * 4 * (1 - k * .6)),
+        girth = k => (s.grub ? 3.6 + Math.sin(k * Math.PI) * 1.6 : snake ? (1.2 + Math.sin(Math.min(1, k * 1.12) * Math.PI) * .85) * Math.min(1, .16 + k * 2.6) : (1.45 + Math.sin(Math.min(1, k * 1.15) * Math.PI) * .95) * Math.min(1, .3 + k * 2.4));   // (v302) a snake: finer segments in a real S, slimmer, a thin tail
       if (s.swim){ const hv = s.swim + Math.sin(o.ph) * 1.2 - (act === 'die' ? o.fall * s.swim * .6 : 0); cx.pre = p => [p[0], p[1] + hv, p[2]]; }   // (v294) an eel swims above the sea floor
       const rise = (s.rise ?? (s.hood ? 9 : 4)) + (act === 'attack' ? [0, 3, -2, 0][f] : 0) - (act === 'die' ? o.fall * 6 : 0);
       // body segments from tail (k=0) to neck (k=1)
@@ -251,16 +252,17 @@ const BEAST = (() => {
         if (s.grub || s.legs) return Math.sin(kk * N * Math.PI) > .3 ? ST : null;
         if (s.hood || s.diamond) return Math.abs(((kk * N * 1.2) % 1) - .5) * 2 < .35 - Math.abs(nn[0]) * .3 ? ST : null;   // cobra / viper: chevrons and diamonds along the back
         return Math.sin(kk * N * Math.PI * 1.4) > .45 ? ST : null; };                                                        // kraits, sea snakes: rings
-      for (let i = 0; i <= N; i++){ const k = i / N, z = -14 * len + k * 22 * len, x = Math.sin(wav + k * 5) * 4 * (1 - k * .6), y = (s.grub ? 2.6 : 1.5) * th + Math.max(0, k - .7) / .3 * rise * (s.legs ? 0 : 1);
+      for (let i = 0; i <= N; i++){ const k = i / N, z = -14 * len + k * 22 * len, x = bend(k, wav), y = (s.grub ? 2.6 : 1.5) * th + Math.max(0, k - .7) / .3 * rise * (s.legs ? 0 : 1);
         const p = [x, y + (act === 'idle' ? Math.sin(o.ph + k * 3) * .3 : 0), z + o.lun * k]; cx.gid = 1 + i;
-        const r = (s.grub ? 3.6 + Math.sin(k * Math.PI) * 1.6 : (1.45 + Math.sin(Math.min(1, k * 1.15) * Math.PI) * .95) * Math.min(1, .3 + k * 2.4)) * th, pr = prev && prev.r || r;
-        if (prev) cap(cx, prev, p, pr, r, SK, {step:.35, tex:(nn, lo, q, t) => { const kk = (i - 1 + t) / N, m = pat(nn, kk); return {m:m || undefined, t:Math.min(3, top(nn, kk) + (s.grub && Math.sin(kk * N * 3) > .5 ? 1 : 0))}; }});
+        const r = girth(k) * th, pr = prev && prev.r || r;
+        if (prev) cap(cx, prev, p, pr, r, SK, {step:.35, tex:(nn, lo, q, t) => { const kk = (i - 1 + t) / N, m = pat(nn, kk); const sc = snake ? (nn[1] < -.35 ? (Math.sin(kk * N * 9) > .72 ? 1 : 0) : (Math.sin(kk * N * 11 + nn[0] * 9) * Math.sin(kk * N * 11 - nn[0] * 9) > .42 ? 1 : 0)) : 0;   // belly plates across; small scales in a diamond weave on the back
+          return {m:m || undefined, t:Math.min(3, top(nn, kk) + sc + (s.grub && Math.sin(kk * N * 3) > .5 ? 1 : 0))}; }});
         p.r = r;
         if (s.legs){ for (const sd of [-1, 1]){ cx.gid = 100 + i * 2 + sd; cap(cx, p, [p[0] + sd * 4, .4, p[2] + Math.sin(o.ph * 3 + i) * 1.4], .7, .5, BE, {}); } }
         prev = p; }
       if (s.fin){ const FN = mat(key, 'efin', s.fin), SPK = s.spark ? emis(key, 'spark', s.spark) : null;   // (v294) an eel's ribbon fin along the back, sparks of light down its sides
         let fp = null;
-        for (let i = 1; i < N; i++){ const k = i / N, x = Math.sin(wav + k * 5) * 4 * (1 - k * .6), z = -14 * len + k * 22 * len, y = 1.5 * th + Math.max(0, k - .7) / .3 * rise, r = (1.45 + Math.sin(Math.min(1, k * 1.15) * Math.PI) * .95) * Math.min(1, .3 + k * 2.4) * th;
+        for (let i = 1; i < N; i++){ const k = i / N, x = bend(k, wav), z = -14 * len + k * 22 * len, y = 1.5 * th + Math.max(0, k - .7) / .3 * rise, r = girth(k) * th;
           const q = [x, y + r * .75 + .9 * th * Math.min(1, k * 3), z + o.lun * k]; if (fp && k < .85){ cx.gid = 160 + i; cap(cx, fp, q, .95 * th, .95 * th, FN, {}); } fp = q;
           if (SPK && i % 2 === 0) for (const sd of [-1, 1]){ cx.gid = 180 + i + (sd > 0 ? 40 : 0); ell(cx, [x + sd * r * .8, y + r * .1, z + o.lun * k], .55, .55, SPK, {}); } } }
       if (WG){ for (const sd of [-1, 1]){ cx.gid = 60 + sd; for (let i = 0; i < 4; i++){ const k = i / 3; ell(cx, [prev[0] + sd * (3 + k * 8), prev[1] + 2 + k * 4 + o.flap * k * 3, prev[2] - 6 - k * 2], 4.6 - k * 1.4, 1.6, WG, {rz:4 - k}); } } }
@@ -280,7 +282,7 @@ const BEAST = (() => {
         else { cx.gid = 90 + h;   // a snake's head: wide at the jaws, flat, a narrower snout, small side eyes
           ell(cx, add(hc, [0, -.2, -.6]), 2.3 * th, 1.45 * th, SK, {rz:2.6 * th, tex:nn => eyesTex(nn, o, EY, {glow:!!s.eyeGlow, sp:.62, y:.3, rx:.11, ry:.13, front:-.15}) || (nn[1] < -.3 ? {m:BE} : ST && (s.hood || s.diamond) && nn[1] > .5 && Math.abs(nn[0]) < .25 ? {m:ST} : undefined)});
           cap(cx, add(hc, [0, -.3, .6]), add(hc, [0, -.6, 2.6 * th]), 1.6 * th, .9 * th, SK, {tex:nn => (nn[1] < -.3 ? {m:BE} : Math.abs(nn[1] + .1) < .07 ? {dt:2} : undefined)});
-          if (act === 'attack' && f === 2){ cx.gid = 150 + h; cap(cx, add(hc, [0, -.8, 2.4 * th]), add(hc, [0, -1.2, 3.8 * th]), .2, .1, M.mouth, {}); cap(cx, add(hc, [-.2, -.9, 3.8 * th]), add(hc, [-.6, -1.1, 4.4 * th]), .12, .08, M.mouth, {}); cap(cx, add(hc, [.2, -.9, 3.8 * th]), add(hc, [.6, -1.1, 4.4 * th]), .12, .08, M.mouth, {}); } }   // the forked tongue
+          if ((act === 'attack' && f === 2) || (act === 'idle' && f % 4 === 1)){ cx.gid = 150 + h; cap(cx, add(hc, [0, -.8, 2.4 * th]), add(hc, [0, -1.2, 3.8 * th]), .2, .1, M.mouth, {}); cap(cx, add(hc, [-.2, -.9, 3.8 * th]), add(hc, [-.6, -1.1, 4.4 * th]), .12, .08, M.mouth, {}); cap(cx, add(hc, [.2, -.9, 3.8 * th]), add(hc, [.6, -1.1, 4.4 * th]), .12, .08, M.mouth, {}); } }   // the forked tongue
         if (CS){ cx.gid = 200 + h; for (let i = 0; i < 4; i++) cap(cx, add(hc, [0, 2.2 * th, 1.4 - i * 1.9]), add(hc, [0, (5.6 - i * .7) * th, -1.2 - i * 2.2]), .9 * th, .25, CS, {}); }   // naga crest (ngon)
         if (s.crown){ cx.gid = 95 + h; frustum(cx, add(hc, [0, 0, -.5]), hc[1] + 6 * th, hc[1] + 2.2 * th, 1.2, 2.6 * th, M.gold, {tex:(nn, kk) => (kk > .8 ? {m:M.gem} : undefined)}); }
       }
