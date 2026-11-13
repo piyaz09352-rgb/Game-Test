@@ -937,6 +937,7 @@ const BEAST = (() => {
       cx.gid = 8; ell(cx, hc, 2.6 * sz, 2.5 * sz, HD, {tex:nn => eyesTex(nn, o, EY, {glow:!!s.eyeGlow, sp:.62, y:.22, rx:.1, ry:.12, front:-.1})});
       cx.gid = 9; const b0 = add(hc, [0, -.3 * sz, 2 * sz]), b1 = add(hc, [0, (s.hook ? -2 : -.9) * sz, (2.2 + 3.4 * bl) * sz]);
       cap(cx, b0, b1, 1.1 * sz * (s.beakW ?? 1), .25 * sz, K, {tex:(nn, lo, q, t) => (Math.abs(nn[1]) < .1 && t > .2 ? {dt:2} : undefined)});
+      if (s.raptor) cap(cx, b1, add(b1, [0, -1.25 * sz, -.15 * sz]), .42 * sz, .12 * sz, K, {tex:() => ({dt:1})});   // (v303) the hook
       if (CQ){ cx.gid = 14; cap(cx, add(hc, [0, 1.3 * sz, 1.6 * sz]), add(hc, [0, 1.1 * sz, (2.4 + 1.8 * bl) * sz]), 1.05 * sz * (s.beakW ?? 1), .45 * sz, CQ, {tex:nn => (Math.sin(nn[2] * 16) > .6 ? {dt:1} : undefined)}); }
       if (HN){ cx.gid = 15; for (const sd of [-1, 1]) cap(cx, add(hc, [sd * 1.2 * sz, 2 * sz, -.6 * sz]), add(hc, [sd * 2.4 * sz, 5.4 * sz, -3.4 * sz]), .9 * sz, .25, HN, {}); }
       if (CR){ cx.gid = 10; for (let i = 0; i < 3; i++) cap(cx, add(hc, [0, 2.2 * sz, (.6 - i * 1.1) * sz]), add(hc, [0, (4.6 + (i === 1 ? 1.2 : 0)) * sz, (-1 - i * 1.4) * sz]), .8 * sz, .3, CR, {}); }
@@ -1593,6 +1594,7 @@ const BEAST = (() => {
         bodyScale:body === 'brute' ? 1.12 : body === 'gaunt' ? .96 : 1, slim:body === 'gaunt' ? .82 : body === 'brute' ? 1.18 : undefined, iris:spec.iris || (/preta|pop|ghoul|skel|krahang|wraith|ghost|phi/.test(key) ? 'irisRd' : 'irisBr')});
       SPR.MOBS[key] = {name:key, fs:Math.max(fs, 96), scale:spec.scale || 1, human:cfg, model:() => {}}; }
     else if (spec.arch === 'quad' && !spec.old) SPR.MOBS[key] = (spec.head === 'elephant' || spec.wing) && fs < 96 ? {name:key, fs:96, scale:(spec.scale || 1) * ((spec.scale || 1) >= 2 ? 1 : 1.15), model:quad2(key, spec)} : {name:key, fs, scale:(spec.scale || 1) * ((spec.scale || 1) >= 2 ? 1 : 1.15), model:quad2(key, spec)};   // natural anatomy (v21)
+    else if (spec.arch === 'bird' && spec.bat && !spec.old && /hawk|eagle|falcon|kite$/.test(key)) SPR.MOBS[key] = {name:key, fs, scale:spec.scale || 1, model:bird2(key, {...spec, bat:false, horns:undefined, raptor:true, beakLen:(spec.beakLen ?? 1) * .85, beakW:1.25, tail:spec.tail && spec.tail !== '-' ? spec.tail : 'fan'})};   // (v303) a hawk is a bird of prey, not a bat with horns: a hooked beak, a broad tail
     else if (spec.arch === 'bird' && spec.bat && !spec.old) SPR.MOBS[key] = {name:key, fs, scale:spec.scale || 1, model:bat2(key, spec)};   // natural bats (v23)
     else if (spec.arch === 'bird' && !spec.bat && !spec.old) SPR.MOBS[key] = {name:key, fs, scale:spec.scale || 1, model:bird2(key, spec)};   // natural birds (v21)
     else SPR.MOBS[key] = {name:key, fs, scale:spec.scale || 1, model:KINDS[spec.arch](key, spec)};
