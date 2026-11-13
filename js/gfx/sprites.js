@@ -182,8 +182,8 @@ Frame.prototype.put = function(x, y, d, m, t, g){
   const i = y * this.w + x; if (d <= this.d[i]) return;
   this.d[i] = d; this.m[i] = m; this.t[i] = t; this.g[i] = g;
 };
-function Ctx(F, th, ox, oy, k = 1){ this.F = F; this.c = Math.cos(th); this.s = Math.sin(th); this.ox = ox; this.oy = oy; this.k = k; this.pre = null; this.gid = 0; }
-function xf(cx, p){ return cx.pre ? cx.pre(p) : p; }
+function Ctx(F, th, ox, oy, k = 1){ this.F = F; this.c = Math.cos(th); this.s = Math.sin(th); this.ox = ox; this.oy = oy; this.k = k; this.pre = null; this.post = null; this.gid = 0; }
+function xf(cx, p){ const q = cx.pre ? cx.pre(p) : p; return cx.post ? cx.post(q) : q; }   // post: a whole-body move on top of whatever the model sets (v304)
 function proj(cx, p){
   const q = xf(cx, p);
   const X = q[0] * cx.c + q[2] * cx.s, Z = -q[0] * cx.s + q[2] * cx.c, Y = q[1];
@@ -413,7 +413,30 @@ const ACTIONS = {
 };
 const MOB_ACTIONS = {
   idle:{n:4, fps:5, loop:true, th:'ยืน'}, walk:{n:4, fps:8, loop:true, th:'เดิน'}, attack:{n:4, fps:10, th:'โจมตี'},
-  hurt:{n:2, fps:8, th:'โดนตี'}, die:{n:4, fps:6, th:'ล้ม'}
+  hurt:{n:2, fps:8, th:'โดนตี'}, die:{n:4, fps:6, th:'ล้ม'},
+  // (v304) a boss's skills have poses of their own, eight frames each (see BOSS_POSE); only a boss's sheet carries them (SPR.bossActs)
+  bslam:{n:8, fps:10, boss:1, th:'ยกตัวทุบ'}, broar:{n:8, fps:10, boss:1, th:'คำราม'}, bcharge:{n:8, fps:10, boss:1, th:'ย่อแล้วพุ่ง'}, bcast:{n:8, fps:10, boss:1, th:'ร่าย'}
+};
+/* (v304) the owner: a boss used one attack pose for every skill. Each kind of skill now moves the whole body the way a heavy
+   animal does it — it gathers first (anticipation), strikes, then settles (follow-through):
+     bslam   rears up on its hind end, hangs for a moment, crashes down past level and dips, then rights itself
+     broar   sinks a little, then throws its front up and forward and shakes while it roars
+     bcharge draws back and low over its haunches, then drives forward nose-down, and recovers
+     bcast   rises, leans back and sways while it channels, then comes down
+   It is the body's own model (its attack or idle frames) carried through a turn about the hind feet, a shift and a small
+   squash, so it works for every body plan: four legs, birds, serpents, insects, spirits, golems and human bosses.
+   k = 0..1 through the pose. Returns the model's own action and frame to draw, and the move for every point. */
+const BOSS_HUMAN = {bslam:'slam', broar:'shout', bcharge:'lunge', bcast:'invoke'};
+const bpS = (a, b, k) => { const t = Math.min(1, Math.max(0, (k - a) / (b - a))); return t * t * (3 - 2 * t); };
+const BOSS_POSE = {
+  bslam(k){ const up = bpS(0, .42, k) * (1 - bpS(.56, .66, k)), hit = bpS(.56, .66, k) * (1 - bpS(.78, 1, k)), ang = up * .46 - hit * .12, dy = -1.3 * hit, dz = -.5 * up - 2.2 * hit;   // (the forward crash itself stays inside the frame: the picture is cut at its edge)
+    return {act:'attack', f:k < .5 ? 0 : k < .6 ? 1 : k < .8 ? 2 : 3, post:p => { const q = rotX([p[0], p[1], p[2] + 6], -ang); return [q[0], Math.max(.25, q[1] + dy), q[2] - 6 + dz]; }}; },
+  broar(k){ const sink = bpS(0, .2, k) * (1 - bpS(.2, .38, k)), up = bpS(.22, .42, k) * (1 - bpS(.84, 1, k)), ang = up * .3 - sink * .07, sh = up * Math.sin(k * 44) * .45;
+    return {act:'attack', f:up > .5 ? 2 : sink > .3 ? 0 : 1, post:p => { const q = rotX([p[0], p[1], p[2] + 6], -ang); return [q[0] + sh, Math.max(.25, q[1] * (1 - sink * .08)), q[2] - 6 + up * .4]; }}; },
+  bcharge(k){ const back = bpS(0, .4, k) * (1 - bpS(.5, .6, k)), go = bpS(.5, .62, k) * (1 - bpS(.8, 1, k)), ang = back * .1 - go * .14;
+    return {act:'attack', f:k < .5 ? 0 : k < .62 ? 1 : k < .8 ? 2 : 3, post:p => { const q = rotX([p[0], p[1], p[2] + 6], -ang); return [q[0], Math.max(.25, q[1] * (1 - back * .13)), q[2] - 6 - back * 1.6 - go * 2.2]; }}; },   // (the model's own strike frame already reaches forward to the frame's edge)
+  bcast(k){ const r = bpS(0, .3, k) * (1 - bpS(.8, 1, k)), ang = r * .17, dy = r * 2 + Math.sin(k * 12.6) * .35 * r, sx = Math.sin(k * 9.4) * .55 * r;
+    return {act:'idle', f:Math.floor(k * 7.99) % 4, post:p => { const q = rotX([p[0], p[1], p[2] + 6], -ang); return [q[0] + sx, q[1] + dy, q[2] - 6]; }}; }
 };
 const ease = t => t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
 
@@ -2077,13 +2100,15 @@ function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
     return img;
   }
   const mb = MOBS[key], A = MOB_ACTIONS[act], fs = Math.ceil(mb.fs * K), F = new Frame(fs, fs + Math.ceil(fs * MOB_PAD)), cx = new Ctx(F, -dir * Math.PI / 4, fs / 2, fs - 6 * K, K * (mb.scale || 1));
-  if (mb.human){ drawHuman(cx, mb.human, humanPose(act, f, A.n, mb.human.weapon)); const img = finish(F, K); if (mb.human.paint && cx.head) paintHead(img, F, cx); img.wsegs = cx.wsegs || null; return img; }   // (v166) where its weapon is, for the boss weapon glow
-  mb.model(cx, act, f, A.n);
+  let mAct = act, mF = f, mN = A.n; if (BOSS_POSE[act]){ const q = BOSS_POSE[act](A.n > 1 ? f / (A.n - 1) : 0); cx.post = q.post; mAct = q.act; mF = q.f; mN = MOB_ACTIONS[q.act].n; }
+  if (mb.human && BOSS_POSE[act]){ const ha = BOSS_HUMAN[act], hn = ACTIONS[ha].n; cx.post = null; mAct = ha; mN = hn; mF = Math.min(hn - 1, Math.round(f / (A.n - 1) * (hn - 1))); }   // a human boss uses the people's own skill poses: slam, shout, lunge, invoke
+  if (mb.human){ drawHuman(cx, mb.human, humanPose(mAct, mF, mN, mb.human.weapon)); const img = finish(F, K); if (mb.human.paint && cx.head) paintHead(img, F, cx); img.wsegs = cx.wsegs || null; return img; }   // (v166) where its weapon is, for the boss weapon glow
+  mb.model(cx, mAct, mF, mN);
   return finish(F, K);
 }
 /* lazy sheet: each action is rasterised the first time it is drawn (or during warm-up) */
 function sheet(kind, key){
-  const acts = kind === 'char' ? CHAR_ACTIONS[key] : Object.keys(MOB_ACTIONS), AT = kind === 'char' ? ACTIONS : MOB_ACTIONS;
+  const acts = kind === 'char' ? CHAR_ACTIONS[key] : Object.keys(MOB_ACTIONS).filter(a => !MOB_ACTIONS[a].boss), AT = kind === 'char' ? ACTIONS : MOB_ACTIONS;
   const K = kOf(kind, key), base = kind === 'char' ? FS : MOBS[key].fs, fs = Math.ceil(base * K);
   const index = {}; acts.forEach(a => { index[a] = {n:AT[a].n, fps:AT[a].fps, loop:!!AT[a].loop}; });
   return {kind, key, K, fs, base, index, cache:{}, anchor:[fs / 2, kind === 'char' ? ANCHOR_Y * K : fs - 6 * K]};
@@ -2176,6 +2201,8 @@ function rebuild(sheets){
 /* the whole strip as one canvas (portraits and menus draw from it): frames side by side in full square cells */
 /* (v97) frames only, no whole-strip canvas: the start-up warm-up used ensure() and built a full-cell canvas for every
    direction of the hero's walk (about 1 M pixels each), which filled the sprite budget and made monsters repaint all the time */
+/* (v304) give a boss's sheet the skill poses (asked for when it first uses a skill) */
+function bossActs(sh){ if (!sh || sh.kind !== 'mob') return sh; for (const a in MOB_ACTIONS) if (MOB_ACTIONS[a].boss && !sh.index[a]) sh.index[a] = {n:MOB_ACTIONS[a].n, fps:MOB_ACTIONS[a].fps, loop:false}; return sh; }
 function ensureFrames(sh, act, dir = 0){ const e = strip(sh, act, dir); for (let f = 0; f < e.n; f++) frameIn(sh, e, f); return e; }
 function ensure(sh, act, dir = 0){ const e = strip(sh, act, dir); for (let f = 0; f < e.n; f++) frameIn(sh, e, f);
   if (!e.c){ const fs = sh.fs; e.c = newCanvas(e.n * fs, fs); const g = e.c.getContext('2d');
@@ -2280,5 +2307,5 @@ function draw(g, sh, act, dir, t, x, y, o = {}){
   g.imageSmoothingEnabled = sm; g.imageSmoothingQuality = sq;
 }
 const prim = {ell, cap, frustum, line, dot, rotX, rotY, rotZ, add, mul, lerp3, nrm, ramp:rampOf};
-return {STATS, WDRAWS, SDRAWS, prim, prime, heroKey, lookKey, parseLookKey, HAIR_COLORS, IRIS_COLORS, HAIR_M, HAIR_F, GEAR_LOOK, buildAll, buildSheet, sheet, ensure, warm, tick, rebuild, renderFrame, draw, frameAt, dirFromVec, DIRS, DIR_TH, ACTIONS, MOB_ACTIONS, CHARS, CHAR_ACTIONS, MOBS, MATS, M, FS, ANCHOR_Y};
+return {STATS, WDRAWS, SDRAWS, prim, prime, heroKey, lookKey, parseLookKey, HAIR_COLORS, IRIS_COLORS, HAIR_M, HAIR_F, GEAR_LOOK, buildAll, buildSheet, sheet, ensure, bossActs, BOSS_POSE, warm, tick, rebuild, renderFrame, draw, frameAt, dirFromVec, DIRS, DIR_TH, ACTIONS, MOB_ACTIONS, CHARS, CHAR_ACTIONS, MOBS, MATS, M, FS, ANCHOR_Y};
 })();
