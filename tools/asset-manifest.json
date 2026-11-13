@@ -354,6 +354,7 @@
 "js/sys/skillfix199.js":{"v":199,"sha":"e6e702f805579459"},
 "js/sys/rune200.js":{"v":202,"sha":"2dbe195fe7d91e40"},
 "js/sys/grandfx200.js":{"v":202,"sha":"71b5b8d19c2e6d06"},
+"js/sys/classfx301.js":{"v":332,"sha":"79a12315c0267f0c"},
 "js/sys/skillsig277.js":{"v":289,"sha":"822d95133b5bbfe2"},
 "js/sys/skillsig283.js":{"v":297,"sha":"5778a91331027176"},
 "js/sys/rogmer203.js":{"v":203,"sha":"78a98e5ae9d7d222"},
