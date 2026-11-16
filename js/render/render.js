@@ -18,7 +18,11 @@ let nightA = 0;
 /* height of each monster (name tag, HP bar, hit point); generated species get it from their archetype and scale */
 const MOB_H0 = {dewblob:22, hare:26, boar:32, lantern:44, boss:70};
 const ARCH_H = {quad:30, bird:30, serpent:26, bug:22, squat:22, floater:42, slime:22, rock:32, human:46, fish:36, cave:30, sky:38, land:32};
-const MOB_H = new Proxy(MOB_H0, {get:(o, k) => o[k] ?? (o[k] = Math.round((ARCH_H[typeof SPECIES_ARCH !== 'undefined' && SPECIES_ARCH[k]] || 30) * ((SPR.MOBS[k] && SPR.MOBS[k].scale) || 1)))});
+/* (v305) heroes, monsters, NPCs, pets and other players are drawn a fifth larger than the scenery (the owner asked for bigger
+   figures): SPR.draw scales them about their feet on the game canvas only (windows and portraits keep their size). Heights
+   used for name plates, HP bars and hit points grow with them. */
+const ACTOR = {cv:$('#cv'), s:1.2};
+const MOB_H = new Proxy(MOB_H0, {get:(o, k) => (o[k] ?? (o[k] = Math.round((ARCH_H[typeof SPECIES_ARCH !== 'undefined' && SPECIES_ARCH[k]] || 30) * ((SPR.MOBS[k] && SPR.MOBS[k].scale) || 1)))) * ACTOR.s});
 function applyPX(px){
   const ow = SW / PX, oh = SH / PX;
   PX = Math.max(px, SW / W, SH / H);
@@ -35,7 +39,7 @@ function resize(){
   SW = w; SH = Math.max(200, Math.round(vpH() - top - pb));
   // auto balance: about 270 world units of height on any screen (v83: closer, so heroes and monsters read bigger; half steps keep pixels even)
   // (v188) the camera sits 20% further out at every zoom step (phones too: their 2 px floor becomes 1.6 px)
-  PX_AUTO = clamp(Math.round(SH / 270 * 2) / 2, 2, 4.5) * .8;
+  PX_AUTO = clamp(Math.round(SH / 270 * 2) / 2, 2, 4.5) * .8 * .9;   // (v305) a tenth further out again: the maps are wider and the figures a fifth larger, so they still read 8% bigger than before
   // one UI scale for every screen: proportional above 1280×720, gently smaller below it (square-root curve, so phone
   // text and buttons stay readable and touchable), times the player's own size setting (Settings → UI size)
   { const f = SH > SW * 1.15 ? Math.min(SH / 1280, SW / 720) : Math.min(SH / 720, SW / 1280), us = typeof SETTINGS !== 'undefined' ? +SETTINGS.uiScale || 1 : 1;
@@ -70,7 +74,7 @@ const F = (w, s) => `${w} ${s}px "Mali", system-ui, sans-serif`;
 const FD = (w, s) => `${w} ${s}px "Mali", sans-serif`;
 const sx = x => (x - cam.x) * PX, sy = y => (y - cam.y) * PX;
 
-function shadowW(g, x, y, r){ g.fillStyle = 'rgba(24,40,16,.28)'; g.beginPath(); g.ellipse(Math.round(x), Math.round(y), r, Math.max(2, r * .38), 0, 0, 7); g.fill(); }
+function shadowW(g, x, y, r){ r *= ACTOR.s; g.fillStyle = 'rgba(24,40,16,.28)'; g.beginPath(); g.ellipse(Math.round(x), Math.round(y), r, Math.max(2, r * .38), 0, 0, 7); g.fill(); }
 function playerAct(){
   if (P.dead) return 'die';
   if (P.roll) return 'roll';
@@ -185,7 +189,7 @@ function drawPlayerW(g){
   if (P.roll){ g.save(); g.globalAlpha = .35; SPR.draw(g, heroSheet(), 'roll', P.dir || 0, P.animT, x - P.roll.vx * 8, y - P.roll.vy * 8); g.restore(); }
   const veil = hideBuff() ? .38 + Math.sin(T * 6) * .06 : 1;
   if (veil < 1){ g.save(); g.globalAlpha = veil; }
-  if (art) ART.draw(g, 'villager', act, P.dir || 0, P.animT, x, y);
+  if (art){ g.save(); g.translate(x, y); g.scale(ACTOR.s, ACTOR.s); ART.draw(g, 'villager', act, P.dir || 0, P.animT, 0, 0); g.restore(); }
   else SPR.draw(g, heroSheet(), P.spin > 0 ? (heroSheet().index.whirl ? 'whirl' : 'skill') : act, P.spin > 0 && !heroSheet().index.whirl ? Math.floor(T * 16) % 8 : P.dir || 0, P.spin > 0 ? T : P.animT, x, y);
   if (veil < 1) g.restore();
   if (false && P.hurt > 0 && !P.dead){ g.save(); g.globalCompositeOperation = 'lighter'; g.globalAlpha = .35; g.fillStyle = '#ff4040'; g.beginPath(); g.ellipse(x, y - 22, 10, 21, 0, 0, 7); g.fill(); g.restore(); }
@@ -224,7 +228,7 @@ function nameTag(x, y, s, col = '#fff', bg = 'rgba(20,18,30,.72)'){
    Everything scales with the world zoom (PX, which already follows the screen size and the zoom buttons), so the plate keeps
    the same proportion to the character on phones, tablets, laptops and 4K screens. */
 const TAG_Z = () => clamp(PX / 2, .45, 2.8) * (typeof SETTINGS !== 'undefined' && +SETTINGS.uiScale ? clamp(+SETTINGS.uiScale, .7, 1.3) : 1);   // (v132) five UI sizes
-const HEAD_H = ride => (ride ? 58 : 43);          // world units from the feet to just above the hair (riding: the mount lifts you)
+const HEAD_H = ride => (ride ? 58 : 43) * ACTOR.s;          // world units from the feet to just above the hair (riding: the mount lifts you)
 const HERO_NAME = {me:['#fffdf0', '#ffe08a', '#e8a032', 'rgba(255,190,70,', '#3a1a04'], mate:['#f4fff8', '#9ff0c8', '#2fb884', 'rgba(90,240,170,', '#05301e'], other:['#f6f9ff', '#cfe0ff', '#7fa2e8', 'rgba(140,180,255,', '#0c1838']};
 /* draws title / name / guild stacked upward from headY (screen px) and returns the top of the stack.
    The name: a deep outline, a thin gold rim, a gilded gradient fill with a band of light sweeping across it, a pulsing

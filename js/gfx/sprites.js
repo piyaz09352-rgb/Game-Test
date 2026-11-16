@@ -2270,6 +2270,8 @@ function lazyQ(sh, e, f){
   idle(step, {timeout:200});
 }
 function draw(g, sh, act, dir, t, x, y, o = {}){
+  // (v305) on the game canvas every figure is drawn larger than the scenery, about its feet (render.js ACTOR)
+  if (!o._as && typeof ACTOR !== 'undefined' && ACTOR.s !== 1 && g.canvas === ACTOR.cv){ g.save(); g.translate(x, y); g.scale(ACTOR.s, ACTOR.s); g.translate(-x, -y); try { return draw(g, sh, act, dir, t, x, y, {...o, _as:1}); } finally { g.restore(); } }
   if (!sh.index[act]) act = 'idle';
   let e = strip(sh, act, dir); const fs = sh.fs, K = sh.K, flip = sh.kind === 'mob' && dir > 4; let f = o.frame ?? frameAt(sh, act, t);
   // rasterise on demand, but only ~6 ms per display frame (v83: was 10, and a strip with no ready frame was always
@@ -2304,6 +2306,9 @@ function draw(g, sh, act, dir, t, x, y, o = {}){
     else g.drawImage(fr.c, l, dy + fr.y / K, w, fr.c.height / K); }
   const ws = e.ws && e.ws[f]; if (ws && WDRAWS.length < 200) WDRAWS.push({g, x, y, mt:sh.kind === 'mob' && g.getTransform ? g.getTransform() : null, segs:ws.map(([a, b]) => flip ? [2 * x - dx - a.x / K, dy + a.y / K, 2 * x - dx - b.x / K, dy + b.y / K] : [dx + a.x / K, dy + a.y / K, dx + b.x / K, dy + b.y / K])});
   const ss = e.ss && e.ss[f]; if (ss && SDRAWS.length < 200) SDRAWS.push({g, x, y, segs:ss.map(([a, b]) => [dx + a.x / K, dy + a.y / K, Math.max(2, Math.hypot(b.x - a.x, b.y - a.y) / K)])});
+  if (o._as && sh.kind !== 'mob'){ const k = ACTOR.s, fx = v => x + (v - x) * k, fy = v => y + (v - y) * k;   // (v305) a hero's blade and shield, for the glows drawn afterwards in plain map coordinates
+    if (ws && WDRAWS.length && WDRAWS[WDRAWS.length - 1].x === x){ const d = WDRAWS[WDRAWS.length - 1]; d.segs = d.segs.map(q => [fx(q[0]), fy(q[1]), fx(q[2]), fy(q[3])]); }
+    if (ss && SDRAWS.length && SDRAWS[SDRAWS.length - 1].x === x){ const d = SDRAWS[SDRAWS.length - 1]; d.segs = d.segs.map(q => [fx(q[0]), fy(q[1]), q[2] * k]); } }
   g.imageSmoothingEnabled = sm; g.imageSmoothingQuality = sq;
 }
 const prim = {ell, cap, frustum, line, dot, rotX, rotY, rotZ, add, mul, lerp3, nrm, ramp:rampOf};
