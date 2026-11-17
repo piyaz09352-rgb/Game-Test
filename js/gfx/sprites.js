@@ -456,7 +456,7 @@ const SK_POSE = {
   knee(P, f){ P.noWeapon = false;
     P.bob = [-1.6, -.5, -1.1, -.3, -.4][f];   // (v313) on the standing foot, not a leap: the knee drives up, the other foot stays on the ground P.lean = [.1, .15, .24, .1, 0][f];
     P.armL = P.armR = [-.4, 1.4, 1.95, 1.2, .3][f]; P.elbL = P.elbR = [.6, 1.3, 1.25, 1.2, .4][f]; P.outL = P.outR = [.3, -.1, -.2, 0, .1][f];
-    P.legL = [.1, .9, 1.25, .4, .1][f]; P.liftL = [0, 3.8, 5.4, 1, 0][f]; P.legR = [-.2, -.3, -.5, -.2, -.1][f]; P.mouth = f === 2 ? 1 : 0; P.sway = [0, -.6, -1, -.4, 0][f]; },
+    P.legL = [.1, .9, 1.25, .4, .1][f]; P.liftL = [0, 3.8, 5.4, 1, 0][f]; P.legR = [-.2, .05, .1, 0, -.1][f]; P.mouth = f === 2 ? 1 : 0; P.sway = [0, -.6, -1, -.4, 0][f]; },
   kick(P, f){ GUARD(P);
     P.spin = [0, .4, .9, 1.5, 2.3, .2][f]; P.lean = [0, -.06, -.15, -.26, -.12, 0][f];
     P.legL = [.32, .35, 1.0, 1.55, .8, .32][f]; P.liftL = [0, 2, 3.6, 0, 1.2, 0][f];
