@@ -22,6 +22,7 @@ test('ninja: reworked skills, ricochet, clones, smoke, four elements', { skip, t
       // (v213) festivals are on again: keep the festival spirit out of this test (it would take a ricochet target)
       if (typeof EVB !== 'undefined' && typeof thaiClock === 'function'){ const c = thaiClock(); EVB.slot = Math.floor((c.h * 60 + c.m) / 15); }
       mobs.forEach(m => { if (m.evb || m.elite) m.dead = true; });
+      for (let i = mobs.filter(m => !m.dead && !m.def.boss && !m.dummy).length; i < 5; i++) spawnMob(MAPS[3].mobs[0], P.x + 200, P.y, {zone:MAPZ});   /* (v310) fewer monsters on a map now: make sure five are there */
       const ms = mobs.filter(m => !m.dead && !m.def.boss && !m.dummy).slice(0, 5);   // training dummies reset their HP: never targets here
       mobs.forEach(m => { if (!ms.includes(m) && !m.dead){ m.x = P.x - 900; m.y = P.y; m.hx = m.x; m.hy = m.y; m.st = {stop:999}; } });   // nothing else in reach of a bounce
       ms.forEach((m, i) => { m.maxhp = m.hp = 1e7; m.x = P.x + 60 + i * 40; m.y = P.y; m.aggro = false; m.st = {stop:999}; });
