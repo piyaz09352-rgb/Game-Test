@@ -56,3 +56,18 @@ test('phone bottles: tap drinks on release, hold opens the picker', { skip, time
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no runtime errors');
 });
+
+test('(v308) a long press still opens the picker when the game is busy as the finger lifts', { skip, timeout: 120000 }, async () => {
+  const { page, errors, close } = await openGame({ width: 1366, height: 768 });
+  try {
+    await enterWorld(page);
+    await page.evaluate(() => { S.inv.redpot = 10; S.inv.orangepot = 5; S.inv.divinepot = 2; S.potSel = {}; S.hp = 5; derive(); renderHotbar(); const c = el('confirm'); if (c) c.hidden = true; });
+    const sel = await page.evaluate(() => `#hotbar .hk[data-hot="${S.hot.length}"]`), [x, y] = await center(page, sel);
+    await page.mouse.move(x, y); await page.mouse.down();
+    await page.evaluate(() => { setTimeout(() => { const t = performance.now(); while (performance.now() - t < 900); }, 100); });   // a heavy frame (a big map being painted) while the finger is down
+    await page.waitForTimeout(550); await page.mouse.up(); await page.waitForTimeout(1500);
+    const r = await page.evaluate(() => ({picker:!!document.querySelector('#potPick [data-pts="orangepot"]'), drank:S.inv.divinepot !== 2}));
+    assert.ok(r.picker && !r.drank, 'held 550 ms: the picker opens and nothing is drunk ' + JSON.stringify(r));
+  } finally { await close(); }
+  assert.deepStrictEqual(errors, [], 'no page errors');
+});

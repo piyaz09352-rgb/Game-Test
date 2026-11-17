@@ -16,6 +16,10 @@ test('treasure goblin and golden hour', { skip, timeout: 120000 }, async () => {
       const g = mobs.find(m => m.type === 'tgoblin' && !m.dead), out = {spawned:!!g, bar:!!document.querySelector('#evBar274 .gob')};
       spawnSlots.length = 0; for (const m of mobs) if (m.type !== 'tgoblin' && !m.dead){ m.dead = true; m.vanish = true; }   // only the goblin: the 'never fights back' check must not see another monster's hit
       if (!g) return out;
+      // (v308) on open ground: the maps are larger now and its random spot could be against a cliff or the map's edge
+      for (let t = 0; t < 400; t++){ const x = 400 + ((t * 977) % 1000) / 1000 * (W - 800), y = 400 + ((t * 571) % 1000) / 1000 * (H - 800); let open = true;
+        for (let a = 0; a < 12 && open; a++) for (const rr of [60, 120, 200]) if (!walkable(x + Math.cos(a / 12 * 6.283) * rr, y + Math.sin(a / 12 * 6.283) * rr * .7, 12)) { open = false; break; }
+        if (open){ g.x = x; g.y = y; g.gtx = null; break; } }
       const d0 = Math.hypot(g.x - P.x, g.y - P.y); P.x = g.x - 60; P.y = g.y; adv(2); out.ran = Math.hypot(g.x - P.x, g.y - P.y) > 90;
       const hp0 = S.hp; out.neverHits = true;
       const z0 = S.bia; GOB.hitT = 0; applyDamage(g, {dmg:10, crit:false}); out.hitBia = S.bia - z0;
