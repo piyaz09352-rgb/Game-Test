@@ -491,9 +491,11 @@ const SK_POSE = {
     const r = f % 2 ? .15 : -.15; P.armL = 1.0; P.armR = 1.0; P.elbL = .65 + r; P.elbR = .65 - r; P.outL = P.outR = -.32; P.head = .1; P.aura = Math.min(4, f); P.sparks = f; },
   throw(P, f){ P.armR = [2.6, 3.0, 1.6, .9, .4][f]; P.elbR = [1.0, 1.5, .05, .2, .4][f]; P.outR = [.3, .35, 0, -.1, .1][f]; P.armL = [1.3, 1.4, .6, .2, .1][f]; P.elbL = .2;
     P.lean = [-.12, -.18, .2, .25, .05][f]; P.twist = [-.4, -.5, .35, .4, .05][f]; P.legL = [.3, .35, .5, .5, .2][f]; P.legR = -.25; P.noWeapon = f === 2 || f === 3; P.sway = [.4, .6, -.6, -.8, -.2][f]; },
-  slam(P, f){ P.bob = [-1.6, 4, 5.2, 0, -1.9, -.4][f]; P.lean = [.1, -.15, -.2, .35, .42, .05][f];
+  // (v309) the owner: «no jumping before the skill, it looks silly». The ground slam stays planted: the weapon rises over the head
+  // with the feet set wide and the knees soft, then the whole body drops into a deep bend as it comes down — no leap, no knee lift
+  slam(P, f){ P.bob = [-1.2, -.3, .2, -1.8, -2.6, -.8][f]; P.lean = [.1, -.12, -.16, .35, .44, .08][f];
     P.armR = [.5, 2.9, 3.2, 1.0, .9, .4][f]; P.elbR = [.8, .4, .5, .1, .1, .4][f]; P.armL = [.4, 2.7, 3.0, 1.0, .9, .3][f]; P.elbL = [.8, .5, .6, .2, .2, .4][f];
-    P.legL = [.2, .1, .2, .45, .45, .2][f]; P.legR = [-.2, -.1, -.2, -.45, -.45, -.2][f]; P.liftL = f === 1 || f === 2 ? 2 : 0; P.mouth = f === 3 || f === 4 ? 1 : 0; P.sparks = f >= 3 ? f : -1; P.wpn = [1.7, 1.3, 1.1, .7, .7, 1.5][f]; P.sway = [0, -.6, -.8, .9, .7, .1][f]; },
+    P.legL = [.3, .3, .32, .5, .52, .3][f]; P.legR = [-.3, -.3, -.32, -.5, -.52, -.3][f]; P.liftL = 0; P.mouth = f === 3 || f === 4 ? 1 : 0; P.sparks = f >= 3 ? f : -1; P.wpn = [1.7, 1.3, 1.1, .7, .7, 1.5][f]; P.sway = [0, -.6, -.8, .9, .7, .1][f]; },
   lunge(P, f){ P.bob = [-1, -1.6, -1.6, -.4][f]; P.lean = [-.1, .38, .36, .05][f]; P.legL = [.1, .85, .8, .2][f]; P.legR = [-.1, -.75, -.7, -.2][f];
     P.armR = [.3, 1.57, 1.55, .6][f]; P.elbR = [1.2, .05, .05, .4][f]; P.armL = [.2, -.4, -.4, .1][f]; P.outL = .4; P.twist = [-.3, .3, .28, 0][f]; P.wpn = [1.7, 1.57, 1.57, 1.6][f]; P.sway = [.3, -1, -.9, 0][f]; },
   shout(P, f){ const on = f >= 1 && f <= 3; P.armL = P.armR = on ? .95 : .5; P.outL = P.outR = on ? 1.1 : .2; P.elbL = P.elbR = on ? .4 : 1.0;
