@@ -25,7 +25,7 @@ test('no monsters in town: the Suwannin Fields, the way out, Auto, bounty, old s
       // Auto in town
       P.x = VSPAWN.x; P.y = VSPAWN.y; P.tx = null; S.lvl = 5; derive(); S.hp = DER.maxhp; setBot(true); for (let i = 0; i < 40 && MAP_ID === 0; i++){ adv(20); await new Promise(res => setTimeout(res, 0)); } o.autoMap = MAP_ID; adv(80); o.autoHunts = BOT.on && (BOT.state === 'hunt' || !!P.target); setBot(false);
       // the fields
-      loadMap(F); adv(5); o.f = [live() > 20, MAPS[F].mobs.slice().sort().join(','), !!CAMP, NPCS.some(n => n.id === 'warp'), !!MS_CH[F] && !MS_CH[0], MS_ARCS.some(a => a.maps[0] === F), W, H];
+      loadMap(F); adv(25); o.f = [live() > 20,   /* (v310) about 80 now: give every spawn slot its first 2.5 s */ MAPS[F].mobs.slice().sort().join(','), !!CAMP, NPCS.some(n => n.id === 'warp'), !!MS_CH[F] && !MS_CH[0], MS_ARCS.some(a => a.maps[0] === F), W, H];
       bossTimer = 0; adv(5); o.boss = !!boss && boss.type === MAPS[F].boss;
       // an old save
       S._f306 = 0; S.ms = {done:{0:1}, cur:null}; f306Fix(); o.save1 = S.ms.done[F] === 1 && !S.ms.done[0]; S._f306 = 0; S.ms = {done:{}, cur:{map:0, step:1, n:2}}; f306Fix(); o.save2 = S.ms.cur.map === F;
