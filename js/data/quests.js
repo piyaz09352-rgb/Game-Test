@@ -91,7 +91,8 @@ function questTurnIn(){
 function bountyFor(mapId){
   const q = qState(), b = q.bounty[mapId];
   if (b) return b;
-  const mp = MAPS[mapId], pool = mp.mobs.filter(t => !MOB[t].night), t = pool[(Math.floor(Date.now() / 3.6e6) + mapId) % pool.length];
+  const mp = MAPS[mapId].mobs.length || typeof FIELDS306 === 'undefined' ? MAPS[mapId] : MAPS[FIELDS306.id], pool = mp.mobs.filter(t => !MOB[t].night), t =   // (v306) Aren has no monsters of its own: Master Vayra's bounty is on the Suwannin Fields outside the east gate
+    pool[(Math.floor(Date.now() / 3.6e6) + mapId) % pool.length];
   return {t, n:25, have:0, taken:false, bia:200 + MOB[t].lvl * 60, exp:Math.round(nextBase(Math.max(1, MOB[t].lvl)) * .25)};
 }
 function bountyTake(mapId){ const q = qState(), b = bountyFor(mapId); b.taken = true; b.have = 0; q.bounty[mapId] = b; SFX.play('quest'); log(L(`รับค่าหัว: ${MOB[b.t].name} ×${b.n}`, `Bounty taken: ${MOB[b.t].en} ×${b.n}`)); dirty = true; save(); }

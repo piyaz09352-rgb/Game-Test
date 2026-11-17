@@ -10,6 +10,7 @@ test('party EXP is capped and rate-limited, chat floods are dropped', { skip, ti
   try {
     await enterWorld(page);
     const r = await page.evaluate(async () => {
+      loadMap(FIELDS306.id);   /* (v306) a hunting map: Aren has no monsters now */
       const cap = pexpCap(), best = Math.max(...MAPS[MAP_ID].mobs.map(t => MOB[t].exp), MOB[MAPS[MAP_ID].boss].exp);
       // a forged share of a billion EXP from a "teammate"
       NET.party = 'p1'; const me = typeof ptyMe === 'function' ? ptyMe() : null; let got = 0; const _g = gainExp; gainExp = (b, j) => { got += b; };

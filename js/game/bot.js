@@ -191,7 +191,6 @@ function updBot(dt){
   // nothing around → roam to the right hunting ground
   BOT.state = 'roam';
   const zone = MAP_ID === 0 ? (S.lvl < 8 ? ZA : ZB) : MAPZ;
-  if (MAP_ID === 0 && typeof FIELDS306 !== 'undefined'){ const gt = GATES.find(g => g.to === FIELDS306.id); if (gt){ BOT.roam = {x:gt.x, y:gt.y}; P.tx = gt.x; P.ty = gt.y; renderBotChip(); return; } }   // (v306) no monsters in town: Auto walks out of the east gate to the Suwannin Fields
   if (!BOT.roam || Math.hypot(BOT.roam.x - P.x, BOT.roam.y - P.y) < 30){
     BOT.roam = null;
     {   // head for the nearest monster Auto would fight, wherever it is on the map

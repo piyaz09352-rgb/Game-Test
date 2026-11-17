@@ -25,3 +25,12 @@ if (typeof EV !== 'undefined') EV.on('draw', () => { const st = typeof tutOn ===
   ctx.save(); ctx.fillStyle = '#ffd76a'; ctx.strokeStyle = '#3a1a04'; ctx.lineWidth = 2.5 * z; ctx.shadowColor = 'rgba(255,200,80,.9)'; ctx.shadowBlur = 12 * z;
   ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 10 * z, y - 12 * z); ctx.lineTo(x - 4 * z, y - 12 * z); ctx.lineTo(x - 4 * z, y - 24 * z); ctx.lineTo(x + 4 * z, y - 24 * z); ctx.lineTo(x + 4 * z, y - 12 * z); ctx.lineTo(x + 10 * z, y - 12 * z); ctx.closePath();
   ctx.stroke(); ctx.fill(); ctx.restore(); });
+/* Auto switched on in Aren: there is nothing to hunt in town, so it walks out of the east gate to the Suwannin Fields
+   (Auto never uses a gate by itself — js/sys/botgate.js — so this one walk is led from here) */
+{ const _ub = updBot; let said = 0;
+  updBot = function(dt){ const r = _ub.apply(this, arguments);
+    if (BOT.on && MAP_ID === 0 && !(BOT.pause > 0) && !P.dead && !(typeof DG !== 'undefined' && DG.active) && !(typeof S !== 'undefined' && S.aq) && typeof FIELDS306 !== 'undefined'){ const gt = f306Gate(FIELDS306.id);
+      if (gt){ if (T - said > 20){ said = T; toast(L('ในเมืองไม่มีมอนสเตอร์ · Auto พาออกไปทุ่งสุวรรณิน', 'No monsters in town · Auto is heading out to the Suwannin Fields')); }
+        P.target = null; P.pending = null; BOT.roam = null; P.tx = gt.x; P.ty = gt.y; BOT.state = 'roam';
+        if (Math.hypot(gt.x - P.x, gt.y - P.y) < 70) travel(FIELDS306.id, 0); } }
+    return r; }; }

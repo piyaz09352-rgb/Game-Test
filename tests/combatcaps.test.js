@@ -15,6 +15,7 @@ test('combat caps', { skip, timeout: 60000 }, async () => {
       S.stats.agi = 150; S.stats.dex = 150; derive(); out.aspdStat = DER.aspd;
       out.red = [0, 60, 120, 5000].map(bhRed);
       // Flee: the most anyone dodges is 95%
+      loadMap(FIELDS306.id);   /* (v306) the monsters live outside Aren now */
       const m = mobs.find(x => !x.dead && !x.def.boss); P.roll = 0; DER.pas.dodge = 0; DER.flee = 99999; const hp0 = S.hp = DER.maxhp; let hits = 0;
       const rnd = Math.random; Math.random = () => .02; try { mobAttack(m); } finally { Math.random = rnd; } if (S.hp < hp0) hits++;
       out.fleeHit = hits; S.hp = DER.maxhp;
@@ -36,7 +37,7 @@ test('mobbed Flee, Perfect Dodge from LUK, status resist from stats', { skip, ti
   try {
     await enterWorld(page);
     const r = await page.evaluate(() => {
-      const out = {};
+      const out = {}; loadMap(FIELDS306.id);   /* (v306) the monsters live outside Aren now */
       S.stats.luk = 100; derive(); out.pd = DER.pas.dodge;
       out.mul = [1, 2, 3, 5, 20].map(roFleeMul);
       S.stats.vit = 100; S.stats.int = 1; derive(); out.vit = roResOf('stun'); out.int = roResOf('silence'); out.none = roResOf('nope');
