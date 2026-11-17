@@ -66,8 +66,8 @@ function ar11Ground(){ const g = terr.getContext('2d'); g.save(); g.setTransform
   const stroke = (pts, w) => { for (const [ww, col] of [[w + 8, 'rgba(120,88,48,.55)'], [w, '#b08a56'], [w - 10, '#c29e68']]){ g.beginPath(); pts.forEach(([x, y], i) => (i ? g.lineTo(x, y) : g.moveTo(x, y))); g.strokeStyle = col; g.lineWidth = ww; g.stroke(); }
     for (let k = 0; k < pts.length * 6; k++){ const [x, y] = pts[Math.floor(r() * pts.length)]; g.fillStyle = r() < .5 ? 'rgba(100,70,40,.35)' : 'rgba(240,215,170,.3)'; g.beginPath(); g.ellipse(x + (r() - .5) * w * .8, y + (r() - .5) * w * .6, .8 + r() * 1.8, .6 + r(), r() * 3, 0, 7); g.fill(); } };
   // the ring lane round the plaza
-  { const pts = []; for (let i = 0; i <= 72; i++){ const a = i / 72 * Math.PI * 2; pts.push([AR11.cx + Math.cos(a) * (AR11.plazaRX + 40), AR11.cy + Math.sin(a) * (AR11.plazaRY + 34)]); } stroke(pts, 34); }
-  for (const rd of ar11Roads()) stroke(rd.pts, 46);
+  // (v312) the owner: «no paths, they look clumsy» — the ring lane, the roads, the lanes and the market strip are no longer painted; the houses still keep clear of the ways
+
   // yards and the lanes that join each plot to its quarter's road
   const plots = ar11Plots();
   for (const p of plots){ if (p.q === 'e'){ // a farmhouse stands on its own raised yard of grass at the paddy edge, not on the paddy
@@ -76,14 +76,9 @@ function ar11Ground(){ const g = terr.getContext('2d'); g.save(); g.setTransform
       for (let k = 0; k < 160; k++){ const a = r() * 6.283, d = Math.sqrt(r()), x = p.x + Math.cos(a) * d * p.room * 1.25, y = p.y + 16 + Math.sin(a) * d * p.room * .85; g.strokeStyle = r() < .5 ? '#5f8a3e' : '#a6c562'; g.lineWidth = .7; g.beginPath(); g.moveTo(x, y); g.lineTo(x + (r() - .5) * 2, y - 3 - r() * 2); g.stroke(); } }
     g.fillStyle = p.q === 'e' ? 'rgba(186,154,98,.75)' : 'rgba(178,150,96,.5)'; g.beginPath(); g.ellipse(p.x, p.y + 18, p.room * .95, p.room * .55, 0, 0, 7); g.fill();
     g.fillStyle = 'rgba(255,240,200,.18)'; g.beginPath(); g.ellipse(p.x - 8, p.y + 12, p.room * .6, p.room * .3, 0, 0, 7); g.fill(); }
-  for (const q of ['w', 'e', 'n']){ const ps = plots.filter(p => p.q === q).sort((a, b) => a.y - b.y || a.x - b.x);   // a lane through each row of plots, in front of the houses
-    const rows = {}; for (const p of ps){ const k = Math.round(p.y / 175); (rows[k] = rows[k] || []).push(p); }
-    for (const row of Object.values(rows)){ row.sort((a, b) => a.x - b.x); const y = row.reduce((s, p) => s + p.y, 0) / row.length + 62; const x0 = q === 'e' ? AR11.cx + AR11.plazaRX + 20 : row[0].x - 60, x1 = q === 'w' ? AR11.cx - AR11.plazaRX - 10 : row[row.length - 1].x + 60;
-      const pond = typeof POND !== 'undefined' && Math.abs(y - POND.y) < POND.r + 40 ? POND : null;   // a lane goes round the lotus pond, not across it
-      if (pond && x0 < pond.x + pond.r + 40 && x1 > pond.x - pond.r - 40){ if (pond.x - pond.r - 50 > x0) stroke([[x0, y], [pond.x - pond.r - 50, y]], 24); if (x1 > pond.x + pond.r + 50) stroke([[pond.x + pond.r + 50, y], [x1, y]], 24); }
-      else stroke([[x0, y], [(x0 + x1) / 2, y + 6], [x1, y]], 24); } }
+
   // the market lane: a wider paved strip
-  { const rd = ar11Roads().find(x => x.side === 's'); if (rd){ g.globalAlpha = .55; stroke(rd.pts, 120); g.globalAlpha = 1; stroke(rd.pts, 46); } }
+
   g.restore(); }
 /* ---------- the village: houses, yards, the market ---------- */
 function ar11Village(){
