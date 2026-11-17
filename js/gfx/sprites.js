@@ -454,7 +454,7 @@ const SK_POSE = {
     if (f === 5){ P.armR = 1.45; P.elbR = .95; P.outR = .65; P.lean = .12; P.twist = .5; P.mouth = 1; }
     P.sway = [0, .5, 0, -.5, 0, .7][f]; },
   knee(P, f){ P.noWeapon = false;
-    P.bob = [-1.6, 3, 5.2, 1.4, -.4][f]; P.lean = [.1, .15, .24, .1, 0][f];
+    P.bob = [-1.6, -.5, -1.1, -.3, -.4][f];   // (v313) on the standing foot, not a leap: the knee drives up, the other foot stays on the ground P.lean = [.1, .15, .24, .1, 0][f];
     P.armL = P.armR = [-.4, 1.4, 1.95, 1.2, .3][f]; P.elbL = P.elbR = [.6, 1.3, 1.25, 1.2, .4][f]; P.outL = P.outR = [.3, -.1, -.2, 0, .1][f];
     P.legL = [.1, .9, 1.25, .4, .1][f]; P.liftL = [0, 3.8, 5.4, 1, 0][f]; P.legR = [-.2, -.3, -.5, -.2, -.1][f]; P.mouth = f === 2 ? 1 : 0; P.sway = [0, -.6, -1, -.4, 0][f]; },
   kick(P, f){ GUARD(P);
@@ -462,14 +462,14 @@ const SK_POSE = {
     P.legL = [.32, .35, 1.0, 1.55, .8, .32][f]; P.liftL = [0, 2, 3.6, 0, 1.2, 0][f];
     if (f >= 2 && f <= 4){ P.armR = -.2; P.outR = .8; P.elbR = .3; P.armL = .5; P.outL = .9; }
     P.sway = [0, .4, .9, 1.2, .8, .2][f]; },
-  spinkick(P, f, n){ P.spin = f / n * Math.PI * 2; P.bob = [0, .8, 1.4, 1.6, 1.4, 1, .4, 0][f]; P.lean = -.22;
+  spinkick(P, f, n){ P.spin = f / n * Math.PI * 2; P.bob = [-.6, -.3, -.2, -.2, -.2, -.3, -.5, -.6][f]; P.lean = -.22;   // (v313) pivots on the standing foot, no hop
     P.legL = f >= 1 && f <= 6 ? 1.5 : .4; P.liftL = f === 1 || f === 6 ? 2 : 0; P.legR = -.2;
     P.armL = .7; P.outL = 1.05; P.elbL = .3; P.armR = .5; P.outR = 1.0; P.elbR = .3; P.sway = 1.2; P.mouth = f > 2 && f < 6 ? 1 : 0; P.aura = Math.min(4, f); },
   // (v313) no leap: the uppercut drives up from a crouch onto the toes, the feet stay on the ground
-  uppercut(P, f){ P.bob = [-2.6, -1.4, .3, .7, .1, -.8][f]; P.lean = [.25, .1, -.12, -.16, 0, .1][f];
+  uppercut(P, f){ P.bob = [-2.6, -1.4, -.55, -.55, -.4, -.8][f]; P.lean = [.25, .1, -.12, -.16, 0, .1][f];
     P.armR = [-.3, 1.6, 2.9, 3.0, 2.2, .6][f]; P.elbR = [1.7, 1.3, .25, .1, .4, .8][f]; P.outR = [.1, -.1, -.15, -.15, 0, .1][f];
     P.armL = [.9, .9, 1.1, 1.0, .8, .4][f]; P.elbL = [1.4, 1.4, 1.5, 1.5, 1.2, .8][f];
-    P.legL = [.3, .2, .5, .7, .3, .3][f]; P.liftL = 0; P.legR = [-.2, -.2, -.1, -.1, -.2, -.2][f]; P.twist = [-.2, .1, .3, .3, .1, 0][f]; P.mouth = f === 3 ? 1 : 0; P.sparks = f; },
+    P.legL = [.3, .2, .35, .35, .3, .3][f]; P.liftL = 0; P.legR = [-.2, -.2, -.1, -.1, -.2, -.2][f]; P.twist = [-.2, .1, .3, .3, .1, 0][f]; P.mouth = f === 3 ? 1 : 0; P.sparks = f; },
   teep(P, f){ GUARD(P); P.legL = [.9, 1.55, 1.5, .6, .32][f]; P.liftL = [3.6, 0, 0, 2, 0][f]; P.lean = [-.08, -.3, -.28, -.1, 0][f]; P.armR = [1.05, .4, .4, 1, 1.05][f]; P.outR = [-.1, .6, .6, 0, -.1][f]; P.sway = [.3, 1, .8, .3, 0][f]; },
   ramwai(P, f){
     if (f <= 2){ P.kneel = 1; P.bob = -4.5; WAI(P, f === 2 ? .35 : 0); P.head = f === 1 ? .2 : .05; P.eyes = f === 1 ? 'closed' : 'open'; P.aura = f; return; }
@@ -518,20 +518,20 @@ const SK_POSE = {
     P.lean = [-.2, -.25, .3, .32, .05][f]; P.legL = .4; P.legR = -.3; P.bob = [-.3, -.2, -1, -1, -.2][f]; P.mouth = f === 2 ? 1 : 0; },
   // (v116) the summoner raises both arms like wings, rises onto the toes, then sweeps them forward to send the swan
   hongcall(P, f){ P.noWeapon = true; P.armL = P.armR = [.35, 1.25, 2.35, 2.85, 1.6, .9][f]; P.outL = P.outR = [.3, 1.35, 1.05, .6, .2, .3][f];
-    P.elbL = P.elbR = [.6, .25, .2, .15, .1, .5][f]; P.bob = [0, .6, 1.4, 1.8, .2, -.3][f]; P.lean = [.05, -.12, -.2, -.18, .22, .08][f];
+    P.elbL = P.elbR = [.6, .25, .2, .15, .1, .5][f]; P.bob = [-.3, -.27, -.27, -.27, -.27, -.3][f]; P.lean = [.05, -.12, -.2, -.18, .22, .08][f];   // (v313) stands tall, no floating
     P.head = [0, -.1, -.18, -.2, .05, 0][f]; P.legL = .25; P.legR = -.25; P.aura = Math.min(4, f); P.sparks = f >= 2 && f <= 4 ? f : -1; P.eyes = f === 2 ? 'closed' : 'open'; P.mouth = f === 4 ? 1 : 0; },
   // (v116) Shadow Execution: a crouch, a leap with the blade high, the drop and the cut
   // (v313) no leap: Shadow Execution rises tall with the blade high, then drops into a deep lunge as it cuts
-  dive(P, f){ P.bob = [-2.2, -1.2, .3, .6, -1.6, -2.6][f]; P.lean = [.32, .1, -.12, -.05, .48, .32][f];
+  dive(P, f){ P.bob = [-2.2, -1.2, -.6, -.55, -1.9, -2.6][f]; P.lean = [.32, .1, -.12, -.05, .48, .32][f];
     P.armR = [1.0, 2.1, 2.9, 3.05, .7, .35][f]; P.elbR = [1.1, .5, .2, .15, .2, .6][f]; P.outR = [-.1, .1, .2, .1, -.2, -.1][f];
     P.armL = [.9, 1.5, 1.9, 1.7, .9, .6][f]; P.elbL = [1.2, .7, .5, .6, 1.0, 1.2][f]; P.outL = [.2, .5, .7, .6, .3, .2][f];
-    P.legL = [.55, .3, .85, .9, .6, .55][f]; P.legR = [-.5, -.4, -.9, -.95, -.55, -.5][f]; P.liftL = 0;
+    P.legL = [.55, .3, .35, .35, .6, .55][f]; P.legR = [-.5, -.4, -.3, -.3, -.55, -.5][f]; P.liftL = 0;
     P.wpn = [2.0, 2.6, 3.0, 3.1, 1.1, 1.3][f]; P.mouth = f === 4 ? 1 : 0; P.sparks = f === 4 ? 3 : -1; },
-  // (v116) Tiger Pounce: down low, spring, both hands forward like claws, land
-  pounce(P, f){ P.bob = [-3.2, -1.4, 2.2, 1.0, -2.2][f]; P.lean = [.46, .62, .72, .55, .3][f];
+  // (v116) Tiger Pounce · (v313) no leap: down low, a long low spring forward with both feet on the ground, claws out, the cut
+  pounce(P, f){ P.bob = [-3.2, -1.6, -2.1, -1.2, -2.2][f]; P.lean = [.46, .62, .72, .55, .3][f];
     P.armL = P.armR = [.8, 1.5, 1.75, 1.4, .6][f]; P.outL = [.12, .3, .36, .22, .1][f]; P.outR = [-.12, -.3, -.36, -.22, -.1][f];
-    P.elbL = P.elbR = [1.4, .35, .1, .5, 1.0][f]; P.legL = [.62, .2, -.42, .1, .52][f]; P.legR = [-.52, -.82, -.92, -.42, -.42][f];
-    P.liftL = f === 2 ? 1.2 : 0; P.head = [.1, -.05, -.12, 0, .08][f]; P.mouth = f === 2 || f === 3 ? 1 : 0; P.sway = [.2, .6, 1, .6, .2][f]; },
+    P.elbL = P.elbR = [1.4, .35, .1, .5, 1.0][f]; P.legL = [.62, .4, .7, .5, .52][f]; P.legR = [-.52, -.6, -.7, -.5, -.42][f];
+    P.liftL = 0; P.head = [.1, -.05, -.12, 0, .08][f]; P.mouth = f === 2 || f === 3 ? 1 : 0; P.sway = [.2, .6, 1, .6, .2][f]; },
   // (v116) Death Mark: the free hand draws the seal before the face, eyes shut, then the blade thrusts through it
   seal(P, f){ P.armL = [1.2, 1.75, 1.85, .6, .4][f]; P.elbL = [1.6, 1.95, 1.95, .6, .8][f]; P.outL = [.1, -.15, -.2, .2, .2][f];
     P.armR = [.4, .5, .6, 1.65, 1.5][f]; P.elbR = [1.2, 1.1, 1.0, .1, .2][f]; P.outR = [-.1, -.1, -.1, .05, 0][f];
@@ -547,7 +547,7 @@ const SK_POSE = {
     P.armR = [2.4, 2.2, .9, .4, .3][f]; P.elbR = [.5, .2, .1, .6, .4][f]; P.outR = [-.3, .4, -.5, -.3, 0][f];
     P.armL = [2.4, 2.2, .9, .4, .3][f]; P.elbL = [.5, .2, .1, .6, .4][f]; P.outL = [-.3, .4, -.5, -.3, 0][f];
     P.twist = [0, .1, -.1, 0, 0][f]; P.wpn = [2.6, 2.2, 1.0, 1.4, 1.7][f]; P.sway = [.4, -.6, -1, -.4, 0][f]; P.mouth = f === 2 ? 1 : 0; P.sparks = f >= 2 && f <= 3 ? f : -1; },
-  twinspin(P, f, n){ P.spin = f / n * Math.PI * 2; P.bob = [-.4, .6, 1.2, 1.4, 1.2, .6, -.2, -.8][f] || 0; P.lean = .12; P.legL = .45; P.legR = -.38; P.liftL = f > 1 && f < 6 ? 1.2 : 0;
+  twinspin(P, f, n){ P.spin = f / n * Math.PI * 2; P.bob = [-.6, -.6, -.6, -.6, -.6, -.6, -.7, -.9][f] || 0;   // (v313) spins on the standing foot, no hop P.lean = .12; P.legL = .45; P.legR = -.38; P.liftL = f > 1 && f < 6 ? 1.2 : 0;
     P.armR = 1.55; P.outR = 1.25; P.elbR = .05; P.armL = 1.55; P.outL = 1.25; P.elbL = .05; P.wpn = 1.55; P.sway = 1.4; P.mouth = 1; P.aura = Math.min(4, f); },
   flurry(P, f){ const a = f % 2; P.bob = -1.2; P.lean = .25; P.legL = .5; P.legR = -.4;
     P.armR = a ? .6 : 1.6; P.elbR = a ? 1.4 : .05; P.armL = a ? 1.6 : .6; P.elbL = a ? .05 : 1.4; P.outL = -.1; P.outR = -.1; P.twist = a ? -.28 : .28; P.sway = a ? .8 : -.8; }
