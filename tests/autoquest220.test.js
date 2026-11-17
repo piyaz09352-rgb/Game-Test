@@ -17,9 +17,9 @@ test('auto quest: a whole chapter by itself, then on to the next map', { skip, t
       openWin('quest'); const b = document.querySelector('#pane-quest [data-aq="1"]'); o.btn = !!b; if (b) b.click(); closeWin('quest');
       o.on = !!S.aq && BOT.on;
       let maxStep = 0;
-      for (let s = 0; s < 1500 && !o.next; s++){ adv(20); const c = msS().cur; if (c && c.map === 0) maxStep = Math.max(maxStep, c.step);
-        if (msS().done[0] && (MAP_ID === 1 || (AQ.plan && AQ.plan.map === 1 && P.tx != null))) o.next = true; if (!S.aq) break; }
-      o.done0 = !!msS().done[0]; o.maxStep = maxStep; o.chip = (document.getElementById('botChip') || {}).title || '';
+      for (let s = 0; s < 1500 && !o.next; s++){ adv(20); const c = msS().cur; if (c && c.map === FIELDS306.id) maxStep = Math.max(maxStep, c.step);
+        if (msS().done[FIELDS306.id] && (MAP_ID === 1 || (AQ.plan && AQ.plan.map === 1 && P.tx != null))) o.next = true; if (!S.aq) break; }
+      o.done0 = !!msS().done[FIELDS306.id];   /* (v306) the first chapter lives in the Suwannin Fields now: Auto quest walks out of Aren by itself */ o.maxStep = maxStep; o.chip = (document.getElementById('botChip') || {}).title || '';
       // a chapter beyond your level: Auto stops and says why
       S.ms = {done:{}}; MS_ARCS[0].maps.forEach(m => { if (m !== 62) S.ms.done[m] = 1; }); S.lvl = 20; loadMap(0); S.aq = true; adv(20); o.stopLv = !S.aq;
       return o;

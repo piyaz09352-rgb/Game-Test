@@ -308,7 +308,7 @@ function setupSpawns(id){
     addSlots('dewblob', 16, ZA); addSlots('hare', 11, ZA); addSlots('kobna', 6, ZA); addSlots('hare', 4, ZB); addSlots('boar', 12, ZB); addSlots('kaipa', 6, ZB); addSlots('lantern', 12, ZN, true);
     bossTimer = bossFirst(); return;
   }
-  const per = Math.max(6, Math.round(58 * AREA() / mp.mobs.length));   // same density on the larger map
+  const per = Math.max(6, Math.round(58 * Math.min(AREA(), 2.5) / mp.mobs.length));   // same density on the larger map · (v305) on the widest maps a little thinner: 145 monsters at most, so a phone still keeps up
   for (const t of mp.mobs) addSlots(t, MOB[t].night ? Math.round(per * .6) : per, MAPZ, MOB[t].night);
   bossTimer = bossFirst();
 }

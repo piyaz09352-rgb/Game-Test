@@ -105,7 +105,7 @@ function renderWorld(){
   const land = LANDS[mp.land], gc = (WM_GROUND[mp.land] || WM_GROUND.fertile);
   const visitedN = Object.keys(S.visited || {}).length, diff = S.lvl < mp.lv[0] - 5 ? ['hard', L('อันตราย', 'Dangerous')] : S.lvl > mp.lv[1] + 5 ? ['easy', L('ง่าย', 'Easy')] : ['fit', L('เหมาะกับคุณ', 'Right for you')];
   const chip = (k, t) => `<span class="wchip ${k}">${t}</span>`;
-  const sk = (bd.bossSkills || []).map(k => chip('sk', L(...BOSS_SKILL_TH[k]))).join('');
+  const sk = ((bd && bd.bossSkills) || []).map(k => chip('sk', L(...BOSS_SKILL_TH[k]))).join('');
   const mobTile = t => { const m = MOB[t], a = seen ? mobArt(t) : '';
     return `<div class="wmob el-${m.elem || 'neutral'}${seen ? '' : ' unk'}" title="${seen ? nm(m) : '?'}"><span class="pic">${a ? `<img data-mart="${t}" src="${a}" alt="">` : '<b>?</b>'}</span><span class="nmx"><b>${seen ? nm(m) : '???'}</b><small>Lv ${m.lvl}${m.night ? ' · ' + L('กลางคืน', 'night') : ''}</small></span></div>`; };
   const warpLbl = here ? L('อยู่ที่นี่แล้ว', 'Already here') : !seen ? L('ยังไม่ปลดล็อก', 'Locked') : !ok ? L('วาร์ปได้ที่หมู่บ้านหรือข้างผู้เฝ้าศาล', 'Warp from the village or beside a shrine keeper') : `${L('วาร์ป', 'Warp')} · ${fee ? fee.toLocaleString() + ' ' + CUR() : L('ฟรี', 'Free')}`;
@@ -117,11 +117,12 @@ function renderWorld(){
         <small>${L(land[0], land[1])}</small><b>${nm(mp)}</b>
         <div class="wchips">${chip('lv', `Lv ${mp.lv[0]}–${mp.lv[1]}`)}${chip(diff[0], diff[1])}${here ? chip('here', '◉ ' + L('คุณอยู่ที่นี่', 'You are here')) : ''}${!seen ? chip('lock', '🔒 ' + L('ยังไม่เคยไป', 'Unexplored')) : ''}</div></div>
       <p class="wmdesc">${L(...mp.desc)}</p>
-      <div class="wmsec"><span>♛ ${L('บอสประจำแคว้น', 'Region boss')}</span></div>
+      ${bd ? '' : `<div class="wmsec"><span>${L('เมือง · ไม่มีมอนสเตอร์และบอส', 'A town · no monsters, no boss')}</span></div>`}
+      ${!bd ? '' : `<div class="wmsec"><span>♛ ${L('บอสประจำแคว้น', 'Region boss')}</span></div>
       <div class="wmbossc el-${bd.elem || 'neutral'}"><span class="pic">${seen && mobArt(mp.boss) ? `<img data-mart="${mp.boss}" src="${mobArt(mp.boss)}" alt="">` : '<b>?</b>'}</span>
         <div class="bi"><b>${seen ? nm(bd) : '???'}</b><small>Lv ${bd.lvl} · ${elemName(bd.elem)} · HP ${bd.hp.toLocaleString()}</small><div class="sks">${seen ? sk : ''}</div></div></div>
       <div class="wmsec"><span>${L('มอนสเตอร์ในแคว้น', 'Monsters here')}</span><small>${mp.mobs.length}</small></div>
-      <div class="wmmobs">${mp.mobs.map(mobTile).join('')}</div>
+      <div class="wmmobs">${mp.mobs.map(mobTile).join('')}</div>`}
       ${seen ? '' : `<p class="wmhint">${L('เดินผ่านประตูขอบแผนที่จากแคว้นข้างเคียงเพื่อปลดล็อก', 'Walk through an edge gate from a neighbouring region to unlock it')}</p>`}
       <button class="btn gold wide wmwarp" data-warp="${mp.id}" ${seen && ok && !here && S.bia >= fee ? '' : 'disabled'}>${warpLbl}</button>
     </aside></div>`;

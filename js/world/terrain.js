@@ -25,7 +25,7 @@ const VSPAWN = {x:320 + VX, y:820};   // where you wake / arrive in Aren
 /* saves made before the move stood in the old west-edge village: carry them along once */
 function villageFix(){ if (S && S.map === 0 && !S.vxv){ if (P.x < 640) P.x += VX; S.vxv = 1; } }
 let CAMP = null;   // the travellers' camp in the middle of every field map (sys/camp.js): a safe spot like the village
-const inVillage = e => ((typeof MAP_ID === 'undefined' || MAP_ID === 0) ? Math.hypot(e.x - 1200, e.y - 800) < 455 :   // (v60) Aren is a round town in the middle of its map
+const inVillage = e => ((typeof MAP_ID === 'undefined' || MAP_ID === 0) ? true :   // (v306) the whole of Aren's map is the town now (it was the round town in the middle, with monster fields round it)   // (v60) Aren is a round town in the middle of its map
    !!CAMP && Math.hypot(e.x - CAMP.x, (e.y - CAMP.y) * 1.2) < 150);
 
 // ground resolution: 2 px per world unit on roomy desktops, less on phones/tablets (canvas memory is limited there)

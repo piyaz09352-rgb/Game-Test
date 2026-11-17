@@ -134,7 +134,8 @@ function tlDeliver(){ const s = tlS(), j = s.job; if (!j || j.to !== MAP_ID) ret
 function tlCancel(){ const s = tlS(), j = s.job; if (!j) return; if (S.inv[j.item]){ S.inv[j.item]--; if (!S.inv[j.item]) delete S.inv[j.item]; } s.job = null; if (S.guide && S.guide.kind === 'post') S.guide = s.prevGuide || null; dirty = true; save(); }
 // the clerk stands by the square (towns) or near the spawn (Aren), on open ground away from the other NPCs
 function tlPostSpot(id){ const c = id === 0 ? {x:VSPAWN.x - 150, y:VSPAWN.y + 70} : {x:W * .5 + 150, y:H * .5 - 95};
-  for (let t = 0; t < 80; t++){ const a = t * 2.4, d = t * 6, x = c.x + Math.cos(a) * d, y = c.y + Math.sin(a) * d * .7; if (walkable(x, y, 14) && !NPCS.some(n => Math.hypot(n.x - x, n.y - y) < 80) && !GATES.some(g => Math.hypot(g.x - x, g.y - y) < 160)) return {x, y}; }
+  for (let t = 0; t < 80; t++){ const a = t * 2.4, d = t * 6, x = c.x + Math.cos(a) * d, y = c.y + Math.sin(a) * d * .7; if (walkable(x, y, 14) && !NPCS.some(n => Math.hypot(n.x - x, n.y - y) < 80) && !GATES.some(g => Math.hypot(g.x - x, g.y - y) < 160)
+      && (id !== 0 || (walkable(x, y + 30, 12) && typeof findPath === 'function' && findPath(VSPAWN.x, VSPAWN.y, x, y + 30)))) return {x, y}; }   // (v306) in Aren it must be a place you can walk up to (the first spot is hemmed in now that the story girl has moved to the fields)
   return c; }
 { const _s = setupNpcs;
   setupNpcs = function(id){ const r = _s.apply(this, arguments); const pi = tlPlace(id); if (pi < 0) return r;

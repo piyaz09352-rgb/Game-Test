@@ -52,8 +52,9 @@ function gobSpawn(key){
 function gobRun(m, dt){
   m.aggro = false; m.atkCd = 9; const dx = m.x - P.x, dy = m.y - P.y, d = Math.hypot(dx, dy) || 1;
   if (d < 300 || (m.hurtT > 0)){ const ux = dx / d, uy = dy / d; let best = null;
-    for (const a of [0, .5, -.5, 1, -1, 1.6, -1.6]){ const c = Math.cos(a), s = Math.sin(a), tx = clamp(m.x + (ux * c - uy * s) * 180, 70, W - 70), ty = clamp(m.y + (ux * s + uy * c) * 180, 80, H - 70);
-      if (walkable(tx, ty, 12)){ best = {x:tx, y:ty}; break; } }
+    for (const a of [0, .5, -.5, 1, -1, 1.6, -1.6, 2.2, -2.2]){ /* (v308) two more ways out: a goblin with its back to a cliff or the map's edge still slips past */ const c = Math.cos(a), s = Math.sin(a), tx = clamp(m.x + (ux * c - uy * s) * 180, 70, W - 70), ty = clamp(m.y + (ux * s + uy * c) * 180, 80, H - 70);
+      let clear = true; for (let k = 1; k <= 6 && clear; k++) clear = walkable(m.x + (tx - m.x) * k / 6, m.y + (ty - m.y) * k / 6, 10);   // (v308) the whole way must be open, not only the end: it used to pick a spot behind a tree, walk into the trunk, stop, and pick the same spot again
+      if (clear){ best = {x:tx, y:ty}; break; } }
     if (best){ m.gtx = best.x; m.gty = best.y; } }
   // it moves itself (calm monsters may be held by their idle behaviours): a little slower than a hero on foot
   if (m.gtx != null && !(m.stunT > 0) && !(typeof mobRooted === 'function' && mobRooted(m))){ const ex = m.gtx - m.x, ey = m.gty - m.y, ed = Math.hypot(ex, ey);

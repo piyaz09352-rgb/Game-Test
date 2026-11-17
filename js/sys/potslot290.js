@@ -49,7 +49,7 @@ document.addEventListener('pointerdown', e => {
   const k = ptsKind(b); if (!k) return;
   const mo = b.matches('.mo.pot'); if (mo){ e.stopPropagation(); e.preventDefault(); b.classList.add('press'); try { b.setPointerCapture(e.pointerId); } catch (er) {} }   // the touch bottles drank on press: now on release, so a hold can open the picker
   clearTimeout(PTS.timer);
-  PTS.p = {b, k, mo, x:e.clientX, y:e.clientY, pid:e.pointerId, t0:performance.now(), done:false, moved:false};
+  PTS.p = {b, k, mo, x:e.clientX, y:e.clientY, pid:e.pointerId, t0:performance.now(), ts0:e.timeStamp, done:false, moved:false};
   PTS.timer = setTimeout(() => { const p = PTS.p; if (!p || p.done || p.moved) return; p.done = true; PTS.eat = true; p.b.style.transform = ''; ptsPick(p.b, p.k); }, PTS.HOLD);
 }, true);
 document.addEventListener('pointermove', e => {
@@ -60,7 +60,11 @@ document.addEventListener('pointermove', e => {
   if (Math.hypot(dx, dy) > PTS.MOVE){ p.moved = true; clearTimeout(PTS.timer); }
 }, true);
 const ptsEnd = e => { const p = PTS.p; if (!p || e.pointerId !== p.pid) return; PTS.p = null; clearTimeout(PTS.timer); p.b.style.transform = ''; p.b.classList.remove('press');
-  if (p.mo && e.type === 'pointerup' && !p.done && !p.moved && performance.now() - p.t0 < PTS.HOLD && typeof mobaAction === 'function') mobaAction(p.b.dataset.mo); };
+  // (v308) a hold is measured from the events' own times, not from when the timer got to run: on a busy frame (a big map
+  // being painted) the release could be handled before the hold timer fired, and a long press drank the potion instead
+  const held = (e.timeStamp && p.ts0 ? e.timeStamp - p.ts0 : performance.now() - p.t0) >= PTS.HOLD;
+  if (e.type === 'pointerup' && !p.done && !p.moved && held){ p.done = true; PTS.eat = true; ptsPick(p.b, p.k); return; }
+  if (p.mo && e.type === 'pointerup' && !p.done && !p.moved && !held && typeof mobaAction === 'function') mobaAction(p.b.dataset.mo); };
 document.addEventListener('pointerup', ptsEnd, true);
 document.addEventListener('pointercancel', ptsEnd, true);
 document.addEventListener('click', e => {

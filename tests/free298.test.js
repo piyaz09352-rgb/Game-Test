@@ -17,7 +17,7 @@ test('free deer, robots and fashion; WASD; the warp board answers; the invasion 
       CSH.tab = 'bot'; openWin('cshop'); await new Promise(res => setTimeout(res, 300)); o.rent = document.querySelectorAll('#pane-cshop [data-rentpet]').length; document.querySelector('#pane-cshop [data-botuse="titan"]').click(); o.bot = !!helperOf() && S.helper.k === 'titan'; closeWin('cshop');
       o.fash = Object.keys(COSTUME).every(cosHave) && Object.keys(WINGS).every(cosHave);
       const x0 = P.x; window.dispatchEvent(new KeyboardEvent('keydown', {key:'d', code:'KeyD'})); await new Promise(res => setTimeout(res, 500)); window.dispatchEvent(new KeyboardEvent('keyup', {key:'d', code:'KeyD'})); o.walked = P.x > x0 + 5; o.noStat = !UIS.open.stat;
-      S.bia = 1e9; S.visited[2] = 1; const b = document.createElement('button'); b.dataset.warp = '2'; document.body.appendChild(b); b.click(); o.card = !el('warpCard').hidden; await new Promise(res => setTimeout(res, 600)); o.arrived = MAP_ID === 2; o.cardGone = el('warpCard').hidden; b.remove();
+      S.bia = 1e9; S.visited[2] = 1; const b = document.createElement('button'); b.dataset.warp = '2'; document.body.appendChild(b); b.click(); o.card = !!el('ldCard') && !el('ldCard').hidden;   /* (v307) the «warping…» card became the loading screen */ await new Promise(res => setTimeout(res, 600)); o.arrived = MAP_ID === 2; for (let i = 0; i < 30 && !el('ldCard').hidden; i++) await new Promise(res => setTimeout(res, 100)); o.cardGone = el('ldCard').hidden; b.remove();
       return o; });
     assert.ok(r.deer && r.ride, 'the Golden Deer is free and rideable');
     assert.strictEqual(r.rent, 0, 'no rent prices for robots'); assert.ok(r.bot, 'a premium robot is taken for free');

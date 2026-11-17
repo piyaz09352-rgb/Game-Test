@@ -16,11 +16,11 @@ test('map stories: east road chapters, NPCs, rewards', { skip, timeout: 180000 }
       for (const [m, ch] of Object.entries(MS_CH)){ for (const st of ch.steps){ if ((st.k === 'kill' || st.k === 'elite') && !(MOB[st.t] && MAPS[m].mobs.includes(st.t))) o.bad.push(m + ':' + st.t); if (st.k === 'item' && !ITEMS[st.t]) o.bad.push(m + ':' + st.t); }
         if (!(COSTUME[ch.cos] || WINGS[ch.cos] || XCOS[ch.cos])) o.bad.push('cos ' + ch.cos); }
       o.chapters = MS_ARCS.length >= 4 && MS_ARCS.every(a => a.maps.every(m => MS_CH[m]) && a.comp && !a.mount && ACH_BY[a.title_id]);   // (v286) the road's mount reward was retired with every fashion mount
-      S.lvl = 20; S.tut = {done:true, i:99}; loadMap(0); adv(4);
+      S.lvl = 20; S.tut = {done:true, i:99}; const F = FIELDS306.id; loadMap(F); adv(4);   /* (v306) the first chapter is in the Suwannin Fields */
       const kh = NPCS.find(n => n.id === 'ms_khaohom'); o.kh = !!kh && npcMark(kh) === '!';
-      msAccept(0); const lan = spawnMob('lantern', P.x + 300, P.y); for (let i = 0; i < 6; i++) EV.emit('kill', lan); o.r1 = msReady(); msHandIn();
+      msAccept(F); const lan = spawnMob('lantern', P.x + 300, P.y); for (let i = 0; i < 6; i++) EV.emit('kill', lan); o.r1 = msReady(); msHandIn();
       for (const p of MS.spots){ P.x = p.x; P.y = p.y; adv(2); } o.r2 = msReady(); msHandIn();
-      addItem('wick', 3); o.r3 = msReady(); const bia = S.bia; msHandIn(); o.paid = S.bia > bia; o.done = !!msS().done[0]; o.bow = cosHave('ms_h_khaohom');
+      addItem('wick', 3); o.r3 = msReady(); const bia = S.bia; msHandIn(); o.paid = S.bia > bia; o.done = !!msS().done[F]; o.bow = cosHave('ms_h_khaohom');
       loadMap(1); adv(4); o.npcs = ['ms_khlui', 'ms_khaohom'].every(id => NPCS.some(n => n.id === id));
       msAccept(1); const mk = spawnMob('bamboomonkey', P.x + 300, P.y); for (let i = 0; i < 10; i++) EV.emit('kill', mk); msHandIn();
       for (const p of MS.spots){ P.x = p.x; P.y = p.y; adv(2); } msHandIn(); adv(3);
