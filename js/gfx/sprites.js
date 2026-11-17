@@ -465,10 +465,11 @@ const SK_POSE = {
   spinkick(P, f, n){ P.spin = f / n * Math.PI * 2; P.bob = [0, .8, 1.4, 1.6, 1.4, 1, .4, 0][f]; P.lean = -.22;
     P.legL = f >= 1 && f <= 6 ? 1.5 : .4; P.liftL = f === 1 || f === 6 ? 2 : 0; P.legR = -.2;
     P.armL = .7; P.outL = 1.05; P.elbL = .3; P.armR = .5; P.outR = 1.0; P.elbR = .3; P.sway = 1.2; P.mouth = f > 2 && f < 6 ? 1 : 0; P.aura = Math.min(4, f); },
-  uppercut(P, f){ P.bob = [-2.6, -.4, 4.2, 5.6, 2.2, -.8][f]; P.lean = [.25, .1, -.12, -.16, 0, .1][f];
+  // (v313) no leap: the uppercut drives up from a crouch onto the toes, the feet stay on the ground
+  uppercut(P, f){ P.bob = [-2.6, -1.4, .3, .7, .1, -.8][f]; P.lean = [.25, .1, -.12, -.16, 0, .1][f];
     P.armR = [-.3, 1.6, 2.9, 3.0, 2.2, .6][f]; P.elbR = [1.7, 1.3, .25, .1, .4, .8][f]; P.outR = [.1, -.1, -.15, -.15, 0, .1][f];
     P.armL = [.9, .9, 1.1, 1.0, .8, .4][f]; P.elbL = [1.4, 1.4, 1.5, 1.5, 1.2, .8][f];
-    P.legL = [.3, .2, .5, .7, .3, .3][f]; P.liftL = [0, 0, 3, 4, 1, 0][f]; P.legR = [-.2, -.2, -.1, -.1, -.2, -.2][f]; P.twist = [-.2, .1, .3, .3, .1, 0][f]; P.mouth = f === 3 ? 1 : 0; P.sparks = f; },
+    P.legL = [.3, .2, .5, .7, .3, .3][f]; P.liftL = 0; P.legR = [-.2, -.2, -.1, -.1, -.2, -.2][f]; P.twist = [-.2, .1, .3, .3, .1, 0][f]; P.mouth = f === 3 ? 1 : 0; P.sparks = f; },
   teep(P, f){ GUARD(P); P.legL = [.9, 1.55, 1.5, .6, .32][f]; P.liftL = [3.6, 0, 0, 2, 0][f]; P.lean = [-.08, -.3, -.28, -.1, 0][f]; P.armR = [1.05, .4, .4, 1, 1.05][f]; P.outR = [-.1, .6, .6, 0, -.1][f]; P.sway = [.3, 1, .8, .3, 0][f]; },
   ramwai(P, f){
     if (f <= 2){ P.kneel = 1; P.bob = -4.5; WAI(P, f === 2 ? .35 : 0); P.head = f === 1 ? .2 : .05; P.eyes = f === 1 ? 'closed' : 'open'; P.aura = f; return; }
@@ -520,10 +521,11 @@ const SK_POSE = {
     P.elbL = P.elbR = [.6, .25, .2, .15, .1, .5][f]; P.bob = [0, .6, 1.4, 1.8, .2, -.3][f]; P.lean = [.05, -.12, -.2, -.18, .22, .08][f];
     P.head = [0, -.1, -.18, -.2, .05, 0][f]; P.legL = .25; P.legR = -.25; P.aura = Math.min(4, f); P.sparks = f >= 2 && f <= 4 ? f : -1; P.eyes = f === 2 ? 'closed' : 'open'; P.mouth = f === 4 ? 1 : 0; },
   // (v116) Shadow Execution: a crouch, a leap with the blade high, the drop and the cut
-  dive(P, f){ P.bob = [-2.2, -.6, 3.2, 4.2, -.4, -2.6][f]; P.lean = [.32, .1, -.12, -.05, .48, .32][f];
+  // (v313) no leap: Shadow Execution rises tall with the blade high, then drops into a deep lunge as it cuts
+  dive(P, f){ P.bob = [-2.2, -1.2, .3, .6, -1.6, -2.6][f]; P.lean = [.32, .1, -.12, -.05, .48, .32][f];
     P.armR = [1.0, 2.1, 2.9, 3.05, .7, .35][f]; P.elbR = [1.1, .5, .2, .15, .2, .6][f]; P.outR = [-.1, .1, .2, .1, -.2, -.1][f];
     P.armL = [.9, 1.5, 1.9, 1.7, .9, .6][f]; P.elbL = [1.2, .7, .5, .6, 1.0, 1.2][f]; P.outL = [.2, .5, .7, .6, .3, .2][f];
-    P.legL = [.55, .3, .85, .9, .6, .55][f]; P.legR = [-.5, -.4, -.9, -.95, -.55, -.5][f]; P.liftL = f >= 2 && f <= 3 ? 1.4 : 0;
+    P.legL = [.55, .3, .85, .9, .6, .55][f]; P.legR = [-.5, -.4, -.9, -.95, -.55, -.5][f]; P.liftL = 0;
     P.wpn = [2.0, 2.6, 3.0, 3.1, 1.1, 1.3][f]; P.mouth = f === 4 ? 1 : 0; P.sparks = f === 4 ? 3 : -1; },
   // (v116) Tiger Pounce: down low, spring, both hands forward like claws, land
   pounce(P, f){ P.bob = [-3.2, -1.4, 2.2, 1.0, -2.2][f]; P.lean = [.46, .62, .72, .55, .3][f];
