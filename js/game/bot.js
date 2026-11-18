@@ -41,8 +41,12 @@ function tgtCmp(a, b){ const da = dist(a, P), db = dist(b, P); return Math.abs(d
 function pickTarget(){
   const th = threats().filter(m => !BOT.skip.has(m));
   if (th.length) return th.sort(tgtCmp)[0];
-  return mobs.filter(m => botOk(m) && dist(m, P) < BOT_CFG.seek).sort(tgtCmp)[0] || null;
+  const all = mobs.filter(m => botOk(m) && dist(m, P) < BOT_CFG.seek), fit = all.filter(botFits);
+  return (fit.length ? fit : all).sort(tgtCmp)[0] || null;   // (v320) monsters near its own level first
 }
+/* (v320) Auto picks a fight it can win: a monster more than 5 levels above the hero is left alone while others are about
+   (one that attacks is still fought back: threats() come first) */
+const botFits = m => !m.def || !m.def.lvl || m.def.lvl + (m.elite ? 5 : 0) <= S.lvl + 5;   // a pack leader (4× HP, harder hits) counts as 5 levels higher
 /* ---------- Auto skill set (saved per character in S.bot) ----------
    list: the player's own priority order of active skills, each on/off. basic: use normal attacks.
    buff: keep the ticked buffs up. heal: heal skills fire below this HP %. spKeep: SP % kept in reserve. */
@@ -190,11 +194,11 @@ function updBot(dt){
   }
   // nothing around → roam to the right hunting ground
   BOT.state = 'roam';
-  const zone = MAP_ID === 0 ? (S.lvl < 8 ? ZA : ZB) : MAPZ;
+  const zone = MAP_ID === 0 ? (S.lvl < 8 ? ZA : ZB) : (typeof f306Zone === 'function' && f306Zone()) || MAPZ;
   if (!BOT.roam || Math.hypot(BOT.roam.x - P.x, BOT.roam.y - P.y) < 30){
     BOT.roam = null;
     {   // head for the nearest monster Auto would fight, wherever it is on the map
-      const near = mobs.filter(m => botOk(m)).sort((a, b) => dist(a, P) - dist(b, P)).slice(0, 4);
+      const ok = mobs.filter(m => botOk(m)), fit = ok.filter(botFits), near = (fit.length ? fit : ok).sort((a, b) => dist(a, P) - dist(b, P)).slice(0, 4);
       const bm = near.find(m => findPath(P.x, P.y, m.x, m.y)); if (bm) BOT.roam = {x:bm.x, y:bm.y}; }
     for (let i = 0; i < 6 && !BOT.roam; i++){ const q = randIn(zone, 18); if (botAvoid() && botBosses().some(m => Math.hypot(m.x - q.x, m.y - q.y) < BOT_BOSS.near + 100)) continue; if (walkable(q.x, q.y, 18) && findPath(P.x, P.y, q.x, q.y)) BOT.roam = q; }
     if (!BOT.roam){ renderBotChip(); return; }

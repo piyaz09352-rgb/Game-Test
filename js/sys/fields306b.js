@@ -5,7 +5,20 @@
    · Auto switched on inside Aren walks out to the fields instead of standing in town;
    · an old save in the middle of the first story chapter keeps it (the chapter now belongs to the new map). */
 'use strict';
-{ const _ss = setupSpawns; setupSpawns = function(id){ if (id === 0){ bossTimer = 1e12; return; } return _ss.apply(this, arguments); }; }
+{ const _ss = setupSpawns; setupSpawns = function(id){ if (id === 0){ bossTimer = 1e12; return; }
+    if (typeof FIELDS306 !== 'undefined' && id === FIELDS306.id){ f306Spawns(); bossTimer = bossFirst(); return; }
+    return _ss.apply(this, arguments); }; }
+/* (v320) the fields keep Aren's old order of danger. A new hero on Auto died about every 30 s here: every kind of monster
+   was spread over the whole map, so Lv 9 boars and Lv 13 lanterns (which attack on sight) stood right by the gate a
+   Lv 1 hero comes in by. As in Aren before v306: the weak ones by the west gate (from Aren), the middle ones in the
+   middle, boars to the east, and the lanterns only at night, far east */
+const F306Z = () => [{x0:180, y0:140, x1:1750, y1:H - 120}, {x0:1650, y0:140, x1:3450, y1:H - 120}, {x0:3350, y0:140, x1:W - 180, y1:H - 120}];
+function f306Spawns(){ const [a, b, c] = F306Z();
+  addSlots('dewblob', 16, a); addSlots('hare', 10, a); addSlots('kobna', 8, a);
+  addSlots('hare', 6, b); addSlots('kaipa', 10, b); addSlots('kobna', 4, b);
+  addSlots('boar', 12, c); addSlots('kaipa', 4, c); addSlots('lantern', 10, c, true); }
+/* Auto roams the part of the fields that suits its level */
+const f306Zone = () => (typeof FIELDS306 !== 'undefined' && MAP_ID === FIELDS306.id ? F306Z()[S.lvl < 6 ? 0 : S.lvl < 10 ? 1 : 2] : null);
 { const _br = bossRecall; bossRecall = function(id){ if (id === 0){ bossTimer = 1e12; return; } return _br.apply(this, arguments); }; }
 const f306Gate = to => (typeof GATES !== 'undefined' ? GATES.find(g => g.to === to) : null);
 function f306Fix(){ if (typeof S === 'undefined' || !S || S._f306) return; const o = S.ms;
