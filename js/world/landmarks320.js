@@ -9,10 +9,11 @@
      · deserts and canyons: a natural arch of banded sandstone;
      · frozen lands: a cluster of ice crystals; caves: the same in amethyst;
      · coasts: an old junk wrecked on the sand, its mast broken, its ribs showing at the stern.
+   (v321) the owner kept only the prang: the arch, the crystals and the wreck are drawn below but no longer placed.
    The landmark stands in a wide glade away from the camp, the trail, the gates and the water; nothing else grows on it. */
 'use strict';
 Object.assign(WATERFALL_BIOMES, {fields:'water', primeval:'water', amberfen:'water', marsh:'water', floatmarket:'water', ashforest:'lava', dragonvale:'lava', dragonroost:'lava', demonthrone:'lava', naraka:'lava'});
-const LM320 = {prang:['cemetery', 'ayodhya', 'badan'], arch:['dryplain', 'desert', 'canyon', 'oasis'], spire:['frozenlake', 'icecave', 'glacier', 'frostcitadel', 'cave'], wreck:['beach', 'isle', 'river']};
+const LM320 = {prang:['cemetery', 'ayodhya', 'badan']};   /* (v321) the owner kept only the prang: the arch, the crystals and the wreck are no longer placed */
 const lmGrad = (g, x0, y0, x1, y1, stops) => { const gr = g.createLinearGradient(x0, y0, x1, y1); stops.forEach((c, i) => gr.addColorStop(i / (stops.length - 1), c)); return gr; };
 
 /* a fallen laterite prang */
