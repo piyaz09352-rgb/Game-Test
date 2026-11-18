@@ -38,10 +38,13 @@ const BEAST = (() => {
     const ph = f / n * Math.PI * 2, o = {bob:0, lun:0, sw:0, fall:0, eyes:'open', tilt:0, ph, flap:Math.sin(ph * 2)};
     if (act === 'idle'){ o.bob = Math.sin(ph) * .4; o.flap = Math.sin(ph) * .5; }
     if (act === 'walk'){ o.sw = Math.sin(ph) * .55; o.bob = Math.abs(Math.cos(ph)) * .9; }
-    if (act === 'attack'){ o.lun = [0, -2.5, 7, 2][f]; o.tilt = [0, .25, -.35, 0][f]; o.sw = [0, -.3, .5, .1][f]; o.flap = [0, 1, -1, 0][f]; }
+    if (act === 'attack'){ o.lun = [0, -2, 4.5, 1.5][f];   /* (v320) a shorter lunge: the limbs, head and jaw now carry the strike, and the head stays in the frame */ o.tilt = [0, .25, -.35, 0][f]; o.sw = [0, -.3, .5, .1][f]; o.flap = [0, 1, -1, 0][f]; }
     if (act === 'hurt'){ o.lun = -2; o.tilt = .3; o.eyes = 'hurt'; }
     if (act === 'die'){ o.fall = [.35, .9, 1.35, 1.55][f]; o.eyes = 'closed'; }
     // (v314) a boss's skill pose (gfx/sprites.js BOSS_POSE ext): its own limbs act it out
+    // (v320) an ordinary monster's bite or swipe uses its limbs too: it gathers (head up, a front paw raised), strikes
+    // (head down and forward, jaw wide, tail lashing) and recovers; a boss's skill pose (BPX below) replaces this
+    if (act === 'attack' && !globalThis.BPX){ o.jaw = [0, .3, 1, .25][f]; o.head = [.15, .3, -.35, 0][f]; o.fold = [0, .5, .05, 0][f]; o.tail = [0, .4, .8, .2][f]; }
     const X = globalThis.BPX; if (X){ o.fold = X.fold || 0; o.head = X.head || 0; o.jaw = X.jaw || 0; o.curl = X.curl || 0; o.spread = X.spread ?? null; o.tail = X.tail || 0; if (act === 'boss') o.sw = X.sw || 0; if (o.jaw > .55) o.eyes = 'open'; }
     return o;
   }
@@ -756,7 +759,8 @@ const BEAST = (() => {
       const o = motion(act, f, n), walk = act === 'walk', ph = o.ph;
       const CR = fam === 'croc', yF = CR ? LL * .8 + rc * .3 : LL + rc * .55, yH = CR ? LL * .78 + rh * .28 : LL * .96 + rh * .5, by = (yF + yH) / 2;   // (v274) a crocodile's belly sits low, near the ground
       fallPre(cx, o, by);
-      const T = p => [p[0], p[1] + o.bob * .6, p[2] + o.lun];
+      const lunK = ele || fam === 'bovine' ? .35 : 1;   /* (v322) a heavy beast strikes with its head and tusks, not by leaping forward: its lunge stays short (and its tusks inside the frame) */
+      const T = p => [p[0], p[1] + o.bob * .6, p[2] + o.lun * lunK];
       const zc = Lb * .5, zh = -Lb * .5;
       const chest = T([0, yF + (F.hump ? .4 : 0), zc]), hip = T([0, yH, zh]), mid = T([0, (yF + yH) / 2 - F.dip, 0]);
       // legs (far side first so the near ones sit on top)
@@ -833,7 +837,7 @@ const BEAST = (() => {
         if (FT){ for (const sd of [-1, 1]) cap(cx, p0, add(p0, [sd * 3.6 * gir, 1.2, -3.2 * gir]), 1.6 * gir, .5, FT, {tex:nn => (Math.sin(nn[0] * 14) > .5 ? {dt:1} : undefined)}); } }   // a fish's tail fin
       // neck and head
       const [nUp, nFw] = F.neck, look = o.tilt * .5 + (act === 'idle' ? Math.sin(ph) * .05 : 0);
-      const hu = o.head || 0, nb = add(chest, [0, rc * .35, rc * .45]), hc = T(add([0, yF + (F.hump ? .4 : 0), zc], [0, rc * .35 + nUp + hu * hr * (hu > 0 ? 1.15 : 1.5), rc * .45 + nFw + (act === 'attack' ? [0, -1, 2.2, .6][f] : 0) - Math.abs(hu) * hr * .3 + (hu < 0 ? -hu * hr * .5 : 0)]));   // (v314) the head thrown up for a roar, lowered for the horns
+      const hu = o.head || 0, nb = add(chest, [0, rc * .35, rc * .45]), hc = T(add([0, yF + (F.hump ? .4 : 0), zc], [0, rc * .35 + nUp + hu * hr * (hu > 0 ? 1.15 : 1.5), rc * .45 + nFw + (act === 'attack' ? [0, -1, 2.2, .6][f] * lunK : 0) - Math.abs(hu) * hr * .3 + (hu < 0 ? -hu * hr * .5 * lunK : 0)]));   // (v314) the head thrown up for a roar, lowered for the horns
       cx.gid = 7; cap(cx, nb, add(hc, [0, -hr * .25, -hr * .3]), rc * (F.thinNeck ? .36 : fam === 'deer' || fam === 'horse' || fam === 'goat' ? .5 : .7), hr * .8, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'neck', t)});
       if (MN && !s.ruff && fam !== 'boar'){ cx.gid = 8; for (let i = 0; i < 6; i++){ const k = i / 5, p = lerp3(nb, hc, k); cap(cx, add(p, [0, rc * .45 * (1 - k * .5), -.6]), add(p, [0, rc * .45 * (1 - k * .5) + (fam === 'horse' ? 1.6 : 2.4), -1.6]), fam === 'horse' ? .9 : 1.3, .4, MN, {}); } }
       if (tiger){ cx.gid = 8; for (const sd of [-1, 1]) ell(cx, add(hc, [sd * hr * .5, -hr * .38, -hr * .05]), hr * .32, hr * .36, BE, {rz:hr * .4}); }   // (v314) a tiger's white cheek ruff with its dark bars
@@ -853,8 +857,7 @@ const BEAST = (() => {
         if (F.flat){ for (const sd of [-1, 1]) ell(cx, add(m1, [sd * F.mr[1] * .35, F.mr[1] * .6, F.mr[1] * .2]), .3, .25, NO); }
         if (fam === 'croc'){ G(13); for (const sd of [-1, 1]) ell(cx, add(hd, [sd * hr * .42, hr * .55, -hr * .05]), hr * .3, hr * .26, SK, {tex:nn => (nn[2] > .15 && nn[1] > -.1 && nn[1] < .7 ? {m:EY, t:0} : coat(nn, .45, 'head'))}); ell(cx, add(m1, [0, F.mr[1] * .5, F.mr[1] * .15]), F.mr[1] * .55, F.mr[1] * .35, SK, {}); }   // (v274) raised eyes on top of the head, a knob at the snout's tip
         else ell(cx, add(m1, [0, F.mr[1] * .35, F.mr[1] * .55]), F.mr[1] * (fam === 'boar' ? .95 : .62), F.mr[1] * (fam === 'boar' ? .8 : .45), NO);
-        if (act === 'attack' && f === 2) { G(11); ell(cx, add(m1, [0, -F.mr[1] * .8, 0]), F.mr[1] * .7, F.mr[1] * .35, M.mouth); }
-        else if ((o.jaw || 0) > .3){ const jw = Math.min(1, (o.jaw - .3) / .6), r1 = F.mr[1] * Math.sqrt(gir);   // (v314) an open mouth: the lower jaw hinges at the cheek and swings down; the dark inside shows between the jaws
+        if ((o.jaw || 0) > .3){ const jw = Math.min(1, (o.jaw - .3) / .6), r1 = F.mr[1] * Math.sqrt(gir);   // (v314) an open mouth: the lower jaw hinges at the cheek and swings down; the dark inside shows between the jaws
           const hinge = add(hd, [0, -hr * .45, hr * .2]), tip = add(m1, [0, -r1 * .7 - F.ml * .55 * jw - hr * .25 * jw, -F.ml * .25 * jw]);
           G(11); ell(cx, lerp3(hinge, add(m1, [0, -r1 * .55 - F.ml * .25 * jw, -F.ml * .15]), .62), r1 * .75, r1 * (.3 + .35 * jw), M.mouth, {rz:F.ml * .45 + r1 * .4});
           G(14); cap(cx, hinge, tip, hr * .32, r1 * .42, MZ, {tex:nn => (nn[1] > .45 ? {m:M.mouth, t:1} : undefined)});
@@ -1594,6 +1597,8 @@ const BEAST = (() => {
 
   const KINDS = {quad, bird, serpent, bug, squat, floater, slime, rock:rock2, fish, cave, sky, land};
   const POINTY_HATS = ['lomphok', 'wizard'];   // no tall pointed hats on monsters (the owner's call): they are dropped here
+  /* (v314/v320) frames big enough for the longer bodies and the attack's lunge (the size on screen does not change) */
+  const QUAD_FS = {cat:84, dog:96, rat:80, boar:108, bovine:116, lizard:104, croc:104, horse:104, deer:104, goat:104, bear:104, elephant:136};
   function make(key, spec){
     if (POINTY_HATS.includes(spec.hat)) spec = {...spec, hat:undefined};
     const fs = spec.fs || 64;
@@ -1604,7 +1609,7 @@ const BEAST = (() => {
       Object.assign(cfg, {paint:true, jag:.2, bangF:12, strands:10, spikes:spec.spikes ?? 14, spikeLen:spec.spikeLen ?? 4.6, bangs:!spec.hat || spec.hat === 'band' || spec.hat === 'headwrap', paintBangs:typeof BANG_SWEEP !== 'undefined' ? BANG_SWEEP : undefined, crown:3,
         bodyScale:body === 'brute' ? 1.12 : body === 'gaunt' ? .96 : 1, slim:body === 'gaunt' ? .82 : body === 'brute' ? 1.18 : undefined, iris:spec.iris || (/preta|pop|ghoul|skel|krahang|wraith|ghost|phi/.test(key) ? 'irisRd' : 'irisBr')});
       SPR.MOBS[key] = {name:key, fs:Math.max(fs, 96), scale:spec.scale || 1, human:cfg, model:() => {}}; }
-    else if (spec.arch === 'quad' && !spec.old) SPR.MOBS[key] = (spec.head === 'elephant' || spec.wing) && fs < 96 ? {name:key, fs:96, scale:(spec.scale || 1) * ((spec.scale || 1) >= 2 ? 1 : 1.15), model:quad2(key, spec)} : {name:key, fs:famOf(spec) === 'cat' ? Math.max(fs, 80) : fs, scale:(spec.scale || 1) * ((spec.scale || 1) >= 2 ? 1 : 1.15), model:quad2(key, spec)};   // (v314) a cat's longer body and tail get a little more room   // natural anatomy (v21)
+    else if (spec.arch === 'quad' && !spec.old) SPR.MOBS[key] = (spec.head === 'elephant' || spec.wing) && fs < 96 ? {name:key, fs:Math.max(96, QUAD_FS[famOf(spec)] || 0), scale:(spec.scale || 1) * ((spec.scale || 1) >= 2 ? 1 : 1.15), model:quad2(key, spec)} : {name:key, fs:Math.max(fs, QUAD_FS[famOf(spec)] || 0), scale:(spec.scale || 1) * ((spec.scale || 1) >= 2 ? 1 : 1.15), model:quad2(key, spec)};   // (v314) a cat's longer body and tail get a little more room   // natural anatomy (v21)
     else if (spec.arch === 'bird' && spec.bat && !spec.old && /hawk|eagle|falcon|kite$/.test(key)) SPR.MOBS[key] = {name:key, fs, scale:spec.scale || 1, model:bird2(key, {...spec, bat:false, horns:undefined, raptor:true, beakLen:(spec.beakLen ?? 1) * .85, beakW:1.25, tail:spec.tail && spec.tail !== '-' ? spec.tail : 'fan'})};   // (v303) a hawk is a bird of prey, not a bat with horns: a hooked beak, a broad tail
     else if (spec.arch === 'bird' && spec.bat && !spec.old) SPR.MOBS[key] = {name:key, fs, scale:spec.scale || 1, model:bat2(key, spec)};   // natural bats (v23)
     else if (spec.arch === 'bird' && !spec.bat && !spec.old) SPR.MOBS[key] = {name:key, fs, scale:spec.scale || 1, model:bird2(key, spec)};   // natural birds (v21)
