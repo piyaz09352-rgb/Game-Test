@@ -7,13 +7,17 @@
    1 = unchanged. Re-run the report after any change. */
 'use strict';
 const LINE_POW = {   // [tier 1 (Lv <40), tier 2, tier 3, tier 4]
-  blade:[.88, .88, .7, .88], rune:[1.6, 1.1, 1.12, 1.1], ranger:[.62, 1.05, 1.42, 1.4], muay:[.88, .8, 1.02, .82],
+  blade:[.88, .88, .7, .88], rune:[1.6, 1.1, 1.12, 1.1], ranger:[.62, 1.05, 1.6, 1.4], muay:[.88, .8, 1.02, .82],
   healer:[1.9, 1.4, 1.4, 1.02], rogue:[1.05, 1.15, 1.55, 1.5], summoner:[2.6, 1.45, 1.15, .75], occult:[3.3, 1.5, 1.4, 1.4],
-  merchant:[.82, .82, 1.02, .95], catfolk:[.85, .58, .72, .92], dogfolk:[.9, .74, .68, .88], ninja:[.52, 1.35, 1.45, 1.5]
+  merchant:[.82, .82, 1.18, .95], catfolk:[.85, .58, .72, .92], dogfolk:[.9, .74, .68, .88], ninja:[.52, 1.35, 1.45, 1.5]
 };
+/* (v323) the slot a line uses is its job tier, and the last job is reached around Lv 70, so the fourth slot is never used:
+   a Lv 115 hero still uses the third. The ranger kept pace at Lv 80 (82 % of the average) but fell to 54 % at Lv 115,
+   where monster HP outgrows its arrows: from Lv 100 on its damage is raised on top of its slot */
+const LINE_LV100 = {ranger:1.5};
 function linePow(){
   const ch = jobChain(), line = ch[1]; if (!line || !LINE_POW[line]) return 1;
-  return LINE_POW[line][Math.min(3, Math.max(0, ch.length - 2))] || 1;
+  return (LINE_POW[line][Math.min(3, Math.max(0, ch.length - 2))] || 1) * ((S.lvl || 1) >= 100 && LINE_LV100[line] || 1);
 }
 { const _p = physDamage; physDamage = function(){ const r = _p.apply(this, arguments); if (r && r.dmg > 0) r.dmg = Math.max(1, Math.round(r.dmg * linePow())); return r; }; }
 { const _m = magicDamage; magicDamage = function(){ const r = _m.apply(this, arguments); if (r && r.dmg > 0) r.dmg = Math.max(1, Math.round(r.dmg * linePow())); return r; }; }
