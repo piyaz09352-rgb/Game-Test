@@ -196,6 +196,10 @@ EV.on('tick', () => { if (typeof mobs === 'undefined') return; const dt = Math.m
         default: sy = 1 - .05 * q; sx = 1 + .04 * q;
       }
     }
+    // (v314) no floating: a boss that stands on the ground stays on it (its own skill pose rears, crouches or rises on its feet);
+    // only fliers and spirits lift. While that pose plays, the squash and stretch here is kept small so the body's own move reads
+    { const pl = SPR.bpPlan ? SPR.bpPlan(SPR.MOBS[m.type]) : 'float'; if (pl !== 'float' && pl !== 'bird') lift = 0;
+      if (m.bp){ sx = 1 + (sx - 1) * .3; sy = 1 + (sy - 1) * .3; } }
     const atk = m.atkT, fz = m.fz, z0 = fz ? fz.z || 0 : 0;
     if (!b.rel) m.atkT = .15;   // hold the wind-back frame of the attack
     if (fz) fz.z = z0 + lift;

@@ -41,6 +41,8 @@ const DINO = (() => {
     if (act === 'attack'){ o.lun = [0, -2.5, 6, 2][f]; o.tilt = [0, .25, -.35, 0][f]; o.jaw = [0, .55, .75, .2][f]; o.flap = [0, 1, -1, 0][f]; }
     if (act === 'hurt'){ o.lun = -2; o.tilt = .3; o.eyes = 'hurt'; o.jaw = .3; }
     if (act === 'die'){ o.fall = [.35, .9, 1.35, 1.55][f]; o.eyes = 'closed'; o.jaw = .25; }
+    // (v314) a boss's skill pose (gfx/sprites.js BOSS_POSE ext): the head goes up or down, the jaw opens, wings spread
+    const X = globalThis.BPX; if (X){ o.hd = (X.head || 0) * 2.6; o.jaw = Math.max(o.jaw, X.jaw || 0); if (X.spread != null) o.flap = Math.max(-1, Math.min(1, X.spread)); o.tailK = X.tail || 0; }
     return o;
   }
   const fallPre = (cx, o, h) => { if (o.fall) cx.pre = p => { const q = rotZ([p[0], p[1] - h, p[2]], o.fall); return [q[0], Math.max(.5, q[1] + h - o.fall * h * .45), q[2]]; }; };
@@ -191,7 +193,7 @@ const DINO = (() => {
         for (const d of [-.35, .35]) cap(cx, hd, add(hd, [d * sd, -.9, 1.1 * AL]), .38, .12, P.CL, {});
         if (P.FE && AL > 1.2){ for (let i = 0; i < 4; i++) cap(cx, lerp3(sh, hd, .3 + i * .2), add(lerp3(sh, hd, .3 + i * .2), [sd * .8, -2.4, -1.4]), .7, .25, P.FE, {}); } }
       // neck: S-curve up from the chest, head carried forward
-      const nb = add(chest, [0, 1.4 * g, 3 * g]), nm = add(nb, [0, 2.6 * (s.neck ?? 1), 1.8]), hc = add(add(nm, [0, 1.6 * (s.neck ?? 1), 2.6 * sk]), [0, o.atk ? [0, .6, -2.2, -.6][f] : 0, o.lun * .8]);
+      const nb = add(chest, [0, 1.4 * g, 3 * g]), nm = add(nb, [0, 2.6 * (s.neck ?? 1), 1.8]), hc = add(add(nm, [0, 1.6 * (s.neck ?? 1), 2.6 * sk]), [0, (o.atk ? [0, .6, -2.2, -.6][f] : 0) + (o.hd || 0), o.lun * .8 - Math.abs(o.hd || 0) * .25]);
       cx.gid = 5; cap(cx, nb, nm, 4.2 * g, 3.5 * g, P.SK, {step:.4, tex:skin('neck', 0, .5)}); cap(cx, nm, add(hc, [0, -.6, -2.6 * sk]), 3.5 * g, 2.6 * sk, P.SK, {step:.4, tex:skin('neck', .5, 1)});
       if (P.FE && s.neckFeathers){ cx.gid = 6; for (let i = 0; i < 5; i++){ const p = lerp3(nb, hc, i / 5); cap(cx, add(p, [0, 2.2, -.6]), add(p, [0, 3.6, -2.4]), .9, .3, P.FE, {}); } }
       const hd = jawHead(cx, P, s, sk, hc, o, {snout:s.snout, beak:s.beak, deep:s.deep, wide:s.wide, pitch:(o.atk ? [0, -.15, .2, 0][f] : 0) + (s.headPitch ?? .08), skin});
@@ -221,7 +223,7 @@ const DINO = (() => {
       // the long neck: rises forward, then levels; it sways gently
       const NL = 26 * NK; let p0 = add(sho, [0, 2 * g, 4.4 * g]); const seg = 8;
       for (let i = 1; i <= seg; i++){ const k = i / seg, sway = Math.sin(o.ph * .5 + k * 2) * 1.2 * k;
-        const p1 = add(add(sho, [0, 2 * g, 4.4 * g]), [sway, NL * .62 * Math.sin(k * 1.35), NL * .55 * k + (o.atk ? [0, -1, 3, 1][f] * k * k : 0)]);
+        const p1 = add(add(sho, [0, 2 * g, 4.4 * g]), [sway, NL * .62 * Math.sin(k * 1.35) + (o.hd || 0) * 1.6 * k * k, NL * .55 * k + (o.atk ? [0, -1, 3, 1][f] * k * k : 0)]);
         cx.gid = 5 + i; cap(cx, p0, p1, (3.7 - k * 2.1) * g, (3.7 - (k + 1 / seg) * 2.1) * g, P.SK, {step:.4, tex:skin('neck', k - 1 / seg, k)}); p0 = p1; }
       // the small head: a rounded snout, a high bump for the nostrils
       const hc = add(p0, [0, .2, 1.4]);
@@ -248,7 +250,7 @@ const DINO = (() => {
       cx.gid = 1; cap(cx, hip, mid, 5.8 * g, 6.6 * g, P.SK, {step:.35, tex:skin('body', 0, .5)}); cx.gid = 2; cap(cx, mid, sho, 6.6 * g, 5.6 * g, P.SK, {step:.35, tex:skin('body', .5, 1)});
       tail(cx, P, skin, add(hip, [0, 0, -4.4 * g]), 12 * L, 3.6 * g, .4, o, {droop:3, segs:7});
       // the head, carried low and forward; on the attack it drops and thrusts the horns
-      const hc = add(sho, [0, -.4 + (o.atk ? [0, .8, -1.6, -.4][f] : 0), 6.2 * g + o.lun * .8]), pitch = o.atk ? [0, -.2, .35, .1][f] : .1;
+      const hc = add(sho, [0, -.4 + (o.atk ? [0, .8, -1.6, -.4][f] : 0) + (o.hd || 0), 6.2 * g + o.lun * .8]), pitch = o.atk ? [0, -.2, .35, .1][f] : .1;
       const R = p => add(hc, rotX(p, pitch)), sk = g;
       // the frill: a broad shield angled up and back from the skull, fringed with knobs
       if (P.FR){ cx.gid = 58; const fw = 7.4 * sk, fh = 7 * sk;
@@ -290,7 +292,7 @@ const DINO = (() => {
         const h = (2.6 + Math.sin(Math.min(1, k * 1.25) * Math.PI) * 6.2) * g, w = h * .62, b = add(along, [side * 1.1 * g, (k < .62 ? 3.2 : 5.4) * g - (k < .62 ? (1 - k / .62) * 1.8 : 0), 0]);
         cx.gid = 70 + i; sheetFill(cx, t => add(b, [0, 0, (t - .5) * w]), t => add(b, [side * .25, h * (1 - Math.abs(t - .45) * 1.5), (t - .5) * w * .4 - h * .12]), .45 * g, P.PL, 7, (nn, t, u) => (u > .85 ? {dt:-1} : Math.abs(t - .5) < .06 ? {dt:1} : undefined)); } }
       // the small head, low and forward, on a short neck sloping down
-      const hc = add(sho, [0, -2.6 * g + (o.atk ? [0, .4, -.8, 0][f] : 0), 6 * g + o.lun * .6]);
+      const hc = add(sho, [0, -2.6 * g + (o.atk ? [0, .4, -.8, 0][f] : 0) + (o.hd || 0), 6 * g + o.lun * .6]);
       cx.gid = 5; cap(cx, add(sho, [0, -.4, 3.6 * g]), add(hc, [0, .2, -1.6]), 3.2 * g, 1.8 * g, P.SK, {tex:skin('neck')});
       cx.gid = 60; ell(cx, hc, 1.9 * g, 1.6 * g, P.SK, {rz:2.4 * g, tex:skin('head')}); cap(cx, add(hc, [0, -.2, .8]), add(hc, [0, -.8 * g, 3.8 * g]), 1.5 * g, .9 * g, P.SK, {tex:skin('head')});
       cx.gid = 61; cap(cx, add(hc, [0, -1.2 * g, .6]), add(hc, [0, -1.4 * g - o.jaw * 1.2, 3.4 * g]), .8 * g, .5 * g, P.SK, {});
@@ -320,7 +322,7 @@ const DINO = (() => {
       const tp = tail(cx, P, skin, add(hip, [0, 0, -4.6 * g]), 13 * L, 3.2 * g, 1, o, {droop:1, rise:.8, segs:8, sway:1.8});
       cx.gid = 56; const e = tp[tp.length - 1]; for (const sd of [-1, 1]) ell(cx, add(e, [sd * 2 * g, 0, -.6]), 2.4 * g, 2 * g, P.AC, {tex:() => ({dt:1})}); ell(cx, add(e, [0, .3, -1.6 * g]), 2 * g, 1.8 * g, P.AC, {});
       // a broad triangular head with horns at the back corners
-      const hc = add(sho, [0, -1.4 * g + (o.atk ? [0, .4, -.8, 0][f] : 0), 5.4 * g + o.lun * .5]);
+      const hc = add(sho, [0, -1.4 * g + (o.atk ? [0, .4, -.8, 0][f] : 0) + (o.hd || 0), 5.4 * g + o.lun * .5]);
       cx.gid = 60; for (const sd of [-1, 1]) ell(cx, add(hc, [sd * 1.4 * g, 0, -.6]), 2.6 * g, 2.2 * g, P.SK, {tex:skin('head')}); cap(cx, hc, add(hc, [0, -.6, 3.4 * g]), 2.4 * g, 1.4 * g, P.SK, {tex:skin('head')});
       cx.gid = 61; for (const sd of [-1, 1]) cap(cx, add(hc, [sd * 3 * g, 1, -1.8 * g]), add(hc, [sd * 4.4 * g, 1.4, -3.2 * g]), .9 * g, .12, P.AC, {});
       cx.gid = 62; for (const sd of [-1, 1]) eye(cx, add(hc, [sd * 2.6 * g, .7 * g, .2]), sd, .45 * g, P, o, !!s.eyeGlow);
@@ -346,7 +348,7 @@ const DINO = (() => {
         const w = wing(cx, P, root, sd, 20 * sz, o, {bone:sz, fold:!fly, lift:fly ? .2 : 0, fingers:[[.15, 1]], trail:add(hip, [sd * 1.4 * sz, -H * .45, -1])});
         if (!fly){ cx.gid = 25 + (sd > 0 ? 1 : 0); const sw = walk ? Math.sin(ph + (sd > 0 ? 0 : Math.PI)) * .4 : 0, hand = [w.wrist[0], .6, w.wrist[2] + 2 + sw * 2]; cap(cx, w.wrist, hand, .7 * sz, .5 * sz, P.WG, {}); } }
       // long neck and the big beaked head with its crest
-      const nb = add(chest, [0, 1.4 * sz, 2 * sz]), hc = add(nb, [0, 4.4 * sz * NK + (o.atk ? [0, .8, -2, -.4][f] : 0), 3.6 * sz * NK + o.lun * .7]);
+      const nb = add(chest, [0, 1.4 * sz, 2 * sz]), hc = add(nb, [0, 4.4 * sz * NK + (o.atk ? [0, .8, -2, -.4][f] : 0) + (o.hd || 0), 3.6 * sz * NK + o.lun * .7]);
       cx.gid = 5; cap(cx, nb, hc, 1.7 * sz, 1.2 * sz, P.SK, {tex:skin('neck')});
       cx.gid = 60; ell(cx, hc, 1.9 * sz, 1.8 * sz, P.SK, {tex:skin('head')});
       const tip = add(hc, [0, -1.4 * sz, 9 * sz * BK]); cx.gid = 61; cap(cx, add(hc, [0, .2, 1]), tip, 1.4 * sz, .2, P.AC, {});
@@ -385,7 +387,7 @@ const DINO = (() => {
       // wings from the shoulders
       for (const sd of [-1, 1]){ const root = add(sho, [sd * 3 * g, 3.4 * g, wyvern ? 0 : -1.6]); wing(cx, P, root, sd, span, o, {bone:g * 1.15, lift:walk ? .1 : .4, fold:false, trail:add(mid, [sd * 3.4 * g, 2, -BL * .3])}); }
       // neck, S-curved, and the head
-      const nb = add(sho, [0, 1.6 * g, 3.4 * g]), nm = add(nb, [0, 4.2 * (s.neck ?? 1), 2.6]), hc = add(nm, [0, 3.4 * (s.neck ?? 1) + (o.atk ? [0, .8, -2.4, -.6][f] : 0), 3.4 * g + o.lun * .8]);
+      const nb = add(sho, [0, 1.6 * g, 3.4 * g]), nm = add(nb, [0, 4.2 * (s.neck ?? 1), 2.6]), hc = add(nm, [0, 3.4 * (s.neck ?? 1) + (o.atk ? [0, .8, -2.4, -.6][f] : 0) + (o.hd || 0), 3.4 * g + o.lun * .8]);
       cx.gid = 5; cap(cx, nb, nm, 3.4 * g, 2.6 * g, P.SK, {step:.4, tex:skin('neck', 0, .5)}); cap(cx, nm, add(hc, [0, -.4, -2.2 * g]), 2.6 * g, 2.2 * g, P.SK, {step:.4, tex:skin('neck', .5, 1)});
       cx.gid = 6; for (let i = 0; i < 5; i++){ const p = lerp3(nb, hc, i / 5); cap(cx, add(p, [0, 2.6 * g, -.4]), add(p, [0, 3.6 * g, -1.6]), .6 * g, .1, SP, {}); }
       const sk = (s.skull ?? 1) * g, hd = jawHead(cx, P, s, sk * .85, hc, o, {snout:1.05, deep:.95, wide:1.05, pitch:(o.atk ? [0, -.2, .25, 0][f] : 0) + .05, skin});
@@ -411,4 +413,5 @@ const DINO = (() => {
     // any of the 8 facings, so it is sized from how far the body reaches from its feet (tail tip, neck, wings)
     const scale = (spec.scale || 1) * (spec.sz || 1), L = spec.len || 1, reach = {theropod:30 * L, sauropod:44 * L, ceratops:24 * L, stego:26 * L, ankylo:22 * L, ptero:26 * (spec.size || 1), dragon:36 * L, wyvern:34 * L}[spec.plan] || 30;
     SPR.MOBS[key] = {name:key, fs:Math.max(spec.fs || 96, 96, Math.ceil(reach * 2.1 * scale)), scale, model:plan(key, spec)};
+    SPR.MOBS[key].dplan = spec.plan; SPR.MOBS[key].native = true;   // (v314) acts its skill poses with its own head, jaw and wings
   }; }

@@ -415,7 +415,9 @@ const MOB_ACTIONS = {
   idle:{n:4, fps:5, loop:true, th:'ยืน'}, walk:{n:4, fps:8, loop:true, th:'เดิน'}, attack:{n:4, fps:10, th:'โจมตี'},
   hurt:{n:2, fps:8, th:'โดนตี'}, die:{n:4, fps:6, th:'ล้ม'},
   // (v304) a boss's skills have poses of their own, eight frames each (see BOSS_POSE); only a boss's sheet carries them (SPR.bossActs)
-  bslam:{n:8, fps:10, boss:1, th:'ยกตัวทุบ'}, broar:{n:8, fps:10, boss:1, th:'คำราม'}, bcharge:{n:8, fps:10, boss:1, th:'ย่อแล้วพุ่ง'}, bcast:{n:8, fps:10, boss:1, th:'ร่าย'}
+  bslam:{n:8, fps:10, boss:1, th:'ยกตัวทุบ'}, broar:{n:8, fps:10, boss:1, th:'คำราม'}, bcharge:{n:8, fps:10, boss:1, th:'ย่อแล้วพุ่ง'}, bcast:{n:8, fps:10, boss:1, th:'ร่าย'},
+  // (v314) more of them: a breath / spit, a spin, a vanish
+  bbreath:{n:8, fps:10, boss:1, th:'พ่น'}, bspin:{n:8, fps:10, boss:1, th:'หมุนฟาด'}, bvanish:{n:8, fps:10, boss:1, th:'ย่อหาย'}, bphase:{n:8, fps:10, boss:1, th:'เซแล้วคำราม'}
 };
 /* (v304) the owner: a boss used one attack pose for every skill. Each kind of skill now moves the whole body the way a heavy
    animal does it — it gathers first (anticipation), strikes, then settles (follow-through):
@@ -426,18 +428,67 @@ const MOB_ACTIONS = {
    It is the body's own model (its attack or idle frames) carried through a turn about the hind feet, a shift and a small
    squash, so it works for every body plan: four legs, birds, serpents, insects, spirits, golems and human bosses.
    k = 0..1 through the pose. Returns the model's own action and frame to draw, and the move for every point. */
-const BOSS_HUMAN = {bslam:'slam', broar:'shout', bcharge:'lunge', bcast:'invoke'};
+const BOSS_HUMAN = {bslam:'slam', broar:'shout', bcharge:'lunge', bcast:'invoke', bbreath:'point', bspin:'whirl', bvanish:'crouch', bphase:'shout'};
 const bpS = (a, b, k) => { const t = Math.min(1, Math.max(0, (k - a) / (b - a))); return t * t * (3 - 2 * t); };
+/* (v314) the owner: «make it real». The whole-body move above stays, but now each body plan also acts with its own limbs:
+   the pose returns `ext`, read by the model's motion() (gfx/beasts.js, gfx/dinos.js) while this frame is drawn —
+     fold   0..1  a four-legged boss folds its front legs under it as it rears (a horse, a bull, a tiger)
+     head   −1..1 the head is thrown up (+) or lowered for the horns and the bite (−)
+     jaw    0..1  the mouth / beak opens
+     curl   0..1  an elephant's trunk curls up
+     spread −1..1 a bird's or dragon's wings are raised and spread (+) or swept back (−)
+     sw           the legs stand apart: front forward, hind back (a charge braced on the ground)
+     tail   0..1  the tail lashes
+   plan: quad (four legs), biped (theropods, wyverns: no rearing, they pitch forward and bite), bird, serpent, bug, squat,
+   float (spirits, jellies, rocks: the old whole-body move). Nothing leaves the ground except what already flies or floats. */
+const BP_REAR = {quad:.42, biped:.1, bird:.08, serpent:.05, bug:.2, squat:.16, float:.3};
+const bpRot = (ang, piv = 6) => p => { const q = rotX([p[0], p[1], p[2] + piv], -ang); return [q[0], Math.max(.25, q[1]), q[2] - piv]; };
 const BOSS_POSE = {
-  bslam(k){ const up = bpS(0, .42, k) * (1 - bpS(.56, .66, k)), hit = bpS(.56, .66, k) * (1 - bpS(.78, 1, k)), ang = up * .46 - hit * .12, dy = -1.3 * hit, dz = -.5 * up - 2.2 * hit;   // (the forward crash itself stays inside the frame: the picture is cut at its edge)
-    return {act:'attack', f:k < .5 ? 0 : k < .6 ? 1 : k < .8 ? 2 : 3, post:p => { const q = rotX([p[0], p[1], p[2] + 6], -ang); return [q[0], Math.max(.25, q[1] + dy), q[2] - 6 + dz]; }}; },
-  broar(k){ const sink = bpS(0, .2, k) * (1 - bpS(.2, .38, k)), up = bpS(.22, .42, k) * (1 - bpS(.84, 1, k)), ang = up * .3 - sink * .07, sh = up * Math.sin(k * 44) * .45;
-    return {act:'attack', f:up > .5 ? 2 : sink > .3 ? 0 : 1, post:p => { const q = rotX([p[0], p[1], p[2] + 6], -ang); return [q[0] + sh, Math.max(.25, q[1] * (1 - sink * .08)), q[2] - 6 + up * .4]; }}; },
-  bcharge(k){ const back = bpS(0, .4, k) * (1 - bpS(.5, .6, k)), go = bpS(.5, .62, k) * (1 - bpS(.8, 1, k)), ang = back * .1 - go * .14;
-    return {act:'attack', f:k < .5 ? 0 : k < .62 ? 1 : k < .8 ? 2 : 3, post:p => { const q = rotX([p[0], p[1], p[2] + 6], -ang); return [q[0], Math.max(.25, q[1] * (1 - back * .13)), q[2] - 6 - back * 1.6 - go * 2.2]; }}; },   // (the model's own strike frame already reaches forward to the frame's edge)
-  bcast(k){ const r = bpS(0, .3, k) * (1 - bpS(.8, 1, k)), ang = r * .17, dy = r * 2 + Math.sin(k * 12.6) * .35 * r, sx = Math.sin(k * 9.4) * .55 * r;
-    return {act:'idle', f:Math.floor(k * 7.99) % 4, post:p => { const q = rotX([p[0], p[1], p[2] + 6], -ang); return [q[0] + sx, q[1] + dy, q[2] - 6]; }}; }
+  /* rears up (four legs: front legs folded, head high), hangs, crashes down as the warning ends (head down, jaw open) */
+  bslam(k, pl = 'float'){ const up = bpS(0, .42, k) * (1 - bpS(.56, .66, k)), hit = bpS(.56, .66, k) * (1 - bpS(.78, 1, k)), R = BP_REAR[pl] ?? .3, bi = pl === 'biped',
+      ang = up * R - hit * (bi ? .24 : .12), dy = -1.3 * hit, dz = -.5 * up - 2.2 * hit;
+    return {act:'attack', f:k < .5 ? 0 : k < .6 ? 1 : k < .8 ? 2 : 3, ext:{fold:pl === 'quad' ? up : 0, head:up * (bi ? .35 : .7) - hit * .8, jaw:up * .25 + hit * .95, curl:up, spread:up * 1.15 - hit * .5, tail:up * .5, sw:hit * .35},
+      post:p => { const q = rotX([p[0], p[1], p[2] + 6], -ang); return [q[0], Math.max(.25, q[1] + dy), q[2] - 6 + dz]; }}; },
+  /* sinks, then throws its head up with the mouth wide and shakes; the feet stay planted */
+  broar(k, pl = 'float'){ const sink = bpS(0, .2, k) * (1 - bpS(.2, .38, k)), up = bpS(.22, .42, k) * (1 - bpS(.84, 1, k)), ang = up * (pl === 'quad' ? .16 : pl === 'float' ? .3 : .08) - sink * .07, sh = up * Math.sin(k * 44) * .45;
+    return {act:'attack', f:up > .5 ? 2 : sink > .3 ? 0 : 1, ext:{head:up * 1 - sink * .4, jaw:up, curl:up * .8, spread:up * .9, tail:up * .4},
+      post:p => { const q = rotX([p[0], p[1], p[2] + 6], -ang); return [q[0] + sh, Math.max(.25, q[1] * (1 - sink * .08)), q[2] - 6 + up * .4]; }}; },
+  /* draws back low with the head down (horns, tusks, beak forward), then drives forward on braced legs */
+  bcharge(k, pl = 'float'){ const back = bpS(0, .4, k) * (1 - bpS(.5, .6, k)), go = bpS(.5, .62, k) * (1 - bpS(.8, 1, k)), ang = back * .1 - go * .14;
+    return {act:'attack', f:k < .5 ? 0 : k < .62 ? 1 : k < .8 ? 2 : 3, ext:{head:-.75 * (back + go), jaw:go * .6, spread:-.6 * (back + go), sw:-.25 * back + .45 * go, tail:go * .5},
+      post:p => { const q = rotX([p[0], p[1], p[2] + 6], -ang); return [q[0], Math.max(.25, q[1] * (1 - back * .13)), q[2] - 6 - back * 1.6 - go * 2.2]; }}; },
+  /* channels: stands tall, head up, mouth a little open, sways; only spirits and fliers rise from the ground */
+  bcast(k, pl = 'float'){ const r = bpS(0, .3, k) * (1 - bpS(.8, 1, k)), ang = r * (pl === 'quad' ? .1 : .17), fl = pl === 'float' || pl === 'bird', dy = fl ? r * 2 + Math.sin(k * 12.6) * .35 * r : 0, sx = Math.sin(k * 9.4) * .55 * r;
+    return {act:'idle', f:Math.floor(k * 7.99) % 4, ext:{head:r * .55, jaw:r * .3, curl:r * .6, spread:r * (.6 + Math.sin(k * 12.6) * .25)},
+      post:p => { const q = rotX([p[0], p[1], p[2] + 6], -ang); return [q[0] + sx, Math.max(.25, q[1] + dy), q[2] - 6]; }}; },
+  /* (v314) a breath, a spit, a jet: the head draws back and up, then thrusts forward with the jaw wide and holds while it pours */
+  bbreath(k){ const pull = bpS(0, .35, k) * (1 - bpS(.4, .5, k)), pour = bpS(.42, .55, k) * (1 - bpS(.85, 1, k)), ang = pull * .14 - pour * .08;
+    return {act:'attack', f:pour > .5 ? 2 : pull > .3 ? 1 : 0, ext:{head:pull * .6 - pour * .25, jaw:pull * .35 + pour, curl:pull, spread:pull * .5 + pour * .3, sw:pour * .2},
+      post:p => { const q = rotX([p[0], p[1], p[2] + 6], -ang); return [q[0] + pour * Math.sin(k * 30) * .25, Math.max(.25, q[1]), q[2] - 6 - pull * 1.4 + pour * 1.6]; }}; },
+  /* (v314) a spin: winds back a quarter turn, then whips all the way round on its feet, tail lashing, and settles */
+  bspin(k){ const wind = bpS(0, .25, k) * (1 - bpS(.25, .35, k)), turn = bpS(.28, .8, k), a = -wind * .7 + turn * Math.PI * 2;
+    return {act:'attack', f:turn > .1 && turn < .95 ? 2 : 0, ext:{tail:1, jaw:.5 * turn * (1 - turn) * 4, spread:.9 * Math.min(1, turn * 3), sw:.3},
+      post:p => { const q = rotY(p, a); return [q[0], Math.max(.25, q[1] * (1 - wind * .06)), q[2]]; }}; },
+  /* (v314) a new phase (HP 70 / 40 / 15 %): it reels back from the blow, head down, a step back on bent legs, then rises and roars */
+  bphase(k){ const reel = bpS(0, .16, k) * (1 - bpS(.3, .45, k)), up = bpS(.4, .55, k) * (1 - bpS(.88, 1, k)), ang = up * .14 - reel * .1, sh = up * Math.sin(k * 44) * .4;
+    return {act:'attack', f:up > .5 ? 2 : 0, ext:{head:up - reel * .7, jaw:up + reel * .3, fold:reel * .3, curl:up, spread:up * .9 - reel * .3, tail:up * .5, sw:-reel * .2},
+      post:p => { const q = rotX([p[0], p[1], p[2] + 6], -ang); return [q[0] + sh, Math.max(.25, q[1] * (1 - reel * .1)), q[2] - 6 - reel * 2.2]; }}; },
+  /* (v314) a vanish: sinks low into a crouch, head down, and fades (the fade is js/sys/bossact.js); comes back up where it lands */
+  bvanish(k){ const d = bpS(0, .55, k) * (1 - bpS(.82, 1, k));
+    return {act:'idle', f:0, ext:{head:-.6 * d, fold:.35 * d, spread:-.5 * d, sw:-.15 * d},
+      post:p => [p[0] * (1 + d * .06), Math.max(.25, p[1] * (1 - d * .22)), p[2] - d * .8]}; }
 };
+/* which body plan a monster is drawn with (set by BEAST.make / the dinosaur maker: mb.arch, mb.dplan, mb.fam) */
+function bpPlan(mb){ if (!mb) return 'float'; if (mb.plan) return mb.plan;
+  const d = mb.dplan; let pl = 'float';
+  if (mb.human) pl = 'human';
+  else if (d) pl = d === 'theropod' || d === 'wyvern' ? 'biped' : d === 'ptero' ? 'bird' : 'quad';
+  else if (mb.arch === 'quad') pl = mb.fam === 'theropod' ? 'biped' : 'quad';
+  else if (mb.arch === 'bird') pl = 'bird';
+  else if (mb.arch === 'serpent') pl = 'serpent';
+  else if (mb.arch === 'bug') pl = 'bug';
+  else if (mb.arch === 'squat') pl = 'squat';
+  return (mb.plan = pl); }
 const ease = t => t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
 
 /* ---------- skill poses ----------
@@ -2104,10 +2155,12 @@ function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
     return img;
   }
   const mb = MOBS[key], A = MOB_ACTIONS[act], fs = Math.ceil(mb.fs * K), F = new Frame(fs, fs + Math.ceil(fs * MOB_PAD)), cx = new Ctx(F, -dir * Math.PI / 4, fs / 2, fs - 6 * K, K * (mb.scale || 1));
-  let mAct = act, mF = f, mN = A.n; if (BOSS_POSE[act]){ const q = BOSS_POSE[act](A.n > 1 ? f / (A.n - 1) : 0); cx.post = q.post; mAct = q.act; mF = q.f; mN = MOB_ACTIONS[q.act].n; }
+  let mAct = act, mF = f, mN = A.n; globalThis.BPX = null;
+  if (BOSS_POSE[act]){ const pl = bpPlan(mb), q = BOSS_POSE[act](A.n > 1 ? f / (A.n - 1) : 0, pl); cx.post = q.post; mAct = q.act; mF = q.f; mN = MOB_ACTIONS[q.act].n;
+    if (mb.native){ globalThis.BPX = q.ext; mAct = 'boss'; mF = 0; mN = 4; } else if (mb.limbs) globalThis.BPX = q.ext; }   // (v314) models that act with their own limbs read the pose's ext
   if (mb.human && BOSS_POSE[act]){ const ha = BOSS_HUMAN[act], hn = ACTIONS[ha].n; cx.post = null; mAct = ha; mN = hn; mF = Math.min(hn - 1, Math.round(f / (A.n - 1) * (hn - 1))); }   // a human boss uses the people's own skill poses: slam, shout, lunge, invoke
   if (mb.human){ drawHuman(cx, mb.human, humanPose(mAct, mF, mN, mb.human.weapon)); const img = finish(F, K); if (mb.human.paint && cx.head) paintHead(img, F, cx); img.wsegs = cx.wsegs || null; return img; }   // (v166) where its weapon is, for the boss weapon glow
-  mb.model(cx, mAct, mF, mN);
+  try { mb.model(cx, mAct, mF, mN); } finally { globalThis.BPX = null; }
   return finish(F, K);
 }
 /* lazy sheet: each action is rasterised the first time it is drawn (or during warm-up) */
@@ -2316,5 +2369,5 @@ function draw(g, sh, act, dir, t, x, y, o = {}){
   g.imageSmoothingEnabled = sm; g.imageSmoothingQuality = sq;
 }
 const prim = {ell, cap, frustum, line, dot, rotX, rotY, rotZ, add, mul, lerp3, nrm, ramp:rampOf};
-return {STATS, WDRAWS, SDRAWS, prim, prime, heroKey, lookKey, parseLookKey, HAIR_COLORS, IRIS_COLORS, HAIR_M, HAIR_F, GEAR_LOOK, buildAll, buildSheet, sheet, ensure, bossActs, BOSS_POSE, warm, tick, rebuild, renderFrame, draw, frameAt, dirFromVec, DIRS, DIR_TH, ACTIONS, MOB_ACTIONS, CHARS, CHAR_ACTIONS, MOBS, MATS, M, FS, ANCHOR_Y};
+return {bpPlan, STATS, WDRAWS, SDRAWS, prim, prime, heroKey, lookKey, parseLookKey, HAIR_COLORS, IRIS_COLORS, HAIR_M, HAIR_F, GEAR_LOOK, buildAll, buildSheet, sheet, ensure, bossActs, BOSS_POSE, warm, tick, rebuild, renderFrame, draw, frameAt, dirFromVec, DIRS, DIR_TH, ACTIONS, MOB_ACTIONS, CHARS, CHAR_ACTIONS, MOBS, MATS, M, FS, ANCHOR_Y};
 })();

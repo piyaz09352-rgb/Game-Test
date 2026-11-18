@@ -20,12 +20,12 @@ test('boss skill poses: each skill has its pose, timed to the warning; ordinary 
       o.differ = new Set([0, 3, 5, 7].map(f => sig(SPR.renderFrame('mob', quadBoss, 'bslam', 2, f, 1)))).size;
       o.human = humanBoss ? [0, 2, 4, 7].map(f => { try { return SPR.renderFrame('mob', humanBoss, 'bslam', 1, f, 1).width > 0; } catch (e) { return String(e.message); } }) : [true];
       clearInterval(keep); b.dead = true; return o; });
-    const want = {slam:'bslam', quake:'bslam', charge:'bcharge', wave:'bcharge', barrage:'bcharge', roar:'broar', meteor:'bcast', field:'bcast', summon:'bcast'};
+    const want = {slam:'bslam', quake:'bslam', charge:'bcharge', wave:'bcharge', barrage:'bbreath', roar:'broar', meteor:'bcast', field:'bcast', summon:'bcast'};
     for (const [id, a] of Object.entries(want)) if (r.acts[id]) assert.deepStrictEqual(r.acts[id].slice(0, 2), [a, a], id + ' plays ' + a);
     assert.ok(Object.values(r.acts).filter(Boolean).length >= 6, 'most skills were cast: ' + JSON.stringify(r.acts));
     assert.ok(r.acts.quake && r.acts.quake[2] > r.acts.slam[2], 'a longer warning stretches the pose (quake > slam)');
     assert.strictEqual(r.rage, 'broar', 'enraged = the roar'); assert.ok(r.ends, 'the pose ends');
-    assert.strictEqual(r.plainActs, 5, 'an ordinary monster keeps its five actions'); assert.strictEqual(r.bossActs, 9, 'a boss gets four more');
+    assert.strictEqual(r.plainActs, 5, 'an ordinary monster keeps its five actions'); assert.strictEqual(r.bossActs, 13, 'a boss gets eight more (v314: breath, spin, vanish, phase)');
     assert.ok(r.differ >= 3, 'the pose moves through different frames'); assert.ok(r.human.every(v => v === true), 'a human boss draws its poses: ' + r.human);
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no page errors');
