@@ -13,7 +13,7 @@
    checked (tests/aren311.test.js). Townsfolk walk the whole village, not only the plaza. The map keeps its size and
    every NPC and shop keeps its place, so nothing else changes. */
 'use strict';
-const AR11 = {homes:false, cx:1200, cy:800, plazaRX:610, plazaRY:440};
+const AR11 = {homes:false, market:false, cx:1200, cy:800, plazaRX:610, plazaRY:440};
 const ar11Npcs = () => (typeof NPCS_HOME !== 'undefined' ? NPCS_HOME : NPCS);   // Aren's own people (NPCS still holds the last map's while the ground is painted)
 const ar11Wet = (x, y, room) => typeof VPOND !== 'undefined' && Math.hypot((VPOND.x - x) / ((VPOND.rx || 90) + room), (VPOND.y - y) / ((VPOND.ry || 50) + room)) < 1;
 /* the 100-floor tower monument's ground (js/world/towermon232.js clears everything standing behind it): keep it free */
@@ -83,7 +83,7 @@ function ar11Ground(){ const g = terr.getContext('2d'); g.save(); g.setTransform
 /* ---------- the village: houses, yards, the market ---------- */
 function ar11Village(){
   const isTree = t => ['tree', 'palm', 'bush', 'rock', 'bamboo', 'banana', 'hay', 'frangipani'].includes(t);
-  const plots = AR11.homes ? ar11Plots() : [], market = ar11Market(), roads = ar11Roads();   // (v315) no homes: the old woods stay where the plots were
+  const plots = AR11.homes ? ar11Plots() : [], market = AR11.market ? ar11Market() : [], roads = ar11Roads();   // (v316) the owner: the market stalls and the pavilion go too   // (v315) no homes: the old woods stay where the plots were
   // clear the old woods where the village now stands (and off the roads); the woods along the map's edges stay
   const clear = p => plots.some(q => Math.hypot(q.x - p.x, (q.y - p.y) * 1.2) < q.room + 70) || market.some(m => Math.hypot(m.x - p.x, m.y - p.y) < 80) || roads.some(rd => ar11SegD(p.x, p.y, rd.pts) < 56)
     || Math.hypot((p.x - AR11.cx) / (AR11.plazaRX + 70), (p.y - AR11.cy) / (AR11.plazaRY + 64)) < 1;
@@ -95,7 +95,7 @@ function ar11Village(){
     for (const dx of [-66, -40, 40, 66]) put('lowfence', p.x + dx, p.y + 82); }   // a low fence along the front of the yard, the gate in the middle
   if (AR11.homes) for (const o of ar11Rows()) put('arrow', o.x, o.y, o.v);   // (v315) the shophouses went with the homes   // a low fence along the front of the yard, the gate in the middle
   // the granary of the hamlet: one sala by the east road
-  { const rd = roads.find(x => x.side === 'e'); if (rd){ const [x, y] = rd.pts[10]; if (!ar11Npcs().some(n => Math.hypot(n.x - x, n.y - y + 120) < 90)) put('sala', x, y - 118); } }
+  if (AR11.market){ const rd = roads.find(x => x.side === 'e'); if (rd){ const [x, y] = rd.pts[10]; if (!ar11Npcs().some(n => Math.hypot(n.x - x, n.y - y + 120) < 90)) put('sala', x, y - 118); } }
   market.forEach((m, k) => { put('arstall', m.x, m.y, k % 6); if (k % 2 === 0) put('lamp', m.x - m.sd * 58, m.y - 24); });
   // every front door stays open: a tree or a jar of the old woods standing in front of one goes
   for (const h of PROPS.filter(p => p.type === 'stilt' || p.type === 'house' || p.type === 'arhome' || p.type === 'arrow')){ const dx = h.x, dy = h.y + 100; if (walkable(dx, dy, 12)) continue;
