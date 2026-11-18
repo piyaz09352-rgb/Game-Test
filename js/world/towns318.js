@@ -44,7 +44,7 @@ function tw318Lay(id){
   const r = tw318Rng(3180 + id), pick = a => a[Math.floor(r() * a.length)], put = (t, x, y, v) => { if (!PROP_TYPES[t]) return; const pts = mir(x, y);
     if (!pts.every(([X, Y]) => free(X, Y))) return; const made = pts.map(([X, Y]) => addProp(t, Math.round(X), Math.round(Y), C.snow && t === 'pine' ? v | 1 : v));   /* a frozen land's pines carry snow */ made.forEach(p => { if (p) p.tw318 = made; }); };
   // 1 · a belt of woods round the edge (the north-west quarter; the rest are its mirrors)
-  for (let y = 70; y < H / 2; y += 70) for (let x = 60; x < W / 2; x += 74){ const edge = Math.min(x - 30, y - 50); if (edge > 230 + r() * 60) continue;
+  for (let y = 70; y < H / 2; y += 88) for (let x = 60; x < W / 2; x += 94){ const edge = Math.min(x - 30, y - 50); if (edge > 170 + r() * 40) continue;   /* (v319) a thinner belt: phones draw fewer trees at once */
     put(pick(C.trees), x + (r() - .5) * 34, y + (r() - .5) * 30, Math.floor(r() * 3)); }
   // 2 · an avenue either side of the road from the town to the gate
   if (ew) for (let x = 360; x < box.x0 - 60; x += 130){ put(pick(C.trees), x, H / 2 - 170, Math.floor(r() * 3)); }

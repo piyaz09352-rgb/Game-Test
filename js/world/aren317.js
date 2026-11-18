@@ -104,8 +104,8 @@ function ar17Land(){
     && !obstacles.some(o => !o.prop && !o.water && !o.cliff && Math.hypot(o.x - x, o.y - y) < (o.r || 0) + pad) && !PROPS.some(p => !AR17_NAT.has(p.type) && Math.hypot(p.x - x, p.y - y) < 90);
   const pairs = [], r = ar17Rng(9173);   // [type, x, y, v] on the west side; each goes in with its mirror on the east
   // 1 · a belt of woods round the edge
-  for (let y = 70; y < 1560; y += 62) for (let x = 50; x < 1170; x += 66){
-    const edge = Math.min(x - 30, y - 50, 1570 - y); if (edge > 150 + r() * 40) continue;
+  for (let y = 70; y < 1560; y += 74) for (let x = 50; x < 1170; x += 80){   /* (v319) a thinner belt: phones draw fewer trees at once */
+    const edge = Math.min(x - 30, y - 50, 1570 - y); if (edge > 130 + r() * 30) continue;
     const k = r(); pairs.push([k < .5 ? 'tree' : k < .72 ? 'palm' : k < .86 ? 'bamboo' : 'banana', x + (r() - .5) * 30, y + (r() - .5) * 26, Math.floor(r() * 3)]); }   // a mixed wood, not one kind of tree
   // 2 · trees along the foot of the hills, either side of the pool
   { const F = AR17.falls[0]; if (F) for (const dx of [-260, -190, -120, 130, 200, 270]){ const x = F.pool.x + dx, y = F.G.base(Math.max(F.G.x0, Math.min(F.G.x1, x))) + 70 + r() * 30; pairs.push([r() < .6 ? 'tree' : 'palm', x, y, Math.floor(r() * 3)]); } }

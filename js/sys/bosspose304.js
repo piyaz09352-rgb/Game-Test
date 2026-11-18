@@ -30,7 +30,7 @@ const BPOSE = {
   kind:{heavy:'bslam', dash:'bcharge', spin:'bspin', roar:'broar', blink:'bvanish', power:'bcast', spell:'bcast'},
   hitK:{bslam:.62, bcharge:.56, broar:.4, bcast:.5, bbreath:.5, bspin:.5, bvanish:.6, bphase:.5}};   // where in the pose the blow is
 function bposeFor(id, kind){ return BPOSE.act[id] || BPOSE.kind[kind] || 'bcast'; }
-function bposeStart(m, act, wait){ if (!m || !m.def || !m.def.boss || typeof SHEETS === 'undefined' || !SHEETS) return; const sh = SHEETS[m.type]; if (!sh || !SPR.bossActs) return; SPR.bossActs(sh); if (!sh.index[act]) return;
+function bposeStart(m, act, wait){ if (!m || !m.def || !(m.def.boss || m.elite) || typeof SHEETS === 'undefined' || !SHEETS) return; const sh = SHEETS[m.type]; if (!sh || !SPR.bossActs) return; SPR.bossActs(sh); if (!sh.index[act]) return;
   m.bp = {act, t0:T, total:Math.min(2.4, Math.max(.8, wait / BPOSE.hitK[act]))}; }
 if (typeof baStart === 'function'){ const _bs = baStart; baStart = function(m, id, kind, wind, name, sig){ const r = _bs.apply(this, arguments);
   try { if (m && m.ba && !m.dead) bposeStart(m, bposeFor(id, kind), m.ba.wind); } catch (e) { console.warn('bosspose', e); } return r; }; }
@@ -38,3 +38,11 @@ if (typeof VFX !== 'undefined' && VFX.play){ const _vp = VFX.play; VFX.play = fu
 { const _ma = mobAnim; mobAnim = function(m){ const b = m && m.bp; if (b && !m.dead){ const e = (T - b.t0) / b.total; if (e >= 0 && e < 1) return [b.act, e * .8 - .0001]; m.bp = null; } return _ma.apply(this, arguments); }; }   // 8 frames at 10 a second = .8
 /* (v314) a new phase: the boss reels back, then rises roaring (the roar and its knock-back are js/sys/bossfury.js) */
 if (typeof furyPhaseUp === 'function'){ const _fp = furyPhaseUp; furyPhaseUp = function(m){ const r = _fp.apply(this, arguments); try { bposeStart(m, 'bphase', .5); } catch (e) {} return r; }; }
+/* (v319) pack leaders (หัวหน้าฝูง, js/sys/world2.js) act their two skills too: the rally is a roar, the other one the pose of
+   the same boss skill. Their sheet is their kind's own; the pose frames are drawn only when one is played */
+const BPOSE_ELITE_WAIT = {bslam:.9, bcharge:.75, broar:.6, bbreath:.6, bcast:.6, bspin:.6, bvanish:.5};
+if (typeof eliteCast === 'function'){ const _ec = eliteCast; eliteCast = function(m){
+  let id = null; const _bc = bossCast; bossCast = function(mm, sk){ if (mm === m) id = sk; return _bc.apply(this, arguments); };   // which skill it chose
+  let r; try { r = _ec.apply(this, arguments); } finally { bossCast = _bc; }
+  try { if (m && m.elite && !m.dead){ if (!id && m.rallyT > 6.9) id = 'roar'; if (id){ const act = bposeFor(id, null); bposeStart(m, act, BPOSE_ELITE_WAIT[act] || .6); } } } catch (e) {}
+  return r; }; }
