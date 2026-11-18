@@ -112,27 +112,27 @@ function dthHide(){ DTH.shown = false; const d = el('dth'); if (d){ d.hidden = t
   #dth .dthsparks .as{top:-12px;background:rgba(220,210,210,.75);border-radius:30%}
   #dth .dthcard{position:relative;width:min(480px,86%);padding:34px 28px 22px;text-align:center;border-radius:20px;isolation:isolate;
     background:radial-gradient(ellipse at 50% 0%,#fffdf6,#fbefd8 55%,#f0d9b0);border:3px solid #e3b04b;
-    box-shadow:0 0 0 2px #6a2a0e,0 0 0 8px rgba(227,176,75,.38),0 0 60px 10px rgba(255,80,40,.35),0 26px 70px rgba(0,0,0,.65);opacity:0}
+    box-shadow:0 0 0 2px #6a2a0e,0 0 0 8px rgba(227,176,75,.38),0 0 60px 10px rgba(255,80,40,.35),0 26px 70px rgba(0,0,0,.65)}
   #dth .dthcard::before{content:"";position:absolute;inset:8px;border-radius:14px;border:1.5px solid rgba(190,120,40,.45);box-shadow:inset 0 0 22px rgba(200,120,40,.18);pointer-events:none}
   #dth .dthc{position:absolute;width:46px;height:46px;pointer-events:none;z-index:2}
   #dth .dthc svg{width:100%;height:100%;display:block;filter:drop-shadow(0 1px 1px rgba(90,40,10,.5))}
   #dth .dthc.tl{left:-6px;top:-6px}#dth .dthc.tr{right:-6px;top:-6px;transform:scaleX(-1)}#dth .dthc.bl{left:-6px;bottom:-6px;transform:scaleY(-1)}#dth .dthc.br{right:-6px;bottom:-6px;transform:scale(-1)}
   #dth .dthshine{position:absolute;inset:0;border-radius:18px;overflow:hidden;pointer-events:none;z-index:1}
   #dth .dthshine::after{content:"";position:absolute;top:-20%;bottom:-20%;width:34%;left:-50%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);transform:skewX(-18deg)}
-  #dth .dthghost{position:absolute;left:50%;top:-58px;width:86px;height:86px;margin-left:-43px;z-index:3;filter:drop-shadow(0 0 14px rgba(200,180,255,.9)) drop-shadow(0 8px 10px rgba(0,0,0,.4));opacity:0}
+  #dth .dthghost{position:absolute;left:50%;top:-58px;width:86px;height:86px;margin-left:-43px;z-index:3;filter:drop-shadow(0 0 14px rgba(200,180,255,.9)) drop-shadow(0 8px 10px rgba(0,0,0,.4))}
   #dth .dthghost svg{position:relative;width:100%;height:100%}
   #dth .soul{position:absolute;left:50%;top:30%;width:12px;height:12px;margin-left:-6px;border-radius:50%;background:radial-gradient(circle,#fff,#d8c8ff 50%,rgba(180,150,255,0) 72%);opacity:0}
-  #dth .dtht{position:relative;z-index:2;margin:20px 0 2px;font:700 54px/1.15 "Mali",var(--thai),sans-serif;letter-spacing:.5px;opacity:0}
+  #dth .dtht{position:relative;z-index:2;margin:20px 0 2px;font:700 54px/1.15 "Mali",var(--thai),sans-serif;letter-spacing:.5px}
   #dth .dtht span{background:linear-gradient(#ffd0a0 0%,#ff4a3a 30%,#b0101c 65%,#4a0610 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
     filter:drop-shadow(1.5px 0 0 #fff4c8) drop-shadow(-1.5px 0 0 #fff4c8) drop-shadow(0 1.5px 0 #fff4c8) drop-shadow(0 -1.5px 0 #fff4c8) drop-shadow(0 3px 0 #6a1a0e) drop-shadow(0 0 10px rgba(255,60,40,.55))}
   #dth .dthrib{position:relative;z-index:2;display:inline-block;margin:4px 0 0;padding:7px 34px;color:#fff8e0;font:700 22px/1.2 "Mali",var(--thai),sans-serif;
-    background:linear-gradient(#ff4a4a,#c0141e 55%,#8a0c16);text-shadow:0 2px 0 #5a0a10,0 0 10px rgba(255,200,120,.5);box-shadow:0 5px 12px rgba(90,10,16,.45),inset 0 1px 0 rgba(255,255,255,.4);clip-path:inset(0 50% 0 50%)}
+    background:linear-gradient(#ff4a4a,#c0141e 55%,#8a0c16);text-shadow:0 2px 0 #5a0a10,0 0 10px rgba(255,200,120,.5);box-shadow:0 5px 12px rgba(90,10,16,.45),inset 0 1px 0 rgba(255,255,255,.4);clip-path:inset(-20px -30px -20px -30px)}
   #dth .dthrib::before,#dth .dthrib::after{content:"";position:absolute;top:6px;bottom:-6px;width:24px;background:#6a0a12;z-index:-1}
   #dth .dthrib::before{left:-16px;clip-path:polygon(0 0,100% 0,100% 100%,0 100%,40% 50%)}#dth .dthrib::after{right:-16px;clip-path:polygon(0 0,100% 0,60% 50%,100% 100%,0 100%)}
   #dth .dthribw{display:inline-block}
-  #dth .dthloss{position:relative;z-index:2;margin:12px 0 14px;min-height:1em;font:700 13px/1.2 var(--thai),sans-serif;color:#9a3a1a;opacity:0}
+  #dth .dthloss{position:relative;z-index:2;margin:12px 0 14px;min-height:1em;font:700 13px/1.2 var(--thai),sans-serif;color:#9a3a1a}
   #dth .dthbtns{position:relative;z-index:2;display:flex;gap:12px;justify-content:center}
-  #dth .dthb{position:relative;overflow:hidden;flex:1 1 0;min-height:64px;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;border-radius:14px;cursor:pointer;opacity:0;
+  #dth .dthb{position:relative;overflow:hidden;flex:1 1 0;min-height:64px;display:flex;align-items:center;justify-content:center;gap:8px;padding:8px 12px;border-radius:14px;cursor:pointer;
     font:700 17px/1.15 var(--thai),sans-serif;border:2px solid #7a3a14;box-shadow:inset 0 2px 0 rgba(255,255,255,.6),0 4px 0 #7a3a14,0 8px 16px rgba(0,0,0,.28);transition:transform .08s,filter .15s}
   #dth .dthb::after{content:"";position:absolute;top:0;bottom:0;width:40%;left:-60%;background:linear-gradient(100deg,transparent,rgba(255,255,255,.7),transparent);transform:skewX(-18deg);animation:dthSweep 3.2s ease-in-out 2s 9999}
   #dth .dthb:hover:not(:disabled){filter:brightness(1.07)}
@@ -186,7 +186,11 @@ function dthHide(){ DTH.shown = false; const d = el('dth'); if (d){ d.hidden = t
     #dth .dthloss{margin:6px 0 10px}
     #dth .dthb{min-height:52px;font-size:15px}#dth .dthico{width:34px;height:34px}
   }
-  @media (prefers-reduced-motion:reduce){#dth *,#dth{animation-duration:.01s!important;animation-iteration-count:1!important}}`; document.head.appendChild(st); }
+  @media (prefers-reduced-motion:reduce){#dth *,#dth{animation-duration:.01s!important;animation-iteration-count:1!important}}
+  /* (v315) the owner's screen showed the sign with only its title: no ribbon, no buttons. Every part of the card was
+     invisible by itself (opacity 0) and only its entrance animation made it appear, and css/hud.css turns every animation
+     off on a device that asks for less motion (Windows «animation effects» off, phone battery saver). The parts are now
+     visible by themselves; the entrance keyframes hide them only while they wait to play (fill:both) */`; document.head.appendChild(st); }
 
 /* (v294) the owner: fallen, then sent out of the server for idling (the sign waits for a button), and entering again
    put the hero back on that map at 0 HP — and dead once more. A hero saved fallen (0 HP) now wakes in town with half

@@ -19,7 +19,7 @@ test('new player: create account and hero, walk, fight, open windows, save and r
     assert.ok(Number.isFinite(st.hp), 'hp is a number');
     assert.ok(st.T >= 0, 'game clock never runs backwards');
     assert.ok(st.mobs === 0 && !st.boss, '(v306) no monsters and no boss in Aren, the starting town: ' + st.mobs);
-    const fl = await page.evaluate(async () => { const m0 = MAP_ID; travel(FIELDS306.id, 0); await new Promise(r => setTimeout(r, 600)); const o = {map:MAP_ID, mobs:mobs.filter(m => !m.dead).length, kinds:new Set(mobs.map(m => m.type)).size, back:GATES.some(g => g.to === 0)}; travel(0, FIELDS306.id); await new Promise(r => setTimeout(r, 400)); o.home = MAP_ID === m0; return o; });
+    const fl = await page.evaluate(async () => { const m0 = MAP_ID; travel(FIELDS306.id, 0); for (let i = 0; i < 60 && mobs.filter(m => !m.dead).length <= 20; i++) await new Promise(r => setTimeout(r, 100));   /* (v310) about 80 monsters fill in over the first seconds */ const o = {map:MAP_ID, mobs:mobs.filter(m => !m.dead).length, kinds:new Set(mobs.map(m => m.type)).size, back:GATES.some(g => g.to === 0)}; travel(0, FIELDS306.id); await new Promise(r => setTimeout(r, 400)); o.home = MAP_ID === m0; return o; });
     assert.ok(fl.mobs > 20 && fl.kinds >= 5 && fl.back && fl.home, 'the monsters live in the Suwannin Fields outside the east gate, and the way back works: ' + JSON.stringify(fl));
 
     await page.evaluate(() => save());
