@@ -265,6 +265,7 @@ function renderAuto(){
     <label class="set"><span><b>${L('ใช้สกิลฟื้นเมื่อ HP ต่ำกว่า', 'Heal skills below HP')}</b><small id="a-heal-v">${b.heal}%</small></span><input type="range" data-arng="heal" min="20" max="95" step="5" value="${b.heal}"></label>
     <label class="set"><span><b>${L('เก็บ SP สำรองไว้', 'Keep SP in reserve')}</b><small id="a-spKeep-v">${b.spKeep}%</small></span><input type="range" data-arng="spKeep" min="0" max="60" step="5" value="${b.spKeep}"></label>
     ${tg('avoidBoss', L('ไม่ตีบอส · หลบหนี', 'Skip bosses · flee'), L('ไม่ตีบอส ไม่เข้าใกล้ ถ้าบอสไล่ตามจะวิ่งกลับเขตปลอดภัยแล้วค่อยฟาร์มต่อ', 'Never fights bosses and keeps away; if one hunts you, runs to the safe zone, then farms again'))}
+    ${tg('autoStat', L('อัปสเตตัสให้อัตโนมัติ', 'Spend stat points for me'), L('ระหว่างเปิด Auto ใช้แต้มสเตตัสที่เหลือกับสเตตัสหลักของอาชีพ (ปิดไว้ถ้าอยากอัปเอง)', 'While Auto is on, spend leftover stat points on your class\'s main stats (leave off to spend them yourself)'))}
     <div class="sec">${L('กินยาอัตโนมัติ', 'Potions')}</div>
     ${tg('potHpOn', L('กินยา HP อัตโนมัติ', 'Drink HP potions'), L('ใช้ยาแดง/ส้ม/ขาว/อีลิกเซอร์ที่ดีที่สุดในกระเป๋า', 'Uses the best red/orange/white/elixir in your bag'))}
     ${b.potHpOn ? `<label class="set"><span><b>${L('กินยา HP เมื่อต่ำกว่า', 'Drink below HP')}</b><small id="a-potHp-v">${b.potHp}%</small></span><input type="range" data-arng="potHp" min="10" max="90" step="5" value="${b.potHp}"></label>` : ''}

@@ -13,12 +13,16 @@
    The landmark stands in a wide glade away from the camp, the trail, the gates and the water; nothing else grows on it. */
 'use strict';
 Object.assign(WATERFALL_BIOMES, {fields:'water', primeval:'water', amberfen:'water', marsh:'water', floatmarket:'water', ashforest:'lava', dragonvale:'lava', dragonroost:'lava', demonthrone:'lava', naraka:'lava'});
-const LM320 = {prang:['cemetery', 'ayodhya', 'badan']};   /* (v321) the owner kept only the prang: the arch, the crystals and the wreck are no longer placed */
+const LM320 = {prang:['cemetery', 'ayodhya', 'badan', 'dryplain', 'desert', 'canyon', 'oasis', 'frozenlake', 'icecave', 'glacier', 'frostcitadel', 'beach', 'isle', 'river']};   /* (v321) the owner kept only the prang · (v322) it stands in the deserts, frozen lands and coasts too, in their own weathering */
+const LM320_V = {dryplain:1, desert:1, canyon:1, oasis:1, frozenlake:2, icecave:2, glacier:2, frostcitadel:2, beach:3, isle:3, river:3};
 const lmGrad = (g, x0, y0, x1, y1, stops) => { const gr = g.createLinearGradient(x0, y0, x1, y1); stops.forEach((c, i) => gr.addColorStop(i / (stops.length - 1), c)); return gr; };
 
 /* a fallen laterite prang */
 PROP_TYPES.lmprang = (seed, v = 0) => makeProp({w:210, h:270, ax:105, ay:258, seed, shadow:[86, 18], collide:58, paint(g, rng){
-  const L = ['#c27a52', '#9a5638', '#6e3a24', '#4a2616'], moss = ['#6f9a44', '#4f7a34', '#3a5e2a'];
+  /* (v322) by land: 0 jungle laterite with moss, vines and a fig · 1 desert sandstone, sand-worn · 2 frozen, snow on every ledge ·
+     3 coast, pale and salt-worn with weed at the foot */
+  const V = v % 4, L = [['#c27a52', '#9a5638', '#6e3a24', '#4a2616'], ['#e0b47a', '#c08a52', '#8a5a30', '#5a3a1c'], ['#a8826e', '#82604e', '#5a4034', '#3a2820'], ['#d4ac8a', '#b08868', '#7e5e46', '#4e3826']][V];
+  const moss = [['#6f9a44', '#4f7a34', '#3a5e2a'], null, null, ['#5a7a3a', '#3e5e2e', '#6a5a2a']][V];
   const blocks = (x0, y0, x1, y1, rows, light) => {   // a wall of laterite blocks, pitted, lit from the left
     g.fillStyle = lmGrad(g, x0, 0, x1, 0, [light ? L[0] : L[1], L[1], L[2]]); g.fillRect(x0, y0, x1 - x0, y1 - y0);
     const rh = (y1 - y0) / rows; g.strokeStyle = 'rgba(40,18,8,.45)'; g.lineWidth = .7;
@@ -40,18 +44,31 @@ PROP_TYPES.lmprang = (seed, v = 0) => makeProp({w:210, h:270, ax:105, ay:258, se
   g.fillStyle = '#2a140a'; g.beginPath(); g.moveTo(-15, bodyY); g.lineTo(-15, -142); g.quadraticCurveTo(0, -158, 15, -142); g.lineTo(15, bodyY); g.closePath(); g.fill();
   g.fillStyle = L[0]; g.fillRect(-22, -148, 44, 6); g.strokeStyle = L[3]; g.lineWidth = .6; for (let x = -20; x < 22; x += 5){ g.beginPath(); g.arc(x, -145, 2, 0, Math.PI); g.stroke(); }
   g.fillStyle = 'rgba(0,0,0,.4)'; g.fillRect(-15, bodyY - 4, 30, 4);
-  // vines hanging down the face, moss in the joints
-  for (let i = 0; i < 9; i++){ const x = -38 + rng() * 76, y0 = top + 20 + rng() * 40, len = 30 + rng() * 70; g.strokeStyle = moss[i % 3]; g.lineWidth = 1.4;
+  // vines hanging down the face, moss in the joints (the jungle one only; the coast one has a little weed)
+  if (V === 0) for (let i = 0; i < 9; i++){ const x = -38 + rng() * 76, y0 = top + 20 + rng() * 40, len = 30 + rng() * 70; g.strokeStyle = moss[i % 3]; g.lineWidth = 1.4;
     g.beginPath(); g.moveTo(x, y0); for (let k = 1; k <= 6; k++) g.lineTo(x + Math.sin(k * 1.3 + i) * 3, y0 + len * k / 6); g.stroke();
     for (let k = 0; k < 6; k++){ g.fillStyle = moss[(i + k) % 3]; ov(g, x + Math.sin(k + i) * 4, y0 + len * k / 6 + 3, 2.4, 1.6, k); g.fill(); } }
-  for (let i = 0; i < 40; i++){ g.fillStyle = moss[i % 3]; ov(g, -90 + rng() * 180, -rng() * 104, 2 + rng() * 3, 1 + rng() * 1.5); g.fill(); }
-  // a fig growing from the broken crown
-  g.strokeStyle = '#5a3a22'; g.lineWidth = 3; g.beginPath(); g.moveTo(2, top + 12); g.quadraticCurveTo(-6, top - 6, -2, top - 18); g.stroke(); g.lineWidth = 1.6; g.beginPath(); g.moveTo(4, top + 10); g.quadraticCurveTo(18, top - 2, 16, top - 12); g.stroke();
+  if (moss) for (let i = 0; i < (V === 0 ? 40 : 14); i++){ g.fillStyle = moss[i % 3]; ov(g, -90 + rng() * 180, -rng() * (V === 0 ? 104 : 30), 2 + rng() * 3, 1 + rng() * 1.5); g.fill(); }
+  // a fig growing from the broken crown (the jungle one)
+  if (V === 0){ g.strokeStyle = '#5a3a22'; g.lineWidth = 3; g.beginPath(); g.moveTo(2, top + 12); g.quadraticCurveTo(-6, top - 6, -2, top - 18); g.stroke(); g.lineWidth = 1.6; g.beginPath(); g.moveTo(4, top + 10); g.quadraticCurveTo(18, top - 2, 16, top - 12); g.stroke();
   for (let i = 0; i < 26; i++){ const a = rng() * 6.283, d = rng() * 20; g.fillStyle = i % 3 ? '#4f8a3a' : '#7ab84e'; ov(g, 4 + Math.cos(a) * d * 1.3, top - 22 + Math.sin(a) * d * .8, 5, 3.4, a); g.fill(); }
-  g.strokeStyle = '#6a4a2a'; g.lineWidth = 1.2; for (const s of [-1, 1]){ g.beginPath(); g.moveTo(s * 6, top + 14); g.quadraticCurveTo(s * 22, top + 40, s * 30, top + 80); g.stroke(); }   // its roots down the stones
+  g.strokeStyle = '#6a4a2a'; g.lineWidth = 1.2; for (const s of [-1, 1]){ g.beginPath(); g.moveTo(s * 6, top + 14); g.quadraticCurveTo(s * 22, top + 40, s * 30, top + 80); g.stroke(); } }   // its roots down the stones
   // fallen blocks round the foot
   for (let i = 0; i < 11; i++){ const x = (rng() < .5 ? -1 : 1) * (70 + rng() * 32), y = -2 - rng() * 10, w = 9 + rng() * 9, h = 6 + rng() * 5, a = (rng() - .5) * .8;
     g.save(); g.translate(x, y); g.rotate(a); g.fillStyle = L[rng() < .5 ? 0 : 1]; g.fillRect(-w / 2, -h, w, h); g.fillStyle = 'rgba(30,12,6,.4)'; g.fillRect(-w / 2, -1.5, w, 1.5); g.fillRect(w / 2 - 2, -h, 2, h); g.restore(); }
+  if (V === 1){   // sand drifted against the base, wind-cut grooves, a dead shrub
+    g.fillStyle = 'rgba(232,196,140,.95)'; for (const [x, w] of [[-70, 60], [64, 54], [0, 90]]){ ov(g, x, -3, w, 12); g.fill(); }
+    g.strokeStyle = 'rgba(120,80,40,.35)'; g.lineWidth = .8; for (let k = 0; k < 10; k++){ const y = -20 - rng() * 200, x = -40 + rng() * 80; g.beginPath(); g.moveTo(x - 10, y); g.lineTo(x + 10, y + 1.5); g.stroke(); }
+    g.strokeStyle = '#7a5a3a'; g.lineWidth = 1.2; for (let k = 0; k < 6; k++){ g.beginPath(); g.moveTo(84, -2); g.lineTo(84 + (k - 2.5) * 5, -12 - rng() * 10); g.stroke(); } }
+  if (V === 2){   // snow on every ledge and on the broken crown, icicles, drifts
+    g.fillStyle = '#f4f8fc'; for (const [y, w] of [[-40, 94], [-74, 76], [-104, 58]]){ g.beginPath(); g.moveTo(-w, y + 2); for (let x = -w; x <= w; x += 8) g.lineTo(x, y - 3 - Math.sin(x * .3) * 1.6 - rng() * 2); g.lineTo(w, y + 2); g.closePath(); g.fill(); }
+    for (const [x, y, w] of [[-10, top + 6, 6], [5, top - 1, 5], [13, top + 13, 5], [-18, top + 22, 5], [19, top + 24, 4]]){ ov(g, x, y, w, 2.4); g.fill(); }   // snow lodged in the broken crown
+    g.fillStyle = 'rgba(220,236,250,.95)'; for (const [y, w] of [[-40, 92], [-74, 74], [-104, 56]]) for (let x = -w + 6; x < w - 4; x += 9 + rng() * 8){ g.beginPath(); g.moveTo(x - 1.6, y + 1); g.lineTo(x + 1.6, y + 1); g.lineTo(x, y + 6 + rng() * 6); g.closePath(); g.fill(); }
+    g.fillStyle = '#eef4fa'; for (const [x, w] of [[-74, 46], [72, 44]]){ ov(g, x, -4, w, 11); g.fill(); } }
+  if (V === 3){   // a white salt crust low on the stones, weed and shells at the foot
+    g.fillStyle = 'rgba(244,240,228,.55)'; for (let i = 0; i < 70; i++){ ov(g, -90 + rng() * 180, -rng() * 34, 1 + rng() * 2.4, .8 + rng()); g.fill(); }
+    g.strokeStyle = '#4e6a3a'; g.lineWidth = 1.3; for (let i = 0; i < 12; i++){ const x = -90 + rng() * 180; g.beginPath(); g.moveTo(x, -1); g.quadraticCurveTo(x + 4, -8, x + (rng() - .5) * 6, -12 - rng() * 6); g.stroke(); }
+    for (let i = 0; i < 6; i++){ g.fillStyle = i % 2 ? '#f0e4d4' : '#e8c8b0'; ov(g, -80 + rng() * 160, -2, 2.4, 1.6); g.fill(); } }
 }});
 /* a natural arch of banded sandstone */
 PROP_TYPES.lmarch = (seed, v = 0) => makeProp({w:290, h:230, ax:145, ay:218, seed, shadow:[120, 18], collide:0, paint(g, rng){
@@ -111,7 +128,7 @@ PROP_TYPES.lmwreck = (seed, v = 0) => makeProp({w:300, h:200, ax:150, ay:182, se
 function lm320Place(id){
   const mp = MAPS[id]; if (!mp || mp.town || id === 0 || mp.dungeon || (typeof WFALLS !== 'undefined' && WFALLS.length)) return;
   const type = Object.keys(LM320).find(k => LM320[k].includes(mp.biome)); if (!type || !PROP_TYPES['lm' + type]) return;
-  const v = type === 'spire' && mp.biome === 'cave' ? 1 : 0;
+  const v = LM320_V[mp.biome] || 0;
   let s = (id * 7919) % 2147483647 || 1; const rr = () => (s = (s * 16807) % 2147483647) / 2147483647;
   const ok = (x, y) => trailD(x, y) > 170 && !(CAMP && Math.hypot(x - CAMP.x, y - CAMP.y) < 700) && !GATES.some(gt => Math.hypot(gt.x - x, gt.y - y) < 450)
     && !obstacles.some(o => (o.water || o.cliff) && Math.hypot(o.x - x, o.y - y) < o.r + 220) && !(typeof LAIR !== 'undefined' && Math.hypot(x - LAIR.x, y - LAIR.y) < 300)

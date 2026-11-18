@@ -759,7 +759,8 @@ const BEAST = (() => {
       const o = motion(act, f, n), walk = act === 'walk', ph = o.ph;
       const CR = fam === 'croc', yF = CR ? LL * .8 + rc * .3 : LL + rc * .55, yH = CR ? LL * .78 + rh * .28 : LL * .96 + rh * .5, by = (yF + yH) / 2;   // (v274) a crocodile's belly sits low, near the ground
       fallPre(cx, o, by);
-      const T = p => [p[0], p[1] + o.bob * .6, p[2] + o.lun];
+      const lunK = ele || fam === 'bovine' ? .35 : 1;   /* (v322) a heavy beast strikes with its head and tusks, not by leaping forward: its lunge stays short (and its tusks inside the frame) */
+      const T = p => [p[0], p[1] + o.bob * .6, p[2] + o.lun * lunK];
       const zc = Lb * .5, zh = -Lb * .5;
       const chest = T([0, yF + (F.hump ? .4 : 0), zc]), hip = T([0, yH, zh]), mid = T([0, (yF + yH) / 2 - F.dip, 0]);
       // legs (far side first so the near ones sit on top)
@@ -836,7 +837,7 @@ const BEAST = (() => {
         if (FT){ for (const sd of [-1, 1]) cap(cx, p0, add(p0, [sd * 3.6 * gir, 1.2, -3.2 * gir]), 1.6 * gir, .5, FT, {tex:nn => (Math.sin(nn[0] * 14) > .5 ? {dt:1} : undefined)}); } }   // a fish's tail fin
       // neck and head
       const [nUp, nFw] = F.neck, look = o.tilt * .5 + (act === 'idle' ? Math.sin(ph) * .05 : 0);
-      const hu = o.head || 0, nb = add(chest, [0, rc * .35, rc * .45]), hc = T(add([0, yF + (F.hump ? .4 : 0), zc], [0, rc * .35 + nUp + hu * hr * (hu > 0 ? 1.15 : 1.5), rc * .45 + nFw + (act === 'attack' ? [0, -1, 2.2, .6][f] : 0) - Math.abs(hu) * hr * .3 + (hu < 0 ? -hu * hr * .5 : 0)]));   // (v314) the head thrown up for a roar, lowered for the horns
+      const hu = o.head || 0, nb = add(chest, [0, rc * .35, rc * .45]), hc = T(add([0, yF + (F.hump ? .4 : 0), zc], [0, rc * .35 + nUp + hu * hr * (hu > 0 ? 1.15 : 1.5), rc * .45 + nFw + (act === 'attack' ? [0, -1, 2.2, .6][f] * lunK : 0) - Math.abs(hu) * hr * .3 + (hu < 0 ? -hu * hr * .5 * lunK : 0)]));   // (v314) the head thrown up for a roar, lowered for the horns
       cx.gid = 7; cap(cx, nb, add(hc, [0, -hr * .25, -hr * .3]), rc * (F.thinNeck ? .36 : fam === 'deer' || fam === 'horse' || fam === 'goat' ? .5 : .7), hr * .8, SK, {step:.3, tex:(nn, lo, q, t) => shade(nn, 'neck', t)});
       if (MN && !s.ruff && fam !== 'boar'){ cx.gid = 8; for (let i = 0; i < 6; i++){ const k = i / 5, p = lerp3(nb, hc, k); cap(cx, add(p, [0, rc * .45 * (1 - k * .5), -.6]), add(p, [0, rc * .45 * (1 - k * .5) + (fam === 'horse' ? 1.6 : 2.4), -1.6]), fam === 'horse' ? .9 : 1.3, .4, MN, {}); } }
       if (tiger){ cx.gid = 8; for (const sd of [-1, 1]) ell(cx, add(hc, [sd * hr * .5, -hr * .38, -hr * .05]), hr * .32, hr * .36, BE, {rz:hr * .4}); }   // (v314) a tiger's white cheek ruff with its dark bars
@@ -1597,7 +1598,7 @@ const BEAST = (() => {
   const KINDS = {quad, bird, serpent, bug, squat, floater, slime, rock:rock2, fish, cave, sky, land};
   const POINTY_HATS = ['lomphok', 'wizard'];   // no tall pointed hats on monsters (the owner's call): they are dropped here
   /* (v314/v320) frames big enough for the longer bodies and the attack's lunge (the size on screen does not change) */
-  const QUAD_FS = {cat:84, dog:96, rat:80, boar:96, bovine:104, lizard:104, croc:104, horse:104, deer:104, goat:104, bear:104, elephant:120};
+  const QUAD_FS = {cat:84, dog:96, rat:80, boar:108, bovine:116, lizard:104, croc:104, horse:104, deer:104, goat:104, bear:104, elephant:136};
   function make(key, spec){
     if (POINTY_HATS.includes(spec.hat)) spec = {...spec, hat:undefined};
     const fs = spec.fs || 64;
