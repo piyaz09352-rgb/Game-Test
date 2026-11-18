@@ -9,9 +9,11 @@
    Loaded after world/maps.js; paintMap() calls these by name. */
 'use strict';
 
-/* a closed, natural outline around (x, y): radius wobbles in long bends, coves and a fine ragged edge */
+/* a closed, natural outline around (x, y): radius wobbles in long bends, coves and a fine ragged edge
+   (v318) the owner: «the ponds are not natural» — the long bends and coves are deeper, so a pond is no longer nearly round;
+   the outline still never goes past the solid edge (k ≤ 1.04), and inward it stays within the water obstacle (r × .82) */
 function w2loop(x, y, rx, ry){
-  const ph = [R() * 6.28, R() * 6.28, R() * 6.28, R() * 6.28], amp = [.075, .05, .028, .012], fr = [2, 3, 6, 13], n = Math.max(48, Math.round((rx + ry) * .9)), pts = [];
+  const ph = [R() * 6.28, R() * 6.28, R() * 6.28, R() * 6.28], amp = [.12, .075, .03, .012], fr = [2, 3, 6, 13], n = Math.max(48, Math.round((rx + ry) * .9)), pts = [];
   for (let i = 0; i < n; i++){ const a = i / n * Math.PI * 2; let k = 1; for (let j = 0; j < 4; j++) k += amp[j] * Math.sin(fr[j] * a + ph[j]); k = Math.min(1.04, k);   // never far past the solid edge
     pts.push([Math.cos(a) * rx * k, Math.sin(a) * ry * k]); }
   // d: how far out (+) or in (−) to draw; wob: how unevenly — a bank is wide on a beach and thin under a steep edge

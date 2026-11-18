@@ -68,18 +68,24 @@ const LIVE = (() => {
           if (k < .2 || k > .8){ g.fillStyle = 'rgba(255,255,255,.7)'; for (let d = 0; d < 4; d++) g.fillRect(x + dir * ((k < .5 ? -11 : 11)) + (d - 1.5) * 2, y - 2 - H1(d + cyc) * 4, 1, 1); } }
         else { const k = (ph - .7) / .35; g.strokeStyle = `rgba(255,255,255,${(1 - k) * .6})`; g.beginPath(); g.ellipse(x + dir * 11, y, 3 + k * 12, (3 + k * 12) * .4, 0, 0, 7); g.stroke(); } } }
   }
+  /* (v318) the waves lapping at the shore were whole ovals and showed the round outline the bank no longer has (water2.js);
+     now they are short broken arcs inside the water that drift out and fade, like ripples */
+  function lvRipples(g, w, x, y, n){ g.lineWidth = 1.2; g.lineCap = 'round';
+    for (let q = 0; q < n; q++){ const k = (T * .35 + q * .5 + w.seed * .01) % 1, f = .62 + k * .22;
+      g.strokeStyle = `rgba(255,255,255,${Math.sin(k * Math.PI) * .3})`;
+      for (let s = 0; s < 4; s++){ const a0 = w.seed * .7 + s * 1.62 + q * .8 + Math.sin(s * 2.3 + w.seed) * .4, len = .45 + ((s * 37 + w.seed) % 5) * .07;
+        g.beginPath(); g.ellipse(x, y, w.rx * f, w.ry * f, 0, a0, a0 + len); g.stroke(); } } }
   function drawWater(g){
     for (const w of WATERS){
       if (w.k === 'pond'){
         if (!view(w.x, w.y, Math.max(w.rx, w.ry) + 20)) continue;
         const x = w.x - cam.x, y = w.y - cam.y;
-        if (!lv()){ if (w.kind === 'water'){ const k = (T * .35 + w.seed * .01) % 1; g.strokeStyle = `rgba(255,255,255,${Math.sin(k * Math.PI) * .3})`; g.lineWidth = 1.2; g.beginPath(); g.ellipse(x, y, w.rx - 6 + k * 7, w.ry - 5 + k * 5, 0, 0, 7); g.stroke(); } continue; }   // low: just the lapping shore
+        if (!lv()){ if (w.kind === 'water') lvRipples(g, w, x, y, 1); continue; }   // low: just the ripples
         g.save(); g.beginPath(); g.ellipse(x, y, w.rx, w.ry, 0, 0, 7); g.clip();
         surface(g, w, (u, v) => { const a = u * 6.283, d = Math.sqrt(v) * .9; return [x + Math.cos(a) * w.rx * d, y + Math.sin(a) * w.ry * d]; }, w.rx * w.ry * 3);
         g.restore();
         if (w.kind === 'water'){ // waves lapping at the shore
-          for (let q = 0; q < 2; q++){ const k = (T * .35 + q * .5 + w.seed * .01) % 1; g.strokeStyle = `rgba(255,255,255,${Math.sin(k * Math.PI) * .32})`; g.lineWidth = 1.2;
-            g.beginPath(); g.ellipse(x, y, w.rx - 6 + k * 7, w.ry - 5 + k * 5, 0, 0, 7); g.stroke(); } }
+          lvRipples(g, w, x, y, 2); }
         else if (w.kind === 'lava'){ g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(x, y, 0, x, y, w.rx + 24); gr.addColorStop(0, 'rgba(255,120,30,0)'); gr.addColorStop(.75, `rgba(255,110,30,${.1 + .06 * Math.sin(T * 2 + w.seed)})`); gr.addColorStop(1, 'rgba(255,90,20,0)'); g.fillStyle = gr; g.beginPath(); g.ellipse(x, y, w.rx + 24, w.ry + 18, 0, 0, 7); g.fill(); g.restore(); }
       } else {
         const ry = (w.y1 - w.y0) / 2, mid = (w.y0 + w.y1) / 2, top = mid - ry - 20, bot = mid + ry + 20;
