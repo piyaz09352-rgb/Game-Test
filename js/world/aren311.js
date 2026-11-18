@@ -13,7 +13,7 @@
    checked (tests/aren311.test.js). Townsfolk walk the whole village, not only the plaza. The map keeps its size and
    every NPC and shop keeps its place, so nothing else changes. */
 'use strict';
-const AR11 = {cx:1200, cy:800, plazaRX:610, plazaRY:440};
+const AR11 = {homes:false, cx:1200, cy:800, plazaRX:610, plazaRY:440};
 const ar11Npcs = () => (typeof NPCS_HOME !== 'undefined' ? NPCS_HOME : NPCS);   // Aren's own people (NPCS still holds the last map's while the ground is painted)
 const ar11Wet = (x, y, room) => typeof VPOND !== 'undefined' && Math.hypot((VPOND.x - x) / ((VPOND.rx || 90) + room), (VPOND.y - y) / ((VPOND.ry || 50) + room)) < 1;
 /* the 100-floor tower monument's ground (js/world/towermon232.js clears everything standing behind it): keep it free */
@@ -69,7 +69,7 @@ function ar11Ground(){ const g = terr.getContext('2d'); g.save(); g.setTransform
   // (v312) the owner: «no paths, they look clumsy» — the ring lane, the roads, the lanes and the market strip are no longer painted; the houses still keep clear of the ways
 
   // yards and the lanes that join each plot to its quarter's road
-  const plots = ar11Plots();
+  const plots = AR11.homes ? ar11Plots() : [];   // (v315) the owner: «remove these houses from the town, all of them» — no homes, no yards
   for (const p of plots){ if (p.q === 'e'){ // a farmhouse stands on its own raised yard of grass at the paddy edge, not on the paddy
       g.fillStyle = '#7f9a4c'; g.beginPath(); g.ellipse(p.x, p.y + 20, p.room * 1.35, p.room * .95, 0, 0, 7); g.fill();
       g.fillStyle = '#8fae58'; g.beginPath(); g.ellipse(p.x, p.y + 16, p.room * 1.28, p.room * .88, 0, 0, 7); g.fill();
@@ -83,7 +83,7 @@ function ar11Ground(){ const g = terr.getContext('2d'); g.save(); g.setTransform
 /* ---------- the village: houses, yards, the market ---------- */
 function ar11Village(){
   const isTree = t => ['tree', 'palm', 'bush', 'rock', 'bamboo', 'banana', 'hay', 'frangipani'].includes(t);
-  const plots = ar11Plots(), market = ar11Market(), roads = ar11Roads();
+  const plots = AR11.homes ? ar11Plots() : [], market = ar11Market(), roads = ar11Roads();   // (v315) no homes: the old woods stay where the plots were
   // clear the old woods where the village now stands (and off the roads); the woods along the map's edges stay
   const clear = p => plots.some(q => Math.hypot(q.x - p.x, (q.y - p.y) * 1.2) < q.room + 70) || market.some(m => Math.hypot(m.x - p.x, m.y - p.y) < 80) || roads.some(rd => ar11SegD(p.x, p.y, rd.pts) < 56)
     || Math.hypot((p.x - AR11.cx) / (AR11.plazaRX + 70), (p.y - AR11.cy) / (AR11.plazaRY + 64)) < 1;
@@ -93,7 +93,7 @@ function ar11Village(){
     if (p.kind === 'farm'){ put('arhome', p.x, p.y, [0, 3, 4][Math.floor(r() * 3)]); put('hay', p.x + s * 92, p.y + 20); if (r() < .6) put('hay', p.x + s * 110, p.y - 16); if (r() < .4) put('fruittree', p.x - s * 98, p.y - 30, Math.floor(r() * 3)); }
     else { put('arhome', p.x, p.y, Math.floor(r() * 6)); put(r() < .5 ? 'banana' : 'fruittree', p.x + s * 96, p.y - 30, Math.floor(r() * 3)); put('spirit', p.x - s * 86, p.y + 22); if (r() < .6) put('flowerbed', p.x - s * 6, p.y + 66); }
     for (const dx of [-66, -40, 40, 66]) put('lowfence', p.x + dx, p.y + 82); }   // a low fence along the front of the yard, the gate in the middle
-  for (const o of ar11Rows()) put('arrow', o.x, o.y, o.v);   // a low fence along the front of the yard, the gate in the middle
+  if (AR11.homes) for (const o of ar11Rows()) put('arrow', o.x, o.y, o.v);   // (v315) the shophouses went with the homes   // a low fence along the front of the yard, the gate in the middle
   // the granary of the hamlet: one sala by the east road
   { const rd = roads.find(x => x.side === 'e'); if (rd){ const [x, y] = rd.pts[10]; if (!ar11Npcs().some(n => Math.hypot(n.x - x, n.y - y + 120) < 90)) put('sala', x, y - 118); } }
   market.forEach((m, k) => { put('arstall', m.x, m.y, k % 6); if (k % 2 === 0) put('lamp', m.x - m.sd * 58, m.y - 24); });
