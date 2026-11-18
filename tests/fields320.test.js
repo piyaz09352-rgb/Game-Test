@@ -21,6 +21,7 @@ test('starter fields: zones by danger; a new hero on Auto survives', { skip, tim
         if (P.dead){ deaths++; dthTown(); setBot(true); if (MAP_ID !== FIELDS306.id){ loadMap(FIELDS306.id); P.x = g.x + 200; P.y = g.y; } } }
       setBot(false);
       // Auto's choice with a weak and a strong monster about as close
+      for (const m of mobs) m.dead = true; mobs = mobs.filter(m => !m.dead);   /* only the two below, so the choice is between them */
       const weak = spawnMob('dewblob', P.x + 90, P.y, {zone:MAPZ}), strong = spawnMob('lantern', P.x + 80, P.y + 10, {zone:MAPZ}); strong.aggro = false; S.lvl = 2;
       const pick = pickTarget(); weak.dead = strong.dead = true;
       return {slots, deaths, kills, lv:S.lvl, pick:pick && pick.type}; });
