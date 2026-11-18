@@ -16,10 +16,10 @@ test('Aren is balanced west and east', { skip, timeout: 120000 }, async () => {
       const water = WATERS.filter(w => w.k === 'pond').map(w => [Math.round(w.x), Math.round(w.y)]);
       const st = {x:1200, y:1000}, gates = GATES.map(g => !!findPath(st.x, st.y, g.x + (1200 - g.x) * .08, g.y + (800 - g.y) * .08));
       return {west:west.length, east:east.length, mirrored, water, gates, falls:WFALLS.length, cliffs:obstacles.filter(o => o.cliff).length, oldPond:POND.x < 0}; });
-    assert.ok(r.west > 40 && Math.abs(r.west - r.east) <= Math.max(6, r.west * .15), 'about as many trees on each side: ' + r.west + ' / ' + r.east);
+    assert.ok(r.west > 40 && Math.abs(r.west - r.east) <= 2, 'as many trees on each side: ' + r.west + ' / ' + r.east);
     assert.ok(r.mirrored >= r.west * .85, 'the east is the mirror of the west: ' + r.mirrored + ' of ' + r.west);
     assert.strictEqual(r.falls, 1, 'one waterfall'); assert.ok(r.cliffs > 40, 'the hills are walls: ' + r.cliffs); assert.ok(r.oldPond, 'the old round pond is gone');
-    for (const [x, y] of [[520, 300], [1880, 300], [980, 1500], [1420, 1500]]) assert.ok(r.water.some(([a, b]) => Math.abs(a - x) < 10 && Math.abs(b - y) < 40), 'a pond at ' + x + ',' + y + ': ' + JSON.stringify(r.water));
+    for (const [x, y] of [[520, 448], [1880, 448], [980, 1500], [1420, 1500]]) assert.ok(r.water.some(([a, b]) => Math.abs(a - x) < 10 && Math.abs(b - y) < 40), 'a pond at ' + x + ',' + y + ': ' + JSON.stringify(r.water));
     assert.ok(r.gates.every(Boolean), 'every gate can be walked to: ' + r.gates);
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no page errors');

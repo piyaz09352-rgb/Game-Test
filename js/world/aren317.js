@@ -15,7 +15,7 @@
    reachable; the cliffs and the plateaus can't be walked on, the creek can be waded. */
 'use strict';
 const AR17 = {spond:[{x:1420, y:1500, rx:108, ry:56}, {x:980, y:1500, rx:108, ry:56}], fields:[{x0:170, y0:1060, x1:700, y1:1390}, {x0:1700, y0:1060, x1:2230, y1:1390}],
-  hill:{x0:150, wd:760, yTop:36, bulge:120, faceH:118, xc:520, seed:41.7}, falls:[]};
+  hill:{x0:150, wd:760, yTop:165, bulge:120, faceH:130, xc:520, seed:41.7}, falls:[]};
 const ar17Rng = s => () => (s = (s * 16807) % 2147483647) / 2147483647;
 const ar17Town = (x, y, pad = 0) => Math.hypot((x - 1200) / (610 + pad), (y - 800) / (440 + pad)) < 1;
 if (typeof POND !== 'undefined'){ POND.x = -9000; POND.y = -9000; }   // the old round pond is not drawn or walked into any more
@@ -57,7 +57,7 @@ function ar17Hills(g){
     const x0 = east ? 2400 - h.x0 - h.wd : h.x0, xc = east ? 2400 - h.xc : h.xc, G = fallGeom(x0, h.wd, h.yTop, h.bulge, h.faceH, east ? -9999 : xc, h.seed);
     const baseC = G.base(xc), pool = {x:xc, y:baseC + 30, rx:74, ry:26};
     const stream = east ? [] : meander(xc + 50, -10, xc, G.rim(xc) + 2, 14, 24, h.seed);
-    const creek = east ? [[pool.x, pool.y + pool.ry]] : creekPath(pool.x - 6, pool.y + pool.ry - 4, 250, h.seed);
+    const creek = east ? [[pool.x, pool.y + pool.ry]] : creekPath(pool.x - 6, pool.y + pool.ry - 4, 170, h.seed);
     const F = {x:pool.x, y:baseC, kind:'water', seed:Math.floor(h.seed * 1e4) + (east ? 1 : 0), G, rimC:G.rim(xc), baseC, pool, stream, creek, biome:MAPS[0].biome};
     fallsPaint(g, B, F);
     ar17NatPond(g, {x:pool.x, y:pool.y + 2, rx:pool.rx + 8, ry:pool.ry + 9}, ar17Rng(east ? 61 : 62));   // the pool gets the same natural bank as the ponds, not a ring of stones
@@ -97,7 +97,8 @@ function ar17Land(){
   const gates = GATES.map(g => ({x:g.x, y:g.y})), inField = (x, y, pad = 0) => AR17.fields.some(F => x > F.x0 - pad && x < F.x1 + pad && y > F.y0 - pad && y < F.y1 + pad);
   const wet = (x, y, pad) => AR17.spond.some(P => Math.hypot((x - P.x) / (P.rx * 1.15 + pad), (y - P.y) / (P.ry * 1.15 + pad)) < 1)
     || AR17.falls.some(F => Math.hypot((x - F.pool.x) / (F.pool.rx + pad), (y - F.pool.y) / (F.pool.ry + pad)) < 1 || F.creek.some(([cx, cy]) => Math.hypot(x - cx, y - cy) < 26 + pad * .3));
-  const hill = (x, y) => AR17.falls.some(F => x > F.G.x0 - 20 && x < F.G.x1 + 20 && y < F.G.base(Math.max(F.G.x0, Math.min(F.G.x1, x))) + 34);
+  // (v318) the cliff face and its foot stay clear; trees may stand up on the hill, off the stream
+  const hill = (x, y) => AR17.falls.some(F => { if (x < F.G.x0 - 20 || x > F.G.x1 + 20) return false; const cx = Math.max(F.G.x0, Math.min(F.G.x1, x)); return y > F.G.rim(cx) - 46 && y < F.G.base(cx) + 34 || F.stream.some(([sx, sy]) => Math.hypot(x - sx, y - sy) < 44); });
   const way = (x, y) => (Math.abs(y - 740) < 70 && (x < 600 || x > 1800)) || (Math.abs(x - 1200) < 70 && y > 1200);
   const free = (x, y, pad = 40) => !ar17Town(x, y, 60) && !way(x, y) && !wet(x, y, 34) && !hill(x, y) && !inField(x, y, 70) && !gates.some(g => Math.hypot(x - g.x, y - g.y) < 150)
     && !obstacles.some(o => !o.prop && !o.water && !o.cliff && Math.hypot(o.x - x, o.y - y) < (o.r || 0) + pad) && !PROPS.some(p => !AR17_NAT.has(p.type) && Math.hypot(p.x - x, p.y - y) < 90);
@@ -118,7 +119,7 @@ function ar17Land(){
   for (const [x, y] of [[700, 480], [690, 1150], [330, 600], [330, 900]]){ pairs.push(['flowerbed', x, y, 0]); pairs.push(['flowerbed', x + 46, y + 20, 1]); }
   const ok = (t, X, Y) => { if (t !== 'hay' && !free(X, Y)) return false; return !PROPS.some(p => AR17_NAT.has(p.type) && Math.hypot(p.x - X, p.y - Y) < 40); };
   for (const [t, x, y, v] of pairs){ if (!PROP_TYPES[t] || !ok(t, x, y) || !ok(t, 2400 - x, y)) continue;
-    addProp(t, Math.round(x), Math.round(y), v); addProp(t, Math.round(2400 - x), Math.round(y), v); }
+    const A = addProp(t, Math.round(x), Math.round(y), v), B = addProp(t, Math.round(2400 - x), Math.round(y), v); if (A && B){ A.ar17 = B; B.ar17 = A; } }
 }
 { const _rm = repaintMap; repaintMap = function(){ const r = _rm.apply(this, arguments); if (MAP_ID !== 0) return r;
     try { ar17Land(); NAV.grid = null;
@@ -127,3 +128,10 @@ function ar17Land(){
         m.fillStyle = tree ? 'rgba(30,70,40,.8)' : '#8f3426'; m.beginPath(); m.arc(p.x / W * 192, p.y / H * 128, tree ? 1.4 : 2, 0, 7); m.fill(); }
     } catch (e) { console.warn('aren317 land', e); }
     return r; }; }
+/* (v318) other systems clear room after the land is laid (round the tower monument, before the gates): a tree whose mirror
+   was taken away goes too, so the two sides stay the same */
+function ar17Pairs(){ if (MAP_ID !== 0) return; const have = new Set(PROPS); let n = 0;
+  for (let i = PROPS.length - 1; i >= 0; i--){ const p = PROPS[i]; if (!p.ar17 || have.has(p.ar17)) continue;
+    PROPS.splice(i, 1); for (let j = obstacles.length - 1; j >= 0; j--) if (obstacles[j].prop === p) obstacles.splice(j, 1); n++; }
+  if (n && typeof NAV !== 'undefined') NAV.grid = null; }
+EV.on('map', () => { for (const ms of [0, 60, 400]) setTimeout(() => { try { ar17Pairs(); } catch (e) {} }, ms); });
