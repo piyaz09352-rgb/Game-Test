@@ -96,7 +96,8 @@ function mgUnder(g){
     else if (f.kind === 'rain'){ g.fillStyle = 'rgba(90,150,230,.28)'; g.beginPath(); g.ellipse(x, y, f.r, f.r * .5, 0, 0, 7); g.fill();
       g.strokeStyle = 'rgba(200,230,255,.6)'; g.lineWidth = 1; for (let i = 0, N = Math.round(14 * fxQ()); i < N; i++){ const ph = (T * 1.6 + mgR(f, i)) % 1, a = mgR(f, i + 3, 6.28), d = mgR(f, i + 7, f.r * .9);
         g.globalAlpha = fade * (1 - ph); g.beginPath(); g.ellipse(x + Math.cos(a) * d, y + Math.sin(a) * d * .5, 3 + ph * 12, (3 + ph * 12) * .4, 0, 0, 7); g.stroke(); } }
-    else if (f.kind === 'storm'){ g.fillStyle = 'rgba(30,40,70,.35)'; g.beginPath(); g.ellipse(x, y, f.r * 1.1, f.r * .55, 0, 0, 7); g.fill(); }
+    else if (f.kind === 'storm'){ const sg = g.createRadialGradient(x, y, 0, x, y, f.r * 1.15); sg.addColorStop(0, 'rgba(30,40,70,.4)'); sg.addColorStop(.7, 'rgba(30,40,70,.22)'); sg.addColorStop(1, 'rgba(30,40,70,0)');   // (v331) the storm's shadow fades out at its rim (it was a hard-edged disc)
+      g.save(); g.translate(x, y); g.scale(1, .5); g.fillStyle = sg; g.beginPath(); g.arc(0, 0, f.r * 1.15, 0, 7); g.fill(); g.restore(); }
     g.restore(); }
 }
 function mgOver(g){
@@ -110,15 +111,20 @@ function mgOver(g){
       for (let i = 0, N = Math.round(26 * fxQ()); i < N; i++){ const a = mgR(f, i, 6.28), d = Math.sqrt(mgR(f, i + 1)) * f.r * .95, px = x + Math.cos(a) * d, py = y + Math.sin(a) * d * .5, ph = (T * 1.8 + mgR(f, i + 2)) % 1, h = 10 + mgR(f, i + 3, 16);
         g.fillStyle = `rgba(255,${120 + Math.round(ph * 100)},40,${.6 * (1 - ph)})`; g.beginPath(); g.moveTo(px - 5, py); g.quadraticCurveTo(px - 2, py - h * (1 - ph * .3), px, py - h * 1.2 - ph * 10); g.quadraticCurveTo(px + 2, py - h * .5, px + 5, py); g.fill(); } }
     else if (f.kind === 'storm'){ const R = f.r * Math.min(1, age * .8 + .3);   // the hurricane: stacked spinning rings, a funnel, debris and lightning
-      const fg = g.createLinearGradient(0, y - 250, 0, y); fg.addColorStop(0, 'rgba(120,140,170,.55)'); fg.addColorStop(1, 'rgba(90,110,140,.15)');   // the funnel body
-      g.fillStyle = fg; g.beginPath(); g.moveTo(x - R * .3, y); g.quadraticCurveTo(x - R * .55, y - 140, x - R * 1.15, y - 250); g.lineTo(x + R * 1.15, y - 250); g.quadraticCurveTo(x + R * .55, y - 140, x + R * .3, y); g.closePath(); g.fill();
+      // (v331) the funnel body: soft stacked mist instead of a straight-sided wedge (the owner: «not angular»), widening and fading upward, swaying gently
+      for (let k = 0; k < 14; k++){ const q = k / 13, hy = y - q * 250, rw = R * (.32 + q * .9), sw = Math.sin(T * 1.6 + k * .5 + f.seed) * R * .06 * q;
+        const mg = g.createRadialGradient(x + sw, hy, 0, x + sw, hy, rw); mg.addColorStop(0, `rgba(${120 - q * 20},${140 - q * 20},${175 - q * 10},${.16 + q * .1})`); mg.addColorStop(1, 'rgba(110,130,165,0)');
+        g.fillStyle = mg; g.beginPath(); g.ellipse(x + sw, hy, rw, rw * .42, 0, 0, 7); g.fill(); }
       for (let k = 0; k < 11; k++){ const hy = y - k * 23, rr = R * (.3 + k * .085), rot = T * (4 - k * .2);
-        g.strokeStyle = `rgba(${215 + k * 3},${228 + k * 2},255,${.85 - k * .04})`; g.lineWidth = 4.5 - k * .25;
+        g.strokeStyle = `rgba(${215 + k * 3},${228 + k * 2},255,${.85 - k * .04})`; g.lineWidth = 4.5 - k * .25; g.lineCap = 'round';
         for (let s = 0; s < 3; s++){ g.beginPath(); g.ellipse(x, hy, rr, rr * .3, 0, rot + s * 2.1, rot + s * 2.1 + 1.7); g.stroke(); } }
       for (let i = 0, N = Math.round(30 * fxQ()); i < N; i++){ const a = T * (2.4 + mgR(f, i)) + mgR(f, i + 5, 6.28), hh = mgR(f, i + 6, 220), rr = R * (.3 + hh / 400);
-        g.fillStyle = i % 3 ? 'rgba(120,110,90,.9)' : 'rgba(70,140,60,.9)'; g.fillRect(x + Math.cos(a) * rr - 2, y - hh + Math.sin(a) * rr * .3 - 1.5, 4, 3); }
-      if (Math.sin(T * 13 + f.seed) > .6){ g.strokeStyle = 'rgba(230,240,255,.95)'; g.lineWidth = 2.2; const bx = x + (mgR(f, Math.floor(T * 8), 2) - 1) * R * .8;
-        g.beginPath(); g.moveTo(bx, y - 260); for (let k = 1; k <= 6; k++) g.lineTo(bx + (mgR(f, Math.floor(T * 8) + k, 2) - 1) * 18, y - 260 + k * 44); g.stroke(); } }
+        g.fillStyle = i % 3 ? 'rgba(120,110,90,.9)' : 'rgba(70,140,60,.9)'; g.beginPath(); g.ellipse(x + Math.cos(a) * rr, y - hh + Math.sin(a) * rr * .3, 2.6, 1.3, a * 1.7, 0, 7); g.fill(); }   // (v331) leaves and grit, rounded (they were little squares)
+      if (Math.sin(T * 13 + f.seed) > .6){ const bx = x + (mgR(f, Math.floor(T * 8), 2) - 1) * R * .8, pts = [[bx, y - 260]];   // (v331) the bolt bends in curves, with a glow (it was a zig-zag of straight strokes)
+        for (let k = 1; k <= 6; k++) pts.push([bx + (mgR(f, Math.floor(T * 8) + k, 2) - 1) * 18, y - 260 + k * 44]);
+        g.lineCap = 'round'; g.lineJoin = 'round';
+        for (const [w, c] of [[7, 'rgba(160,200,255,.25)'], [3.2, 'rgba(200,225,255,.6)'], [1.6, 'rgba(240,248,255,.98)']]){ g.strokeStyle = c; g.lineWidth = w; g.beginPath(); g.moveTo(pts[0][0], pts[0][1]);
+          for (let k = 1; k < pts.length - 1; k++){ const mx = (pts[k][0] + pts[k + 1][0]) / 2, my = (pts[k][1] + pts[k + 1][1]) / 2; g.quadraticCurveTo(pts[k][0], pts[k][1], mx, my); } g.lineTo(pts[pts.length - 1][0], pts[pts.length - 1][1]); g.stroke(); } } }
     else if (f.kind === 'pit'){ // boulders falling from the sky onto the pit
       for (let i = 0, N = Math.round(12 * fxQ()); i < N; i++){ const st = .2 + i * .38, ph = (age - st) / .7; if (ph < 0 || ph > 1.6) continue; const a = mgR(f, i, 6.28), d = mgR(f, i + 1, f.r * .7), gx = x + Math.cos(a) * d, gy = y + Math.sin(a) * d * .5, sz = 18 + mgR(f, i + 2, 18);
         if (ph <= 1){ const py = gy - 320 * (1 - ph * ph); g.fillStyle = '#6a5440'; g.beginPath(); g.ellipse(gx, py, sz, sz * .85, mgR(f, i + 3, 3), 0, 7); g.fill(); g.fillStyle = 'rgba(255,255,255,.18)'; g.beginPath(); g.ellipse(gx - sz * .3, py - sz * .3, sz * .4, sz * .3, 0, 0, 7); g.fill();

@@ -73,6 +73,9 @@ function h6Pc(ui, U, k, m, g){
   const ex = el('h6Exp'), exR = ex ? (brect(ex).right - U.left) / k : 0, cl = Math.max(exR + g * 2, W * .26), cr = x0 - g * 2;
   H6.chat = cr - cl > 220 ? {left:cl, width:Math.min(460, cr - cl), bottom:m / k} : null; h6Chat();
 }
+function h6ChatBtn(){ const ui = el('ui'), cb = el('chatBtn'), ex = el('h6Exp'); if (!ui || !cb || cb.hidden || !ex || !ui.classList.contains('h6') || !ui.classList.contains('moba')) return;
+  const U = brect(ui), k = (U.height / (ui.offsetHeight || 1)) || 1, X = brect(ex), set = (n, v) => { v = Math.round(v) + 'px'; if (cb.style.getPropertyValue(n) !== v) cb.style.setProperty(n, v, 'important'); };
+  const v = `auto auto ${Math.round((U.bottom - X.bottom) / k)}px ${Math.round((X.right - U.left) / k + 8)}px`; if (cb.style.getPropertyValue('inset') !== v) cb.style.setProperty('inset', v, 'important'); void set; }   // (moblay244 pins it with inset)
 function h6Chat(){ const cb = el('chatBox'), ui = el('ui'); if (!cb || !H6.chat || !ui || !ui.classList.contains('h6pc') || h6Hand()) return;
   const c = H6.chat, set = (n, v) => { v = Math.round(v) + 'px'; if (cb.style.getPropertyValue(n) !== v) cb.style.setProperty(n, v, 'important'); };
   set('left', c.left); set('width', c.width); set('bottom', c.bottom); if (cb.style.right !== 'auto') cb.style.setProperty('right', 'auto', 'important'); if (cb.style.top !== 'auto') cb.style.setProperty('top', 'auto', 'important'); }
@@ -93,14 +96,19 @@ function h6Layout(){
   hudPut(mc, m, I.b + g * k, 'r'); const M = R(mc);
   if (ch && ch.offsetWidth) hudPut(ch, m, M.b + g * k, 'r');
   if (rl){ hudPut(rl, m, I.b + g * k, 'r'); rl.style.zIndex = rl.classList.contains('folded') ? '' : '45'; }
+  // the open menu: as many columns as fit, as tall as the room under the orbs (down to the action buttons on PC)
+  if (rl && !rl.classList.contains('folded')){ const top = I.b + g * k, low = moba ? U.height - m : (el('dock') && el('dock').offsetWidth ? Math.min(U.height - m, R(el('dock')).t - g * k) : U.height - m);
+    const cols = (ui.offsetWidth < 900 ? 6 : 5), mh = Math.max(150, Math.round((low - top) / k - 8)); rl.style.setProperty('--h6c', cols); rl.style.setProperty('--h6mh', mh + 'px'); }
   // bottom left: EXP and the clock
   if (ex){ ex.style.left = Math.round(m / k) + 'px'; ex.style.bottom = Math.round(m / k * .8) + 'px'; }
+  // the chat button on touch screens: beside the EXP pill along the bottom (it was dropped on top of the pill)
+  h6ChatBtn();
   if (hand) return;
   if (moba){ const j = el('joy'), X = ex && R(ex); if (j && X){ const J = R(j); if (J.b > X.t - g * k && J.l < X.r){ const top = parseFloat(j.style.top) || (J.t / k); j.style.setProperty('top', Math.round(top - (J.b - X.t + g * k) / k) + 'px', 'important'); } } }
   else h6Pc(ui, U, k, m, g);
 }
 { const _lh = layoutHud; layoutHud = function(){ const out = _lh.apply(this, arguments); try { h6Layout(); } catch (e) { console.warn('hud326', e); } return out; }; }
-{ const _pc = placeChat; placeChat = function(){ const r = _pc.apply(this, arguments); try { h6Chat(); } catch (e) {} return r; }; }
+{ const _pc = placeChat; placeChat = function(){ const r = _pc.apply(this, arguments); try { h6Chat(); h6ChatBtn(); } catch (e) {} return r; }; }
 { const _rh = renderHotbar; renderHotbar = function(){ const r = _rh.apply(this, arguments); try { if (el('ui') && el('ui').classList.contains('h6pc')) h6Layout(); } catch (e) {} return r; }; }
 setInterval(() => { try { h6Tick(); } catch (e) {} }, 1000);
 /* the bright-theme readability pass (js/sys/sunread.js) darkens lettering it thinks sits on parchment: the new HUD is dark
@@ -173,3 +181,5 @@ h6LiteCheck(); setInterval(h6LiteCheck, 3000);
 /* the coin shop placed its own button next to the minimap twice a second (js/sys/coinshop274.js cshPlace), undoing the orb's place
    (on PC it sat below the row); under the new HUD the HUD places it */
 if (typeof cshPlace === 'function'){ const _cp = cshPlace; cshPlace = function(){ if (el('ui') && el('ui').classList.contains('h6') && el('h6Icons')) return; return _cp.apply(this, arguments); }; }
+/* the touch layout (js/sys/moblay244.js) runs after the HUD and puts the chat button back under the quest card: place it after that too */
+if (typeof mlyLayout === 'function'){ const _ml = mlyLayout; mlyLayout = function(){ const r = _ml.apply(this, arguments); try { h6ChatBtn(); } catch (e) {} return r; }; }
