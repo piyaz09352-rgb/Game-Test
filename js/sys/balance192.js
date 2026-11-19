@@ -7,14 +7,14 @@
    1 = unchanged. Re-run the report after any change. */
 'use strict';
 const LINE_POW = {   // [tier 1 (Lv <40), tier 2, tier 3, tier 4] · (v324) retuned from a full report after the v323 Auto fixes
-  blade:[0.96, 1.1, 0.7, 0.88], rune:[1.44, 0.71, 1.07, 1.1], ranger:[0.47, 0.9, 1.94, 1.4], muay:[0.79, 0.58, 0.84, 0.82],
-  healer:[2.17, 1.34, 1.4, 1.02], rogue:[1.21, 1.3, 1.76, 1.5], summoner:[2.12, 1.29, 1.34, 0.75], occult:[3.21, 1.87, 1.61, 1.4],
-  merchant:[1.54, 1, 1.06, 0.95], catfolk:[1.41, 0.79, 0.62, 0.92], dogfolk:[1.37, 0.95, 0.82, 0.88], ninja:[0.29, 1.46, 1.3, 1.5]
+  blade:[1.09, 1.1, 0.7, 0.88], rune:[1.44, 0.59, 1.07, 1.1], ranger:[0.43, 0.79, 1.94, 1.4], muay:[0.79, 0.58, 0.71, 0.82],
+  healer:[2.42, 1.34, 1.4, 1.02], rogue:[1.21, 1.3, 1.76, 1.5], summoner:[2.12, 1.29, 1.34, 0.75], occult:[3.21, 2.11, 1.96, 1.4],
+  merchant:[1.74, 1.17, 1.06, 0.95], catfolk:[1.41, 0.79, 0.56, 0.92], dogfolk:[1.53, 1.09, 0.82, 0.88], ninja:[0.23, 1.46, 1.3, 1.5]
 };
 /* (v323) the slot a line uses is its job tier, and the last job is reached around Lv 70, so the fourth slot is never used:
    a Lv 115 hero still uses the third. The ranger kept pace at Lv 80 (82 % of the average) but fell to 54 % at Lv 115,
    where monster HP outgrows its arrows: from Lv 100 on its damage is raised on top of its slot */
-const LINE_LV100 = {blade:1.58, rune:0.86, ranger:1.42, muay:0.85, rogue:1.08, summoner:0.75, occult:0.81, merchant:1.2, catfolk:1.18, dogfolk:1.13};
+const LINE_LV100 = {blade:1.58, rune:0.86, ranger:1.42, rogue:1.08, summoner:0.75, occult:0.67, merchant:1.09, catfolk:1.32, dogfolk:1.13};
 function linePow(){
   const ch = jobChain(), line = ch[1]; if (!line || !LINE_POW[line]) return 1;
   return (LINE_POW[line][Math.min(3, Math.max(0, ch.length - 2))] || 1) * ((S.lvl || 1) >= 100 && LINE_LV100[line] || 1);
