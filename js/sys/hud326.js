@@ -73,7 +73,7 @@ function h6Pc(ui, U, k, m, g){
   const ex = el('h6Exp'), exR = ex ? (brect(ex).right - U.left) / k : 0, cl = Math.max(exR + g * 2, W * .26), cr = x0 - g * 2;
   H6.chat = cr - cl > 220 ? {left:cl, width:Math.min(460, cr - cl), bottom:m / k} : null; h6Chat();
 }
-function h6ChatBtn(){ const ui = el('ui'), cb = el('chatBtn'), ex = el('h6Exp'); if (!ui || !cb || cb.hidden || !ex || !ui.classList.contains('h6') || !ui.classList.contains('moba')) return;
+function h6ChatBtn(){ const ui = el('ui'), cb = el('chatBtn'), ex = el('h6Exp'); if (!ui || !cb || cb.hidden || !ex || !ui.classList.contains('h6')) return;   // (v332) on PC too (it floated in the middle of the screen)
   const U = brect(ui), k = (U.height / (ui.offsetHeight || 1)) || 1, X = brect(ex), set = (n, v) => { v = Math.round(v) + 'px'; if (cb.style.getPropertyValue(n) !== v) cb.style.setProperty(n, v, 'important'); };
   const v = `auto auto ${Math.round((U.bottom - X.bottom) / k)}px ${Math.round((X.right - U.left) / k + 8)}px`; if (cb.style.getPropertyValue('inset') !== v) cb.style.setProperty('inset', v, 'important'); void set; }   // (moblay244 pins it with inset)
 function h6Chat(){ const cb = el('chatBox'), ui = el('ui'); if (!cb || !H6.chat || !ui || !ui.classList.contains('h6pc') || h6Hand()) return;
@@ -183,3 +183,11 @@ h6LiteCheck(); setInterval(h6LiteCheck, 3000);
 if (typeof cshPlace === 'function'){ const _cp = cshPlace; cshPlace = function(){ if (el('ui') && el('ui').classList.contains('h6') && el('h6Icons')) return; return _cp.apply(this, arguments); }; }
 /* the touch layout (js/sys/moblay244.js) runs after the HUD and puts the chat button back under the quest card: place it after that too */
 if (typeof mlyLayout === 'function'){ const _ml = mlyLayout; mlyLayout = function(){ const r = _ml.apply(this, arguments); try { h6ChatBtn(); } catch (e) {} return r; }; }
+/* (v332) the banner (festival, boss news) always sits under the target pill: it was placed once when it appeared, so a
+   target picked afterwards slid under it, and the HUD's zoom on PC was not counted */
+function h6Banner(){ const b = el('banner'), ui = el('ui'); if (!b || !ui || !ui.classList.contains('h6') || b.hidden || !b.offsetWidth) return;
+  const U = brect(ui), k = (U.height / (ui.offsetHeight || 1)) || 1; let y = 8;
+  for (const id of ['target', 'tSt']){ const e = el(id); if (e && !e.hidden && e.offsetWidth){ const r = brect(e); if (r.height) y = Math.max(y, (r.bottom - U.top) / k + 6); } }
+  const v = Math.round(y) + 'px'; if (b.style.getPropertyValue('top') !== v) b.style.setProperty('top', v, 'important'); }
+setInterval(() => { try { h6Banner(); } catch (e) {} }, 200);
+if (typeof banner === 'function'){ const _bn = banner; banner = function(){ const r = _bn.apply(this, arguments); requestAnimationFrame(() => { try { h6Banner(); } catch (e) {} }); return r; }; }

@@ -271,3 +271,15 @@ html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb > svg:not(.mico){ width:38px
   background:radial-gradient(circle at 50% 30%, rgba(70,58,140,.95), rgba(16,12,40,.95)) padding-box, linear-gradient(135deg, #ffd56a, #59dcff) border-box !important; border:1.5px solid transparent; box-shadow:0 0 10px rgba(255,200,90,.55), 0 3px 8px rgba(0,0,0,.45); }
 html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb:not(:has(.tip))::after{ content:attr(aria-label) !important; display:block !important; position:static !important; max-width:62px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center;
   font:700 10.5px/1.15 system-ui, sans-serif; color:#f0ecff; text-shadow:0 1px 2px rgba(0,0,0,.85); background:none !important; border:0 !important; width:auto !important; height:auto !important; }
+
+/* (v332) the NPC dialog and the warp list in the same style as the other windows (they kept the old bright blue header) */
+html body.h6w #ui#ui #dialog.dialog, html body.h6w #ui#ui #warpGrid{ background:linear-gradient(180deg, rgba(250,249,255,.97), rgba(236,234,252,.97)) padding-box, linear-gradient(135deg, #c79bff, #59dcff 50%, #ffd76a) border-box !important;
+  border:2px solid transparent !important; border-radius:18px !important; box-shadow:0 0 0 1px rgba(255,255,255,.4), 0 0 26px rgba(140,110,255,.45), 0 18px 40px rgba(10,6,30,.45) !important; overflow:hidden; }
+html body.h6w #ui#ui #dialog.dialog::before, html body.h6w #ui#ui #dialog.dialog::after, html body.h6w #ui#ui #warpGrid::before, html body.h6w #ui#ui #warpGrid::after{ display:none !important; }
+html body.h6w #ui#ui #dialog .dh, html body.h6w #ui#ui #warpGrid .wghd{ background:linear-gradient(100deg, #2c2468, #1a1640 60%, #20305e) !important; border:0 !important; position:relative;
+  box-shadow:0 4px 14px rgba(20,10,60,.35) !important; }
+html body.h6w #ui#ui #dialog .dh::after, html body.h6w #ui#ui #warpGrid .wghd::after{ content:'' !important; display:block !important; position:absolute !important; left:0; right:0; bottom:0; top:auto !important; height:1.5px; background:linear-gradient(90deg, transparent, #b47cff, #4fd8ff, #ffd36a, transparent) !important; box-shadow:0 0 8px rgba(120,180,255,.8); }
+html body.h6w #ui#ui #dialog .dh *, html body.h6w #ui#ui #warpGrid .wghd *:not(button):not(button *){ color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:0 0 6px rgba(160,130,255,.7), 0 1px 2px rgba(0,0,0,.6) !important; }
+html body.h6w #ui#ui #dialog .dh small, html body.h6w #ui#ui #dialog .dh .sub, html body.h6w #ui#ui #warpGrid .wghd small{ color:#cfc8ff !important; -webkit-text-fill-color:#cfc8ff !important; }
+html body.h6w #ui#ui #dialog .dh button, html body.h6w #ui#ui #warpGrid .wghd button[data-wclose], html body.h6w #ui#ui #warpGrid .wghd .wgx, html body.h6w #ui#ui #dialog .dh .x{ border-radius:50% !important;
+  background:radial-gradient(circle at 50% 30%, rgba(150,60,110,.95), rgba(48,14,36,.95)) padding-box, linear-gradient(135deg, #ff8ab0, #ffb36a) border-box !important; border:1.5px solid transparent !important; box-shadow:0 0 10px rgba(255,110,150,.6) !important; color:#fff !important; }
