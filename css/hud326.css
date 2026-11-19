@@ -178,3 +178,34 @@ html body #ui#ui.ui.h6.moba #joy > .halo{ background:radial-gradient(circle, rgb
 html body #ui#ui.ui.h6.moba #joy > .ring{ background:transparent !important; border:1px solid rgba(255,255,255,.35) !important; box-shadow:0 0 0 1px rgba(150,120,255,.55), 0 0 10px rgba(80,200,255,.45), inset 0 0 12px rgba(150,120,255,.35) !important; }
 html body #ui#ui.ui.h6.moba #joy > .yantra{ filter:hue-rotate(195deg) saturate(1.5) brightness(1.1) !important; opacity:.4 !important; }
 html body #ui#ui.ui.h6.moba #joy > .arrow{ filter:hue-rotate(195deg) saturate(1.5) !important; }
+
+/* ---------- (v327) the name plate, top left: one glass plate like the other panels, the portrait overlapping its left end ----------
+   The owner: the top-left name tag did not match. It floated on the ground with no backing, the level badge hung half off
+   the portrait and the bars were hard to read on bright grass. */
+html body #ui#ui.ui.h6 #charCard#charCard.card.char{ position:absolute; display:flex !important; align-items:center !important; gap:0 !important; min-height:62px !important;
+  padding:7px 14px 8px 76px !important; border-radius:34px 16px 16px 34px !important; overflow:visible !important; width:auto !important;
+  background:linear-gradient(100deg, rgba(34,26,78,.82), rgba(16,14,38,.72) 70%, rgba(16,14,38,.6)) padding-box, var(--a6-rim2) border-box !important; border:1.5px solid transparent !important;
+  box-shadow:0 0 14px rgba(140,110,255,.4), 0 6px 16px rgba(0,0,0,.4) !important; backdrop-filter:blur(8px) saturate(1.3); -webkit-backdrop-filter:blur(8px) saturate(1.3); }
+html body #ui#ui.ui.h6 #charCard#charCard .portrait{ position:absolute !important; left:-6px !important; top:50% !important; transform:translateY(-50%) !important; width:70px !important; height:70px !important; margin:0 !important; z-index:2;
+  background:radial-gradient(circle at 50% 35%, #3c3480, #110d2a 75%) padding-box, var(--a6-rim) border-box !important; border:3px solid transparent !important;
+  box-shadow:0 0 16px rgba(150,120,255,.75), 0 0 34px rgba(80,200,255,.25), 0 4px 10px rgba(0,0,0,.5) !important; }
+html body #ui#ui.ui.h6 #charCard#charCard .portrait canvas{ border-radius:50% !important; }
+html body #ui#ui.ui.h6 #charCard#charCard #lvBadge, html body #ui#ui.ui.h6 #charCard#charCard .h6job{ display:none !important; }
+html body #ui#ui.ui.h6 #charCard#charCard .cinfo{ width:176px !important; gap:4px !important; }
+html body #ui#ui.ui.h6 #charCard#charCard .cname{ display:flex !important; align-items:center !important; gap:6px !important; min-width:0; }
+html body #ui#ui.ui.h6 #charCard#charCard .cname #cJob{ flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font:800 13px/1.15 system-ui, sans-serif !important; letter-spacing:.2px; }
+html body #ui#ui.ui.h6 #charCard#charCard .h6chips{ display:flex; gap:4px; flex:none; }
+html body #ui#ui.ui.h6 #charCard#charCard .h6chips i{ font:800 10px/16px system-ui, sans-serif; font-style:normal; height:16px; padding:0 6px; border-radius:8px; color:#fff; -webkit-text-fill-color:#fff; border:1px solid rgba(255,255,255,.7); text-shadow:0 1px 1px rgba(0,0,0,.5); white-space:nowrap; }
+html body #ui#ui.ui.h6 #charCard#charCard .h6chips .h6lv{ background:linear-gradient(135deg, #ff5f8f, #ff9a3c); box-shadow:0 0 8px rgba(255,100,130,.7); }
+html body #ui#ui.ui.h6 #charCard#charCard .h6chips .h6jl{ background:linear-gradient(135deg, #3f8dff, #3fe0ff); box-shadow:0 0 8px rgba(70,170,255,.7); }
+html body #ui#ui.ui.h6 #charCard#charCard .bar{ height:14px !important; border-radius:7px !important; }
+html body #ui#ui.ui.h6 #charCard#charCard .bar::before{ content:attr(data-h6); position:absolute; left:7px; top:0; bottom:0; z-index:3; display:flex; align-items:center; font:900 8.5px/1 system-ui, sans-serif; letter-spacing:.6px; color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.9); pointer-events:none; }
+html body #ui#ui.ui.h6 #charCard#charCard .bar span{ justify-content:flex-end !important; padding-right:8px !important; }
+html body #ui#ui.ui.h6 #charCard#charCard .portrait::after{ inset:-8px; border-color:rgba(180,220,255,.45); }
+html body #ui#ui.ui.h6 #charCard#charCard.card.char{ height:auto !important; max-height:none !important; min-height:0 !important; padding:8px 14px 9px 78px !important; }
+html body #ui#ui.ui.h6 #charCard#charCard .cinfo{ width:206px !important; height:auto !important; }
+html body #ui#ui.ui.h6 #charCard#charCard .cname{ height:auto !important; margin:0 0 1px !important; }
+html body #ui#ui.ui.h6 #charCard#charCard .cname .h6chips{ background:none !important; border:0 !important; box-shadow:none !important; padding:0 !important; margin:0 !important; height:auto !important; }
+html body #ui#ui.ui.h6 #charCard#charCard .bar::before{ background:none !important; width:auto !important; height:auto !important; border:0 !important; box-shadow:none !important; -webkit-mask:none !important; mask:none !important; transform:none !important; }
+html body #ui#ui.ui.h6 #charCard#charCard.card.char{ aspect-ratio:auto !important; }
+html body #ui#ui.ui.h6 #charCard#charCard .bar span, html body #ui#ui.ui.h6 #charCard#charCard .bar span em{ line-height:1 !important; height:100% !important; display:flex !important; align-items:center !important; margin:0 !important; padding-top:0 !important; padding-bottom:0 !important; }

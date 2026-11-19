@@ -31,6 +31,9 @@ function h6Build(){
     else if (k === 'menu' && typeof setRail === 'function'){ setRail(!RAIL.fold); layoutHud(); } });
   ui.appendChild(ic);
   const ex = document.createElement('div'); ex.id = 'h6Exp'; ex.innerHTML = '<i>EXP</i><span class="bar"><u></u></span><em>0%</em><s>00:00</s>'; ui.appendChild(ex);
+  // the name plate: the level chips sit beside the name (the old badges on the portrait are hidden by the stylesheet)
+  { const cn = document.querySelector('#charCard .cname'); if (cn && !cn.querySelector('.h6chips')){ const c = document.createElement('span'); c.className = 'h6chips'; c.innerHTML = '<i class="h6lv">Lv 1</i><i class="h6jl">Job 1</i>'; cn.appendChild(c); } }
+  for (const [sel, t] of [['#hpBar', 'HP'], ['#charCard .bar.sp', 'SP']]){ const b = document.querySelector(sel); if (b) b.dataset.h6 = t; }
   const pt = document.querySelector('#charCard .portrait'); if (pt && !pt.querySelector('.h6job')){ const j = document.createElement('span'); j.className = 'h6job'; pt.appendChild(j); }
   const tg = el('target'); if (tg && !tg.querySelector('.h6ring')){ const r = document.createElement('span'); r.className = 'h6ring'; r.innerHTML = H6_SVG.ring; tg.appendChild(r); }
 }
@@ -41,6 +44,8 @@ function h6Tick(){
   const em = ex.querySelector('em'), u = ex.querySelector('u'), s = ex.querySelector('s'), pt = p.toFixed(1) + '%', ck = String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
   if (em.textContent !== pt){ em.textContent = pt; u.style.width = p + '%'; } if (s.textContent !== ck) s.textContent = ck;
   const j = document.querySelector('#charCard .h6job'); if (j && j.textContent !== String(S.jlvl)) j.textContent = String(S.jlvl);
+  const lv = document.querySelector('#charCard .h6lv'), jl = document.querySelector('#charCard .h6jl'), lt = 'Lv ' + S.lvl, jt = 'Job ' + S.jlvl;
+  if (lv && lv.textContent !== lt) lv.textContent = lt; if (jl && jl.textContent !== jt) jl.textContent = jt;
   const dot = (k, on) => { const e = document.querySelector(`#h6Icons .h6-${k} .dot`); if (e && e.classList.contains('on') !== !!on) e.classList.toggle('on', !!on); };
   dot('skill', S.skPts > 0); dot('menu', typeof railDot === 'function' && [...document.querySelectorAll('#rail .menu .dot')].some(x => !x.hidden));
 }

@@ -16,7 +16,7 @@
 "css/login233.css":{"v":302,"sha":"cce116864755e777"},
 "css/phi237.css":{"v":251,"sha":"abe4870877a1df63"},
 "css/eqstyle245.css":{"v":288,"sha":"7f63129d1f511201"},
-"css/hud326.css":{"v":2,"sha":"1e7996edc67f7322"},
+"css/hud326.css":{"v":3,"sha":"74ccd5d4690657ea"},
 "js/gfx/sprites.js":{"v":355,"sha":"f3df042c00bde66b"},
 "js/gfx/beasts.js":{"v":338,"sha":"bb5e3f4364f23f55"},
 "js/gfx/variety.js":{"v":158,"sha":"01104208cb4ff965"},
@@ -304,7 +304,7 @@
 "js/sys/jobfx.js":{"v":126,"sha":"ac13b74234494a83"},
 "js/sys/tutfold.js":{"v":127,"sha":"1e510ee1ed4ec762"},
 "js/sys/changelog.js":{"v":127,"sha":"0509d4ccdd277a38"},
-"js/sys/changelog272.js":{"v":367,"sha":"58c6057a1da790b8"},
+"js/sys/changelog272.js":{"v":368,"sha":"11c55631eb7256aa"},
 "js/sys/bossnature.js":{"v":279,"sha":"dab626b53dac17e4"},
 "js/sys/inspect.js":{"v":125,"sha":"7bfd122f80df54a5"},
 "js/sys/petnet.js":{"v":136,"sha":"3f84ce0bd40d9a52"},
@@ -464,4 +464,4 @@
 "js/world/heaven297.js":{"v":326,"sha":"9555825631676541"},
 "js/world/lands298.js":{"v":327,"sha":"40b1c8ddfd735351"},
 "js/sys/free298.js":{"v":329,"sha":"bdd352195f0467fa"},
-"js/sys/hud326.js":{"v":2,"sha":"65ad0cdb6153ba1e"}}
+"js/sys/hud326.js":{"v":3,"sha":"e0dc6da719705d7e"}}
