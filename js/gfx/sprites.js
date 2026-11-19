@@ -409,7 +409,7 @@ const ACTIONS = {
   snatch:{n:5, fps:12, th:'ล้วง'}, heave:{n:5, fps:10, th:'ทอดแห'}, flurry:{n:6, fps:16, th:'รัวมีด'}, crossslash:{n:5, fps:14, th:'ฟันกากบาท'}, twinspin:{n:8, fps:18, th:'หมุนมีดคู่'},
   // (v116) poses of their own for skills that used to share one
   hongcall:{n:6, fps:10, th:'กางปีกอัญเชิญหงส์'}, dive:{n:6, fps:14, th:'กระโจนฟันลง'}, pounce:{n:5, fps:13, th:'พยัคฆ์กระโจน'},
-  seal:{n:5, fps:11, th:'ผนึกตรามรณะ'}, rake:{n:6, fps:15, th:'ตะปบกรงเล็บ'}
+  seal:{n:5, fps:11, th:'ผนึกตรามรณะ'}, push:{n:5, fps:11, th:'ผลักพลัง'}, skyraise:{n:6, fps:10, th:'ชูไม้เท้าเรียกฟ้า'}, sweep:{n:5, fps:12, th:'กวาดแขนเป็นวง'}, kneelshot:{n:5, fps:10, th:'คุกเข่ายิง'}, sealfire:{n:5, fps:11, th:'ประสานมือพ่นไฟ'}, sealsky:{n:5, fps:11, th:'ประสานมือเหนือหัว'}, fanthrow:{n:5, fps:13, th:'สะบัดดาวเป็นพัด'}, rake:{n:6, fps:15, th:'ตะปบกรงเล็บ'}
 };
 const MOB_ACTIONS = {
   idle:{n:4, fps:5, loop:true, th:'ยืน'}, walk:{n:4, fps:8, loop:true, th:'เดิน'}, attack:{n:4, fps:10, th:'โจมตี'},
@@ -584,6 +584,34 @@ const SK_POSE = {
     P.elbL = P.elbR = [1.4, .35, .1, .5, 1.0][f]; P.legL = [.62, .4, .7, .5, .52][f]; P.legR = [-.52, -.6, -.7, -.5, -.42][f];
     P.liftL = 0; P.head = [.1, -.05, -.12, 0, .08][f]; P.mouth = f === 2 || f === 3 ? 1 : 0; P.sway = [.2, .6, 1, .6, .2][f]; },
   // (v116) Death Mark: the free hand draws the seal before the face, eyes shut, then the blade thrusts through it
+  /* (v325) more poses for the casters, the ninja and the hunter, all with the feet on the ground:
+     push      both palms thrust forward from the chest (bolts, lances, a burst of force)
+     skyraise  the staff lifted high in both hands, the head back, then swung down at the target (meteors, storms, lightning)
+     sweep     the arm swept in a wide arc across the body (waves, seas of frost, a curse spread over many)
+     kneelshot on one knee, bow level, a long draw and the release (a piercing or aimed shot)
+     sealfire  the hands in a sign at the mouth, then a breath out (fire jutsu)
+     sealsky   the hands joined above the head, then brought down (wind, lightning, the qilin)
+     fanthrow  the arms crossed, then flung out wide (a fan of shuriken or kunai) */
+  push(P, f){ P.armL = P.armR = [.9, .8, 1.56, 1.56, 1.0][f]; P.elbL = P.elbR = [1.7, 1.9, .06, .1, .9][f]; P.outL = [-.3, -.35, .22, .25, -.1][f]; P.outR = [-.3, -.35, .22, .25, -.1][f];
+    P.lean = [-.04, -.1, .24, .22, .05][f]; P.twist = [0, -.12, .05, .05, 0][f]; P.legL = [.15, .1, .52, .5, .2][f]; P.legR = [-.15, -.2, -.36, -.35, -.15][f]; P.bob = [-.4, -.7, -.9, -.8, -.3][f];
+    P.glow = f; P.mouth = f === 2 ? 1 : 0; P.aura = f >= 1 && f <= 3 ? f : -1; P.sparks = f === 2 ? 3 : -1; P.wpn = 1.9; },
+  skyraise(P, f){ P.armL = [1.2, 2.5, 3.0, 3.1, 3.0, 1.5][f]; P.armR = [1.3, 2.6, 3.05, 3.15, 3.0, 1.6][f]; P.elbL = P.elbR = [.8, .4, .15, .1, .15, .3][f]; P.outL = P.outR = [.05, .1, .15, .18, .15, .05][f];
+    P.head = [0, -.08, -.16, -.18, -.12, .05][f]; P.lean = [0, -.06, -.12, -.14, -.08, .18][f]; P.bob = [-.4, -.2, 0, .1, 0, -.9][f]; P.legL = .3; P.legR = -.25;
+    P.mouth = f >= 2 && f <= 4 ? 1 : 0; P.ring = f >= 1 && f <= 4 ? f : -1; P.aura = Math.min(4, f); P.glow = f; P.sparks = f >= 3 ? f : -1; P.wpn = 2.4; },
+  sweep(P, f){ P.armR = 1.45; P.elbR = [.6, .2, .1, .1, .5][f]; P.outR = [-.7, -.4, .5, 1.2, .6][f]; P.armL = [.9, .7, .6, .5, .8][f]; P.elbL = 1.2; P.outL = [.3, .3, .1, -.2, .1][f];
+    P.twist = [-.45, -.3, .2, .5, .2][f]; P.lean = [.0, .05, .14, .16, .05][f]; P.legL = .45; P.legR = -.35; P.bob = [-.6, -.8, -1, -.9, -.4][f]; P.sway = [-.8, -.4, .5, .9, .3][f];
+    P.glow = f; P.aura = f >= 1 && f <= 3 ? f : -1; P.mouth = f === 2 ? 1 : 0; P.wpn = 1.7; },
+  kneelshot(P, f){ P.kneel = 1; P.bob = -4.5; P.lean = .06; P.armL = 1.57; P.outL = .05; P.elbL = .05; P.armR = [1.3, 1.5, 1.55, 1.5, 1.2][f]; P.elbR = [.6, 1.6, 2.05, .3, .3][f]; P.outR = .08;
+    P.draw = [0, .7, 1, 0, 0][f]; P.arrow = f >= 1 && f <= 2; P.head = .02; P.eyes = f === 2 ? 'closed' : 'open'; },
+  sealfire(P, f){ P.armL = P.armR = [1.1, 1.45, 1.5, 1.2, .8][f]; P.elbL = P.elbR = [1.6, 2.2, 2.25, 1.4, 1.0][f]; P.outL = P.outR = [-.3, -.48, -.5, -.2, 0][f];
+    P.head = [0, .06, .04, -.06, 0][f]; P.lean = [0, -.04, .12, .2, .05][f]; P.legL = [.2, .2, .35, .45, .25][f]; P.legR = -.25; P.bob = [-.3, -.5, -.7, -.8, -.3][f];
+    P.mouth = f >= 2 && f <= 3 ? 1 : 0; P.eyes = f === 1 ? 'closed' : 'open'; P.aura = f >= 1 && f <= 3 ? 3 : -1; P.glow = f; P.wpn = 1.3; },
+  sealsky(P, f){ P.armL = P.armR = [1.2, 2.6, 2.9, 1.6, 1.0][f]; P.elbL = P.elbR = [1.5, 1.4, 1.2, .2, .6][f]; P.outL = P.outR = [-.25, -.4, -.45, .1, .1][f];
+    P.head = [0, -.08, -.12, .04, 0][f]; P.lean = [0, -.06, -.08, .24, .08][f]; P.legL = [.2, .2, .2, .55, .3][f]; P.legR = [-.2, -.2, -.2, -.45, -.25][f]; P.bob = [-.3, -.2, -.1, -1.2, -.4][f];
+    P.eyes = f === 2 ? 'closed' : 'open'; P.aura = f >= 1 && f <= 3 ? f + 1 : -1; P.ring = f === 2 || f === 3 ? f : -1; P.glow = f; P.mouth = f === 3 ? 1 : 0; P.wpn = 1.3; },
+  fanthrow(P, f){ P.armL = P.armR = [1.3, 1.35, 1.4, 1.3, .8][f]; P.elbL = P.elbR = [1.3, 1.5, .15, .1, .5][f]; P.outL = P.outR = [-.45, -.6, .9, 1.35, .5][f];
+    P.lean = [.05, .0, .18, .2, .05][f]; P.twist = [0, -.06, .04, 0, 0][f]; P.legL = [.25, .2, .5, .5, .25][f]; P.legR = [-.2, -.25, -.4, -.4, -.2][f]; P.bob = [-.5, -.8, -.9, -.8, -.3][f];
+    P.mouth = f === 2 ? 1 : 0; P.sparks = f === 2 || f === 3 ? f : -1; P.wpn = 1.3; },
   seal(P, f){ P.armL = [1.2, 1.75, 1.85, .6, .4][f]; P.elbL = [1.6, 1.95, 1.95, .6, .8][f]; P.outL = [.1, -.15, -.2, .2, .2][f];
     P.armR = [.4, .5, .6, 1.65, 1.5][f]; P.elbR = [1.2, 1.1, 1.0, .1, .2][f]; P.outR = [-.1, -.1, -.1, .05, 0][f];
     P.lean = [0, -.05, 0, .42, .26][f]; P.bob = [0, -.3, -.45, -1.3, -.6][f]; P.legL = [.2, .2, .25, .7, .5][f]; P.legR = [-.2, -.2, -.25, -.55, -.4][f];
