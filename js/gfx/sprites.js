@@ -592,6 +592,127 @@ const SK_POSE = {
      sealfire  the hands in a sign at the mouth, then a breath out (fire jutsu)
      sealsky   the hands joined above the head, then brought down (wind, lightning, the qilin)
      fanthrow  the arms crossed, then flung out wide (a fan of shuriken or kunai) */
+  /* (v329) more skill poses, so that no pose stands in for more than four skills of one class (the mage's «invoke» had eight):
+     orbit      the hands turn a ball of power in front of the chest (wards, barriers, links)
+     kneelpray  down on one knee, palms together, head bowed, then up (meditation, revival)
+     bless      both palms held out and lowered softly (healing light)
+     release    the arms crossed on the chest, then flung wide (a nova, a judgement, a falling sky)
+     beckon     one arm sweeps up from the ground, calling something out of it (summoned beasts, edicts)
+     staffspin  the staff turns like a wheel in front of the body (storms, seals, fortune)
+     sidestep   a quick step aside, the body leaning low and away (steps, blinks) — the feet stay down
+     focus      a hand to the brow, the eyes shut, a breath drawn in (instinct, hunting sense) */
+  orbit(P, f){ const a = f / 4 * Math.PI * 2; P.armL = 1.2 + Math.sin(a) * .18; P.armR = 1.25 - Math.sin(a) * .18; P.elbL = P.elbR = 1.6; P.outL = -.25 + Math.cos(a) * .2; P.outR = -.25 - Math.cos(a) * .2;
+    P.lean = .03; P.bob = -.5 + Math.sin(a) * .2; P.legL = .25; P.legR = -.2; P.glow = f; P.ring = f; P.aura = Math.min(3, f); P.eyes = f === 2 ? 'closed' : 'open'; P.wpn = 2.3; P.sway = Math.sin(a) * .3; },
+  kneelpray(P, f){ const k = f >= 1 && f <= 3; P.kneel = k ? 1 : 0; P.bob = k ? -4.5 : [-.6, 0, 0, 0, -.8][f]; P.armL = P.armR = [.8, 1.15, 1.2, 1.4, 1.0][f]; P.elbL = P.elbR = [1.0, 1.9, 2.0, 1.6, .9][f]; P.outL = P.outR = [-.1, -.45, -.48, -.4, -.1][f];
+    P.head = [0, .14, .16, -.06, 0][f]; P.lean = [0, .2, .22, .05, 0][f]; P.eyes = f >= 1 && f <= 2 ? 'closed' : 'open'; P.glow = f; P.aura = k ? f : -1; P.ring = f === 3 ? 3 : -1; P.wpn = 2.4; },
+  bless(P, f){ P.armL = P.armR = [.9, 1.35, 1.25, 1.05, .7][f]; P.elbL = P.elbR = [.9, .25, .2, .3, .8][f]; P.outL = P.outR = [.1, .15, .3, .45, .2][f]; P.lean = [0, .06, .1, .08, 0][f]; P.bob = [-.3, -.4, -.8, -.9, -.3][f];
+    P.head = [0, .04, .08, .08, 0][f]; P.legL = .2; P.legR = -.2; P.glow = f; P.aura = f >= 1 && f <= 3 ? f : -1; P.sparks = f === 2 ? 2 : -1; P.wpn = 2.3; P.eyes = f === 3 ? 'closed' : 'open'; },
+  release(P, f){ P.armL = P.armR = [1.1, 1.3, 1.6, 1.55, .9][f]; P.elbL = P.elbR = [1.6, 1.95, .1, .12, .7][f]; P.outL = P.outR = [-.5, -.72, 1.25, 1.3, .4][f];
+    P.lean = [0, .12, -.12, -.1, 0][f]; P.bob = [-.4, -1.2, .1, 0, -.4][f]; P.head = [0, .1, -.12, -.1, 0][f]; P.legL = .35; P.legR = -.3; P.mouth = f >= 2 && f <= 3 ? 1 : 0;
+    P.eyes = f === 1 ? 'closed' : 'open'; P.glow = f; P.aura = Math.min(4, f); P.ring = f >= 2 ? f : -1; P.sparks = f >= 2 && f <= 3 ? 3 : -1; P.wpn = 2.2; },
+  beckon(P, f){ P.armR = [.2, .6, 1.8, 2.6, 1.4][f]; P.elbR = [.3, .5, .4, .2, .5][f]; P.outR = [.1, .3, .25, .2, .15][f]; P.armL = [.5, .6, .9, 1.0, .6][f]; P.outL = [.4, .6, .8, .8, .4][f]; P.elbL = .5;
+    P.lean = [.2, .3, .05, -.1, 0][f]; P.bob = [-1.2, -1.8, -.6, 0, -.3][f]; P.head = [.1, .16, -.04, -.14, 0][f]; P.legL = .4; P.legR = -.35; P.twist = [-.2, -.3, .05, .15, 0][f];
+    P.glow = f; P.ring = f >= 2 ? f : -1; P.aura = f >= 2 ? f : -1; P.mouth = f === 3 ? 1 : 0; P.wpn = 2.2; },
+  staffspin(P, f){ P.armR = 1.35; P.elbR = .6; P.outR = .05; P.wpn = 1.7 + f * 1.26; P.armL = [.7, 1.1, .9, 1.1, .7][f]; P.elbL = .9; P.outL = .3;
+    P.lean = .05; P.bob = -.6 + Math.sin(f * 1.5) * .2; P.legL = .3; P.legR = -.25; P.twist = Math.sin(f * 1.3) * .15; P.glow = f; P.sparks = f; P.aura = Math.min(3, f); P.mouth = f === 3 ? 1 : 0; },
+  sidestep(P, f){ P.sway = [0, 1.2, 1.5, 1.3, .3][f]; P.lean = [.05, .18, .2, .16, .04][f]; P.bob = [-.4, -1.6, -1.8, -1.5, -.4][f]; P.legL = [.2, .55, .6, .55, .25][f]; P.legR = [-.2, -.5, -.55, -.5, -.2][f];
+    P.armL = [.3, .9, 1.0, .8, .3][f]; P.outL = [.3, .9, 1.0, .8, .3][f]; P.elbL = .4; P.armR = [.4, .3, .2, .3, .4][f]; P.outR = [.2, -.2, -.3, -.2, .2][f]; P.elbR = .8; P.twist = [0, .3, .35, .3, 0][f]; P.head = [0, -.04, -.04, 0, 0][f]; },
+  focus(P, f){ P.armL = [.6, 2.0, 2.3, 2.2, .7][f]; P.elbL = [.8, 2.3, 2.6, 2.5, .8][f]; P.outL = [.2, .05, -.05, 0, .2][f]; P.armR = [.4, .5, .5, .5, .4][f]; P.elbR = .7; P.outR = .2;
+    P.head = [0, .08, .1, -.06, 0][f]; P.lean = [0, .04, .06, .02, 0][f]; P.bob = [-.3, -.6, -.8, -.4, -.2][f]; P.legL = .25; P.legR = -.2; P.eyes = f >= 1 && f <= 2 ? 'closed' : 'open'; P.aura = f >= 2 ? f : -1; P.glow = f; P.sparks = f === 3 ? 2 : -1; },
+  /* (v329) the normal attack as a three-hit combo, its own for each class line (js/sys/combo329.js plays them in turn).
+     Every one keeps both feet on the ground: the power comes from the hips, the shoulders and a step. */
+  // swordsman: a diagonal cut down → a rising backhand cut → a lunging thrust
+  c_sw1(P, f){ P.armR = [.7, 2.75, 1.9, .55, .4][f]; P.elbR = [.4, .9, .15, .1, .4][f]; P.outR = [.3, .7, .15, -.45, .1][f]; P.wpn = [1.6, 1.0, 1.2, .9, 1.5][f];
+    P.armL = [.2, .55, .3, -.25, .1][f]; P.elbL = [.3, .9, .6, .3, .3][f]; P.lean = [0, -.1, .14, .22, .04][f]; P.twist = [0, -.45, .15, .45, .1][f];
+    P.legL = [0, -.12, .4, .52, .12][f]; P.legR = -P.legL * .7; P.bob = [0, .3, -.3, -1.1, -.2][f]; P.sway = [0, .5, -.2, -.7, -.2][f]; P.mouth = f === 2 ? 1 : 0; },
+  c_sw2(P, f){ P.armR = [.45, .3, 1.5, 2.45, 1.0][f]; P.elbR = [.6, .5, .1, .2, .4][f]; P.outR = [-.35, -.55, .3, .85, .2][f]; P.wpn = [2.0, 2.4, 1.6, 1.2, 1.6][f];
+    P.armL = [.3, .5, .2, -.3, .1][f]; P.elbL = [.5, .9, .5, .3, .3][f]; P.lean = [.06, .14, .1, -.06, .02][f]; P.twist = [.1, .45, -.1, -.45, 0][f];
+    P.legL = [.2, .35, .45, .3, .1][f]; P.legR = [-.15, -.3, -.38, -.25, -.1][f]; P.bob = [-.4, -1.0, -.6, .1, -.2][f]; P.sway = [.2, .7, -.1, -.6, 0][f]; },
+  c_sw3(P, f){ P.bob = [-.6, -1.2, -1.7, -1.5, -.3][f]; P.lean = [-.08, -.04, .4, .38, .06][f]; P.legL = [.1, .2, .85, .8, .2][f]; P.legR = [-.1, -.2, -.72, -.7, -.15][f];
+    P.armR = [.8, .9, 1.57, 1.55, .7][f]; P.elbR = [1.2, 1.9, .05, .06, .5][f]; P.outR = [.1, .2, -.02, -.02, .1][f]; P.wpn = [1.6, 1.7, 1.57, 1.57, 1.6][f];
+    P.armL = [.4, .7, -.4, -.4, .1][f]; P.outL = [.2, .2, .45, .45, .2][f]; P.elbL = .4; P.twist = [-.3, -.45, .3, .28, 0][f]; P.sway = [.3, .5, -1, -.9, 0][f]; P.mouth = f === 2 ? 1 : 0; },
+  // mage: the staff levels like a wand → the free palm throws a spark → the staff comes down from overhead
+  c_mg1(P, f){ P.armR = [1.0, 1.3, 1.57, 1.5, 1.1][f]; P.elbR = [.9, 1.3, .05, .1, .6][f]; P.outR = [.1, .15, -.05, -.05, .1][f]; P.wpn = [2.1, 2.2, 1.57, 1.6, 1.9][f];
+    P.armL = .6; P.elbL = 1.2; P.outL = .25; P.lean = [0, -.05, .14, .12, .03][f]; P.twist = [0, -.2, .2, .18, 0][f]; P.legL = [.1, .1, .35, .3, .1][f]; P.legR = -.2; P.glow = f; P.sparks = f === 2 ? 2 : -1; },
+  c_mg2(P, f){ P.armL = [.5, 1.2, 1.58, 1.5, .6][f]; P.elbL = [1.0, 1.9, .05, .1, .8][f]; P.outL = [.2, -.1, -.08, -.05, .2][f]; P.armR = [.9, .8, .6, .6, .8][f]; P.elbR = .8; P.outR = .3; P.wpn = 2.3;
+    P.lean = [0, -.06, .16, .14, .02][f]; P.twist = [0, .3, -.32, -.3, 0][f]; P.legR = [-.1, -.1, -.4, -.38, -.1][f]; P.legL = .2; P.sway = [0, .4, -.6, -.5, 0][f]; P.glow = f; P.mouth = f === 2 ? 1 : 0; },
+  c_mg3(P, f){ P.armR = [1.0, 2.6, 3.0, 1.3, .8][f]; P.armL = [.8, 2.4, 2.8, 1.2, .6][f]; P.elbR = P.elbL = [.8, .4, .3, .15, .5][f]; P.outR = P.outL = [.15, .1, .1, .05, .15][f]; P.wpn = [2.0, 1.8, 1.6, 1.0, 1.6][f];
+    P.lean = [0, -.12, -.16, .32, .1][f]; P.bob = [-.3, .1, .2, -1.6, -.5][f]; P.legL = .35; P.legR = -.3; P.glow = f; P.aura = f >= 1 && f <= 3 ? f : -1; P.sparks = f === 3 ? 3 : -1; P.mouth = f === 3 ? 1 : 0; },
+  // hunter: a quick snap shot from the hip → a turned shot → a full draw leaning back
+  c_ar1(P, f){ P.armL = 1.35; P.outL = .1; P.elbL = .1; P.armR = [1.0, 1.2, 1.25, 1.0, .6][f]; P.elbR = [.6, 1.3, 1.8, .3, .3][f]; P.outR = .1; P.draw = [0, .45, .7, 0, 0][f]; P.arrow = f >= 1 && f <= 2;
+    P.lean = [.05, .1, .12, .04, 0][f]; P.twist = [0, -.18, -.28, .05, 0][f]; P.bob = -.6; P.legL = .3; P.legR = -.2; },
+  c_ar2(P, f){ P.armL = 1.5; P.outL = [.1, .25, .3, .25, .1][f]; P.elbL = .05; P.armR = [1.0, 1.4, 1.48, 1.2, .5][f]; P.elbR = [.6, 1.7, 2.2, .3, .3][f]; P.outR = [.1, .3, .35, .2, .1][f]; P.draw = [0, .7, 1, 0, 0][f]; P.arrow = f >= 1 && f <= 2;
+    P.twist = [.3, .45, .5, .2, 0][f]; P.lean = [0, .04, .05, 0, 0][f]; P.legL = [.1, -.2, -.25, -.1, .1][f]; P.legR = [-.1, .3, .32, .1, -.1][f]; P.sway = [0, .6, .7, .3, 0][f]; },
+  c_ar3(P, f){ P.armL = [1.5, 1.75, 1.8, 1.6, 1.4][f]; P.outL = .05; P.elbL = .05; P.armR = [1.1, 1.6, 1.7, 1.3, .6][f]; P.elbR = [.6, 2.0, 2.4, .3, .3][f]; P.outR = .1; P.draw = [0, .8, 1, 0, 0][f]; P.arrow = f >= 1 && f <= 2;
+    P.lean = [0, -.14, -.2, .08, 0][f]; P.twist = [0, -.35, -.45, .1, 0][f]; P.bob = [-.3, -.9, -1.2, -.5, -.2][f]; P.legL = .42; P.legR = -.36; P.head = [0, -.06, -.1, 0, 0][f]; P.glow = f; P.eyes = f === 2 ? 'closed' : 'open'; },
+  // muay thai: jab–cross → a low roundhouse (the kicking foot stays near the ground) → a rising elbow
+  c_mt1(P, f){ GUARD(P); P.lean = .08; P.legL = .35; P.legR = -.3; P.bob = -.6;
+    if (f === 1){ P.armL = 1.58; P.elbL = .04; P.outL = -.05; P.twist = -.3; P.lean = .14; }
+    if (f === 3){ P.armR = 1.58; P.elbR = .04; P.outR = -.06; P.twist = .42; P.lean = .18; P.legR = -.45; P.mouth = 1; } },
+  c_mt2(P, f){ GUARD(P); P.twist = [0, .2, .55, .6, .1][f]; P.lean = [.05, -.06, -.14, -.12, .02][f]; P.legL = [.3, .5, 1.05, .95, .35][f]; P.liftL = [0, .6, 1.4, 1.0, 0][f];
+    P.legR = -.25; P.bob = [-.5, -.7, -1.0, -.9, -.4][f]; if (f >= 2 && f <= 3){ P.armR = -.25; P.outR = .7; P.elbR = .3; } P.mouth = f === 2 ? 1 : 0; },
+  c_mt3(P, f){ GUARD(P); P.armR = [1.0, 1.4, 2.4, 2.3, 1.0][f]; P.elbR = [1.8, 2.3, 2.6, 2.5, 1.6][f]; P.outR = [.2, .1, -.3, -.3, .1][f]; P.twist = [0, -.25, .45, .5, .1][f];
+    P.lean = [.05, .1, .2, .18, .05][f]; P.legL = [.3, .4, .55, .5, .3][f]; P.legR = [-.3, -.35, -.45, -.42, -.3][f]; P.bob = [-.5, -1.0, -.3, -.4, -.5][f]; P.mouth = f === 2 ? 1 : 0; P.sparks = f === 2 ? 2 : -1; },
+  // healer: the staff taps forward → the free hand sweeps a blessing → the staff rises and points
+  c_hl1(P, f){ P.armR = [.8, 1.0, 1.4, 1.3, .9][f]; P.elbR = [.8, 1.2, .2, .2, .6][f]; P.outR = .1; P.wpn = [2.1, 2.2, 1.7, 1.75, 2.0][f]; P.armL = .45; P.elbL = 1.0; P.outL = .2;
+    P.lean = [0, -.03, .1, .08, 0][f]; P.legL = [.1, .1, .3, .28, .1][f]; P.legR = -.15; P.glow = f; },
+  c_hl2(P, f){ P.armL = [.5, 1.0, 1.35, 1.25, .6][f]; P.elbL = [1.0, .4, .1, .2, .7][f]; P.outL = [-.4, -.2, .4, .9, .3][f]; P.armR = .8; P.elbR = .9; P.outR = .2; P.wpn = 2.3;
+    P.twist = [0, .25, -.15, -.35, 0][f]; P.lean = [0, .03, .08, .06, 0][f]; P.legL = .2; P.legR = -.2; P.sway = [0, .3, -.3, -.6, 0][f]; P.glow = f; P.aura = f >= 2 && f <= 3 ? 2 : -1; },
+  c_hl3(P, f){ P.armR = [1.0, 2.2, 2.4, 1.6, 1.0][f]; P.elbR = [.7, .3, .2, .05, .5][f]; P.outR = [.1, .15, .15, -.02, .1][f]; P.wpn = [2.0, 2.3, 2.3, 1.6, 1.9][f]; P.armL = [.5, 1.3, 1.4, .8, .5][f]; P.elbL = [1.0, .6, .5, .8, .9][f]; P.outL = .3;
+    P.head = [0, -.06, -.08, .02, 0][f]; P.lean = [0, -.06, -.08, .16, .04][f]; P.bob = [-.2, .1, .2, -.8, -.3][f]; P.legL = .3; P.legR = -.25; P.glow = f; P.ring = f >= 1 && f <= 3 ? f : -1; P.mouth = f === 2 ? 1 : 0; },
+  // rogue: a slash → a backhand slash → a low stab
+  c_dg1(P, f){ P.armR = [.5, 1.6, 1.3, .65, .4][f]; P.elbR = [.8, 1.6, .05, .15, .5][f]; P.outR = [.2, 1.0, -.3, -.5, .08][f]; P.wpn = [1.7, .9, 1.7, 2.1, 1.7][f];
+    P.armL = [.3, .7, -.2, -.3, .15][f]; P.elbL = [.5, 1.2, .5, .45, .4][f]; P.outL = .25; P.lean = [.05, -.05, .22, .18, .04][f]; P.twist = [0, -.45, .38, .5, .08][f];
+    P.legL = [.1, -.1, .5, .45, .1][f]; P.legR = -P.legL * .6; P.bob = [-.4, .1, -.9, -.7, -.2][f]; P.sway = [0, .5, -.6, -.7, -.1][f]; },
+  c_dg2(P, f){ P.armR = [.5, .4, 1.3, 1.5, .5][f]; P.elbR = [.8, 1.6, .2, .1, .5][f]; P.outR = [-.3, -.6, .5, 1.0, .1][f]; P.wpn = [1.7, 2.3, 1.4, 1.1, 1.7][f];
+    P.armL = [.3, .5, .2, -.2, .1][f]; P.elbL = .5; P.outL = .3; P.lean = [.1, .16, .14, .08, .04][f]; P.twist = [.1, .5, -.2, -.5, 0][f];
+    P.legL = [.3, .45, .4, .3, .15][f]; P.legR = [-.2, -.35, -.3, -.25, -.1][f]; P.bob = [-.8, -1.4, -1.1, -.8, -.3][f]; P.sway = [.2, .7, -.2, -.7, 0][f]; },
+  c_dg3(P, f){ P.bob = [-1.2, -2.4, -2.6, -1.8, -.4][f]; P.lean = [.2, .3, .46, .4, .06][f]; P.legL = [.3, .5, .8, .75, .2][f]; P.legR = [-.3, -.45, -.68, -.65, -.15][f];
+    P.armR = [.3, .1, 1.45, 1.4, .5][f]; P.elbR = [1.2, 1.6, .06, .1, .5][f]; P.outR = [.1, .3, -.05, -.05, .1][f]; P.wpn = [1.8, 2.2, 1.6, 1.6, 1.7][f];
+    P.armL = [.4, .9, .2, .1, .2][f]; P.elbL = 1.0; P.outL = -.1; P.twist = [-.2, -.35, .3, .28, 0][f]; P.sway = [.3, .6, -.8, -.7, 0][f]; P.eyes = f === 2 ? 'closed' : 'open'; },
+  // summoner: the staff points the way → the free hand beckons in a circle → both hands drive the staff forward
+  c_sm1(P, f){ P.armR = [1.1, 1.5, 1.57, 1.3, 1.0][f]; P.elbR = [.9, .1, .05, .3, .6][f]; P.outR = [.2, .35, .4, .3, .15][f]; P.wpn = [2.1, 1.7, 1.6, 1.8, 2.0][f]; P.armL = .5; P.elbL = 1.1; P.outL = .3;
+    P.twist = [0, .25, .3, .2, 0][f]; P.lean = [0, .08, .1, .06, 0][f]; P.legL = .25; P.legR = -.2; P.glow = f; P.sparks = f === 2 ? 1 : -1; },
+  c_sm2(P, f){ const a = f / 4 * Math.PI * 2; P.armL = 1.3 + Math.sin(a) * .35; P.elbL = .5 + Math.cos(a) * .3; P.outL = .3 + Math.cos(a) * .35; P.armR = .9; P.elbR = .8; P.outR = .2; P.wpn = 2.3;
+    P.twist = Math.sin(a) * -.2; P.lean = .04; P.legL = .2; P.legR = -.2; P.bob = -.4 + Math.sin(a) * .2; P.glow = f; P.aura = f >= 1 && f <= 3 ? f : -1; P.mouth = f === 2 ? 1 : 0; },
+  c_sm3(P, f){ P.armR = [.9, 1.0, 1.55, 1.5, .9][f]; P.armL = [.8, .9, 1.4, 1.35, .7][f]; P.elbR = [1.2, 1.8, .1, .12, .7][f]; P.elbL = [1.3, 1.9, .3, .32, .8][f]; P.outR = .05; P.outL = -.2; P.wpn = [1.9, 1.8, 1.57, 1.57, 1.8][f];
+    P.lean = [0, -.1, .3, .28, .04][f]; P.bob = [-.4, -.8, -1.4, -1.2, -.3][f]; P.legL = [.2, .2, .65, .6, .2][f]; P.legR = [-.2, -.2, -.55, -.5, -.15][f]; P.twist = [0, -.2, .1, .1, 0][f]; P.glow = f; P.sparks = f === 2 ? 3 : -1; },
+  // hexer: a finger points the curse → a clawing swipe of shadow → the staff jabs with a hiss
+  c_oc1(P, f){ P.armL = [.5, 1.2, 1.58, 1.55, .7][f]; P.elbL = [1.1, 1.4, .03, .05, .8][f]; P.outL = [.2, .0, -.06, -.06, .2][f]; P.armR = .7; P.elbR = .9; P.outR = .3; P.wpn = 2.2;
+    P.head = [0, .04, .08, .06, 0][f]; P.lean = [0, .05, .16, .14, .02][f]; P.twist = [0, .2, -.3, -.28, 0][f]; P.legR = -.35; P.legL = .15; P.eyes = f === 1 ? 'closed' : 'open'; P.glow = f; P.mouth = f === 2 ? 1 : 0; },
+  c_oc2(P, f){ P.armL = [.6, 2.2, 1.0, .5, .5][f]; P.elbL = [1.2, .4, .3, .6, .9][f]; P.outL = [.2, .5, -.2, -.4, .2][f]; P.armR = .7; P.elbR = 1.0; P.outR = .3; P.wpn = 2.2;
+    P.lean = [.05, -.04, .26, .3, .06][f]; P.twist = [0, .35, -.3, -.45, 0][f]; P.bob = [-.5, -.2, -1.2, -1.4, -.4][f]; P.legL = .3; P.legR = -.3; P.sway = [0, .5, -.6, -.8, 0][f]; P.glow = f; P.aura = f === 2 ? 2 : -1; },
+  c_oc3(P, f){ P.armR = [.6, .4, 1.57, 1.55, .8][f]; P.elbR = [1.1, 1.8, .05, .08, .7][f]; P.outR = [.2, .25, .0, .0, .2][f]; P.wpn = [2.0, 2.3, 1.57, 1.57, 1.9][f]; P.armL = [.5, .6, .9, .9, .5][f]; P.elbL = 1.6; P.outL = -.2;
+    P.lean = [0, -.12, .34, .32, .05][f]; P.bob = [-.3, -.2, -1.3, -1.2, -.3][f]; P.legL = [.1, .05, .7, .65, .15][f]; P.legR = [-.1, -.05, -.6, -.55, -.1][f]; P.twist = [0, -.3, .2, .2, 0][f]; P.mouth = f === 2 ? 1 : 0; P.glow = f; },
+  // merchant: a slanting chop → a level sweep → an overhead two-hand chop
+  c_ax1(P, f){ P.armR = [.6, 2.5, 1.7, .5, .4][f]; P.elbR = [.5, .8, .2, .15, .4][f]; P.outR = [.4, .9, .3, -.3, .1][f]; P.wpn = [1.6, 1.0, 1.0, .9, 1.5][f]; P.armL = [.2, .5, .3, -.1, .1][f]; P.elbL = .5;
+    P.lean = [0, -.1, .18, .24, .04][f]; P.twist = [0, -.5, .2, .5, .1][f]; P.legL = [0, -.1, .45, .52, .12][f]; P.legR = -P.legL * .7; P.bob = [0, .2, -.5, -1.2, -.2][f]; P.sway = [0, .6, -.3, -.8, -.2][f]; },
+  c_ax2(P, f){ P.armR = 1.45; P.elbR = [.4, .2, .1, .1, .4][f]; P.outR = [-.6, -.9, .4, 1.2, .3][f]; P.wpn = 1.55; P.armL = [.6, .9, .6, .4, .5][f]; P.outL = [.4, .6, .1, -.2, .2][f]; P.elbL = .6;
+    P.twist = [-.3, -.6, .25, .7, .1][f]; P.lean = [.06, .1, .16, .14, .04][f]; P.legL = .45; P.legR = -.35; P.bob = [-.6, -.9, -1.2, -1.1, -.4][f]; P.sway = [-.3, -.7, .5, 1.0, .2][f]; P.mouth = f === 2 ? 1 : 0; },
+  c_ax3(P, f){ P.bob = [-.8, .1, .2, -1.8, -2.4][f]; P.lean = [.08, -.14, -.16, .38, .44][f]; P.armR = [.5, 2.9, 3.15, 1.0, .9][f]; P.armL = [.4, 2.7, 3.0, 1.0, .9][f]; P.elbR = [.8, .4, .5, .1, .1][f]; P.elbL = [.8, .5, .6, .2, .2][f];
+    P.legL = [.3, .32, .34, .5, .52][f]; P.legR = [-.3, -.32, -.34, -.5, -.52][f]; P.wpn = [1.7, 1.3, 1.1, .7, .7][f]; P.mouth = f >= 3 ? 1 : 0; P.sparks = f === 3 ? 3 : -1; P.sway = [0, -.5, -.7, .8, .6][f]; },
+  // catfolk: the left paw rakes → the right paw rakes → both paws strike from a low crouch (it stays on its feet)
+  c_ct1(P, f){ P.lean = [.25, .3, .36, .3, .25][f]; P.bob = [-1.2, -.8, -1.4, -1.3, -1.0][f]; P.armL = [.6, 2.1, .9, .5, .6][f]; P.elbL = [1.2, .3, .7, 1.0, 1.1][f]; P.outL = [.15, .3, -.25, -.3, .15][f];
+    P.armR = .6; P.elbR = 1.3; P.outR = -.1; P.twist = [0, .25, -.3, -.3, 0][f]; P.legL = .45; P.legR = -.4; P.mouth = f === 2 ? 1 : 0; },
+  c_ct2(P, f){ P.lean = [.25, .3, .36, .3, .25][f]; P.bob = [-1.0, -.6, -1.4, -1.3, -1.0][f]; P.armR = [.6, 2.2, .9, .5, .6][f]; P.elbR = [1.2, .25, .7, 1.0, 1.1][f]; P.outR = [-.15, .3, -.3, -.35, -.1][f];
+    P.armL = .6; P.elbL = 1.3; P.outL = .15; P.twist = [0, -.25, .35, .32, 0][f]; P.legL = .45; P.legR = -.4; P.mouth = f === 2 ? 1 : 0; },
+  c_ct3(P, f){ P.bob = [-1.4, -2.6, -1.6, -1.5, -.8][f]; P.lean = [.3, .45, .4, .36, .2][f]; P.legL = [.5, .55, .8, .75, .4][f]; P.legR = [-.4, -.5, -.7, -.65, -.35][f];
+    P.armR = P.armL = [.6, .3, 1.5, 1.45, .7][f]; P.elbR = P.elbL = [1.3, 1.7, .2, .25, 1.0][f]; P.outR = [-.1, .2, -.15, -.15, -.1][f]; P.outL = [.1, .3, -.15, -.15, .1][f]; P.mouth = f >= 2 && f <= 3 ? 1 : 0; P.sparks = f === 2 ? 3 : -1; },
+  // dogfolk: a thrust → a turning side cut → a rising cut with a growl
+  c_dog1(P, f){ P.bob = [-.4, -.8, -1.4, -1.2, -.3][f]; P.lean = [0, -.02, .32, .3, .04][f]; P.legL = [.1, .15, .7, .65, .15][f]; P.legR = [-.1, -.15, -.6, -.55, -.1][f];
+    P.armR = [.7, .8, 1.57, 1.55, .7][f]; P.elbR = [1.1, 1.8, .05, .06, .5][f]; P.outR = .05; P.wpn = [1.6, 1.7, 1.57, 1.57, 1.6][f]; P.armL = [.4, .6, -.3, -.3, .1][f]; P.outL = .35; P.elbL = .5; P.twist = [-.2, -.35, .25, .25, 0][f]; },
+  c_dog2(P, f){ P.armR = [1.0, 1.4, 1.45, 1.4, .9][f]; P.elbR = [.6, .3, .1, .1, .4][f]; P.outR = [-.5, -.8, .5, 1.1, .3][f]; P.wpn = [1.6, 1.4, 1.55, 1.5, 1.6][f]; P.armL = [.5, .7, .4, .2, .3][f]; P.outL = [.3, .5, .1, -.2, .2][f]; P.elbL = .6;
+    P.twist = [-.2, -.55, .3, .65, .1][f]; P.lean = [.05, .1, .16, .12, .04][f]; P.legL = .4; P.legR = -.32; P.bob = [-.5, -.8, -1.1, -1.0, -.3][f]; P.sway = [-.2, -.6, .5, .9, .2][f]; },
+  c_dog3(P, f){ P.armR = [.4, .2, 1.4, 2.6, 1.2][f]; P.elbR = [.6, .8, .2, .2, .4][f]; P.outR = [-.2, -.3, .2, .5, .2][f]; P.wpn = [2.0, 2.4, 1.6, 1.0, 1.5][f]; P.armL = [.3, .5, .4, .2, .2][f]; P.elbL = .7; P.outL = .3;
+    P.bob = [-.8, -1.8, -.8, .2, -.3][f]; P.lean = [.1, .3, .1, -.12, .02][f]; P.legL = [.3, .5, .45, .3, .2][f]; P.legR = [-.25, -.42, -.38, -.25, -.15][f]; P.twist = [0, .3, -.1, -.3, 0][f]; P.mouth = f >= 2 && f <= 3 ? 1 : 0; P.head = [0, .06, -.04, -.1, 0][f]; },
+  // ninja: a star from the right → a backhand star → a low sidearm throw of two
+  c_nj1(P, f){ P.armR = [.5, 1.9, 1.35, .75, .4][f]; P.elbR = [.7, 2.0, .25, .1, .5][f]; P.outR = [.2, .55, .05, -.2, .1][f]; P.wpn = [1.7, 2.6, 1.5, 1.2, 1.7][f]; P.armL = [.4, 1.25, .9, .35, .2][f]; P.elbL = .3; P.outL = .15;
+    P.lean = [0, -.06, .14, .12, .03][f]; P.twist = [0, -.4, .3, .38, .06][f]; P.legL = [0, -.1, .4, .36, .08][f]; P.legR = -P.legL * .6; P.bob = [0, .2, -.6, -.5, -.1][f]; P.thrown = f === 2 || f === 3; },
+  c_nj2(P, f){ P.armR = [.5, .9, 1.4, 1.3, .5][f]; P.elbR = [.8, 2.2, .3, .2, .6][f]; P.outR = [-.2, -.7, .6, .9, .1][f]; P.wpn = [1.7, 2.4, 1.4, 1.2, 1.7][f]; P.armL = .5; P.elbL = .7; P.outL = .3;
+    P.twist = [.1, .5, -.3, -.5, 0][f]; P.lean = [.04, .1, .14, .1, .02][f]; P.legL = .3; P.legR = -.28; P.bob = [-.5, -.9, -1.0, -.8, -.3][f]; P.sway = [.2, .6, -.4, -.7, 0][f]; P.thrown = f === 2 || f === 3; },
+  c_nj3(P, f){ P.bob = [-1.0, -2.2, -2.4, -2.0, -.6][f]; P.lean = [.15, .3, .36, .3, .06][f]; P.legL = [.3, .6, .7, .65, .25][f]; P.legR = [-.3, -.55, -.62, -.58, -.2][f];
+    P.armR = [.6, .9, 1.3, 1.25, .5][f]; P.elbR = [.6, 1.0, .1, .1, .5][f]; P.outR = [.3, .9, -.3, -.5, .1][f]; P.wpn = 1.6; P.armL = [.5, .8, 1.2, 1.15, .4][f]; P.elbL = [.6, 1.0, .1, .1, .5][f]; P.outL = [-.2, .6, -.4, -.5, .1][f];
+    P.twist = [0, -.45, .35, .45, 0][f]; P.sway = [0, .6, -.6, -.8, 0][f]; P.thrown = f >= 2 && f <= 3; P.eyes = f === 2 ? 'closed' : 'open'; },
   push(P, f){ P.armL = P.armR = [.9, .8, 1.56, 1.56, 1.0][f]; P.elbL = P.elbR = [1.7, 1.9, .06, .1, .9][f]; P.outL = [-.3, -.35, .22, .25, -.1][f]; P.outR = [-.3, -.35, .22, .25, -.1][f];
     P.lean = [-.04, -.1, .24, .22, .05][f]; P.twist = [0, -.12, .05, .05, 0][f]; P.legL = [.15, .1, .52, .5, .2][f]; P.legR = [-.15, -.2, -.36, -.35, -.15][f]; P.bob = [-.4, -.7, -.9, -.8, -.3][f];
     P.glow = f; P.mouth = f === 2 ? 1 : 0; P.aura = f >= 1 && f <= 3 ? f : -1; P.sparks = f === 2 ? 3 : -1; P.wpn = 1.9; },
