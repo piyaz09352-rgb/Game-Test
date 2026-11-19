@@ -199,3 +199,8 @@ html body.h6w .win input[type=range], html body.h6w .win input[type=checkbox], h
 html body.h6lite #ui.ui.h6 *, html body.h6lite #ui.ui.h6 *::before, html body.h6lite #ui.ui.h6 *::after, html body.h6lite #h6Icons *, html body.h6lite #h6Icons *::before, html body.h6lite #h6Icons *::after{ animation:none !important; }
 html body.h6lite #ui.ui.h6 *, html body.h6lite .win{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
 html body.h6lite #ui.ui.h6 #goalCard, html body.h6lite #ui.ui.h6 #mapCard, html body.h6lite #ui.ui.h6 #target.card.target, html body.h6lite #ui#ui.ui.h6 #charCard#charCard.card.char{ background-color:rgba(16,14,38,.82) !important; }
+/* (v330) the death screen: the owner saw it flicker fast on a phone. While dead the game canvas is greyed through a CSS
+   filter every frame; the HUD's glass panels blurred that filtered canvas again behind each panel and its rims kept
+   turning — on phone graphics chips that stack flickers. While the death screen is up the HUD is plain and still. */
+html body #wrap.dthon #ui.ui.h6 *, html body #wrap.dthon #ui.ui.h6 *::before, html body #wrap.dthon #ui.ui.h6 *::after{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+html body #wrap.dthon #ui.ui.h6 :not(#dth):not(#dth *), html body #wrap.dthon #ui.ui.h6 :not(#dth):not(#dth *)::before, html body #wrap.dthon #ui.ui.h6 :not(#dth):not(#dth *)::after, html body #wrap.dthon #h6Icons *, html body #wrap.dthon #h6Icons *::before, html body #wrap.dthon #h6Icons *::after{ animation-play-state:paused !important; }
