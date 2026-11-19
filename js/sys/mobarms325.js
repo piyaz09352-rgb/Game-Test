@@ -28,12 +28,35 @@ const MA325 = {
     asuramaze_lord:{weapon:'dagger', katana:1}, skygarden_lord:{weapon:'sword', spear:1}, mangrove_lord:{weapon:'sword', spear:1},
     gloom_lord:{weapon:'dagger', claw:1}, sapphire_lord:{weapon:'dagger', claw:1}, suncourt_lord:{weapon:'sword'}},
   tier:{fire:2, shadow:3, earth:4, holy:5},   // the metal by element (sprites.js BL: steel, steel, ember, obsidian, jade, sun)
-  col:{}, wing:new Set()};
+  col:{}, wing:new Set(),
+  // (v325) the owner (a brown wooden sentinel with a plain white wing): «wings and characters like this, I don't want them:
+  // colourful, in beautiful outfits». The plain painted wings that js/gfx/variety.js gave some human monsters are gone; the
+  // ones whose legend has wings wear a fitting fashion wing (the krahang keeps its winnowing baskets: that is the legend)
+  mobWing:{kinnorn:'w_swan', goldkinnaree:'tws_kanok', impling:'w_bat', flamefiend:'w_devil', demonknight:'w_fallen', dragonknight:'w_dragon', dragoncultist:'w_raven'},
+  keepWing:new Set(['krahang', 'krahangluang']),
+  // outfits by element for monsters in drab clothes: [top, pants, trim]
+  dress:{fire:[['scarlet', 'wine', 'gold'], ['sunset', 'crimson', 'gold'], ['coral', 'wine', 'gold']],
+    water:[['royalBlue', 'ivory', 'gold'], ['aqua', 'navy', 'silver'], ['peacock', 'navy', 'gold']],
+    earth:[['forest', 'sand', 'gold'], ['emerald', 'bronze', 'gold'], ['teal', 'ochre', 'gold']],
+    wind:[['mint', 'teal', 'ivory'], ['sky', 'royalBlue', 'silver'], ['teal', 'cream', 'gold']],
+    holy:[['ivory', 'gold', 'gold'], ['cream', 'sky', 'gold'], ['sakura', 'ivory', 'gold']],
+    shadow:[['plum', 'midnight', 'gold'], ['wine', 'indigoD', 'silver'], ['lavender', 'plum', 'silver'], ['crimsonV', 'onyx', 'gold']],
+    neutral:[['navy', 'scarlet', 'gold'], ['rose', 'navy', 'gold']]}};
+const ma325Drab = mat => { const d = SPR.MATS[SPR.M[mat]], hx = d && d.hex && d.hex[1]; if (!hx) return false;
+  const [r, g, b] = [1, 3, 5].map(i => parseInt(hx.substr(i, 2), 16) / 255), mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, sat = mx === mn ? 0 : (mx - mn) / (1 - Math.abs(2 * l - 1));
+  const hu = mx === mn ? 0 : mx === r ? ((g - b) / (mx - mn) + 6) % 6 * 60 : mx === g ? ((b - r) / (mx - mn) + 2) * 60 : ((r - g) / (mx - mn) + 4) * 60;
+  return sat < .32 || l < .2 || l > .9 || (hu > 12 && hu < 50 && l < .4); };   // grey, black, washed-out white, or dark brown
+const ma325Near = (a, b) => { const A = SPR.MATS[SPR.M[a]], B = SPR.MATS[SPR.M[b]]; if (!A || !B || !A.ramp || !B.ramp) return false; const p = A.ramp[1], q = B.ramp[1]; return Math.hypot(p[0] - q[0], p[1] - q[1], p[2] - q[2]) < 70; };   // clothes the colour of the skin
 { const armed = [];
   for (const k in SPR.MOBS){ const h = SPR.MOBS[k].human; if (!h) continue; const a = MA325.arms[k], d = (typeof MOB !== 'undefined' && MOB[k]) || {};
     if (a){ for (const f of ['mace', 'spear', 'axe', 'twoHand', 'katana', 'claw']) delete h[f]; Object.assign(h, a); }
     if (h.weapon && h.weapon !== 'fist'){ if (h.wTier == null) h.wTier = MA325.tier[d.elem] ?? 1; armed.push(k); }
-    if (d.boss && h.wings){ MA325.wing.add(k); delete h.wings; delete h.wingTip; } }
+    if (d.boss && h.wings){ MA325.wing.add(k); delete h.wings; delete h.wingTip; }
+    else if (h.wings && !MA325.keepWing.has(k)){ delete h.wings; delete h.wingTip; }
+    // a drab outfit becomes a colourful one in the monster's element (the skin, hair and face stay its own)
+    if ((ma325Drab(h.top) && ma325Drab(h.pants)) || ma325Near(h.top, h.skinM)){ const P = MA325.dress[d.elem] || MA325.dress.neutral, hh = [...k].reduce((a, c) => a * 31 + c.charCodeAt(0) | 0, 7), [tp, pa, tr] = P[Math.abs(hh) % P.length];
+      if (h.sleeve === h.top) h.sleeve = tp; h.top = tp; h.pants = pa; if (h.skirt){ h.skirt = [...h.skirt]; h.skirt[4] = pa; h.skirt[5] = tr; }
+      h.belt = tr; h.necklace = true; h.armband = tr; h.bootCuff = tr; if (h.hatMat && ma325Drab(h.hatMat)){ h.hatMat = h.bandMat = h.capMat = tr; } } }
   // a colour for each armed monster that no other has: hues a golden angle apart, in three tones in turn
   armed.sort().forEach((k, i) => { const hu = (i * 137.508 + 18) % 360, [s, l] = [[92, 62], [78, 70], [96, 55]][i % 3];
     MA325.col[k] = [`hsl(${hu},100%,92%)`, `hsl(${hu},${s}%,${l}%)`, `hsl(${hu},${s}%,${l - 18}%)`]; }); }
@@ -89,10 +112,10 @@ baWeaponGlow = function(g, d, m){
 { const _dm = drawMobW;
   drawMobW = function(g, m){
     const ok = m && !m.dead && m.def, hum = ok && !m.def.boss && MA325.col[m.type];
-    const wg = ok && m.def.boss && MA325.wing.has(m.type) && !(m.fz && m.fz.hidden) && typeof drawWings === 'function' && typeof WINGS !== 'undefined';
+    const fw = ok && !m.def.boss && MA325.mobWing[m.type], wg = ok && (fw || m.def.boss && MA325.wing.has(m.type)) && !(m.fz && m.fz.hidden) && typeof drawWings === 'function' && typeof WINGS !== 'undefined';
     let wid = null, wo = null;
-    if (wg){ const ids = ma325Wings(); wid = m._ma325w && WINGS[m._ma325w] ? m._ma325w : (m._ma325w = ids[Math.floor(Math.random() * ids.length)]);
-      const bz = m.def.bsz || (typeof BOSS_SZ !== 'undefined' ? BOSS_SZ : 1), fz = m.fz, k = bz * (fz ? 1 + ((fz.phase || 1) - 1) * .04 : 1);
+    if (wg){ const ids = ma325Wings(); wid = fw && WINGS[fw] ? fw : m._ma325w && WINGS[m._ma325w] ? m._ma325w : (m._ma325w = ids[Math.floor(Math.random() * ids.length)]);
+      const bz = !m.def.boss ? (m.elite ? 1.3 : 1) : m.def.bsz || (typeof BOSS_SZ !== 'undefined' ? BOSS_SZ : 1), fz = m.fz, k = bz * (fz ? 1 + ((fz.phase || 1) - 1) * .04 : 1);
       wo = {x:m.x - cam.x, y:m.y - cam.y - (fz ? fz.z || 0 : 0), k, dir:m.dir || 0, moving:!!m.moving}; }
     const wDraw = part => { try { g.save(); if (T - m.born < .4) g.globalAlpha = (T - m.born) / .4; g.translate(wo.x, wo.y); g.scale(wo.k, wo.k);
       drawWings(g, wid, 0, 0, wo.dir, T, {part, moving:wo.moving}); } catch (e) {} finally { g.restore(); } };
