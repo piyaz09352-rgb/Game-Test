@@ -22,7 +22,10 @@ function updPlayer(dt){
   const vmul = (inVillage(P) ? 2 : 1) * (P.sit ? 2 : 1);
   P.rH += dt * vmul; P.rS += dt * vmul;
   if (P.rH >= 6){ P.rH = 0; S.hp = Math.min(DER.maxhp, S.hp + Math.max(1, Math.floor(DER.maxhp / 200) + Math.floor(DER.b.vit / 5))); }
-  if (P.rS >= (/INT/.test(JOBS[S.job].stat) ? 4 : 8) / (P.buffs.meditate ? 2 : 1)){ P.rS = 0; S.sp = Math.min(DER.maxsp, S.sp + 1 + Math.floor(DER.maxsp / 100) + Math.floor(DER.b.int / 6) + (DER.pas.spRegen || 0)); }
+  // (v324) a job without INT got SP every 8 s and almost no INT share: about 0.75 SP a second at Lv 115 against 10 for a
+  // caster, so its skills sat unused. It now ticks as often and gets a share that grows with its level instead
+  if (P.rS >= 4 / (P.buffs.meditate ? 2 : 1)){ P.rS = 0; const noInt = !/INT/.test(JOBS[S.job].stat);
+    S.sp = Math.min(DER.maxsp, S.sp + 1 + Math.floor(DER.maxsp / 100) + Math.floor(DER.b.int / 6) + (noInt ? Math.floor((S.lvl || 1) / 8) : 0) + (DER.pas.spRegen || 0)); }
   if (P.roll){ updRoll(dt); P.moving = false; return; }
   if (P.capT > 0){ P.capT -= dt; P.moving = false; if (P.capT <= 0) resolveCapture(); return; }
   if (P.spin > 0) P.spin -= dt;
