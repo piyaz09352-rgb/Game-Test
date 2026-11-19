@@ -84,17 +84,18 @@ function h6Layout(){
   const U = brect(ui), k = (U.height / (ui.offsetHeight || 1)) || 1, R = e => { const b = brect(e); return {l:b.left - U.left, t:b.top - U.top, r:b.right - U.left, b:b.bottom - U.top, w:b.width, h:b.height}; };
   const c = R(cc), m = Math.max(6, Math.round(c.l)), g = 8, moba = ui.classList.contains('moba');
   ui.classList.toggle('h6pc', !moba);
-  if (h6Hand()) return;
+  const hand = h6Hand();   // a layout the player arranged: the buttons stay where they put them, the rest of the HUD is still placed
   // top right: the tiles, the minimap under them, the chips under that; the menu opens over the minimap
   hudPut(ic, m, m, 'r'); const I = R(ic);
   // the coin shop's own button (with its coin count) stands in the first tile's place, dressed as the gold orb
-  { const cs = el('cshBtn'), slot = ic.querySelector('.h6-shop'); if (cs && slot){ const S0 = R(slot), set = (n, v) => { v = Math.round(v) + 'px'; if (cs.style.getPropertyValue(n) !== v) cs.style.setProperty(n, v, 'important'); };
-      set('left', S0.l / k); set('top', S0.t / k); if (cs.style.right !== 'auto') cs.style.setProperty('right', 'auto', 'important'); } }
+  { const cs = el('cshBtn'), slot = ic.querySelector('.h6-shop'); if (cs && slot){ const set = (n, v) => { v = Math.round(v) + 'px'; if (cs.style.getPropertyValue(n) !== v) cs.style.setProperty(n, v, 'important'); };
+      const sb = brect(slot); set('left', (sb.left - U.left) / k); set('top', (sb.top - U.top) / k); if (cs.style.right !== 'auto') cs.style.setProperty('right', 'auto', 'important'); } }
   hudPut(mc, m, I.b + g * k, 'r'); const M = R(mc);
   if (ch && ch.offsetWidth) hudPut(ch, m, M.b + g * k, 'r');
   if (rl){ hudPut(rl, m, I.b + g * k, 'r'); rl.style.zIndex = rl.classList.contains('folded') ? '' : '45'; }
   // bottom left: EXP and the clock
   if (ex){ ex.style.left = Math.round(m / k) + 'px'; ex.style.bottom = Math.round(m / k * .8) + 'px'; }
+  if (hand) return;
   if (moba){ const j = el('joy'), X = ex && R(ex); if (j && X){ const J = R(j); if (J.b > X.t - g * k && J.l < X.r){ const top = parseFloat(j.style.top) || (J.t / k); j.style.setProperty('top', Math.round(top - (J.b - X.t + g * k) / k) + 'px', 'important'); } } }
   else h6Pc(ui, U, k, m, g);
 }
@@ -165,3 +166,10 @@ new MutationObserver(list => { if (!document.body.classList.contains('h6w')) ret
     if (r.type === 'attributes'){ const e = r.target; if (!e.hidden && e.matches && e.matches(H6_WROOT)) try { h6Recolor(e); } catch (x) {} continue; }
     for (const n of r.addedNodes){ if (n.nodeType !== 1 || !n.isConnected || !n.closest || !n.closest(H6_WROOT) || n.closest('#charCard, #goalCard, #mapCard, #target, #h6Icons')) continue; try { h6Recolor(n); } catch (x) {} } } })
   .observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:['hidden']});
+/* (v330) lite mode: the effect setting on low, or a phone with few cores / little memory */
+function h6LiteCheck(){ const weak = (navigator.hardwareConcurrency || 8) <= 4 || (navigator.deviceMemory || 8) <= 3, coarse = matchMedia('(pointer:coarse)').matches;
+  const on = (typeof GFX !== 'undefined' && GFX.fx === 0) || (coarse && weak); if (document.body.classList.contains('h6lite') !== on) document.body.classList.toggle('h6lite', on); }
+h6LiteCheck(); setInterval(h6LiteCheck, 3000);
+/* the coin shop placed its own button next to the minimap twice a second (js/sys/coinshop274.js cshPlace), undoing the orb's place
+   (on PC it sat below the row); under the new HUD the HUD places it */
+if (typeof cshPlace === 'function'){ const _cp = cshPlace; cshPlace = function(){ if (el('ui') && el('ui').classList.contains('h6') && el('h6Icons')) return; return _cp.apply(this, arguments); }; }

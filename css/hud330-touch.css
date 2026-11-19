@@ -1,0 +1,20 @@
+/* VAYRATHEN — css/hud330-touch.css — (v330) the new HUD on touch screens: the skill wheel, the potions and small buttons, the joystick,
+   the arrange bar (จัดตำแหน่งปุ่ม). Shared rules: css/hud330.css. */
+html body #ui.ui.h6.moba #joy{ opacity:.7; }
+html body #ui.ui.h6.moba #joy, html body #ui.ui.h6.moba #joy *{ filter:hue-rotate(0deg); }
+/* the joystick: a glass ring with a glowing rim and a bright orb */
+html body #ui.ui.h6.moba #joy{ opacity:1; border-radius:50% !important; background:radial-gradient(circle, rgba(30,24,70,.35) 55%, rgba(30,24,70,.55)) padding-box, conic-gradient(from 200deg, rgba(180,124,255,.8), rgba(79,216,255,.8), rgba(255,211,106,.8), rgba(180,124,255,.8)) border-box !important;
+  border:2px solid transparent !important; box-shadow:0 0 16px rgba(140,110,255,.45), inset 0 0 20px rgba(80,200,255,.25) !important; }
+html body #ui.ui.h6.moba #joy::before, html body #ui.ui.h6.moba #joy::after{ display:none !important; }
+html body #ui.ui.h6.moba #joyKnob{ border-radius:50% !important; background:radial-gradient(circle at 40% 32%, #ffffff, #b8a8ff 40%, #5a3ce0 100%) !important; border:2px solid rgba(255,255,255,.9) !important;
+  box-shadow:0 0 14px rgba(160,130,255,.95), 0 0 30px rgba(80,200,255,.4) !important; }
+html body #ui.ui.h6.moba #joyKnob::before, html body #ui.ui.h6.moba #joyKnob::after, html body #ui.ui.h6.moba #joyKnob *{ display:none !important; }
+/* the joystick's own layers: a violet-cyan halo, a thin glowing rim, the yantra turned to faint blue light */
+html body #ui#ui.ui.h6.moba #joy > .halo{ background:radial-gradient(circle, rgba(140,110,255,0) 50%, rgba(140,110,255,.32) 62%, rgba(80,200,255,0) 72%) !important; animation:a6pulse 3.4s ease-in-out infinite !important; }
+html body #ui#ui.ui.h6.moba #joy > .ring{ background:transparent !important; border:1px solid rgba(255,255,255,.35) !important; box-shadow:0 0 0 1px rgba(150,120,255,.55), 0 0 10px rgba(80,200,255,.45), inset 0 0 12px rgba(150,120,255,.35) !important; }
+html body #ui#ui.ui.h6.moba #joy > .yantra{ filter:hue-rotate(195deg) saturate(1.5) brightness(1.1) !important; opacity:.4 !important; }
+html body #ui#ui.ui.h6.moba #joy > .arrow{ filter:hue-rotate(195deg) saturate(1.5) !important; }
+/* (v330) the arrange bar (จัดตำแหน่งปุ่ม) in the same glass, its hint readable */
+html body #ui#ui.ui.h6 #heBar{ background:linear-gradient(rgba(16,14,38,.86), rgba(16,14,38,.86)) padding-box, var(--a6-rim2) border-box !important; border:1.5px solid transparent !important; border-radius:14px !important; box-shadow:0 0 14px rgba(140,110,255,.45) !important; }
+html body #ui#ui.ui.h6 #heBar, html body #ui#ui.ui.h6 #heBar > :not(button){ color:#f0ecff !important; -webkit-text-fill-color:#f0ecff !important; text-shadow:0 1px 2px rgba(0,0,0,.7) !important; }
+html body #ui#ui.ui.h6 #heBar button, html body #ui#ui.ui.h6 #heBar button *{ -webkit-text-fill-color:currentColor !important; text-shadow:none !important; }

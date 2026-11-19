@@ -1,3 +1,6 @@
+/* VAYRATHEN — css/hud330.css — (v330) the new HUD, shared by every device: colours, glass panels, the name plate, the target,
+   the top-right orbs, EXP and the clock, the chat, windows, lite mode. PC-only rules are in css/hud330-pc.css, touch-only
+   in css/hud330-touch.css (split from css/hud326.css; the look is unchanged). Layout: js/sys/hud326.js. */
 /* VAYRATHEN — css/hud326.css — (v326) one HUD for phone, tablet and PC: modern glass with aura
    The owner: the reference layout (a phone and an iPad screen), then «redesign it all, it isn't pretty: modern, sparkling,
    with aura — cool». Dark see-through glass with a glowing gradient rim (violet → cyan → gold), white text, bars that
@@ -16,7 +19,6 @@
 @keyframes a6pulse{ 0%, 100%{ opacity:.55; transform:scale(1); } 50%{ opacity:.95; transform:scale(1.06); } }
 @keyframes a6sheen{ 0%{ transform:translateX(-120%); } 60%, 100%{ transform:translateX(220%); } }
 @keyframes a6twinkle{ 0%, 100%{ opacity:0; transform:scale(.3) rotate(0deg); } 50%{ opacity:1; transform:scale(1) rotate(45deg); } }
-
 /* glass panels with a living gradient rim */
 html body #ui.ui.h6 #goalCard, html body #ui.ui.h6 #mapCard, html body #ui.ui.h6 #target.card.target, html body #ui.ui.h6 #rail:not(.folded) .menu{
   background:linear-gradient(var(--a6-glass), var(--a6-glass)) padding-box, var(--a6-rim) border-box !important; border:1.5px solid transparent !important;
@@ -28,7 +30,6 @@ html body #ui.ui.h6 #goalCard b, html body #ui.ui.h6 #goalCard h3, html body #ui
 html body #ui.ui.h6 #goalCard button, html body #ui.ui.h6 #mapCard button{ background:rgba(255,255,255,.1) !important; border:1px solid rgba(190,170,255,.55) !important; color:#fff !important; border-radius:50% !important; box-shadow:0 0 8px rgba(120,160,255,.35) !important; }
 html body #ui.ui.h6 #mapCard{ padding:6px !important; }
 html body #ui.ui.h6 #mapCard #minimap{ border-radius:10px !important; border:1px solid rgba(255,255,255,.35) !important; box-shadow:0 0 10px rgba(80,200,255,.35) !important; }
-
 /* the character: a portrait in a turning aura ring, two glowing badges, glowing bars */
 html body #ui.ui.h6 #charCard.card.char{ background:transparent !important; border:0 !important; box-shadow:none !important; padding:0 !important; width:auto !important; min-width:0 !important; height:auto !important; overflow:visible !important; display:flex !important; align-items:center !important; gap:12px !important; }
 html body #ui.ui.h6 #charCard::before, html body #ui.ui.h6 #charCard::after{ display:none !important; }
@@ -52,7 +53,6 @@ html body #ui.ui.h6 #charCard .bar span{ position:absolute !important; inset:0 !
 html body #ui.ui.h6 #charCard .bar span b{ display:none !important; }
 html body #ui.ui.h6 #charCard .bar span em{ font-style:normal !important; background:none !important; color:#fff !important; }
 html body #ui.ui.h6 #charCard .thin, html body #ui.ui.h6 #charCard .xpt{ display:none !important; }
-
 /* the target */
 html body #ui.ui.h6 #target.card.target{ border-radius:26px !important; padding:6px 16px 8px 48px !important; min-height:44px; }
 html body #ui.ui.h6 #target .h6ring{ position:absolute; left:6px; top:50%; transform:translateY(-50%); width:34px; height:34px; border-radius:50%; display:grid; place-items:center; color:#ff9ab8;
@@ -61,7 +61,6 @@ html body #ui.ui.h6 #target .h6ring svg{ animation:a6rot 6s linear infinite; }
 html body #ui.ui.h6 #target .bar.hp{ height:9px !important; border-radius:5px !important; background:rgba(0,0,0,.5) !important; border:1px solid rgba(255,255,255,.2) !important; overflow:hidden; }
 html body #ui.ui.h6 #target .bar.hp i#tI{ background:var(--a6-hp) !important; box-shadow:0 0 8px rgba(255,90,120,.9); border-radius:5px; }
 html body #ui.ui.h6 #target .em, html body #ui.ui.h6 #target small span{ background:rgba(255,255,255,.12) !important; border:1px solid rgba(255,255,255,.3) !important; }
-
 /* the top-right tiles: glass orbs with a glowing coloured ring and a sparkle */
 html body #ui.ui.h6 #railTog{ display:none !important; }
 #h6Icons .h6-shop{ visibility:hidden; }
@@ -86,7 +85,8 @@ html body #ui.ui.h6 #rail:not(.folded) .menu .mb{ color:#fff !important; backgro
 #h6Icons .t::after{ content:''; position:absolute; top:-3px; left:4px; width:8px; height:8px; pointer-events:none;
   background:radial-gradient(circle, #fff 0 18%, transparent 20%), conic-gradient(from 45deg, transparent 0 20deg, #fff 20deg 25deg, transparent 25deg 110deg, #fff 110deg 115deg, transparent 115deg 200deg, #fff 200deg 205deg, transparent 205deg 290deg, #fff 290deg 295deg, transparent 295deg);
   border-radius:50%; animation:a6twinkle 2.8s ease-in-out infinite; animation-delay:var(--d, 0s); }
-#h6Icons button:hover .t{ transform:translateY(-2px) scale(1.06); box-shadow:0 0 20px var(--g), 0 6px 12px rgba(0,0,0,.45); } #h6Icons button:active .t{ transform:scale(.93); }
+#h6Icons button:hover .t{ transform:translateY(-2px) scale(1.06); box-shadow:0 0 20px var(--g), 0 6px 12px rgba(0,0,0,.45); }
+#h6Icons button:active .t{ transform:scale(.93); }
 #h6Icons .t svg{ width:22px; height:22px; color:var(--i); filter:drop-shadow(0 0 4px var(--g)); }
 #h6Icons .h6-shop{ --c:linear-gradient(135deg, #ffe27a, #ff8a3c); --g:rgba(255,170,60,.75); --i:#ffd77a; --d:.2s; }
 #h6Icons .h6-skill{ --c:linear-gradient(135deg, #e0a8ff, #8a5cff); --g:rgba(170,110,255,.8); --i:#e2c2ff; --d:1.1s; }
@@ -95,39 +95,18 @@ html body #ui.ui.h6 #rail:not(.folded) .menu .mb{ color:#fff !important; backgro
 #h6Icons b{ font:800 11px/1.1 system-ui, sans-serif; color:#fff; text-shadow:0 0 6px var(--g), 0 1px 2px rgba(0,0,0,.95); white-space:nowrap; }
 #h6Icons .dot{ position:absolute; top:-2px; right:-2px; width:10px; height:10px; border-radius:50%; background:#ff3b6a; border:1.5px solid #fff; box-shadow:0 0 8px #ff3b6a; display:none; }
 #h6Icons .dot.on{ display:block; }
-
 /* EXP and the clock */
 #h6Exp{ position:absolute; z-index:30; display:flex; align-items:center; gap:8px; height:22px; padding:0 11px; border-radius:11px; background:linear-gradient(var(--a6-glass), var(--a6-glass)) padding-box, var(--a6-rim2) border-box; border:1px solid transparent;
   box-shadow:0 0 10px rgba(140,110,255,.35); font:800 11px/1 system-ui, sans-serif; color:#fff; pointer-events:none; text-shadow:0 1px 2px rgba(0,0,0,.8); }
-#h6Exp i{ font-style:normal; color:#ffd36a; } #h6Exp .bar{ position:relative; width:76px; height:6px; border-radius:3px; background:rgba(0,0,0,.5); overflow:hidden; }
-#h6Exp .bar u{ display:block; height:100%; background:var(--a6-xp); border-radius:3px; box-shadow:0 0 8px rgba(255,200,80,.9); } #h6Exp em{ font-style:normal; } #h6Exp s{ text-decoration:none; color:#9fe4ff; }
-
+#h6Exp i{ font-style:normal; color:#ffd36a; }
+#h6Exp .bar{ position:relative; width:76px; height:6px; border-radius:3px; background:rgba(0,0,0,.5); overflow:hidden; }
+#h6Exp .bar u{ display:block; height:100%; background:var(--a6-xp); border-radius:3px; box-shadow:0 0 8px rgba(255,200,80,.9); }
+#h6Exp em{ font-style:normal; }
+#h6Exp s{ text-decoration:none; color:#9fe4ff; }
 /* chat: a see-through log */
 html body #ui.ui.h6 #chatBox.idle{ background:transparent !important; border-color:transparent !important; box-shadow:none !important; backdrop-filter:none !important; }
 html body #ui.ui.h6 #chatBox.idle .cempty{ display:none !important; }
 html body #ui.ui.h6 #chatBox.idle .clog *{ color:#fff; text-shadow:0 1px 2px rgba(0,0,0,.95), 0 0 3px rgba(0,0,0,.8); }
-
-/* buttons: skills (glass squares, gradient rim), potions (glass orbs), small round buttons */
-html body #ui.ui.h6pc #dock{ background:transparent !important; border:0 !important; box-shadow:none !important; padding:0 !important; transform:none !important; }
-html body #ui.ui.h6pc #dock::before, html body #ui.ui.h6pc #dock::after{ display:none !important; }
-html body #ui.ui.h6pc #hotbar{ position:absolute !important; inset:0 !important; display:block !important; background:none !important; border:0 !important; box-shadow:none !important; padding:0 !important; width:auto !important; height:auto !important; }
-html body #ui.ui.h6pc #hotbar > .hsep{ display:none !important; }
-html body #ui.ui.h6pc #hotbar > .hk{ position:absolute !important; margin:0 !important; transform:none; color:#fff !important; }
-html body #ui.ui.h6pc #hotbar > .hk.h6sk, html body #ui.ui.h6.moba .mo.sk{ width:54px !important; height:54px !important; border-radius:15px !important;
-  background:linear-gradient(rgba(20,16,46,.72), rgba(20,16,46,.72)) padding-box, var(--a6-rim2) border-box !important; border:1.5px solid transparent !important; box-shadow:0 0 12px rgba(120,140,255,.45), 0 4px 10px rgba(0,0,0,.4) !important; }
-html body #ui.ui.h6.moba .mo.sk{ width:auto !important; height:auto !important; }
-html body #ui.ui.h6pc #hotbar > .hk.h6sk.empty, html body #ui.ui.h6.moba .mo.sk.empty{ background:linear-gradient(rgba(20,16,46,.4), rgba(20,16,46,.4)) padding-box, linear-gradient(135deg, rgba(200,170,255,.5), rgba(90,220,255,.5)) border-box !important; box-shadow:0 0 6px rgba(120,140,255,.25) !important; }
-html body #ui.ui.h6pc #hotbar > .hk.h6pot, html body #ui.ui.h6.moba .mo.pot{ width:50px !important; height:50px !important; border-radius:50% !important;
-  background:radial-gradient(circle at 50% 30%, rgba(70,56,130,.85), rgba(16,12,36,.85)) padding-box, linear-gradient(135deg, #ff7aa8, #ffd36a) border-box !important; border:1.5px solid transparent !important; box-shadow:0 0 12px rgba(255,140,160,.5), 0 4px 10px rgba(0,0,0,.4) !important; }
-html body #ui.ui.h6.moba .mo.pot{ width:auto !important; height:auto !important; }
-html body #ui.ui.h6pc #hotbar > .hk.h6ut, html body #ui.ui.h6.moba .mu, html body #ui.ui.h6.moba .mo.roll{ width:44px !important; height:44px !important; border-radius:50% !important;
-  background:radial-gradient(circle at 50% 30%, rgba(60,50,120,.8), rgba(14,10,34,.8)) padding-box, linear-gradient(135deg, #8ad8ff, #b47cff) border-box !important; border:1.5px solid transparent !important; box-shadow:0 0 10px rgba(100,170,255,.45), 0 3px 8px rgba(0,0,0,.4) !important; color:#fff !important; }
-html body #ui.ui.h6.moba .mu, html body #ui.ui.h6.moba .mo.roll{ width:auto !important; height:auto !important; }
-html body #ui.ui.h6pc #hotbar > .hk.h6ut.on, html body #ui.ui.h6.moba .mu.on{ background:radial-gradient(circle at 50% 30%, #ffe88a, #f0a020) padding-box, linear-gradient(135deg, #fff, #ffd36a) border-box !important; box-shadow:0 0 16px rgba(255,200,60,.9) !important; color:#3a2200 !important; }
-html body #ui.ui.h6pc #hotbar > .hk b, html body #ui.ui.h6pc #hotbar > .hk span{ color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.9) !important; }
-html body #ui.ui.h6pc #hotbar > .hk.h6ut b{ font-size:11px !important; } html body #ui.ui.h6pc #hotbar > .hk.h6ut span{ font-size:8.5px !important; }
-html body #ui.ui.h6pc #hotbar > .hk kbd{ background:linear-gradient(135deg, #b47cff, #4fd8ff) !important; color:#fff !important; border:1px solid rgba(255,255,255,.8) !important; border-radius:7px !important; box-shadow:0 0 6px rgba(120,160,255,.8) !important; }
-
 /* the attack button: a glass core inside a turning aura, a pulsing halo and orbiting sparks */
 html body #ui.ui.h6 .mo.atk{ background:radial-gradient(circle at 50% 32%, #4a3c96 0%, #1e1650 55%, #0c0820 100%) padding-box, var(--a6-rim) border-box !important; border:3px solid transparent !important; color:#fff !important;
   box-shadow:0 0 18px rgba(160,120,255,.85), 0 0 40px rgba(80,200,255,.35), inset 0 0 18px rgba(120,200,255,.35) !important; animation:a6spin 4s linear infinite; overflow:visible !important; }
@@ -139,46 +118,23 @@ html body #ui.ui.h6 .mo.atk::before{ content:'' !important; position:absolute !i
 html body #ui.ui.h6 .mo.atk .atkaura{ display:none !important; }
 html body #ui.ui.h6 .mo.atk svg{ color:#fff !important; stroke:#fff !important; filter:drop-shadow(0 0 6px rgba(170,200,255,.95)) drop-shadow(0 0 2px #fff) !important; position:relative; z-index:2; }
 html body #ui.ui.h6 .mo.atk:active{ transform:scale(.94); }
-html body #ui.ui.h6 #pcAtk small{ background:linear-gradient(var(--a6-glass), var(--a6-glass)) padding-box, var(--a6-rim2) border-box !important; border:1px solid transparent !important; color:#fff !important; box-shadow:0 0 8px rgba(140,110,255,.4); }
-html body #ui.ui.h6.moba #joy{ opacity:.7; }
-html body #ui.ui.h6.moba #joy, html body #ui.ui.h6.moba #joy *{ filter:hue-rotate(0deg); }
-
 @media (prefers-reduced-motion: reduce){
   html body #ui.ui.h6 *, html body #ui.ui.h6 *::before, html body #ui.ui.h6 *::after, #h6Icons *, #h6Icons *::before, #h6Icons *::after{ animation:none !important; }
 }
-
 /* (stronger than the older skins) white text on the glass */
 html body #ui.ui.h6 #goalCard #goal, html body #ui.ui.h6 #goalCard #goal *, html body #ui.ui.h6 #goalCard .ch, html body #ui.ui.h6 #goalCard header *{ color:#efeaff !important; text-shadow:0 1px 2px rgba(0,0,0,.7) !important; }
 html body #ui.ui.h6 #goalCard #goal b{ color:#ffe08a !important; }
 html body #ui.ui.h6 #charCard #cJob, html body #ui.ui.h6 #charCard #cJob *{ color:#fff !important; text-shadow:0 0 6px rgba(150,120,255,.9), 0 1px 2px rgba(0,0,0,.95) !important; }
 html body #ui.ui.h6 #mapCard #mapName, html body #ui.ui.h6 #mapCard #mapName *, html body #ui.ui.h6 #mapCard #clock{ color:#fff !important; text-shadow:0 0 6px rgba(120,180,255,.8), 0 1px 2px rgba(0,0,0,.9) !important; }
-html body #ui.ui.h6pc #dock #hotbar > .hk b, html body #ui.ui.h6pc #dock #hotbar > .hk span, html body #ui.ui.h6pc #dock #hotbar > .hk em{ color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.95) !important; }
-html body #ui.ui.h6pc #dock #hotbar > .hk.h6ut.on b, html body #ui.ui.h6pc #dock #hotbar > .hk.h6ut.on span{ color:#3a2200 !important; text-shadow:none !important; }
 /* the chips, the festival banner and the achievement pop-up on the same glass */
 html body #ui.ui.h6 #chips > *, html body #ui.ui.h6 #banner, html body #ui.ui.h6 #achPop{ background:linear-gradient(var(--a6-glass), var(--a6-glass)) padding-box, var(--a6-rim2) border-box !important; border:1px solid transparent !important; color:#fff !important; box-shadow:0 0 10px rgba(140,110,255,.35) !important; }
 html body #ui.ui.h6 #chips > * *, html body #ui.ui.h6 #banner *, html body #ui.ui.h6 #achPop *{ color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.8); }
 html body #ui.ui.h6 #banner b, html body #ui.ui.h6 #achPop b{ color:#ffe08a !important; }
 html body #ui.ui.h6 #banner::before, html body #ui.ui.h6 #banner::after, html body #ui.ui.h6 #achPop::before, html body #ui.ui.h6 #achPop::after{ display:none !important; }
-html body #ui.ui.h6 #goalCard *, html body #ui.ui.h6 #charCard #cJob *, html body #ui.ui.h6 #charCard #cJob, html body #ui.ui.h6 #mapCard #mapName, html body #ui.ui.h6 #mapCard #mapName *,
-html body #ui.ui.h6pc #dock #hotbar > .hk b, html body #ui.ui.h6pc #dock #hotbar > .hk span, html body #ui.ui.h6 #chips *, html body #ui.ui.h6 #banner *, html body #ui.ui.h6 #achPop *, html body #ui.ui.h6 #target *{
-  -webkit-text-fill-color:currentColor !important; -webkit-text-stroke:0 !important; background-clip:border-box !important; -webkit-background-clip:border-box !important; }
 html body #ui.ui.h6 #target .bar i, html body #ui.ui.h6 #target .h6ring{ -webkit-background-clip:padding-box, border-box !important; background-clip:padding-box, border-box !important; }
 html body #ui.ui.h6 #target .bar i{ background-clip:border-box !important; -webkit-background-clip:border-box !important; }
 html body #ui#ui.ui.h6 #mapCard#mapCard #mapName#mapName, html body #ui#ui.ui.h6 #mapCard#mapCard #mapName#mapName *, html body #ui#ui.ui.h6 #mapCard#mapCard #clock#clock{ color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:0 0 6px rgba(120,180,255,.8), 0 1px 2px rgba(0,0,0,.9) !important; }
 html body #ui#ui.ui.h6 #charCard#charCard #cJob#cJob, html body #ui#ui.ui.h6 #charCard#charCard #cJob#cJob *{ color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:0 0 6px rgba(150,120,255,.9), 0 1px 2px rgba(0,0,0,.95) !important; }
-/* the joystick: a glass ring with a glowing rim and a bright orb */
-html body #ui.ui.h6.moba #joy{ opacity:1; border-radius:50% !important; background:radial-gradient(circle, rgba(30,24,70,.35) 55%, rgba(30,24,70,.55)) padding-box, conic-gradient(from 200deg, rgba(180,124,255,.8), rgba(79,216,255,.8), rgba(255,211,106,.8), rgba(180,124,255,.8)) border-box !important;
-  border:2px solid transparent !important; box-shadow:0 0 16px rgba(140,110,255,.45), inset 0 0 20px rgba(80,200,255,.25) !important; }
-html body #ui.ui.h6.moba #joy::before, html body #ui.ui.h6.moba #joy::after{ display:none !important; }
-html body #ui.ui.h6.moba #joyKnob{ border-radius:50% !important; background:radial-gradient(circle at 40% 32%, #ffffff, #b8a8ff 40%, #5a3ce0 100%) !important; border:2px solid rgba(255,255,255,.9) !important;
-  box-shadow:0 0 14px rgba(160,130,255,.95), 0 0 30px rgba(80,200,255,.4) !important; }
-html body #ui.ui.h6.moba #joyKnob::before, html body #ui.ui.h6.moba #joyKnob::after, html body #ui.ui.h6.moba #joyKnob *{ display:none !important; }
-/* the joystick's own layers: a violet-cyan halo, a thin glowing rim, the yantra turned to faint blue light */
-html body #ui#ui.ui.h6.moba #joy > .halo{ background:radial-gradient(circle, rgba(140,110,255,0) 50%, rgba(140,110,255,.32) 62%, rgba(80,200,255,0) 72%) !important; animation:a6pulse 3.4s ease-in-out infinite !important; }
-html body #ui#ui.ui.h6.moba #joy > .ring{ background:transparent !important; border:1px solid rgba(255,255,255,.35) !important; box-shadow:0 0 0 1px rgba(150,120,255,.55), 0 0 10px rgba(80,200,255,.45), inset 0 0 12px rgba(150,120,255,.35) !important; }
-html body #ui#ui.ui.h6.moba #joy > .yantra{ filter:hue-rotate(195deg) saturate(1.5) brightness(1.1) !important; opacity:.4 !important; }
-html body #ui#ui.ui.h6.moba #joy > .arrow{ filter:hue-rotate(195deg) saturate(1.5) !important; }
-
 /* ---------- (v327) the name plate, top left: one glass plate like the other panels, the portrait overlapping its left end ----------
    The owner: the top-left name tag did not match. It floated on the ground with no backing, the level badge hung half off
    the portrait and the bars were hard to read on bright grass. */
@@ -209,7 +165,6 @@ html body #ui#ui.ui.h6 #charCard#charCard .cname .h6chips{ background:none !impo
 html body #ui#ui.ui.h6 #charCard#charCard .bar::before{ background:none !important; width:auto !important; height:auto !important; border:0 !important; box-shadow:none !important; -webkit-mask:none !important; mask:none !important; transform:none !important; }
 html body #ui#ui.ui.h6 #charCard#charCard.card.char{ aspect-ratio:auto !important; }
 html body #ui#ui.ui.h6 #charCard#charCard .bar span, html body #ui#ui.ui.h6 #charCard#charCard .bar span em{ line-height:1 !important; height:100% !important; display:flex !important; align-items:center !important; margin:0 !important; padding-top:0 !important; padding-bottom:0 !important; }
-
 /* ---------- (v328) windows (bag, skills, status, equipment, settings, quests, shops…) in the same style ----------
    The frame is frosted glass with the HUD's gradient rim and glow; the title bar dark glass with a glowing title; the
    close and minimise buttons glass orbs. What is inside is recoloured by js/sys/hud326.js (h6Recolor). */
@@ -239,3 +194,8 @@ html body.h6w #ui#ui#ui .win .wb::before, html body.h6w #ui#ui#ui .win .wb::afte
 html body.h6w #ui#ui#ui .eqdoll2.e6, html body.h6w #ui#ui#ui .eqdoll2.e6 > .eqstage{ background:radial-gradient(circle at 50% 46%, rgba(255,255,255,.96) 0, rgba(255,255,255,.88) 20%, rgba(214,200,255,.5) 40%, rgba(170,220,255,.2) 60%, rgba(244,242,254,0) 75%) !important; }
 html body.h6w #ui#ui#ui .eqdoll2.e6 .eqbox{ background:radial-gradient(circle at 38% 30%, #ffffff, #efeafe 60%, #ddd4fb) !important; }
 html body.h6w .win input[type=range], html body.h6w .win input[type=checkbox], html body.h6w .win input[type=radio]{ accent-color:#8a6cff; }
+/* (v330) lite: weak phones and the low effect setting — the rims and rings stop turning and the glass is not blurred
+   (both are repainted every frame by the graphics chip); the colours and the layout stay the same */
+html body.h6lite #ui.ui.h6 *, html body.h6lite #ui.ui.h6 *::before, html body.h6lite #ui.ui.h6 *::after, html body.h6lite #h6Icons *, html body.h6lite #h6Icons *::before, html body.h6lite #h6Icons *::after{ animation:none !important; }
+html body.h6lite #ui.ui.h6 *, html body.h6lite .win{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+html body.h6lite #ui.ui.h6 #goalCard, html body.h6lite #ui.ui.h6 #mapCard, html body.h6lite #ui.ui.h6 #target.card.target, html body.h6lite #ui#ui.ui.h6 #charCard#charCard.card.char{ background-color:rgba(16,14,38,.82) !important; }

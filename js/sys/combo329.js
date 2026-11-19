@@ -121,7 +121,11 @@ function cbFx(line, st, t){ const f = CB_FX[line]; if (!f || !t || typeof fx2Add
     VFX.play = function(key){ if (CB329.quiet && (key === 'slashHit' || key === 'swingArc' || key === 'clawHit' || key === 'punchHit')) return; return _vp.apply(this, arguments); };
     let r; try { r = _ba.apply(this, arguments); } finally { CB329.quiet = false; VFX.play = _vp; }
     if (!(P.atkAnim > 0)) return r;   // nothing went off (no arrows)
-    const sh = heroSheet(); if (sh && sh.index[act]){ P.skAct = act; P.skillAnim = Math.min(5 / 15 + .04, P.atkAnim || .42); }
+    const sh = heroSheet(); if (sh && sh.index[act]){
+      // the blow fits inside the time to the next one: at a high attack speed the pose plays faster instead of being cut off
+      const gap = Math.max(.2, (typeof DER !== 'undefined' && DER.interval) || .5) * .92, dur = Math.min(5 / 15, gap);
+      sh.index[act].fps = 5 / dur; P.skAct = act; P.skillAnim = dur + .02; P.atkAnim = 0;
+      P.act = act; P.animT = 0; CB329.pose = act; CB329.until = T + dur; }   // start on its first frame (it showed the last frame of the one before for a moment)
     // when the blow lands: at once for a hand weapon, on arrival for a bolt, an arrow or a star
     const far = JOBS[S.job].caster || JOBS[S.job].ranged || JOBS[S.job].weapon.type === 'shuriken', sp = JOBS[S.job].caster ? 520 : JOBS[S.job].weapon.type === 'shuriken' ? 760 : 720;
     const delay = far ? (JOBS[S.job].caster ? .12 : .06) + Math.hypot(t.x - P.x, t.y - P.y) / sp : (JOBS[S.job].weapon.type === 'dagger' ? .06 : .1);
@@ -152,3 +156,32 @@ for (const id in SK329.map){ const sk = SKILLS[id]; if (!sk) continue; sk.act = 
   for (const id in SKILLS){ const sk = SKILLS[id]; if (!sk.act || SPR.ACTIONS[sk.act]) continue; if (FALL[sk.act]) sk.act = FALL[sk.act]; }
   for (const j in JOBS){ const ch = jobChain(j), want = new Set(SPR.CHAR_ACTIONS[j] || []);
     for (const id in SKILLS){ const sk = SKILLS[id]; if (sk.act && SPR.ACTIONS[sk.act] && ch.includes(sk.job)) want.add(sk.act); } SPR.CHAR_ACTIONS[j] = [...want]; } }
+/* a blow stays whole: a second strike in the same attack (twin fists, a double hit) used to restart the old swing and its clock */
+if (typeof updPlayer === 'function'){ const _up = updPlayer;
+  updPlayer = function(){ if (CB329.pose && T < CB329.until && P.skAct === CB329.pose){ P.atkAnim = 0; if (P.act === null) P.act = CB329.pose; } else CB329.pose = null; return _up.apply(this, arguments); }; }
+
+/* ---------- (v330) each class's own sound on its combo: a light accent on the first two blows, a full finisher on the third
+   (synthesised like every other sound in the game, through the effects volume; never louder than a normal hit) ---------- */
+const CBS = (() => {
+  const R = () => (typeof SFX !== 'undefined' && SFX.raw ? SFX.raw() : null);
+  function tone(a, out, type, f, t, d, v, to, lp){ const s = a.createOscillator(), g = a.createGain(); s.type = type; s.frequency.setValueAtTime(f, t); if (to) s.frequency.exponentialRampToValueAtTime(Math.max(20, to), t + d);
+    let n = s; if (lp){ const fl = a.createBiquadFilter(); fl.type = 'lowpass'; fl.frequency.value = lp; s.connect(fl); n = fl; } n.connect(g); g.connect(out);
+    g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .004); g.gain.exponentialRampToValueAtTime(.0004, t + d); s.start(t); s.stop(t + d + .05); }
+  function hiss(a, out, nb, t, d, v, f, to, q = 1, type = 'bandpass'){ const s = a.createBufferSource(), g = a.createGain(), fl = a.createBiquadFilter(); s.buffer = nb; s.loop = true; fl.type = type; fl.frequency.setValueAtTime(f, t); if (to) fl.frequency.exponentialRampToValueAtTime(to, t + d); fl.Q.value = q;
+    s.connect(fl); fl.connect(g); g.connect(out); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(v, t + .003); g.gain.exponentialRampToValueAtTime(.0004, t + d); s.start(t); s.stop(t + d + .05); }
+  const V = {
+    blade(a, o, nb, t, st){ hiss(a, o, nb, t, .09, .18, 5200, 2600, 3); tone(a, o, 'triangle', st === 2 ? 2400 : 1800, t + .01, st === 2 ? .45 : .2, .07, st === 2 ? 2300 : 1700); if (st === 2) tone(a, o, 'sine', 3600, t + .02, .5, .04); },
+    rune(a, o, nb, t, st){ tone(a, o, 'sine', 520 + st * 140, t, .22 + st * .1, .1, 1300 + st * 300); if (st === 2){ hiss(a, o, nb, t + .02, .35, .14, 900, 200, .8); tone(a, o, 'sine', 180, t, .35, .12, 70); } },
+    ranger(a, o, nb, t, st){ hiss(a, o, nb, t, .06, .12, 3000, 6000, 2); tone(a, o, 'triangle', 300, t, .06, .07, 160); if (st === 2) hiss(a, o, nb, t + .03, .22, .1, 7000, 2500, 4); },
+    muay(a, o, nb, t, st){ tone(a, o, 'sine', 150, t, .12 + st * .06, .2 + st * .05, 55); hiss(a, o, nb, t, .05, .2, 1400, 600, 1); if (st === 2) hiss(a, o, nb, t + .01, .2, .16, 500, 120, .7, 'lowpass'); },
+    healer(a, o, nb, t, st){ const base = [880, 1046, 1318][st]; tone(a, o, 'sine', base, t, .4, .07); tone(a, o, 'sine', base * 1.5, t + .05, .45, .04); if (st === 2) tone(a, o, 'sine', base * 2, t + .1, .6, .04); },
+    rogue(a, o, nb, t, st){ hiss(a, o, nb, t, .05, .16, 7000, 3500, 5); if (st >= 1) hiss(a, o, nb, t + .06, .05, .14, 6500, 3200, 5); if (st === 2) tone(a, o, 'sawtooth', 220, t, .18, .05, 110, 900); },
+    summoner(a, o, nb, t, st){ tone(a, o, 'sine', 660, t, .3, .06, 990); tone(a, o, 'sine', 990, t + .04, .3, .04, 660); if (st === 2){ tone(a, o, 'triangle', 330, t, .5, .06, 495); hiss(a, o, nb, t, .4, .06, 2500, 5000, 3); } },
+    occult(a, o, nb, t, st){ tone(a, o, 'sawtooth', 110 + st * 20, t, .25, .06, 70, 700); hiss(a, o, nb, t, .2, .08, 600, 300, 4); if (st === 2) tone(a, o, 'sine', 55, t, .5, .12, 40); },
+    merchant(a, o, nb, t, st){ tone(a, o, 'sine', 120, t, .14, .2, 60); const n = st === 2 ? 5 : 2; for (let i = 0; i < n; i++){ tone(a, o, 'square', 2600 + i * 230, t + .03 + i * .045, .08, .025, 2500 + i * 230, 5000); } if (st === 2) hiss(a, o, nb, t, .25, .12, 400, 150, .8, 'lowpass'); },
+    catfolk(a, o, nb, t, st){ hiss(a, o, nb, t, .07, .14, 4200, 8000, 3); if (st === 2){ tone(a, o, 'sawtooth', 700, t + .02, .22, .05, 420, 2400); tone(a, o, 'sine', 1400, t + .02, .2, .03, 900); } },
+    dogfolk(a, o, nb, t, st){ tone(a, o, 'square', 180, t, .06, .08, 120, 1200); hiss(a, o, nb, t, .04, .14, 2200, 1200, 2); if (st === 2){ tone(a, o, 'sawtooth', 300, t + .05, .5, .05, 520, 1500); tone(a, o, 'sawtooth', 302, t + .05, .5, .04, 524, 1500); } },
+    ninja(a, o, nb, t, st){ hiss(a, o, nb, t, .1, .1, 6000, 9000, 6); tone(a, o, 'triangle', 3200, t + .02, .06, .04, 2800); if (st === 2) hiss(a, o, nb, t + .03, .3, .1, 1800, 600, .7); }};
+  return {play(line, st){ const r = R(); if (!r || !V[line] || r.vol.s <= 0) return; try { V[line](r.ac, r.out, r.nb, r.ac.currentTime + .005, st); } catch (e) {} }};
+})();
+{ const _fx = cbFx; cbFx = function(line, st){ CBS.play(line, st); return _fx.apply(this, arguments); }; }

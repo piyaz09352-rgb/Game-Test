@@ -770,6 +770,23 @@ function twoHandChop(P, f){
 }
 /* (v210) a one-handed axe is chopped, not swept: the elbow goes up and out and the axe high beside the head, then it comes down
    at a slant with the hips behind it, bites low in front and follows through; the free arm swings back for balance */
+/* (v330) monsters with the new weapons strike with them: a spear (หอก) is held in both hands and thrust with a lunge, a
+   one-handed club (กระบอง) comes down from high over the head with the whole body behind it (two-handed clubs and axes use twoHandChop) */
+function spearThrust(P, f){
+  P.armR = [.9, .8, 1.57, 1.4, .9][f]; P.elbR = [1.3, 1.9, .05, .35, 1.2][f]; P.outR = [.05, .1, -.02, 0, .05][f];
+  P.wpn = [1.75, 1.75, 1.6, 1.62, 1.75][f] - P.armR - P.elbR * .7 + .1;   // the shaft points at the foe: weapon line = arm + elbow·0.7 + wpn − 0.1, level ahead ≈ π/2 (a little up while guarding)
+  P.armL = [.95, .85, 1.35, 1.25, .9][f]; P.elbL = [1.2, 1.6, .35, .5, 1.1][f]; P.outL = [-.25, -.2, -.35, -.3, -.2][f];
+  P.lean = [0, -.06, .38, .22, .02][f]; P.twist = [0, -.35, .25, .15, 0][f]; P.sway = [0, .4, -.8, -.4, 0][f];
+  P.legL = [.15, .1, .8, .6, .15][f]; P.legR = [-.15, -.15, -.7, -.5, -.12][f]; P.bob = [-.4, -.8, -1.6, -1.1, -.3][f];
+  return P;
+}
+function maceSmash(P, f){
+  P.armR = [.6, 2.9, 2.6, .9, .5][f]; P.elbR = [.5, .5, .3, .05, .3][f]; P.outR = [.2, .1, .05, -.05, .1][f]; P.gripUp = f === 1 || f === 2; P.wpn = [1.3, 1.0, .6, .2, 1.2][f];
+  P.armL = [.3, .6, .4, -.2, .1][f]; P.elbL = [.4, .8, .6, .3, .3][f]; P.outL = [.25, .35, .3, .35, .2][f];
+  P.lean = [0, -.15, .05, .36, .1][f]; P.twist = [0, -.3, -.05, .3, .1][f]; P.sway = [0, .4, -.1, -.6, -.2][f];
+  P.legL = [0, -.1, .3, .56, .2][f]; P.legR = -P.legL * .7; P.bob = [0, .3, 0, -1.6, -.4][f];
+  return P;
+}
 function axeChop1(P, f){
   P.armR = [.55, 2.3, 2.0, 1.05, .45][f]; P.elbR = [.9, .9, .3, .05, .25][f]; P.outR = [.2, .6, .35, -.05, .1][f]; P.wRoll = [0, .7, .3, 0, 0][f]; P.wpn = [1.0, .95, .3, .1, .45][f];
   P.armL = [.25, .75, .35, -.35, -.1][f]; P.elbL = [.4, .9, .6, .3, .35][f]; P.outL = [.2, .25, .2, .3, .2][f];
@@ -2317,7 +2334,9 @@ function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
     const cfg = CHARS[key], A = ACTIONS[act], fs = Math.ceil(FS * K), F = new Frame(fs, fs), cx = new Ctx(F, -dir * Math.PI / 4, fs / 2, ANCHOR_Y * K, K * (cfg.bodyScale || 1));
     let P = humanPose(act, f, A.n, cfg.weapon);
     if (act === 'attack' && cfg.twoHand && cfg.weapon === 'sword') P = twoHandChop(P, f);   // (v197) greatswords and war axes: both hands, overhead chop
-    else if (act === 'attack' && cfg.axe && cfg.weapon === 'sword') P = axeChop1(P, f);   // (v210) a hand axe chops down at a slant
+    else if (act === 'attack' && cfg.axe && cfg.weapon === 'sword') P = axeChop1(P, f);
+    else if (act === 'attack' && cfg.spear && cfg.weapon === 'sword') P = spearThrust(P, f);
+    else if (act === 'attack' && cfg.mace && cfg.weapon === 'sword') P = maceSmash(P, f);   // (v210) a hand axe chops down at a slant
     if (ONE_HAND.includes(cfg.weapon) && !cfg.twoHand && DAGGER_LEFT.includes(dir)) P = mirrorArms(P);   // one-handed weapons are carried in the hand the camera can see
     drawHuman(cx, cfg, P);
     const img = finish(F, K);
@@ -2330,7 +2349,9 @@ function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
   if (BOSS_POSE[act]){ const pl = bpPlan(mb), q = BOSS_POSE[act](A.n > 1 ? f / (A.n - 1) : 0, pl); cx.post = q.post; mAct = q.act; mF = q.f; mN = MOB_ACTIONS[q.act].n;
     if (mb.native){ globalThis.BPX = q.ext; mAct = 'boss'; mF = 0; mN = 4; } else if (mb.limbs) globalThis.BPX = q.ext; }   // (v314) models that act with their own limbs read the pose's ext
   if (mb.human && BOSS_POSE[act]){ const ha = BOSS_HUMAN[act], hn = ACTIONS[ha].n; cx.post = null; mAct = ha; mN = hn; mF = Math.min(hn - 1, Math.round(f / (A.n - 1) * (hn - 1))); }   // a human boss uses the people's own skill poses: slam, shout, lunge, invoke
-  if (mb.human){ drawHuman(cx, mb.human, humanPose(mAct, mF, mN, mb.human.weapon)); const img = finish(F, K); if (mb.human.paint && cx.head) paintHead(img, F, cx); img.wsegs = cx.wsegs || null; return img; }   // (v166) where its weapon is, for the boss weapon glow
+  if (mb.human){ let HP = humanPose(mAct, mF, mN, mb.human.weapon); const hc = mb.human;   // (v330) a monster swings its own weapon the way a hero would
+    if (mAct === 'attack' && hc.weapon === 'sword'){ const f5 = Math.min(4, Math.round(mF / Math.max(1, mN - 1) * 3)); HP = hc.twoHand ? twoHandChop(HP, f5) : hc.spear ? spearThrust(HP, f5) : hc.mace ? maceSmash(HP, f5) : hc.axe ? axeChop1(HP, f5) : HP; }
+    drawHuman(cx, mb.human, HP); const img = finish(F, K); if (mb.human.paint && cx.head) paintHead(img, F, cx); img.wsegs = cx.wsegs || null; return img; }   // (v166) where its weapon is, for the boss weapon glow
   try { mb.model(cx, mAct, mF, mN); } finally { globalThis.BPX = null; }
   return finish(F, K);
 }
