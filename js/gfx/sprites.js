@@ -1717,7 +1717,7 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   // a rod ×0.72, a longstaff ×1.3; the katana is its own long single blade
   const kat = w === 'dagger' && !!cfg.katana, two = !!cfg.twoHand || kat;
   // (v188) the merchant's axes are short hand axes: AXE_K shortens the whole weapon (haft, swing trail) and its head
-  const len = (cfg.axe && w === 'sword' ? AXE_K[two ? 1 : 0] : 1) * (kat ? (19.5 + Math.max(0, wt) * .5) * WPN_BIG : ((w === 'sword' ? 17 : w === 'staff' ? 20 : 9.5) + Math.max(0, wt) * (w === 'sword' ? .7 : w === 'staff' ? .5 : .3)) * (w === 'sword' ? (two ? 1.45 : .88) : w === 'staff' ? (two ? .86 : .5) : 1) * WPN_BIG * (w === 'dagger' ? 1.15 : 1));   // daggers a touch more: they were the hardest to see
+  const len = (cfg.axe && w === 'sword' ? AXE_K[two ? 1 : 0] : cfg.spear && w === 'sword' ? 1.5 : cfg.mace && w === 'sword' ? .8 : 1) * (kat ? (19.5 + Math.max(0, wt) * .5) * WPN_BIG : ((w === 'sword' ? 17 : w === 'staff' ? 20 : 9.5) + Math.max(0, wt) * (w === 'sword' ? .7 : w === 'staff' ? .5 : .3)) * (w === 'sword' ? (two ? 1.45 : .88) : w === 'staff' ? (two ? .86 : .5) : 1) * WPN_BIG * (w === 'dagger' ? 1.15 : 1));   // daggers a touch more: they were the hardest to see
   let dir = P.wdir || rotX(rotX([0, -1, 0], P.armR + P.wpn), P.lean);
   if (w === 'staff' && P.ring >= 0) dir = nrm([0, 1, .25]);
   // (v211) an axe is held up the haft, not at its very end: the head sits closer to the hands and the haft runs on past the lower hand
@@ -1727,7 +1727,29 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   const base = midS ? add(hR, mul(dir, -stL * .44)) : add(hR, mul(dir, w === 'staff' ? -6 : -.8)), tip = axeHL ? add(base, mul(dir, axeHL)) : midS ? add(hR, mul(dir, stL * .56)) : add(hR, mul(dir, len));
   (cx.wsegs || (cx.wsegs = [])).push(w === 'staff' ? [proj(cx, add(tip, mul(dir, -.4))), proj(cx, add(tip, mul(dir, 3.2)))]   // (v159) a staff glows at its head only, never along the shaft
     : [proj(cx, add(base, mul(dir, kat ? 2 : 1))), proj(cx, tip)]);   // the blade in this frame
+  if (w === 'sword' && (cfg.spear || cfg.mace)){ const sg = cx.wsegs[cx.wsegs.length - 1]; sg[0] = proj(cx, add(tip, mul(dir, cfg.spear ? -5.5 : -5))); }   // (v325) a spear and a club glow at the head
   G();
+  if (w === 'sword' && cfg.spear){
+    // (v325) a spear (หอก / ทวน): a long lacquered shaft held near its middle, a steel socket with a red horsehair tassel and a leaf-shaped head
+    const wvR = [dir[1] * 0 - dir[2] * 0, dir[2] * 1 - dir[0] * 0, dir[0] * 0 - dir[1] * 1], wv = Math.hypot(...wvR) < .25 ? [1, 0, 0] : nrm(wvR);
+    const sock = add(tip, mul(dir, -5.6));
+    cap(cx, add(base, mul(dir, -9)), sock, .72, .66, M[wt >= 5 ? 'gold' : wt === 3 ? 'charcoal' : 'lacquer'], {tex:(n, lo, q, t) => (t > .44 && t < .52 ? {m:M.leather, t:1} : undefined)});
+    G(); ell(cx, add(base, mul(dir, -9.3)), .85, .85, M.gold);
+    G(); for (let i = 0; i < 7; i++){ const a = i / 7 * 6.28, d = add(add(sock, mul(wv, Math.cos(a) * 1.1)), [0, 0, Math.sin(a) * 1.1]); cap(cx, sock, add(d, mul(dir, -2.6)), .45, .3, M.scarlet || M.ember, {}); }
+    G(); cap(cx, add(sock, mul(dir, -.4)), add(sock, mul(dir, 1.2)), .95, .8, M.gold, {});
+    const hw = 1.5 + Math.max(0, wt - 2) * .08, half = t => hw * Math.sin(Math.min(1, t * 1.25) * Math.PI) * (1 - t * .35), rows = 8;
+    G(); for (const u of [-1, -.5, 0, .5, 1]){ const tone = Math.abs(u) > .8 ? 0 : u === 0 ? 2 : 1; let p0 = add(sock, mul(dir, 1));
+      for (let r = 1; r <= rows; r++){ const t = r / rows, p1 = add(add(sock, mul(dir, 1 + 4.6 * t)), mul(wv, u * half(t * .92))); cap(cx, p0, p1, .4, .4, blade, {tex:() => ({t:tone})}); p0 = p1; } }
+  } else if (w === 'sword' && cfg.mace){
+    // (v325) a yaksha's club (กระบอง): a grip wrapped in leather, a shaft that swells toward the head, gold bands and studs, a jewel on the crown
+    const g0 = add(base, mul(dir, -3.2)), hd = add(tip, mul(dir, -2.6)), wood = M[wt >= 5 ? 'gold' : wt === 3 ? 'charcoal' : 'wood'], band = M[wt >= 3 ? 'gold' : wt === 2 ? 'ember' : 'gold'];
+    cap(cx, g0, base, .82, .82, M.leather, {}); G(); ell(cx, add(g0, mul(dir, -.5)), 1.05, 1.05, band);
+    G(); cap(cx, base, hd, .95, (two ? 2.3 : 1.9), wood, {tex:(n, lo, q, t) => (Math.abs(t - .3) < .03 || Math.abs(t - .62) < .03 || t > .9 ? {m:band, t:1} : undefined)});
+    G(); ell(cx, add(hd, mul(dir, 1.2)), two ? 2.4 : 2, two ? 2.4 : 2, wood, {});
+    G(); const wvR = [-dir[1], dir[0], 0], wv = Math.hypot(...wvR) < .25 ? [1, 0, 0] : nrm(wvR);
+    for (let i = 0; i < 6; i++){ const a = i / 6 * 6.28, r = two ? 2.3 : 1.9, o = add(mul(wv, Math.cos(a) * r), [0, 0, Math.sin(a) * r]); ell(cx, add(add(hd, mul(dir, .9)), o), .55, .55, band); ell(cx, add(add(hd, mul(dir, -1.6)), mul(o, .85)), .45, .45, band); }
+    G(); ell(cx, add(tip, mul(dir, .4)), 1, 1, M[wt >= 2 ? 'gem' : 'gold'], {});
+  } else
   if (w === 'sword' && cfg.axe){
     // (v164) the merchant line's axe: a wooden haft wrapped at the grip, an iron head with a curved bit (a bearded
     // hand axe in one hand; a broad double-bit war axe in two), a steel cap on the butt

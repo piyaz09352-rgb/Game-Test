@@ -94,7 +94,7 @@ async function simOne({ line, lv, sec, boss: bossMode, bossType }){
   // (v324) which skills it uses and how much of the damage each one does (applyDamage knows the skill; normal hits have none)
   const skUse = {}, skDmg = {}; let dmgAll = 0; const _ex = execSkill, _ad = applyDamage;
   execSkill = function(id){ skUse[id] = (skUse[id] || 0) + 1; return _ex.apply(this, arguments); };
-  applyDamage = function(m, res, sk){ const hp0 = m && m.hp; const r = _ad.apply(this, arguments); const d = Math.max(0, (hp0 || 0) - Math.max(0, m.hp || 0)); if (d && !m.pvp){ dmgAll += d; const k = sk && sk.id ? sk.id : 'basic'; skDmg[k] = (skDmg[k] || 0) + d; } return r; };
+  applyDamage = function(m, res, sk){ const hp0 = m && m.hp; const r = _ad.apply(this, arguments); const d = Math.max(0, (hp0 || 0) - Math.max(0, m.hp || 0)); if (d && !m.pvp){ dmgAll += d; const k = sk && sk.id ? sk.id : res && (res.poison || res.bleed) ? 'dot' : 'basic';   /* (v325) poison, burn, curse and bleed ticks apart from plain hits */ skDmg[k] = (skDmg[k] || 0) + d; } return r; };
   EV.on('kill', onKill);
   const expNow = () => { let e = S.exp; for (let l = lv; l < S.lvl; l++) e += nextBase(l); return e; };
   exp0 = expNow();

@@ -20,3 +20,6 @@ for (const j of Object.keys(JOBS)){ const acts = new Set(SPR.CHAR_ACTIONS[j] || 
   for (let k = j; k && JOBS[k]; k = JOBS[k].parent) for (const id of JOBS[k].skills || []) if (SKILLS[id] && SKILLS[id].act && SPR.ACTIONS[SKILLS[id].act] && !acts.has(SKILLS[id].act)){ acts.add(SKILLS[id].act); add = true; }
   if (add) SPR.CHAR_ACTIONS[j] = [...acts]; }
 for (const key in SPR.CHAR_ACTIONS){ const j = String(key).split('|')[0]; if (j !== key && JOBS[j] && SPR.CHAR_ACTIONS[j]) SPR.CHAR_ACTIONS[key] = SPR.CHAR_ACTIONS[j]; }
+/* (v325) every skill knows its own id: six later skills (Divine Wrath, Heavenfall, Doom, Mass Hex, Cataclysm, Gravity
+   Well) had none, so systems keyed on sk.id (the balance report's damage share among them) filed their hits as plain attacks */
+{ const fix = () => { for (const k in SKILLS) if (SKILLS[k] && !SKILLS[k].id) SKILLS[k].id = k; }; fix(); setTimeout(fix, 0); }

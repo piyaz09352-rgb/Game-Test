@@ -79,34 +79,41 @@ const H2 = n => { const s = Math.sin(n * 91.7 + 17.3) * 43758.5453; return s - M
 function drawWings(g, id, x, y, dir, t, o = {}){
   const W = wingDef(id); if (!W) return;
   const away = dir >= 3 && dir <= 5, side = dir === 2 || dir === 6;
-  if ((o.part === 'front') !== away) return;              // behind the body unless we see your back
+  // (v325) the owner: wings from the 8 directions did not look real (a diagonal drew both wings full size as if seen from the
+  // front, the side showed only one). Now each wing is a plane swept back from the shoulders in a V (about 34°), turned with
+  // the body: its width on screen is how much of it faces the camera, its tip rises as it reaches away from the camera (the
+  // view looks down at the ground), and a wing nearer than the body is drawn over it, a farther one behind it.
+  const main = !o.part || (o.part === 'front') === away;   // the halo, the glow and the particles: drawn once
   const sh = y - (o.ride ? 31 : 16) + (o.sit ? 4 : 0), sp = (o.moving ? 9 : 3.2) * (W.kind === 'butterfly' ? 1.6 : 1), fl = Math.sin(t * sp) * (o.moving ? .3 : .14), fold = o.sit ? .55 : 1;
   const k = W.span * .85 * (o.scale || 1), sc = g.getTransform().a, blur = sc * 5;
+  const ph = (dir || 0) * Math.PI / 4, bx = Math.sin(ph), bd = Math.cos(ph), lx = Math.cos(ph), ld = -Math.sin(ph), ca = Math.cos(.6), sa = Math.sin(.6);
+  const wings = [-1, 1].map(w => { const vx = w * lx * ca + bx * sa, vd = w * ld * ca + bd * sa;
+    return {w, vx, vd, z:bd * 2.5 + vd * 20, sx:(vx < 0 || (Math.abs(vx) < 1e-6 && w < 0) ? -1 : 1) * Math.max(.46, Math.abs(vx))}; }).sort((p, q) => q.z - p.z);   // far wing first
+  const mine = wings.filter(q => !o.part || (q.z < 0) === (o.part === 'front'));
+  if (!main && !mine.length) return;
   g.save(); g.translate(x, sh);
-  if (W.halo && !side){ g.save(); g.globalCompositeOperation = 'lighter'; const hy = -(o.ride ? 44 : 40) + Math.sin(t * 2) * .8; g.strokeStyle = `rgba(${W.glow},.95)`; g.lineWidth = 1.4; g.shadowColor = `rgba(${W.glow},1)`; g.shadowBlur = blur * 1.4;
+  if (main && W.halo && !side){ g.save(); g.globalCompositeOperation = 'lighter'; const hy = -(o.ride ? 44 : 40) + Math.sin(t * 2) * .8; g.strokeStyle = `rgba(${W.glow},.95)`; g.lineWidth = 1.4; g.shadowColor = `rgba(${W.glow},1)`; g.shadowBlur = blur;
     g.beginPath(); g.ellipse(0, hy, 7, 2.2, 0, 0, 7); g.stroke(); g.restore(); }
   // a soft glow behind the pair
-  g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(0, -6, 0, 0, -6, 34 * k); gr.addColorStop(0, `rgba(${W.glow},${.14 + .06 * Math.sin(t * 2)})`); gr.addColorStop(1, `rgba(${W.glow},0)`); g.fillStyle = gr; g.beginPath(); g.ellipse(0, -6, 34 * k, 22 * k, 0, 0, 7); g.fill(); g.restore();
-  const sides = side ? [dir === 2 ? 1 : -1] : [-1, 1];
-  for (const s of sides){
-    // (v193) from the side the near wing fans out behind your back at nearly full size, tilted up (it was squeezed to half and tucked behind the body)
-    g.save(); g.scale(s * (side ? .85 : dir === 0 || dir === 4 ? 1 : .8) * fold, fold); if (side){ g.translate(3, 0); g.rotate(-.12); } else if (dir !== 0 && dir !== 4) g.translate((dir === 1 || dir === 5 ? 1 : -1) * s * 2, 0);
+  if (main){ g.save(); g.globalCompositeOperation = 'lighter'; const gr = g.createRadialGradient(bx * 3, -6, 0, bx * 3, -6, 34 * k); gr.addColorStop(0, `rgba(${W.glow},${.14 + .06 * Math.sin(t * 2)})`); gr.addColorStop(1, `rgba(${W.glow},0)`); g.fillStyle = gr;
+    g.fillRect(-40 * k, -50 * k, 80 * k, 80 * k); g.restore(); }
+  const G = [[34, -24], [44, -10], [28, 8], [18, -20], [40, -28], [10, -8]];
+  for (const q of mine){ const s = q.sx < 0 ? -1 : 1, rx = bx * 2.5, ry = -bd * 1.2, tilt = -q.vd * .38;
+    g.save(); g.translate(rx, ry); g.transform(q.sx * fold, tilt * fold, 0, fold, 0, 0);
     g.translate(2.5, 0); g.rotate(-fl - (o.sit ? .3 : 0)); g.scale(k, k);
     g.shadowColor = `rgba(${W.glow},.85)`; g.shadowBlur = blur;
     wingShape(g, W, t, s);
     g.restore();
-  }
-  // twinkles: bright four-point glints flare on the wing tips and edges
-  { const G = [[34, -24], [44, -10], [28, 8], [18, -20], [40, -28], [10, -8]], gs = g.getTransform().a;
+    // twinkles: bright four-point glints flare on this wing's tips and edges
     g.save(); g.globalCompositeOperation = 'lighter';
-    for (const s of sides) for (let i = 0; i < G.length; i++){ const tw = Math.pow(Math.max(0, Math.sin(t * (2.2 + i * .37) + i * 2.1 + s * 1.3)), 8); if (tw < .04) continue;
-      const px = s * G[i][0] * k * (side ? .85 : 1) * fold, py = G[i][1] * k * fold, r = (1.2 + tw * 2.6) * (W.kind === 'satan' ? 1.15 : 1);
+    for (let i = 0; i < G.length; i++){ const tw = Math.pow(Math.max(0, Math.sin(t * (2.2 + i * .37) + i * 2.1 + q.w * 1.3)), 8); if (tw < .04) continue;
+      const gx = (G[i][0] + 2.5) * k, px = rx + q.sx * gx * fold, py = ry + (tilt * gx + G[i][1] * k) * fold, r = (1.2 + tw * 2.6) * (W.kind === 'satan' ? 1.15 : 1);
       g.fillStyle = `rgba(${W.glow},${tw * .5})`; g.beginPath(); g.arc(px, py, r * 1.8, 0, 7); g.fill();
       g.fillStyle = `rgba(255,255,255,${tw})`; g.beginPath(); g.moveTo(px, py - r * 2.4); g.lineTo(px + r * .35, py); g.lineTo(px, py + r * 2.4); g.lineTo(px - r * .35, py); g.closePath(); g.fill();
       g.beginPath(); g.moveTo(px - r * 2.4, py); g.lineTo(px, py + r * .35); g.lineTo(px + r * 2.4, py); g.lineTo(px, py - r * .35); g.closePath(); g.fill(); }
     g.restore(); }
   g.restore();
-  wingFx(g, W, x, sh, t, o, side);
+  if (main) wingFx(g, W, x, sh, t, o, side);
 }
 const wlg = (g, x0, y0, x1, y1, c) => { const gr = g.createLinearGradient(x0, y0, x1, y1); gr.addColorStop(0, c[0]); gr.addColorStop(.5, c[1]); gr.addColorStop(1, c[2]); return gr; };
 function feather(g, x, y, ang, len, w, fill, edge, tip){
