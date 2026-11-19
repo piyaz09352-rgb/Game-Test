@@ -119,9 +119,14 @@ function g2Fissures(f){ if (f._fs) return f._fs; const out = [];
     let a = a0; for (let j = 0; j <= N; j++){ const u = j / N; a += (g2h(i * 31 + j, 92) - .5) * .22; const r = f.r * .5 + u * L * .75; pts.push([Math.cos(a) * r, Math.sin(a) * r * .5, (1 - u) * (5 + g2h(i, 93) * 4) * (.6 + g2h(i * 31 + j, 94) * .7)]); }
     out.push(pts); }
   return (f._fs = out); }
-function g2FissureDraw(g, x, y, pts, reach, glow){
-  const n = Math.max(2, Math.ceil(pts.length * reach)), L = [], R = [];
-  for (let j = 0; j < n; j++){ const [px, py, w] = pts[j], q = pts[Math.min(pts.length - 1, j + 1)], p0 = pts[Math.max(0, j - 1)], dx = q[0] - p0[0], dy = q[1] - p0[1], d = Math.hypot(dx, dy) || 1, nx = -dy / d, ny = dx / d * .5;
+function g2FissureDraw(g, x, y, pts0, reach, glow, wk = 1){
+  /* (v325) the crack creeps out smoothly (its tip slides between the points instead of a whole segment popping in) and
+     opens as it goes: narrow at first, widening to full */
+  const fl = (pts0.length - 1) * Math.max(0, Math.min(1, reach)), i0 = Math.floor(fl), fr = fl - i0, pts = pts0.slice(0, i0 + 1);
+  if (fr > 0 && i0 + 1 < pts0.length){ const a = pts0[i0], b = pts0[i0 + 1]; pts.push([a[0] + (b[0] - a[0]) * fr, a[1] + (b[1] - a[1]) * fr, a[2] + (b[2] - a[2]) * fr]); }
+  if (pts.length < 2) return;
+  const n = pts.length, L = [], R = [];
+  for (let j = 0; j < n; j++){ const [px, py, w0] = pts[j], w = w0 * wk * (j === n - 1 ? .35 : 1), q = pts[Math.min(pts.length - 1, j + 1)], p0 = pts[Math.max(0, j - 1)], dx = q[0] - p0[0], dy = q[1] - p0[1], d = Math.hypot(dx, dy) || 1, nx = -dy / d, ny = dx / d * .5;
     L.push([x + px + nx * w, y + py + ny * w]); R.push([x + px - nx * w, y + py - ny * w]); }
   g.fillStyle = '#3b2716'; g.beginPath(); L.forEach((p, i) => i ? g.lineTo(p[0] + .8, p[1] + 1.2) : g.moveTo(p[0] + .8, p[1] + 1.2)); for (let i = R.length - 1; i >= 0; i--) g.lineTo(R[i][0] - .8, R[i][1] + 1.2); g.closePath(); g.fill();   // soil walls
   g.fillStyle = '#0d0806'; g.beginPath(); L.forEach((p, i) => i ? g.lineTo(p[0], p[1] + 1.6) : g.moveTo(p[0], p[1] + 1.6)); for (let i = R.length - 1; i >= 0; i--) g.lineTo(R[i][0], R[i][1] + 1.6); g.closePath(); g.fill();   // the dark gap
@@ -144,13 +149,15 @@ function g2TurfDraw(g, f, x, y, pr, age, half){
     for (let i = 0; i < 5; i++) g2Grass(g, (g2h(s.s + i, 105) - .5) * W * 1.4, (g2h(s.s + i, 106) - .5) * D, s.s + i, 3);
     g.restore(); } }
 function g2PitUnder(g, f, x, y, age, fade){
-  const open = g2ease(Math.min(1, (age - .2) / .8)), close = age > PIT.burst ? g2ease(Math.min(1, (age - PIT.burst) / .9)) : 0, pr = f.r * .6 * open * (1 - close * .85);
+  const open = g2ease(Math.min(1, Math.max(0, (age - .15) / 1.1))), close = age > PIT.burst ? g2ease(Math.min(1, (age - PIT.burst) / 1.2)) : 0, pr = f.r * .6 * open * (1 - close);
   g.save(); g.globalAlpha = fade;
   // churned earth showing through the grass round the hole
   g.save(); g.translate(x, y); g.scale(1, .5); const sg = g.createRadialGradient(0, 0, 0, 0, 0, f.r * 1.15); sg.addColorStop(0, 'rgba(92,64,38,.55)'); sg.addColorStop(.6, 'rgba(110,80,50,.3)'); sg.addColorStop(1, 'rgba(110,80,50,0)'); g.fillStyle = sg; g.beginPath(); g.arc(0, 0, f.r * 1.15, 0, 7); g.fill(); g.restore();
   // fissures splitting the ground outwards
-  const reach = Math.min(1, Math.max(0, (age - .05) / .7)), glow = .5 * (1 - close);
-  for (const pts of g2Fissures(f)) g2FissureDraw(g, x, y, pts, reach, glow);
+  const reach = g2ease(Math.min(1, Math.max(0, (age - .05) / .9))), glow = .5 * (1 - close), wk = g2ease(Math.min(1, Math.max(0, (age - .05) / 1.1))) * (1 - close * .5);
+  for (const pts of g2Fissures(f)) g2FissureDraw(g, x, y, pts, reach, glow, wk);
+  // (v325) the ground sinks before it tears: a soft dark dip spreads under the cracks and deepens as the hole opens
+  { const sink = g2ease(Math.min(1, age / .9)) * (1 - close); if (sink > .01){ g.save(); g.translate(x, y); g.scale(1, .5); const dg = g.createRadialGradient(0, 0, f.r * .1, 0, 0, f.r * (.45 + sink * .5)); dg.addColorStop(0, `rgba(40,26,14,${.45 * sink})`); dg.addColorStop(.7, `rgba(60,40,22,${.22 * sink})`); dg.addColorStop(1, 'rgba(60,40,22,0)'); g.fillStyle = dg; g.beginPath(); g.arc(0, 0, f.r * (.45 + sink * .5), 0, 7); g.fill(); g.restore(); } }
   if (pr > 2){
     const rim = g2Rag(x, y, pr, f.seed, .16), wall = g2Rag(x, y + pr * .12, pr * .9, f.seed + 1, .13), deep = g2Rag(x, y + pr * .2, pr * .62, f.seed + 2, .12);
     // the soil wall: layered earth, lit at the top, going dark as it drops
@@ -174,20 +181,21 @@ function g2PitUnder(g, f, x, y, age, fade){
   g.restore();
 }
 function g2PitOver(g, f, x, y, age, fade){
-  const open = g2ease(Math.min(1, (age - .2) / .8)), burst = age > PIT.burst, pr = f.r * .6 * open;
-  g.save(); g.globalAlpha = fade;
-  if (!burst && pr > 2){
+  const open = g2ease(Math.min(1, Math.max(0, (age - .15) / 1.1))), burst = age > PIT.burst, out = burst ? Math.max(0, 1 - (age - PIT.burst) / .45) : 1, pr = f.r * .6 * open;
+  g.save(); g.globalAlpha = fade * out;
+  if (out > 0 && pr > 2){
     g2TurfDraw(g, f, x, y, pr, age, 'front');
     // loose earth sliding in from all round, a haze of dust over the hole
     for (let j = 0; j < Math.round(14 * g2q()); j++){ const u = ((j / 14) + T * .22) % 1, a = j * 2.4 + u * 2, rr = f.r * 1.05 * (1 - u) + pr * .2;
-      g.globalAlpha = fade * Math.min(1, (1 - u) * 2.5) * .6; g2Dust(g, x + Math.cos(a) * rr, y + Math.sin(a) * rr * .5, 6 + (1 - u) * 6, .45); }
-    g.globalAlpha = fade * .35; g2Dust(g, x, y - 6, pr * .9, .35, '160,130,95');
+      g.globalAlpha = fade * out * Math.min(1, (1 - u) * 2.5) * .6; g2Dust(g, x + Math.cos(a) * rr, y + Math.sin(a) * rr * .5, 6 + (1 - u) * 6, .45); }
+    g.globalAlpha = fade * out * .35; g2Dust(g, x, y - 6, pr * .9, .35, '160,130,95');
   }
+  g.globalAlpha = fade;
   // the eruption: earth and dust blast up out of the hole, clods fly and fall, the ground cracks further and settles
   if (burst){ const k = (age - PIT.burst) / 1.7; if (k < 1){
-    const plume = Math.sin(Math.min(1, k * 1.6) * Math.PI);
+    const plume = Math.sin(Math.min(1, k * 1.6) * Math.PI), rise = g2ease(Math.min(1, k * 4));   // (v325) the blast swells up over the first moments
     for (let i = 0; i < 14; i++){ const a = g2h(i, 120) * 6.283, h = (30 + g2h(i, 121) * 50) * plume, sx = x + Math.cos(a) * f.r * .25 * g2h(i, 122), sy = y + Math.sin(a) * f.r * .12;
-      g.globalAlpha = fade * (1 - k) * .75; g2Dust(g, sx, sy - h, 14 + h * .35, .7, i % 2 ? '120,92,62' : '160,128,92'); }
+      g.globalAlpha = fade * (1 - k) * .75 * rise; g2Dust(g, sx, sy - h, 14 + h * .35, .7, i % 2 ? '120,92,62' : '160,128,92'); }
     for (let i = 0; i < Math.round(30 * g2q()); i++){ const a = g2h(i, 50) * 6.283, sp = 40 + g2h(i, 51) * 120, px = x + Math.cos(a) * sp * k, py = y + Math.sin(a) * sp * k * .5 - (sp * 1.1 * k - 170 * k * k);
       g.globalAlpha = fade * Math.min(1, (1 - k) * 2); g2Clod(g, px, py, 2.4 + g2h(i, 52) * 3.2, i); }
     for (let i = 0; i < 12; i++){ const a = i / 12 * 6.283, rr = f.r * (.35 + k * .9); g.globalAlpha = fade * (1 - k) * .5; g2Dust(g, x + Math.cos(a) * rr, y + Math.sin(a) * rr * .5 - k * 12, 16 + k * 24, .55); }

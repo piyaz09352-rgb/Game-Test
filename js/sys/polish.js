@@ -91,7 +91,7 @@ if (typeof AFFIX !== 'undefined'){
 { const _bp = botPick;
   botPick = function(t){ if (!t || !S) return _bp.apply(this, arguments);
     const line = jobChain(), saved = {}, hold = (id, v) => { if (!(id in saved)) saved[id] = BOT.used[id]; BOT.used[id] = v; };
-    if (line.includes('rune')){ const n = mobs.filter(m => !m.dead && Math.hypot(m.x - t.x, m.y - t.y) < 150).length; if (n < 3) for (const id of ['solarfall', 'deluge', 'tempest', 'earthswallow']) hold(id, 1e15); }
+    if (line.includes('rune')){ const n = mobs.filter(m => !m.dead && Math.hypot(m.x - t.x, m.y - t.y) < 150).length; if (n < 2 && !t.elite && !(t.def && t.def.boss)) for (const id of ['solarfall', 'deluge', 'tempest', 'earthswallow']) hold(id, 1e15); }   /* (v325) two together, or a pack leader or boss alone (it waited for three: maps hold fewer monsters since v313, so the great spells went 1–4 times in 2.5 minutes) */
     if (line.includes('blade') && threats().length >= 2) for (const id of ['vanguard', 'roar', 'provoke']) if (skl(id)) hold(id, -1);
     try { return _bp.apply(this, arguments); } finally { for (const id in saved){ if (saved[id] === undefined) delete BOT.used[id]; else BOT.used[id] = saved[id]; } } }; }
 

@@ -91,6 +91,10 @@ async function simOne({ line, lv, sec, boss: bossMode, bossType }){
   const mobLv = (() => { const ls = (MAPS[mapId].mobs || []).map(k => MOB[k] && !MOB[k].boss && MOB[k].lvl).filter(Boolean); return ls.length ? Math.round(ls.reduce((a, b) => a + b, 0) / ls.length) : 0; })();
   // run
   let kills = 0, deaths = 0, exp0 = 0; const onKill = m => { if (!m.minion && !m.def.dummy) kills++; };
+  // (v324) which skills it uses and how much of the damage each one does (applyDamage knows the skill; normal hits have none)
+  const skUse = {}, skDmg = {}; let dmgAll = 0; const _ex = execSkill, _ad = applyDamage;
+  execSkill = function(id){ skUse[id] = (skUse[id] || 0) + 1; return _ex.apply(this, arguments); };
+  applyDamage = function(m, res, sk){ const hp0 = m && m.hp; const r = _ad.apply(this, arguments); const d = Math.max(0, (hp0 || 0) - Math.max(0, m.hp || 0)); if (d && !m.pvp){ dmgAll += d; const k = sk && sk.id ? sk.id : res && (res.poison || res.bleed) ? 'dot' : 'basic';   /* (v325) poison, burn, curse and bleed ticks apart from plain hits */ skDmg[k] = (skDmg[k] || 0) + d; } return r; };
   EV.on('kill', onKill);
   const expNow = () => { let e = S.exp; for (let l = lv; l < S.lvl; l++) e += nextBase(l); return e; };
   exp0 = expNow();
@@ -108,10 +112,12 @@ async function simOne({ line, lv, sec, boss: bossMode, bossType }){
   }
   setBot(false);
   EV.h.kill = (EV.h.kill || []).filter(f => f !== onKill);
+  execSkill = _ex; applyDamage = _ad;
   const types = new Set(); for (const id in S.skills){ const sk = SKILLS[id]; if (sk && skl(id)) types.add(sk.type); }
   const aoe = ['aoeSelf', 'aoeTarget', 'fieldDot', 'line', 'nova', 'cone'].filter(x => types.has(x));
   return { line, lineName: JOBS[line].name, job, jobName: JOBS[job].name, lv, map: mapId, mapName: MAPS[mapId].name, mobLv,
     kpm: +(kills / (sec / 60)).toFixed(1), expPm: Math.round((expNow() - exp0) / (sec / 60)), deaths, pots: 300 - (S.inv[potId] || 0), spPots: ITEMS[spId] ? 300 - (S.inv[spId] || 0) : 0,
+    skills: Object.fromEntries(Object.keys({...skUse, ...skDmg}).map(k => [k, [skUse[k] || 0, dmgAll ? Math.round((skDmg[k] || 0) / dmgAll * 100) : 0]])),
     hpLow: Math.round(hpLowest * 100), boss: bossM ? {name: bossM.def.name, lvl: bossM.def.lvl, won: !!bossM.dead, hpLeft: bossM.dead ? 0 : Math.round(bossM.hp / bossM.maxhp * 100), sec: Math.round(t), dps: Math.round((bossM.maxhp - Math.max(0, bossM.hp)) / Math.max(1, t)), maxhp: bossM.maxhp} : null, castPct: Math.round(tm.cast / sec * 100), sitPct: Math.round(tm.sit / sec * 100), movePct: Math.round(tm.move / sec * 100), aoe: aoe.join(',') || '-', atk: DER.atk, matk: DER.matk, maxhp: DER.maxhp };
 }
 

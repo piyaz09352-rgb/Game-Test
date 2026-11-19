@@ -19,12 +19,13 @@ const DT_KIND = {
 function dailyGen(){
   const day = dayKey(); let s = hashS(`${day}|${S.name || ''}|${S.job}`) || 1; const r = () => (s = (s * 1103515245 + 12345) >>> 0) / 4294967296;
   // maps that suit this level, for the hunt-a-species and element tasks
-  const fit = MAPS.filter(m => S.lvl >= m.lv[0] - 3 && S.lvl <= m.lv[1] + 8); const near = fit.length ? fit : [MAPS.reduce((a, b) => Math.abs(b.lv[0] - S.lvl) < Math.abs(a.lv[0] - S.lvl) ? b : a)];
+  const hunt = MAPS.filter(m => m && m.lv && (m.mobs || []).some(t => MOB[t] && !MOB[t].boss));   // (v323) only maps with monsters: Aren has none since v306 (a daily there crashed)
+  const fit = hunt.filter(m => S.lvl >= m.lv[0] - 3 && S.lvl <= m.lv[1] + 8); const near = fit.length ? fit : [hunt.reduce((a, b) => Math.abs(b.lv[0] - S.lvl) < Math.abs(a.lv[0] - S.lvl) ? b : a)];
   const pool = ['killAny', 'killT', 'elem', 'skill', 'pickup', 'potion', ...(S.lvl >= 8 ? ['boss', 'boss'] : []), 'craft'];
   const out = [], used = new Set();
   while (out.length < 3){ const k = pool[Math.floor(r() * pool.length)]; if (used.has(k) || (k === 'killT' && used.has('elem')) || (k === 'elem' && used.has('killT'))) continue; used.add(k);
     const d = {k, have:0, done:false, claimed:false};
-    if (k === 'killT' || k === 'elem'){ const m = near[Math.floor(r() * near.length)], mobs = m.mobs.filter(t => MOB[t] && !MOB[t].night); d.m = m.id; d.t = mobs[Math.floor(r() * mobs.length)] || m.mobs[0]; d.e = MOB[d.t].elem || 'neutral'; if (k === 'elem') delete d.t; }
+    if (k === 'killT' || k === 'elem'){ const m = near[Math.floor(r() * near.length)], mobs = m.mobs.filter(t => MOB[t] && !MOB[t].night); d.m = m.id; d.t = mobs[Math.floor(r() * mobs.length)] || m.mobs[0]; d.e = (MOB[d.t] && MOB[d.t].elem) || 'neutral'; if (k === 'elem') delete d.t; }
     d.n = DT_KIND[k].n(S.lvl); out.push(d); }
   S.daily = {day, tasks:out, bonus:false}; dirty = true;
 }

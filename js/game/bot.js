@@ -79,6 +79,7 @@ function botReady(id, keep){
 BOT.used = BOT.used || {}; BOT.castT = BOT.castT || {};
 function botUsable(id, t){
   const sk = SKILLS[id];
+  if (sk.bia && (S.bia || 0) < sk.bia(skl(id) || 1)) return false;   // (v323) a skill paid in Bia, and not enough Bia
   if (sk.type === 'aoeSelf') return t && dist(t, P) < (sk.radius || 60) + t.def.r;
   if (sk.type === 'command') return SUMMONS.some(s => s.kind === 'beast' && s.beast !== 'kinnaree');
   if (sk.type === 'debuff' && t && t.st && Object.keys(sk.st ? sk.st(1) : {}).some(k => t.st[k] > 0)) return false;   // already afflicted
@@ -88,7 +89,7 @@ function botPick(t){
   const b = botSet(), keep = Math.round(DER.maxsp * b.spKeep / 100), hp = S.hp / DER.maxhp, sp = S.sp / DER.maxsp;
   for (const e of b.list){
     if (!e.on) continue; const sk = SKILLS[e.id];
-    if (botKind(sk) === 'heal' && hp * 100 < b.heal && botReady(e.id, 0)) return e.id;
+    if (botKind(sk) === 'heal' && hp * 100 < b.heal && !botWeak(e.id) && botReady(e.id, 0)) return e.id;
   }
   for (const e of b.list) if (e.on && botKind(SKILLS[e.id]) === 'sp' && sp < .5 && botReady(e.id, 0)) return e.id;
   if (b.buff) for (const e of b.list){
@@ -112,13 +113,21 @@ function botPick(t){
   if (!t) return null;
   let best = null, bt = Infinity;
   b.list.forEach((e, i) => {
-    if (!e.on || botKind(SKILLS[e.id]) !== 'atk' || !botReady(e.id, keep) || !botUsable(e.id, t)) return;
+    if (!e.on || botKind(SKILLS[e.id]) !== 'atk' || botWeak(e.id) || !botReady(e.id, keep) || !botUsable(e.id, t)) return;
     const when = (BOT.used[e.id] || 0) + i * 1e-3;          // oldest use first, list order breaks ties
     if (when < bt){ bt = when; best = e.id; }
   });
   return best;
 }
-function botFire(id){ const cd0 = P.cds[id] || 0; trySkill(id); if ((P.cds[id] || 0) > cd0 || P.cast){ BOT.used[id] = performance.now(); BOT.castT[id] = T; } }
+/* (v323) the novice's own skills are left alone once they no longer matter: Stone Throw once the hero has an attack
+   skill of its job (it was cast as often as the job's best skills, a third of a Lv 115 hunter's casts), First Aid once it
+   heals less than 5 % of Max HP (45 HP to a hero of thousands: a Lv 115 merchant cast it 28 times in 2 minutes) */
+function botWeak(id){ const sk = SKILLS[id]; if (!sk || sk.job !== 'novice') return false;
+  if (sk.type === 'heal') return typeof sk.heal === 'function' && sk.heal(skl(id) || 1) < DER.maxhp * .05;
+  return S.job !== 'novice' && ownedSkillIds().some(o => SKILLS[o] && SKILLS[o].job !== 'novice' && botKind(SKILLS[o]) === 'atk' && skl(o)); }
+function botFire(id){ const cd0 = P.cds[id] || 0; trySkill(id); if ((P.cds[id] || 0) > cd0 || P.cast){ BOT.used[id] = performance.now(); BOT.castT[id] = T; }
+  else BOT.used[id] = performance.now();   /* (v323) it did not go off (no Bia, blocked, out of reach…): it goes to the back of the turn instead of being
+     chosen again at once — a Lv 115 merchant without Bia tried Gold Rush 158 times a minute and its other skills never got a turn */ }
 /* range the auto stands at when normal attacks are off: the shortest ticked attack skill */
 function botHoldRange(){
   const b = S.bot; if (!b || b.basic) return 0;

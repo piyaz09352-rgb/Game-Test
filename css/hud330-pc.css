@@ -1,0 +1,29 @@
+/* VAYRATHEN — css/hud330-pc.css — (v330) the new HUD on PC (mouse and keyboard): the skill fan round the attack button, the potions and
+   the small round buttons. Shared rules: css/hud330.css. */
+/* buttons: skills (glass squares, gradient rim), potions (glass orbs), small round buttons */
+html body #ui.ui.h6pc #dock{ background:transparent !important; border:0 !important; box-shadow:none !important; padding:0 !important; transform:none !important; }
+html body #ui.ui.h6pc #dock::before, html body #ui.ui.h6pc #dock::after{ display:none !important; }
+html body #ui.ui.h6pc #hotbar{ position:absolute !important; inset:0 !important; display:block !important; background:none !important; border:0 !important; box-shadow:none !important; padding:0 !important; width:auto !important; height:auto !important; }
+html body #ui.ui.h6pc #hotbar > .hsep{ display:none !important; }
+html body #ui.ui.h6pc #hotbar > .hk{ position:absolute !important; margin:0 !important; transform:none; color:#fff !important; }
+html body #ui.ui.h6pc #hotbar > .hk.h6sk{ width:54px !important; height:54px !important; }
+html body #ui.ui.h6pc #hotbar > .hk.h6sk, html body #ui.ui.h6.moba .mo.sk{ border-radius:15px !important;
+  background:linear-gradient(rgba(20,16,46,.72), rgba(20,16,46,.72)) padding-box, var(--a6-rim2) border-box !important; border:1.5px solid transparent !important; box-shadow:0 0 12px rgba(120,140,255,.45), 0 4px 10px rgba(0,0,0,.4) !important; }
+html body #ui.ui.h6pc #hotbar > .hk.h6sk.empty, html body #ui.ui.h6.moba .mo.sk.empty{ background:linear-gradient(rgba(20,16,46,.4), rgba(20,16,46,.4)) padding-box, linear-gradient(135deg, rgba(200,170,255,.5), rgba(90,220,255,.5)) border-box !important; box-shadow:0 0 6px rgba(120,140,255,.25) !important; }
+html body #ui.ui.h6pc #hotbar > .hk.h6pot{ width:50px !important; height:50px !important; }
+html body #ui.ui.h6pc #hotbar > .hk.h6pot, html body #ui.ui.h6.moba .mo.pot{ border-radius:50% !important;
+  background:radial-gradient(circle at 50% 30%, rgba(70,56,130,.85), rgba(16,12,36,.85)) padding-box, linear-gradient(135deg, #ff7aa8, #ffd36a) border-box !important; border:1.5px solid transparent !important; box-shadow:0 0 12px rgba(255,140,160,.5), 0 4px 10px rgba(0,0,0,.4) !important; }
+html body #ui.ui.h6pc #hotbar > .hk.h6ut{ width:44px !important; height:44px !important; }
+html body #ui.ui.h6pc #hotbar > .hk.h6ut, html body #ui.ui.h6.moba .mu, html body #ui.ui.h6.moba .mo.roll{ border-radius:50% !important;
+  background:radial-gradient(circle at 50% 30%, rgba(60,50,120,.8), rgba(14,10,34,.8)) padding-box, linear-gradient(135deg, #8ad8ff, #b47cff) border-box !important; border:1.5px solid transparent !important; box-shadow:0 0 10px rgba(100,170,255,.45), 0 3px 8px rgba(0,0,0,.4) !important; color:#fff !important; }
+html body #ui.ui.h6pc #hotbar > .hk.h6ut.on, html body #ui.ui.h6.moba .mu.on{ background:radial-gradient(circle at 50% 30%, #ffe88a, #f0a020) padding-box, linear-gradient(135deg, #fff, #ffd36a) border-box !important; box-shadow:0 0 16px rgba(255,200,60,.9) !important; color:#3a2200 !important; }
+html body #ui.ui.h6pc #hotbar > .hk b, html body #ui.ui.h6pc #hotbar > .hk span{ color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.9) !important; }
+html body #ui.ui.h6pc #hotbar > .hk.h6ut b{ font-size:11px !important; }
+html body #ui.ui.h6pc #hotbar > .hk.h6ut span{ font-size:8.5px !important; }
+html body #ui.ui.h6pc #hotbar > .hk kbd{ background:linear-gradient(135deg, #b47cff, #4fd8ff) !important; color:#fff !important; border:1px solid rgba(255,255,255,.8) !important; border-radius:7px !important; box-shadow:0 0 6px rgba(120,160,255,.8) !important; }
+html body #ui.ui.h6 #pcAtk small{ background:linear-gradient(var(--a6-glass), var(--a6-glass)) padding-box, var(--a6-rim2) border-box !important; border:1px solid transparent !important; color:#fff !important; box-shadow:0 0 8px rgba(140,110,255,.4); }
+html body #ui.ui.h6pc #dock #hotbar > .hk b, html body #ui.ui.h6pc #dock #hotbar > .hk span, html body #ui.ui.h6pc #dock #hotbar > .hk em{ color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.95) !important; }
+html body #ui.ui.h6pc #dock #hotbar > .hk.h6ut.on b, html body #ui.ui.h6pc #dock #hotbar > .hk.h6ut.on span{ color:#3a2200 !important; text-shadow:none !important; }
+html body #ui.ui.h6 #goalCard *, html body #ui.ui.h6 #charCard #cJob *, html body #ui.ui.h6 #charCard #cJob, html body #ui.ui.h6 #mapCard #mapName, html body #ui.ui.h6 #mapCard #mapName *,
+html body #ui.ui.h6pc #dock #hotbar > .hk b, html body #ui.ui.h6pc #dock #hotbar > .hk span, html body #ui.ui.h6 #chips *, html body #ui.ui.h6 #banner *, html body #ui.ui.h6 #achPop *, html body #ui.ui.h6 #target *{
+  -webkit-text-fill-color:currentColor !important; -webkit-text-stroke:0 !important; background-clip:border-box !important; -webkit-background-clip:border-box !important; }

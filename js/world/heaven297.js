@@ -21,8 +21,8 @@ const HVN_EARTHLY = new Set(['tree', 'palm', 'pine', 'bush', 'deadtree', 'thornt
 
 /* ---------- the land ---------- */
 BIOME.tavatimsa = {base:['#fff6e0', '#fff8e8', '#fffaf0'], mottle:['rgba(240,210,140,.2)', 'rgba(255,255,255,.5)'], blades:null, road:['#f0d890', '#f6e0a0', '#fce8b0'],
-  floor:null, ponds:4, pondR:[80, 135], pondCols:['#f4ecd8', '#5a98d8', '#8ac0f0', '#dff0ff'],
-  props:[['parijata', 5, 3], ['kalpatree', 3, 3], ['devapillar', 4, 3], ['lotuslamp', 3, 2], ['statue', 2, 2], ['sala', 1, 2]], propN:85, fx:'petals', fxA:.4, sky:true};
+  floor:null, ponds:0, pondR:[80, 135],   /* (v325) the owner: the holes looking down at the clouds were silly — no more */ pondCols:['#f4ecd8', '#5a98d8', '#8ac0f0', '#dff0ff'],
+  props:[['parijata', 5, 3], ['kalpatree', 3, 3], ['lotuslamp', 3, 2], ['statue', 2, 2], ['sala', 1, 2]], propN:85, fx:'petals', fxA:.4, sky:true};
 
 /* ---------- the island's floor, and its edge breaking off into the clouds ---------- */
 function hvnFloor(g){
@@ -73,7 +73,7 @@ function hvnFloor(g){
 
 /* ---------- heavenly plants only; no cook, no fire ---------- */
 function hvnTidy(){
-  const SWAP = {tree:'parijata', palm:'kalpatree', pine:'parijata', himtree:'parijata', banana:'kalpatree', flowerbed:'lotusbowl', frangipani:'parijata', camptree:'kalpatree', crystal:'devapillar', obelisk:'devapillar'};   // bushes, hedges and jars simply go (a row of identical lamps in their place was clutter)
+  const SWAP = {tree:'parijata', palm:'kalpatree', pine:'parijata', himtree:'parijata', banana:'kalpatree', flowerbed:'lotusbowl', frangipani:'parijata', camptree:'kalpatree', crystal:'lotuslamp', obelisk:'lotuslamp'};   /* (v325) no Deva pillars: the owner had them removed */   // bushes, hedges and jars simply go (a row of identical lamps in their place was clutter)
   for (let i = PROPS.length - 1; i >= 0; i--){ const p = PROPS[i]; if (!HVN_EARTHLY.has(p.type)) continue;
     for (let j = obstacles.length - 1; j >= 0; j--) if (obstacles[j].prop === p) obstacles.splice(j, 1);
     const to = SWAP[p.type]; if (!to || !PROP_TYPES[to]){ PROPS.splice(i, 1); continue; }
