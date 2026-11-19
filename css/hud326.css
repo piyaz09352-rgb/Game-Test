@@ -209,3 +209,33 @@ html body #ui#ui.ui.h6 #charCard#charCard .cname .h6chips{ background:none !impo
 html body #ui#ui.ui.h6 #charCard#charCard .bar::before{ background:none !important; width:auto !important; height:auto !important; border:0 !important; box-shadow:none !important; -webkit-mask:none !important; mask:none !important; transform:none !important; }
 html body #ui#ui.ui.h6 #charCard#charCard.card.char{ aspect-ratio:auto !important; }
 html body #ui#ui.ui.h6 #charCard#charCard .bar span, html body #ui#ui.ui.h6 #charCard#charCard .bar span em{ line-height:1 !important; height:100% !important; display:flex !important; align-items:center !important; margin:0 !important; padding-top:0 !important; padding-bottom:0 !important; }
+
+/* ---------- (v328) windows (bag, skills, status, equipment, settings, quests, shops…) in the same style ----------
+   The frame is frosted glass with the HUD's gradient rim and glow; the title bar dark glass with a glowing title; the
+   close and minimise buttons glass orbs. What is inside is recoloured by js/sys/hud326.js (h6Recolor). */
+html body.h6w .win, html body.h6w section.win{ background:linear-gradient(180deg, rgba(250,249,255,.97), rgba(236,234,252,.97)) padding-box, linear-gradient(135deg, #c79bff, #59dcff 50%, #ffd76a) border-box !important;
+  border:2px solid transparent !important; border-radius:18px !important; box-shadow:0 0 0 1px rgba(255,255,255,.4), 0 0 26px rgba(140,110,255,.45), 0 18px 40px rgba(10,6,30,.45) !important; overflow:hidden; }
+html body.h6w .win::before, html body.h6w .win::after{ display:none !important; }
+html body.h6w .win > header.wt{ background:linear-gradient(100deg, #2c2468, #1a1640 60%, #20305e) !important; border:0 !important; border-bottom:1.5px solid transparent !important; position:relative;
+  box-shadow:0 1px 0 rgba(255,255,255,.08) inset, 0 4px 14px rgba(20,10,60,.35) !important; color:#fff !important; }
+html body.h6w .win > header.wt::before{ content:'' !important; display:block !important; position:absolute !important; left:0; right:0; bottom:-1.5px; top:auto !important; height:1.5px; background:linear-gradient(90deg, transparent, #b47cff, #4fd8ff, #ffd36a, transparent) !important; box-shadow:0 0 8px rgba(120,180,255,.8); border:0 !important; width:auto !important; transform:none !important; -webkit-mask:none !important; mask:none !important; }
+html body.h6w .win > header.wt::after{ display:none !important; }
+html body.h6w .win > header.wt b, html body.h6w .win > header.wt b *{ color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:0 0 8px rgba(160,130,255,.9), 0 1px 2px rgba(0,0,0,.6) !important; letter-spacing:.3px; }
+html body.h6w .win > header.wt .gem{ background:radial-gradient(circle at 40% 35%, #fff, #b8a8ff 45%, #5a3ce0) !important; border:0 !important; border-radius:50% !important; box-shadow:0 0 10px rgba(160,130,255,.95) !important; }
+html body.h6w .win > header.wt kbd{ background:rgba(255,255,255,.12) !important; color:#dcd6ff !important; border:1px solid rgba(255,255,255,.3) !important; }
+html body.h6w .win > header.wt .ibtn{ width:32px !important; height:32px !important; border-radius:50% !important; color:#fff !important; background:radial-gradient(circle at 50% 30%, rgba(80,66,150,.95), rgba(20,14,48,.95)) padding-box, linear-gradient(135deg, #8ad8ff, #b47cff) border-box !important;
+  border:1.5px solid transparent !important; box-shadow:0 0 10px rgba(120,160,255,.55) !important; }
+html body.h6w .win > header.wt .ibtn[data-wclose]{ background:radial-gradient(circle at 50% 30%, rgba(150,60,110,.95), rgba(48,14,36,.95)) padding-box, linear-gradient(135deg, #ff8ab0, #ffb36a) border-box !important; box-shadow:0 0 10px rgba(255,110,150,.6) !important; }
+html body.h6w .win > header.wt .ibtn svg{ stroke:#fff !important; }
+html body.h6w .win .wb, html body.h6w .win .pane{ background:transparent !important; }
+html body.h6w .win ::-webkit-scrollbar-thumb{ background:linear-gradient(#b47cff, #4fd8ff) !important; border-radius:6px; }
+html body.h6w .win input, html body.h6w .win select, html body.h6w .win textarea{ background:rgba(255,255,255,.9) !important; border:1px solid rgba(150,125,235,.55) !important; border-radius:10px !important; color:#352c6a !important; }
+html body.h6w .win input:focus, html body.h6w .win select:focus{ outline:none !important; box-shadow:0 0 0 2px rgba(120,160,255,.45) !important; }
+html body.h6w .win.win .wb.wb{ background:radial-gradient(120% 60% at 50% 0%, rgba(200,180,255,.22), transparent 60%) !important; }
+html body.h6w .win.win .wb.wb::before, html body.h6w .win.win .wb.wb::after{ display:none !important; }
+html body.h6w .win.win .eqdoll2.eqdoll2{ background:radial-gradient(circle, rgba(255,255,255,.96) 0, rgba(255,255,255,.9) 22%, rgba(214,200,255,.55) 40%, rgba(170,220,255,.22) 58%, rgba(244,242,254,0) 72%) !important; }
+html body.h6w #ui#ui#ui .win .wb{ background:radial-gradient(120% 60% at 50% 0%, rgba(200,180,255,.22), transparent 60%) !important; }
+html body.h6w #ui#ui#ui .win .wb::before, html body.h6w #ui#ui#ui .win .wb::after{ display:none !important; }
+html body.h6w #ui#ui#ui .eqdoll2.e6, html body.h6w #ui#ui#ui .eqdoll2.e6 > .eqstage{ background:radial-gradient(circle at 50% 46%, rgba(255,255,255,.96) 0, rgba(255,255,255,.88) 20%, rgba(214,200,255,.5) 40%, rgba(170,220,255,.2) 60%, rgba(244,242,254,0) 75%) !important; }
+html body.h6w #ui#ui#ui .eqdoll2.e6 .eqbox{ background:radial-gradient(circle at 38% 30%, #ffffff, #efeafe 60%, #ddd4fb) !important; }
+html body.h6w .win input[type=range], html body.h6w .win input[type=checkbox], html body.h6w .win input[type=radio]{ accent-color:#8a6cff; }

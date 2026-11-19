@@ -104,8 +104,64 @@ function h6Layout(){
 setInterval(() => { try { h6Tick(); } catch (e) {} }, 1000);
 /* the bright-theme readability pass (js/sys/sunread.js) darkens lettering it thinks sits on parchment: the new HUD is dark
    glass with white lettering, so it leaves the HUD cards alone (and what it already darkened goes back) */
+/* (v328) windows in the new palette: cream panels and tiles go frosted lavender-white, gold buttons and chosen tabs a
+   violet-cyan gradient with white lettering, brown ink deep indigo, gold edges and rings lavender. Item art, rarity frames,
+   the equipment ring's slot colours and anything drawn from a picture keep their own colours. */
+const H6_WSKIP = 'svg, canvas, img, .iart, .sico, .rar:not(.r0), .gdx, .dy, .dyesw, .cdv, .wt, .eqsl, .tcard, .tc-art, [style*="url("]';
+const h6Hsl = c => { const r = c[0] / 255, g = c[1] / 255, b = c[2] / 255, mx = Math.max(r, g, b), mn = Math.min(r, g, b), l = (mx + mn) / 2, d = mx - mn;
+  if (!d) return [0, 0, l]; const s = d / (1 - Math.abs(2 * l - 1)); let h = mx === r ? ((g - b) / d + 6) % 6 : mx === g ? (b - r) / d + 2 : (r - g) / d + 4; return [h * 60, s, l]; };
+const h6Rgb = s => { const m = /rgba?\(([^)]+)\)/.exec(s || ''); if (!m) return null; const p = m[1].split(/[ ,\/]+/).filter(Boolean).map(Number); return [p[0], p[1], p[2], p.length > 3 ? p[3] : 1]; };
+const h6Goldish = c => { if (!c || c[3] < .15) return false; const [h, s, l] = h6Hsl(c); return h >= 26 && h <= 58 && s >= .35 && l >= .32 && l <= .82; };
+const H6_DONE = new WeakSet(), H6_GOLD = new WeakSet(), H6_SIGS = new Set();
+/* (v328) the recolouring goes into a style sheet, one rule per kind of element (its window and its classes), not onto the
+   elements: windows that rebuild their rows by copying attributes (the bag) would wipe inline styles at every update */
+const H6_SHEET = (() => { const st = document.createElement('style'); st.id = 'h6WinRules'; document.head.appendChild(st); return st.sheet; })();
+const H6_TRANSIENT = /^(sdk|slt|wout)$/;   // state classes (on, sel…) stay in the key: a chosen tab gets its own rule
+function h6Sig(e){ const cls = [...e.classList].filter(c => !H6_TRANSIENT.test(c)); if (!cls.length) return null;
+  const scope = e.closest('.win') ? '.win' : e.closest('#confirm') ? '#confirm' : e.closest('.dialog') ? '.dialog' : e.closest('.cubox') ? '.cubox' : '.tipcard';   // (windows share their contents: the bag moves between two of them)
+  return scope + ' ' + e.tagName.toLowerCase() + cls.map(c => '.' + CSS.escape(c)).join(''); }
+function h6Apply(e, sig, P){ const keys = Object.keys(P); if (!keys.length){ if (sig) H6_SIGS.add(sig); return; }
+  if (!sig){ for (const k of keys) if (e.style.getPropertyValue(k) !== P[k]) e.style.setProperty(k, P[k], 'important'); return; }   // an element without classes: on itself
+  H6_SIGS.add(sig); const bgK = keys.filter(k => /^background/.test(k)), oth = keys.filter(k => !/^background/.test(k)), pre = 'html:is(#h6z#h6z#h6z#h6z, html) body.h6w ' + sig;
+  try { if (bgK.length) H6_SHEET.insertRule(`${pre}:not([style*="background"]):not(.wt *){${bgK.map(k => `${k}:${P[k]} !important`).join(';')}}`, H6_SHEET.cssRules.length);
+    if (oth.length) H6_SHEET.insertRule(`${pre}:not([style*="color"]):not(.wt *){${oth.map(k => `${k}:${P[k]} !important`).join(';')}}`, H6_SHEET.cssRules.length); } catch (x) {} }   // each element is recoloured once (a redrawn window makes new elements; nothing is rewritten again and again)
+function h6Recolor(root){
+  const all = [root, ...root.querySelectorAll('*:not(svg *)')];
+  for (const e of all){ if (!e.style || H6_DONE.has(e) || (e.closest && e.closest(H6_WSKIP))) continue; H6_DONE.add(e); if (e.classList.contains('sdk') || e.classList.contains('slt')) e.classList.remove('sdk', 'slt');
+    const sig = h6Sig(e); if (sig && H6_SIGS.has(sig)) continue;   // this kind of element already has its rule
+    const P = {}, set = (x, k, v) => { P[k] = v; };
+    const cs = getComputedStyle(e), bg = typeof srOwnBg === 'function' ? srOwnBg(cs) : h6Rgb(cs.backgroundColor);
+    let kind = null; if (bg && bg[3] >= .2 && !/url\(/.test(cs.backgroundImage)){ const [h, s, l] = h6Hsl(bg); if (h >= 18 && h <= 62 && s >= .16 && l >= .8) kind = 'cream'; else if (h >= 26 && h <= 58 && s >= .45 && l >= .4 && l < .8) kind = 'gold'; }
+    if (!kind && /url\(/.test(cs.backgroundImage) && /gradient\(/.test(cs.backgroundImage)){   // layers: picture(s) + cream gradient(s) → keep the pictures, the gradients go lavender
+      const L = h6Layers(cs.backgroundImage); let ch = false; const out = L.map(x => { if (!/gradient\(/.test(x)) return x; const cols = (x.match(/rgba?\([^)]+\)/g) || []).map(h6Rgb); if (!cols.length) return x;
+        const avg = cols.reduce((a, c) => a.map((v, i) => v + c[i]), [0, 0, 0, 0]).map(v => v / cols.length), [h, s2, l] = h6Hsl(avg); if (h >= 18 && h <= 62 && s2 >= .14 && l >= .74){ ch = true; return 'linear-gradient(180deg, rgba(252,251,255,.96), rgba(238,236,253,.96))'; } return x; });
+      if (ch) set(e, 'background-image', out.join(', ')); }
+    if (!kind && /url\(/.test(cs.backgroundImage)){ const bc = h6Rgb(cs.backgroundColor); if (bc && bc[3] >= .2){ const [h, s2, l] = h6Hsl(bc); if (h >= 18 && h <= 62 && s2 >= .16 && l >= .78) set(e, 'background-color', 'rgba(244,242,254,.96)'); } }   // a tile with a watermark: only its colour
+    if (kind === 'cream'){ set(e, 'background', 'linear-gradient(180deg, rgba(252,251,255,.95), rgba(240,238,253,.95))'); }
+    else if (kind === 'gold'){ H6_GOLD.add(e); set(e, 'background', 'linear-gradient(135deg, #9a6cff, #3fc6ff)'); set(e, 'color', '#fff'); set(e, '-webkit-text-fill-color', '#fff'); set(e, 'text-shadow', '0 1px 2px rgba(40,20,90,.45)'); set(e, 'box-shadow', '0 0 10px rgba(120,140,255,.55), 0 2px 6px rgba(40,20,90,.25)'); set(e, 'border-color', 'rgba(255,255,255,.6)'); }
+    // edges and rings: gold → lavender
+    if (kind !== 'gold'){ for (const side of ['Top', 'Right', 'Bottom', 'Left']){ const w = parseFloat(cs['border' + side + 'Width']); if (w > 0 && h6Goldish(h6Rgb(cs['border' + side + 'Color']))){ set(e, 'border-color', 'rgba(150,125,235,.5)'); break; } }
+      if (cs.boxShadow && cs.boxShadow !== 'none' && /rgb/.test(cs.boxShadow)){ const nb = cs.boxShadow.replace(/rgba?\([^)]+\)/g, m => { const c = h6Rgb(m); return h6Goldish(c) ? `rgba(150,125,235,${Math.min(.65, c[3])})` : m; }); if (nb !== cs.boxShadow) set(e, 'box-shadow', nb); } }
+    // lettering: brown ink → deep indigo, gold lettering → violet (only on its own text, never on the gradient buttons)
+    if (kind !== 'gold' && [...e.childNodes].some(n => n.nodeType === 3 && n.nodeValue.trim())){ const fg = h6Rgb(cs.webkitTextFillColor && !/0\)$/.test(cs.webkitTextFillColor) ? cs.webkitTextFillColor : cs.color);
+      if (fg){ const [h, s, l] = h6Hsl(fg); const inGold = e.closest && [...(function*(){ let n = e.parentElement; for (let i = 0; n && i < 3; i++, n = n.parentElement) yield n; })()].some(p => H6_GOLD.has(p));
+        if (!inGold && h >= 12 && h <= 48 && s >= .12 && l < .42){ set(e, 'color', '#352c6a'); set(e, '-webkit-text-fill-color', '#352c6a'); }
+        else if (!inGold && h >= 28 && h <= 56 && s >= .5 && l >= .3 && l <= .72){ set(e, 'color', '#6a44d8'); set(e, '-webkit-text-fill-color', '#6a44d8'); } } }
+    h6Apply(e, sig, P); }
+}
+const h6Layers = v => { const out = []; let d = 0, cur = ''; for (const ch of v){ if (ch === '(') d++; else if (ch === ')') d--; if (ch === ',' && !d){ out.push(cur.trim()); cur = ''; } else cur += ch; } if (cur.trim()) out.push(cur.trim()); return out; };
+const H6_WROOT = '.win, .dialog, .cubox, .tipcard, #confirm';
+document.body.classList.add('h6w');
 if (typeof srCheck === 'function'){ const _sc = srCheck; const H6_OWN = '#charCard, #goalCard, #mapCard, #target, #achPop, #banner, #chips, #h6Icons, #h6Exp';
-  srCheck = function(root){ if (root && root.closest && el('ui') && el('ui').classList.contains('h6') && root.closest(H6_OWN)){
-      for (const e of [root, ...root.querySelectorAll('*')]){ e.classList.remove('sdk', 'slt'); if (e.style && e.style.getPropertyPriority('color') === 'important'){ e.style.removeProperty('color'); e.style.removeProperty('-webkit-text-fill-color'); } }
+  srCheck = function(root){ if (root && root.closest && document.body.classList.contains('h6w') && root.closest(H6_WROOT) && !root.closest(H6_OWN)){ try { h6Recolor(root); } catch (e) { console.warn('h6Recolor', e); } return; }
+    if (root && root.closest && el('ui') && el('ui').classList.contains('h6') && root.closest(H6_OWN)){
+      for (const e of [root, ...root.querySelectorAll('*')]){ if (e.classList.contains('sdk') || e.classList.contains('slt')) e.classList.remove('sdk', 'slt'); if (e.style && e.style.getPropertyPriority('color') === 'important'){ e.style.removeProperty('color'); e.style.removeProperty('-webkit-text-fill-color'); } }
       return; }
     return _sc.apply(this, arguments); }; }
+/* new window content is recoloured at once, before it is painted (the shared queue above waits up to 1.5 s, so a window
+   would first show cream and then change, and its later recolouring counted as the window "changing" while you play) */
+new MutationObserver(list => { if (!document.body.classList.contains('h6w')) return;
+  for (const r of list){
+    if (r.type === 'attributes'){ const e = r.target; if (!e.hidden && e.matches && e.matches(H6_WROOT)) try { h6Recolor(e); } catch (x) {} continue; }
+    for (const n of r.addedNodes){ if (n.nodeType !== 1 || !n.isConnected || !n.closest || !n.closest(H6_WROOT) || n.closest('#charCard, #goalCard, #mapCard, #target, #h6Icons')) continue; try { h6Recolor(n); } catch (x) {} } } })
+  .observe(document.body, {childList:true, subtree:true, attributes:true, attributeFilter:['hidden']});
