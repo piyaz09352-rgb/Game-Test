@@ -43,3 +43,9 @@ const SP_NOINT = .55;
   for (const id in SKILLS){ const sk = SKILLS[id]; if (typeof sk.sp !== 'function' || sk._spNoInt || !sk.job || sk.job === 'novice') continue;
     const ln = rootLine(sk.job), J = JOBS[ln]; if (!J || /INT/.test(J.stat || '')) continue;
     const o = sk.sp; sk._spNoInt = 1; sk.sp = lv => Math.max(1, Math.round(o(lv) * SP_NOINT)); } }
+/* (v324) the mage's three great spells (Tempest, Earth Swallow, Deluge) hit hard but took 4 s to cast with a 15 s
+   cooldown: two casts each in five minutes. A shorter cast and cooldown make them part of the fight */
+for (const id of ['tempest', 'earthswallow', 'deluge']){ const sk = SKILLS[id]; if (!sk || sk._v324) continue; sk._v324 = 1;
+  const c0 = sk.cast, d0 = sk.cd;
+  if (c0 != null) sk.cast = typeof c0 === 'function' ? lv => c0(lv) * .62 : c0 * .62;
+  if (d0 != null) sk.cd = typeof d0 === 'function' ? lv => d0(lv) * .8 : d0 * .8; }
