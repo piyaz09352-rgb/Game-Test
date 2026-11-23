@@ -174,7 +174,9 @@ function updBot(dt){
   // out of potions and hurt → back to the village
   // (v273) no Return Talisman any more: walk to this map's Shrine Keeper and warp home for free
   if (hp < BOT_CFG.retreatHp && !hpPot && MAP_ID !== 0){ const k = NPCS.find(x => x.id === 'warp');
-    if (k && !threats().length){ BOT.state = 'retreat'; if (P.sit) P.sit = false; P.target = null; P.pending = null;
+    // (v333) also with monsters on you: the 100-bot playtest saw Auto stand and fight to the death at 4% HP with no potions
+    // left (a pack and its leader). Now it breaks off and runs for the keeper; the warp takes it home.
+    if (k && (!threats().length || hp < BOT_CFG.retreatHp * .6)){ BOT.state = 'retreat'; if (P.sit) P.sit = false; P.target = null; P.pending = null;
       if (Math.hypot(k.x - P.x, k.y - P.y) < 70){ warpTo(0); return; }
       if (!P.ride && canRideNow()){ P.ride = true; renderHotbar(); } P.tx = k.x; P.ty = k.y + 40; renderBotChip(); return; } }
   if (hp < BOT_CFG.retreatHp && !hpPot && MAP_ID === 0 && !inVillage(P)){

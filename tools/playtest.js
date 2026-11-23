@@ -53,7 +53,8 @@ async function playInPage(p, simMin){
   const mapAvg = id => { const ls = (MAPS[id].mobs || []).map(k => MOB[k] && !MOB[k].boss && MOB[k].lvl).filter(Boolean); return ls.length ? ls.reduce((a, b) => a + b, 0) / ls.length : null; };
   const goodMap = () => { let best = 1, gap = 1e9; MAPS.forEach((m, i) => { const a = mapAvg(i); if (a == null || MAPS[i].town) return; const g = Math.abs(a - (S.lvl + Math.max(0, p.risk) * .5)); if (g < gap){ gap = g; best = i; } }); return best; };
   const potId = () => ['redpot', 'orangepot', 'yellowpot', 'whitepot', 'elixirpot'].filter(k => S.inv[k]).pop();
-  const winFits = id => { const w = document.getElementById('win-' + id); if (!w || w.hidden) return 'not open'; const r = w.getBoundingClientRect(), u = el('ui').getBoundingClientRect();
+  const winFits = id => { const w = document.getElementById('win-' + (id === 'bag' ? 'equip' : id));   // the bag opens inside the equipment window
+  if (!w || w.hidden) return 'not open'; const r = w.getBoundingClientRect(), u = el('ui').getBoundingClientRect();
     if (r.width < 40 || r.height < 40) return 'empty'; if (r.left < u.left - 3 || r.right > u.right + 3 || r.top < u.top - 3 || r.bottom > u.bottom + 3) return 'off screen'; return ''; };
   const clickAll = sel => { const e = document.querySelector(sel); if (e && !e.disabled){ e.click(); return true; } return false; };
   // the tutorial and pop-ups: read for a moment, then press on
@@ -75,11 +76,11 @@ async function playInPage(p, simMin){
     const btns = [...document.querySelectorAll('#win-skill [data-skill]')].filter(b => !b.disabled && b.offsetWidth); for (let n = 0; n < 5 && btns.length && S.skPts > 0; n++) pick(btns).click();
     await frame(); clickAll('#win-skill [data-skok]'); await frame(); out.skillUps++;
     const fit = winFits('skill'); if (fit) out.winsBad.push('skill:' + fit); closeWin('skill'); };
-  const changeJob = async () => { const j = JOBS[S.job]; if (!j.next || jobChangeBlock()) return; const back = MAP_ID; warpTo(0); out.warps++; run(1);
+  const changeJob = async () => { const j = JOBS[S.job]; if (!j.next || jobChangeBlock()) return; const back = MAP_ID; warpTo(0); out.warps++; await loadingWait(); run(1);
     const n = NPCS.find(x => x.id === 'job'); if (!n){ issue('no-job-npc', {}); return; } openNpc(n); await frame(); await realWait(40);
     const bs = [...document.querySelectorAll('#dialog [data-job]')]; if (!bs.length){ issue('job-dialog-no-choices', {job:S.job, jlvl:S.jlvl}); } else { pick(bs).click(); await frame(); await realWait(40); clickAll('#confirm:not([hidden]) [data-ok]'); }
     await frame(); if (JOBS[S.job] !== j) out.jobs.push(S.job); else if (bs.length) issue('job-change-did-not-happen', {job:S.job}); const d = el('dialog'); if (d) d.hidden = true;
-    warpTo(back || goodMap()); out.warps++; };
+    warpTo(back || goodMap()); out.warps++; await loadingWait(); };
   // ---------- the play loop ----------
   out.lvLog.push([0, S.lvl]); let lastExp = S.exp + S.lvl * 1e7, lastExpT = 0, nextLook = 30 + R() * 60, nextAfk = 120 + R() * 300, nextMapCheck = 60, lastTarget = null, tgtSince = 0, tgtHp = 0, posAt = {x:P.x, y:P.y, t:0}, deathsRecent = [];
   await dismiss(); await leaveTown();
@@ -105,7 +106,7 @@ async function playInPage(p, simMin){
     if (t > nextLook && R() < p.curious){ const id = pick(['bag', 'stat', 'skill', 'quest', 'settings', 'world', 'auto', 'equip', 'wiki', 'social']); try { openWin(id); out.winsOpened++; await frame(); await realWait(20);
         const fit = winFits(id); if (fit) out.winsBad.push(id + ':' + fit); } catch (e) { issue('window-error', {id, e:String(e).slice(0, 120)}); } run(2 + R() * 6); try { closeWin(id); } catch (e) {} nextLook = t + 40 + R() * 120; }
     // the right field for this level
-    if (t > nextMapCheck){ nextMapCheck = t + 90; const a = mapAvg(MAP_ID); if (a == null || a < S.lvl - 8 || a > S.lvl + 10 + p.risk){ const to = goodMap(); if (to !== MAP_ID){ warpTo(to); out.warps++; } } }
+    if (t > nextMapCheck){ nextMapCheck = t + 90; const a = mapAvg(MAP_ID); if (a == null || a < S.lvl - 8 || a > S.lvl + 10 + p.risk){ const to = goodMap(); if (to !== MAP_ID){ warpTo(to); out.warps++; await loadingWait(); posAt = {x:P.x, y:P.y, t}; } } }
     if (MAPS[MAP_ID].town || MAP_ID === 0){ await leaveTown(); continue; }
     if (p.auto && BOT.on) continue;   // Auto does the fighting
     // fight: keep the target, or pick one
@@ -116,7 +117,7 @@ async function playInPage(p, simMin){
     else if (P.target === lastTarget){ if (P.target.hp < tgtHp){ tgtHp = P.target.hp; tgtSince = t; }
       else if (t - tgtSince > 20){ out.stuck.push({map:MAP_ID, x:Math.round(P.x), y:Math.round(P.y), mob:P.target.type, d:Math.round(Math.hypot(P.target.x - P.x, P.target.y - P.y))}); P.target = null; tgtSince = t; } }
     if (P.target && !P.target.dead && R() < p.skill * .5){ const hot = (S.hot || []).filter(id => id && SKILLS[id] && skl(id) && !(P.cds[id] > 0) && SKILLS[id].type !== 'passive'); if (hot.length){ try { trySkill(pick(hot)); out.skillsUsed++; } catch (e) { issue('skill-error', {e:String(e).slice(0, 120)}); } } }
-    if (t - posAt.t > 30){ if (Math.hypot(P.x - posAt.x, P.y - posAt.y) < 15 && (P.target || P.tx != null) && !P.dead) out.stuck.push({map:MAP_ID, x:Math.round(P.x), y:Math.round(P.y), why:'not moving'}); posAt = {x:P.x, y:P.y, t}; }
+    if (t - posAt.t > 30){ if (Math.hypot(P.x - posAt.x, P.y - posAt.y) < 15 && (P.target || P.tx != null) && !P.dead && !(typeof LD !== 'undefined' && LD.busy)) out.stuck.push({map:MAP_ID, x:Math.round(P.x), y:Math.round(P.y), why:'not moving'}); posAt = {x:P.x, y:P.y, t}; }
   }
   if (t - lastExpT > out.noExpLongest) out.noExpLongest = t - lastExpT;
   return {...out, maps:[...out.maps], lvl:S.lvl, jlvl:S.jlvl, job:S.job, bia:S.bia, noExpLongest:Math.round(out.noExpLongest)};
@@ -155,8 +156,8 @@ async function oneBot(browser, url, p){
   await Promise.all(Array.from({length:CONC}, worker));
   await browser.close(); srv.close();
   rows.sort((a, b) => a.id - b.id);
-  fs.writeFileSync(path.join(__dirname, '..', 'docs', 'playtest-rows.json'), JSON.stringify(rows, null, 1));
-  fs.writeFileSync(path.join(__dirname, '..', 'docs', 'PLAYTEST.md'), report(rows, Math.round((Date.now() - t0) / 60000)));
+  fs.writeFileSync(path.resolve(__dirname, '..', 'docs', process.env.OUT ? process.env.OUT + '-rows.json' : 'playtest-rows.json'), JSON.stringify(rows, null, 1));
+  fs.writeFileSync(path.resolve(__dirname, '..', 'docs', process.env.OUT ? process.env.OUT + '.md' : 'PLAYTEST.md'), report(rows, Math.round((Date.now() - t0) / 60000)));
   console.log('report: docs/PLAYTEST.md');
 })();
 

@@ -21,13 +21,17 @@
   "ok": true,
   "fail": null,
   "errors": [],
-  "realSec": 31,
-  "kills": 0,
-  "deaths": 0,
+  "realSec": 342,
+  "kills": 261,
+  "deaths": 4,
   "stuck": [],
   "issues": [],
-  "winsOpened": 4,
-  "winsBad": [],
+  "winsOpened": 63,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open",
+   "bag:not open"
+  ],
   "maps": [
    71
   ],
@@ -35,40 +39,93 @@
    [
     0,
     1
+   ],
+   [
+    16,
+    2
+   ],
+   [
+    22,
+    3
+   ],
+   [
+    35,
+    4
+   ],
+   [
+    46,
+    5
+   ],
+   [
+    59,
+    6
+   ],
+   [
+    97,
+    7
+   ],
+   [
+    174,
+    8
+   ],
+   [
+    208,
+    9
+   ],
+   [
+    249,
+    10
+   ],
+   [
+    426,
+    11
+   ],
+   [
+    625,
+    12
+   ],
+   [
+    787,
+    13
+   ],
+   [
+    1073,
+    14
    ]
   ],
-  "potions": 5,
-  "skillsUsed": 0,
-  "statUps": 2,
-  "skillUps": 0,
+  "potions": 6,
+  "skillsUsed": 514,
+  "statUps": 32,
+  "skillUps": 21,
   "jobs": [
-   "novice"
+   "novice",
+   "summoner"
   ],
-  "warps": 0,
+  "warps": 2,
   "autoOn": 0,
-  "afkSec": 0,
-  "firstKillAt": null,
+  "afkSec": 99.13596162066608,
+  "firstKillAt": 14,
   "walkedOut": 12,
-  "noExpLongest": 240,
-  "lvl": 1,
-  "jlvl": 1,
-  "job": "novice",
+  "noExpLongest": 67,
+  "lvl": 14,
+  "jlvl": 7,
+  "job": "summoner",
   "bia": 500
  },
  {
   "id": 2,
   "acc": "pt00284670",
   "name": "ToeyLv1",
-  "kind": "casual",
-  "risk": 3,
-  "react": 0.7101695675915897,
-  "skill": 0.40996125797273647,
-  "potAt": 0.2594313749156107,
-  "forget": 0.2,
+  "kind": "careful",
+  "risk": 0,
+  "react": 0.5826271756936923,
+  "skill": 0.6574709434795524,
+  "potAt": 0.457073531186708,
+  "forget": 0.05,
   "auto": false,
-  "afk": 0.1,
-  "curious": 0.4,
-  "statPlan": "random",
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
   "device": "pc",
   "w": 1920,
   "h": 1080,
@@ -77,13 +134,16 @@
   "ok": true,
   "fail": null,
   "errors": [],
-  "realSec": 45,
-  "kills": 45,
-  "deaths": 0,
+  "realSec": 345,
+  "kills": 283,
+  "deaths": 3,
   "stuck": [],
   "issues": [],
-  "winsOpened": 16,
-  "winsBad": [],
+  "winsOpened": 113,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
   "maps": [
    71
   ],
@@ -93,61 +153,86 @@
     1
    ],
    [
-    20,
-    2
-   ],
-   [
-    37,
+    38,
     3
    ],
    [
-    67,
+    48,
     4
    ],
    [
-    81,
+    59,
     5
    ],
    [
-    131,
+    66,
     6
    ],
    [
-    158,
+    100,
     7
+   ],
+   [
+    260,
+    8
+   ],
+   [
+    303,
+    9
+   ],
+   [
+    390,
+    10
+   ],
+   [
+    468,
+    11
+   ],
+   [
+    573,
+    12
+   ],
+   [
+    781,
+    13
+   ],
+   [
+    928,
+    14
    ]
   ],
-  "potions": 0,
-  "skillsUsed": 26,
-  "statUps": 8,
-  "skillUps": 5,
+  "potions": 6,
+  "skillsUsed": 500,
+  "statUps": 84,
+  "skillUps": 18,
   "jobs": [
-   "novice"
+   "novice",
+   "ranger"
   ],
-  "warps": 0,
+  "warps": 2,
   "autoOn": 0,
-  "afkSec": 53.15901589494153,
-  "firstKillAt": 15,
+  "afkSec": 101.9382579121451,
+  "firstKillAt": 38,
   "walkedOut": 12,
-  "noExpLongest": 57,
-  "lvl": 7,
-  "jlvl": 6,
-  "job": "novice",
+  "noExpLongest": 79,
+  "lvl": 14,
+  "jlvl": 7,
+  "job": "ranger",
   "bia": 500
  },
  {
   "id": 3,
   "acc": "pt00330541",
   "name": "ต้นข้าวNoob",
-  "kind": "grinder",
-  "risk": 2,
-  "react": 0.5390577723454021,
-  "skill": 0.8134823348203126,
-  "potAt": 0.413257711480026,
+  "kind": "careful",
+  "risk": -2,
+  "react": 0.8585866585181032,
+  "skill": 0.6829848584174109,
+  "potAt": 0.513257711480026,
   "forget": 0.05,
   "auto": false,
-  "afk": 0.02,
-  "curious": 0.1,
+  "afk": 0.04,
+  "curious": 0.25,
   "statPlan": "job",
   "device": "phone",
   "w": 844,
@@ -157,12 +242,1415 @@
   "ok": true,
   "fail": null,
   "errors": [],
-  "realSec": 47,
-  "kills": 41,
+  "realSec": 391,
+  "kills": 299,
+  "deaths": 4,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 107,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    29,
+    2
+   ],
+   [
+    38,
+    3
+   ],
+   [
+    57,
+    4
+   ],
+   [
+    68,
+    5
+   ],
+   [
+    86,
+    6
+   ],
+   [
+    112,
+    7
+   ],
+   [
+    164,
+    8
+   ],
+   [
+    217,
+    9
+   ],
+   [
+    361,
+    10
+   ],
+   [
+    469,
+    11
+   ],
+   [
+    532,
+    12
+   ],
+   [
+    624,
+    13
+   ],
+   [
+    666,
+    14
+   ],
+   [
+    946,
+    15
+   ],
+   [
+    1008,
+    16
+   ],
+   [
+    1045,
+    17
+   ],
+   [
+    1110,
+    18
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 400,
+  "statUps": 69,
+  "skillUps": 26,
+  "jobs": [
+   "novice",
+   "catfolk"
+  ],
+  "warps": 5,
+  "autoOn": 0,
+  "afkSec": 27.051572442078765,
+  "firstKillAt": 29,
+  "walkedOut": 12,
+  "noExpLongest": 60,
+  "lvl": 18,
+  "jlvl": 11,
+  "job": "catfolk",
+  "bia": 500
+ },
+ {
+  "id": 4,
+  "acc": "pt00470429",
+  "name": "ต้นข้าวza",
+  "kind": "careful",
+  "risk": -1,
+  "react": 0.9398822481929708,
+  "skill": 0.7504726911664348,
+  "potAt": 0.4972602179028374,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 466074486,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 305,
+  "kills": 233,
+  "deaths": 6,
+  "stuck": [
+   {
+    "map": 71,
+    "x": 220,
+    "y": 1695,
+    "why": "not moving"
+   }
+  ],
+  "issues": [],
+  "winsOpened": 56,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    47,
+    2
+   ],
+   [
+    55,
+    3
+   ],
+   [
+    72,
+    4
+   ],
+   [
+    102,
+    5
+   ],
+   [
+    124,
+    6
+   ],
+   [
+    240,
+    7
+   ],
+   [
+    292,
+    8
+   ],
+   [
+    367,
+    9
+   ],
+   [
+    521,
+    10
+   ],
+   [
+    609,
+    11
+   ],
+   [
+    645,
+    12
+   ],
+   [
+    769,
+    13
+   ],
+   [
+    1195,
+    14
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 343,
+  "statUps": 26,
+  "skillUps": 17,
+  "jobs": [
+   "novice",
+   "merchant"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 58.82398989229649,
+  "firstKillAt": 14,
+  "walkedOut": 12,
+  "noExpLongest": 88,
+  "lvl": 14,
+  "jlvl": 7,
+  "job": "merchant",
+  "bia": 500
+ },
+ {
+  "id": 5,
+  "acc": "pt00575264",
+  "name": "Nutza",
+  "kind": "careful",
+  "risk": -2,
+  "react": 0.5106673408349358,
+  "skill": 0.7429987079198467,
+  "potAt": 0.5396420051993998,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 930484410,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 492,
+  "kills": 345,
+  "deaths": 4,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 198,
+  "winsBad": [],
+  "maps": [
+   71,
+   31,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    15,
+    2
+   ],
+   [
+    29,
+    3
+   ],
+   [
+    32,
+    4
+   ],
+   [
+    44,
+    5
+   ],
+   [
+    65,
+    6
+   ],
+   [
+    84,
+    7
+   ],
+   [
+    112,
+    8
+   ],
+   [
+    154,
+    9
+   ],
+   [
+    224,
+    10
+   ],
+   [
+    348,
+    11
+   ],
+   [
+    405,
+    12
+   ],
+   [
+    510,
+    13
+   ],
+   [
+    649,
+    14
+   ],
+   [
+    700,
+    15
+   ],
+   [
+    789,
+    16
+   ],
+   [
+    829,
+    17
+   ],
+   [
+    899,
+    18
+   ],
+   [
+    944,
+    19
+   ],
+   [
+    1011,
+    20
+   ],
+   [
+    1110,
+    21
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 705,
+  "statUps": 161,
+  "skillUps": 27,
+  "jobs": [
+   "novice",
+   "rogue"
+  ],
+  "warps": 5,
+  "autoOn": 0,
+  "afkSec": 101.61629687837151,
+  "firstKillAt": 14,
+  "walkedOut": 12,
+  "noExpLongest": 64,
+  "lvl": 21,
+  "jlvl": 13,
+  "job": "rogue",
+  "bia": 500
+ },
+ {
+  "id": 6,
+  "acc": "pt00650233",
+  "name": "GunPro",
+  "kind": "careful",
+  "risk": 1,
+  "react": 0.9966780523288428,
+  "skill": 0.7340127469664499,
+  "potAt": 0.4761191333300058,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 607136582,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 219,
+  "kills": 191,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 83,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    34,
+    3
+   ],
+   [
+    44,
+    4
+   ],
+   [
+    58,
+    5
+   ],
+   [
+    93,
+    6
+   ],
+   [
+    218,
+    7
+   ],
+   [
+    238,
+    8
+   ],
+   [
+    311,
+    9
+   ],
+   [
+    432,
+    10
+   ],
+   [
+    599,
+    11
+   ],
+   [
+    670,
+    12
+   ],
+   [
+    1037,
+    13
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 380,
+  "statUps": 56,
+  "skillUps": 18,
+  "jobs": [
+   "novice",
+   "muay"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 73.88084685610647,
+  "firstKillAt": 33,
+  "walkedOut": 12,
+  "noExpLongest": 99,
+  "lvl": 13,
+  "jlvl": 6,
+  "job": "muay",
+  "bia": 500
+ },
+ {
+  "id": 7,
+  "acc": "pt00726429",
+  "name": "มะลิ",
+  "kind": "careful",
+  "risk": -2,
+  "react": 0.685167698368974,
+  "skill": 0.7567532452087632,
+  "potAt": 0.4758961126096063,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 50289936,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 356,
+  "kills": 378,
+  "deaths": 3,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 102,
+  "winsBad": [],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    17,
+    2
+   ],
+   [
+    22,
+    3
+   ],
+   [
+    37,
+    4
+   ],
+   [
+    57,
+    5
+   ],
+   [
+    97,
+    6
+   ],
+   [
+    121,
+    7
+   ],
+   [
+    159,
+    8
+   ],
+   [
+    202,
+    9
+   ],
+   [
+    249,
+    10
+   ],
+   [
+    303,
+    11
+   ],
+   [
+    468,
+    12
+   ],
+   [
+    560,
+    13
+   ],
+   [
+    679,
+    14
+   ],
+   [
+    911,
+    15
+   ],
+   [
+    1089,
+    16
+   ],
+   [
+    1131,
+    17
+   ],
+   [
+    1188,
+    18
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 542,
+  "statUps": 68,
+  "skillUps": 23,
+  "jobs": [
+   "novice",
+   "catfolk"
+  ],
+  "warps": 4,
+  "autoOn": 0,
+  "afkSec": 52.37481089419444,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 46,
+  "lvl": 18,
+  "jlvl": 10,
+  "job": "catfolk",
+  "bia": 500
+ },
+ {
+  "id": 8,
+  "acc": "pt00830323",
+  "name": "เมฆาNoob",
+  "kind": "careful",
+  "risk": -3,
+  "react": 0.8729815163523804,
+  "skill": 0.7501726687653795,
+  "potAt": 0.526021970634359,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 229494257,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 496,
+  "kills": 574,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 168,
+  "winsBad": [],
+  "maps": [
+   71,
+   31,
+   32
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    18,
+    2
+   ],
+   [
+    24,
+    3
+   ],
+   [
+    36,
+    4
+   ],
+   [
+    44,
+    5
+   ],
+   [
+    58,
+    6
+   ],
+   [
+    84,
+    7
+   ],
+   [
+    125,
+    8
+   ],
+   [
+    161,
+    9
+   ],
+   [
+    190,
+    10
+   ],
+   [
+    253,
+    11
+   ],
+   [
+    311,
+    12
+   ],
+   [
+    363,
+    13
+   ],
+   [
+    454,
+    14
+   ],
+   [
+    510,
+    15
+   ],
+   [
+    577,
+    16
+   ],
+   [
+    604,
+    17
+   ],
+   [
+    651,
+    18
+   ],
+   [
+    694,
+    19
+   ],
+   [
+    743,
+    20
+   ],
+   [
+    828,
+    21
+   ],
+   [
+    868,
+    22
+   ],
+   [
+    942,
+    23
+   ],
+   [
+    1016,
+    24
+   ],
+   [
+    1200,
+    25
+   ]
+  ],
+  "potions": 4,
+  "skillsUsed": 0,
+  "statUps": 123,
+  "skillUps": 33,
+  "jobs": [
+   "novice",
+   "catfolk"
+  ],
+  "warps": 6,
+  "autoOn": 1,
+  "afkSec": 119.30208520465628,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 76,
+  "lvl": 25,
+  "jlvl": 17,
+  "job": "catfolk",
+  "bia": 500
+ },
+ {
+  "id": 9,
+  "acc": "pt00939182",
+  "name": "ใบเตยLv1",
+  "kind": "careful",
+  "risk": 0,
+  "react": 0.6005374017639725,
+  "skill": 0.5660557250799871,
+  "potAt": 0.5492857104396847,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 190698265,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 460,
+  "kills": 351,
+  "deaths": 5,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 156,
+  "winsBad": [],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    27,
+    3
+   ],
+   [
+    38,
+    4
+   ],
+   [
+    65,
+    5
+   ],
+   [
+    97,
+    6
+   ],
+   [
+    147,
+    7
+   ],
+   [
+    166,
+    8
+   ],
+   [
+    224,
+    9
+   ],
+   [
+    295,
+    10
+   ],
+   [
+    379,
+    11
+   ],
+   [
+    567,
+    12
+   ],
+   [
+    715,
+    13
+   ],
+   [
+    819,
+    14
+   ],
+   [
+    1034,
+    15
+   ],
+   [
+    1105,
+    16
+   ],
+   [
+    1153,
+    17
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 420,
+  "statUps": 121,
+  "skillUps": 25,
+  "jobs": [
+   "novice",
+   "merchant"
+  ],
+  "warps": 3,
+  "autoOn": 0,
+  "afkSec": 72.89714251546988,
+  "firstKillAt": 26,
+  "walkedOut": 12,
+  "noExpLongest": 97,
+  "lvl": 17,
+  "jlvl": 10,
+  "job": "merchant",
+  "bia": 500
+ },
+ {
+  "id": 10,
+  "acc": "pt01094260",
+  "name": "เมฆาNoob",
+  "kind": "careful",
+  "risk": 1,
+  "react": 0.8035681450290457,
+  "skill": 0.6349067531222975,
+  "potAt": 0.5888998639950993,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 453964970,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 404,
+  "kills": 301,
+  "deaths": 4,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 172,
+  "winsBad": [],
+  "maps": [
+   71,
+   31,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    14,
+    2
+   ],
+   [
+    28,
+    3
+   ],
+   [
+    40,
+    4
+   ],
+   [
+    63,
+    5
+   ],
+   [
+    80,
+    6
+   ],
+   [
+    113,
+    7
+   ],
+   [
+    222,
+    8
+   ],
+   [
+    298,
+    9
+   ],
+   [
+    350,
+    10
+   ],
+   [
+    418,
+    11
+   ],
+   [
+    486,
+    12
+   ],
+   [
+    531,
+    13
+   ],
+   [
+    591,
+    14
+   ],
+   [
+    736,
+    15
+   ],
+   [
+    767,
+    16
+   ],
+   [
+    844,
+    17
+   ],
+   [
+    926,
+    18
+   ],
+   [
+    1047,
+    19
+   ],
+   [
+    1118,
+    20
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 342,
+  "statUps": 138,
+  "skillUps": 25,
+  "jobs": [
+   "novice",
+   "dogfolk"
+  ],
+  "warps": 7,
+  "autoOn": 0,
+  "afkSec": 71.06199921856728,
+  "firstKillAt": 14,
+  "walkedOut": 12,
+  "noExpLongest": 82,
+  "lvl": 20,
+  "jlvl": 12,
+  "job": "dogfolk",
+  "bia": 500
+ },
+ {
+  "id": 11,
+  "acc": "pt0111889",
+  "name": "Boss99",
+  "kind": "careful",
+  "risk": -2,
+  "react": 0.9715207768937204,
+  "skill": 0.5248486279160011,
+  "potAt": 0.46544469288338197,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 453165043,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 205,
+  "kills": 287,
   "deaths": 1,
   "stuck": [],
   "issues": [],
-  "winsOpened": 14,
+  "winsOpened": 79,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    40,
+    2
+   ],
+   [
+    44,
+    3
+   ],
+   [
+    55,
+    4
+   ],
+   [
+    77,
+    5
+   ],
+   [
+    123,
+    6
+   ],
+   [
+    161,
+    7
+   ],
+   [
+    293,
+    8
+   ],
+   [
+    332,
+    9
+   ],
+   [
+    465,
+    10
+   ],
+   [
+    555,
+    11
+   ],
+   [
+    688,
+    12
+   ],
+   [
+    799,
+    13
+   ],
+   [
+    972,
+    14
+   ],
+   [
+    1188,
+    15
+   ]
+  ],
+  "potions": 1,
+  "skillsUsed": 283,
+  "statUps": 43,
+  "skillUps": 24,
+  "jobs": [
+   "novice",
+   "occult"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 63.231815226949664,
+  "firstKillAt": 36,
+  "walkedOut": 12,
+  "noExpLongest": 50,
+  "lvl": 15,
+  "jlvl": 7,
+  "job": "occult",
+  "bia": 500
+ },
+ {
+  "id": 12,
+  "acc": "pt01246029",
+  "name": "ปลายฟ้าTH",
+  "kind": "careful",
+  "risk": 0,
+  "react": 0.5760907868277705,
+  "skill": 0.6289271087054755,
+  "potAt": 0.5889580072318008,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 955731011,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 412,
+  "kills": 254,
+  "deaths": 10,
+  "stuck": [
+   {
+    "map": 71,
+    "x": 220,
+    "y": 1695,
+    "why": "not moving"
+   }
+  ],
+  "issues": [
+   {
+    "k": "death-loop",
+    "t": 444,
+    "map": 71,
+    "lvl": 9,
+    "mob": "hare",
+    "mobLv": 4
+   },
+   {
+    "k": "death-loop",
+    "t": 820,
+    "map": 71,
+    "lvl": 11,
+    "mob": "hare",
+    "mobLv": 4
+   }
+  ],
+  "winsOpened": 156,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    22,
+    2
+   ],
+   [
+    33,
+    3
+   ],
+   [
+    40,
+    4
+   ],
+   [
+    56,
+    5
+   ],
+   [
+    85,
+    6
+   ],
+   [
+    157,
+    7
+   ],
+   [
+    279,
+    8
+   ],
+   [
+    350,
+    9
+   ],
+   [
+    467,
+    10
+   ],
+   [
+    705,
+    11
+   ],
+   [
+    914,
+    12
+   ],
+   [
+    1042,
+    13
+   ],
+   [
+    1178,
+    14
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 444,
+  "statUps": 125,
+  "skillUps": 20,
+  "jobs": [
+   "novice",
+   "dogfolk"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 162.52877949621939,
+  "firstKillAt": 22,
+  "walkedOut": 12,
+  "noExpLongest": 74,
+  "lvl": 14,
+  "jlvl": 7,
+  "job": "dogfolk",
+  "bia": 500
+ },
+ {
+  "id": 13,
+  "acc": "pt01343386",
+  "name": "PloyTH",
+  "kind": "careful",
+  "risk": 0,
+  "react": 0.6462206214415938,
+  "skill": 0.764992285969198,
+  "potAt": 0.562675142922753,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 354854501,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 352,
+  "kills": 284,
+  "deaths": 4,
+  "stuck": [
+   {
+    "map": 71,
+    "x": 220,
+    "y": 1695,
+    "why": "not moving"
+   }
+  ],
+  "issues": [
+   {
+    "k": "death-loop",
+    "t": 440,
+    "map": 71,
+    "lvl": 10,
+    "mob": "dewblob",
+    "mobLv": 1
+   }
+  ],
+  "winsOpened": 200,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    17,
+    2
+   ],
+   [
+    23,
+    3
+   ],
+   [
+    33,
+    4
+   ],
+   [
+    48,
+    5
+   ],
+   [
+    67,
+    6
+   ],
+   [
+    79,
+    7
+   ],
+   [
+    148,
+    8
+   ],
+   [
+    258,
+    9
+   ],
+   [
+    355,
+    10
+   ],
+   [
+    480,
+    11
+   ],
+   [
+    590,
+    12
+   ],
+   [
+    783,
+    13
+   ],
+   [
+    993,
+    14
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 541,
+  "statUps": 170,
+  "skillUps": 20,
+  "jobs": [
+   "novice",
+   "blade"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 120.50846953434333,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 67,
+  "lvl": 14,
+  "jlvl": 7,
+  "job": "blade",
+  "bia": 500
+ },
+ {
+  "id": 14,
+  "acc": "pt01466538",
+  "name": "นภา007",
+  "kind": "careful",
+  "risk": 0,
+  "react": 0.6090201112949383,
+  "skill": 0.7505052685507132,
+  "potAt": 0.47102426668676745,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 115999724,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 341,
+  "kills": 166,
+  "deaths": 3,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 78,
   "winsBad": [],
   "maps": [
    71
@@ -177,72 +1665,208 @@
     2
    ],
    [
-    29,
+    32,
     3
    ],
    [
-    53,
+    75,
     4
    ],
    [
-    103,
+    105,
     5
    ],
    [
-    151,
+    457,
     6
    ],
    [
-    223,
+    484,
     7
+   ],
+   [
+    554,
+    8
+   ],
+   [
+    605,
+    9
+   ],
+   [
+    674,
+    10
+   ],
+   [
+    730,
+    11
+   ],
+   [
+    841,
+    12
+   ],
+   [
+    931,
+    13
+   ],
+   [
+    1145,
+    14
    ]
   ],
-  "potions": 0,
-  "skillsUsed": 127,
-  "statUps": 8,
-  "skillUps": 3,
+  "potions": 1,
+  "skillsUsed": 480,
+  "statUps": 45,
+  "skillUps": 22,
   "jobs": [
-   "novice"
+   "novice",
+   "summoner"
   ],
-  "warps": 0,
+  "warps": 2,
   "autoOn": 0,
-  "afkSec": 0,
+  "afkSec": 138.38240537251457,
   "firstKillAt": 16,
   "walkedOut": 12,
-  "noExpLongest": 30,
-  "lvl": 7,
-  "jlvl": 6,
-  "job": "novice",
+  "noExpLongest": 269,
+  "lvl": 14,
+  "jlvl": 7,
+  "job": "summoner",
   "bia": 500
  },
  {
-  "id": 4,
-  "acc": "pt00470429",
-  "name": "ต้นข้าวza",
-  "kind": "explorer",
-  "risk": 4,
-  "react": 1.0131959562251325,
-  "skill": 0.633963588221913,
-  "potAt": 0.3630136238704499,
-  "forget": 0.15,
+  "id": 15,
+  "acc": "pt015687",
+  "name": "Ice007",
+  "kind": "careful",
+  "risk": -2,
+  "react": 0.8486163126065472,
+  "skill": 0.5971829906558539,
+  "potAt": 0.5272619772363742,
+  "forget": 0.05,
   "auto": false,
-  "afk": 0.06,
-  "curious": 0.8,
-  "statPlan": "random",
-  "device": "phone",
-  "w": 844,
-  "h": 390,
-  "touch": true,
-  "seed": 466074486,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 387267121,
   "ok": true,
   "fail": null,
   "errors": [],
-  "realSec": 45,
-  "kills": 49,
-  "deaths": 1,
+  "realSec": 248,
+  "kills": 243,
+  "deaths": 2,
   "stuck": [],
   "issues": [],
-  "winsOpened": 24,
+  "winsOpened": 98,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    36,
+    3
+   ],
+   [
+    43,
+    4
+   ],
+   [
+    62,
+    5
+   ],
+   [
+    84,
+    6
+   ],
+   [
+    216,
+    7
+   ],
+   [
+    268,
+    8
+   ],
+   [
+    439,
+    9
+   ],
+   [
+    515,
+    10
+   ],
+   [
+    636,
+    11
+   ],
+   [
+    713,
+    12
+   ],
+   [
+    860,
+    13
+   ],
+   [
+    990,
+    14
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 350,
+  "statUps": 71,
+  "skillUps": 17,
+  "jobs": [
+   "novice",
+   "rune"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 83.5973604366171,
+  "firstKillAt": 36,
+  "walkedOut": 12,
+  "noExpLongest": 78,
+  "lvl": 14,
+  "jlvl": 6,
+  "job": "rune",
+  "bia": 500
+ },
+ {
+  "id": 16,
+  "acc": "pt01664870",
+  "name": "May_x",
+  "kind": "careful",
+  "risk": -3,
+  "react": 0.8544328963171846,
+  "skill": 0.5768442029956934,
+  "potAt": 0.4602598750778753,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 782297509,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 264,
+  "kills": 171,
+  "deaths": 0,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 130,
   "winsBad": [],
   "maps": [
    71
@@ -253,46 +1877,10677 @@
     1
    ],
    [
+    27,
+    2
+   ],
+   [
+    32,
+    3
+   ],
+   [
+    50,
+    4
+   ],
+   [
+    201,
+    5
+   ],
+   [
+    282,
+    6
+   ],
+   [
+    301,
+    7
+   ],
+   [
+    402,
+    8
+   ],
+   [
+    572,
+    9
+   ],
+   [
+    657,
+    10
+   ],
+   [
+    762,
+    11
+   ],
+   [
+    910,
+    12
+   ],
+   [
+    1080,
+    13
+   ]
+  ],
+  "potions": 1,
+  "skillsUsed": 330,
+  "statUps": 101,
+  "skillUps": 18,
+  "jobs": [
+   "novice",
+   "healer"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 87.657507452023,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 130,
+  "lvl": 13,
+  "jlvl": 6,
+  "job": "healer",
+  "bia": 500
+ },
+ {
+  "id": 17,
+  "acc": "pt01769083",
+  "name": "Beam",
+  "kind": "careful",
+  "risk": 1,
+  "react": 0.8159790594670825,
+  "skill": 0.5300262331636745,
+  "potAt": 0.4754503917067546,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 563506433,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 384,
+  "kills": 296,
+  "deaths": 3,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 86,
+  "winsBad": [],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    18,
+    2
+   ],
+   [
+    67,
+    3
+   ],
+   [
+    80,
+    4
+   ],
+   [
+    89,
+    5
+   ],
+   [
+    116,
+    6
+   ],
+   [
+    136,
+    7
+   ],
+   [
+    206,
+    8
+   ],
+   [
+    281,
+    9
+   ],
+   [
+    386,
+    10
+   ],
+   [
+    494,
+    11
+   ],
+   [
+    572,
+    12
+   ],
+   [
+    821,
+    13
+   ],
+   [
+    924,
+    14
+   ],
+   [
+    1081,
+    15
+   ],
+   [
+    1194,
+    16
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 322,
+  "statUps": 58,
+  "skillUps": 18,
+  "jobs": [
+   "novice",
+   "catfolk"
+  ],
+  "warps": 3,
+  "autoOn": 0,
+  "afkSec": 72.80341631863425,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 59,
+  "lvl": 16,
+  "jlvl": 9,
+  "job": "catfolk",
+  "bia": 500
+ },
+ {
+  "id": 18,
+  "acc": "pt01812655",
+  "name": "TarNoob",
+  "kind": "careful",
+  "risk": -1,
+  "react": 0.8347205775485935,
+  "skill": 0.5243734311425935,
+  "potAt": 0.5221286075525584,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 189634318,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 325,
+  "kills": 189,
+  "deaths": 4,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 78,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    58,
+    2
+   ],
+   [
+    73,
+    3
+   ],
+   [
+    106,
+    4
+   ],
+   [
+    126,
+    5
+   ],
+   [
+    141,
+    6
+   ],
+   [
+    163,
+    7
+   ],
+   [
+    413,
+    8
+   ],
+   [
+    450,
+    9
+   ],
+   [
+    497,
+    10
+   ],
+   [
+    553,
+    11
+   ],
+   [
+    625,
+    12
+   ],
+   [
+    890,
+    13
+   ],
+   [
+    1101,
+    14
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 271,
+  "statUps": 44,
+  "skillUps": 24,
+  "jobs": [
+   "novice",
+   "occult"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 122.14041001728754,
+  "firstKillAt": 56,
+  "walkedOut": 12,
+  "noExpLongest": 86,
+  "lvl": 14,
+  "jlvl": 6,
+  "job": "occult",
+  "bia": 500
+ },
+ {
+  "id": 19,
+  "acc": "pt01922041",
+  "name": "IceNoob",
+  "kind": "careful",
+  "risk": -1,
+  "react": 0.8518350863604971,
+  "skill": 0.6461482319730093,
+  "potAt": 0.5566673859519267,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 713083303,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 391,
+  "kills": 256,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 125,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    31,
+    3
+   ],
+   [
+    37,
+    4
+   ],
+   [
+    54,
+    5
+   ],
+   [
+    92,
+    6
+   ],
+   [
+    123,
+    7
+   ],
+   [
+    144,
+    8
+   ],
+   [
+    179,
+    9
+   ],
+   [
+    297,
+    10
+   ],
+   [
+    542,
+    11
+   ],
+   [
+    640,
+    12
+   ],
+   [
+    962,
+    13
+   ],
+   [
+    1106,
+    14
+   ]
+  ],
+  "potions": 3,
+  "skillsUsed": 365,
+  "statUps": 98,
+  "skillUps": 18,
+  "jobs": [
+   "novice",
+   "blade"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 156.34283425814604,
+  "firstKillAt": 30,
+  "walkedOut": 12,
+  "noExpLongest": 119,
+  "lvl": 14,
+  "jlvl": 6,
+  "job": "blade",
+  "bia": 500
+ },
+ {
+  "id": 20,
+  "acc": "pt02081724",
+  "name": "Bank007",
+  "kind": "careful",
+  "risk": -1,
+  "react": 0.5101004252257293,
+  "skill": 0.7789233859530293,
+  "potAt": 0.48267385705033033,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 707302497,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 372,
+  "kills": 332,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 265,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    27,
+    3
+   ],
+   [
+    35,
+    4
+   ],
+   [
+    44,
+    5
+   ],
+   [
+    165,
+    6
+   ],
+   [
+    188,
+    7
+   ],
+   [
+    218,
+    8
+   ],
+   [
+    306,
+    9
+   ],
+   [
+    349,
+    10
+   ],
+   [
+    447,
+    11
+   ],
+   [
+    659,
+    12
+   ],
+   [
+    766,
+    13
+   ],
+   [
+    939,
+    14
+   ],
+   [
+    1070,
+    15
+   ],
+   [
+    1152,
+    16
+   ],
+   [
+    1197,
+    17
+   ]
+  ],
+  "potions": 5,
+  "skillsUsed": 665,
+  "statUps": 228,
+  "skillUps": 26,
+  "jobs": [
+   "novice",
+   "rogue"
+  ],
+  "warps": 3,
+  "autoOn": 0,
+  "afkSec": 160.14964445268254,
+  "firstKillAt": 27,
+  "walkedOut": 12,
+  "noExpLongest": 95,
+  "lvl": 17,
+  "jlvl": 9,
+  "job": "rogue",
+  "bia": 500
+ },
+ {
+  "id": 21,
+  "acc": "pt02198613",
+  "name": "Tar007",
+  "kind": "careful",
+  "risk": 1,
+  "react": 0.8080580592658642,
+  "skill": 0.5659010422257246,
+  "potAt": 0.5994083446447775,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 374828626,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 298,
+  "kills": 268,
+  "deaths": 4,
+  "stuck": [
+   {
+    "map": 71,
+    "x": 220,
+    "y": 1695,
+    "why": "not moving"
+   }
+  ],
+  "issues": [
+   {
+    "k": "death-loop",
+    "t": 448,
+    "map": 71,
+    "lvl": 10,
+    "mob": "kaipa",
+    "mobLv": 6
+   }
+  ],
+  "winsOpened": 172,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    33,
+    3
+   ],
+   [
+    46,
+    4
+   ],
+   [
+    55,
+    5
+   ],
+   [
+    60,
+    6
+   ],
+   [
+    89,
+    7
+   ],
+   [
+    137,
+    8
+   ],
+   [
+    236,
+    9
+   ],
+   [
+    391,
+    10
+   ],
+   [
+    487,
+    11
+   ],
+   [
+    592,
+    12
+   ],
+   [
+    823,
+    13
+   ],
+   [
+    1095,
+    14
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 321,
+  "statUps": 139,
+  "skillUps": 20,
+  "jobs": [
+   "novice",
+   "healer"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 97.65206532909164,
+  "firstKillAt": 33,
+  "walkedOut": 12,
+  "noExpLongest": 83,
+  "lvl": 14,
+  "jlvl": 7,
+  "job": "healer",
+  "bia": 500
+ },
+ {
+  "id": 22,
+  "acc": "pt02249300",
+  "name": "TarGG",
+  "kind": "careful",
+  "risk": -2,
+  "react": 0.9378386262049148,
+  "skill": 0.6768953145374057,
+  "potAt": 0.4897757158567084,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 271932554,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 262,
+  "kills": 250,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 126,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    35,
+    3
+   ],
+   [
+    39,
+    4
+   ],
+   [
+    113,
+    5
+   ],
+   [
+    133,
+    6
+   ],
+   [
+    171,
+    7
+   ],
+   [
+    211,
+    8
+   ],
+   [
+    286,
+    9
+   ],
+   [
+    405,
+    10
+   ],
+   [
+    562,
+    11
+   ],
+   [
+    727,
+    12
+   ],
+   [
+    964,
+    13
+   ],
+   [
+    1073,
+    14
+   ],
+   [
+    1120,
+    15
+   ],
+   [
+    1169,
+    16
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 348,
+  "statUps": 94,
+  "skillUps": 21,
+  "jobs": [
+   "novice",
+   "merchant"
+  ],
+  "warps": 3,
+  "autoOn": 0,
+  "afkSec": 109.14083032828793,
+  "firstKillAt": 34,
+  "walkedOut": 12,
+  "noExpLongest": 107,
+  "lvl": 16,
+  "jlvl": 9,
+  "job": "merchant",
+  "bia": 20
+ },
+ {
+  "id": 23,
+  "acc": "pt02392849",
+  "name": "นภา_x",
+  "kind": "casual",
+  "risk": 0,
+  "react": 1.2577329154395187,
+  "skill": 0.2585548980434215,
+  "potAt": 0.31608570891715854,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 408665462,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 277,
+  "kills": 171,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 66,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    38,
+    2
+   ],
+   [
+    46,
+    3
+   ],
+   [
+    63,
+    4
+   ],
+   [
+    84,
+    5
+   ],
+   [
+    112,
+    6
+   ],
+   [
+    174,
+    7
+   ],
+   [
+    272,
+    8
+   ],
+   [
+    484,
+    9
+   ],
+   [
+    607,
+    10
+   ],
+   [
+    845,
+    11
+   ],
+   [
+    936,
+    12
+   ],
+   [
+    1090,
+    13
+   ]
+  ],
+  "potions": 2,
+  "skillsUsed": 90,
+  "statUps": 37,
+  "skillUps": 18,
+  "jobs": [
+   "novice",
+   "blade"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 227.06393001930041,
+  "firstKillAt": 34,
+  "walkedOut": 12,
+  "noExpLongest": 138,
+  "lvl": 13,
+  "jlvl": 4,
+  "job": "blade",
+  "bia": 500
+ },
+ {
+  "id": 24,
+  "acc": "pt02417060",
+  "name": "เมฆาGG",
+  "kind": "casual",
+  "risk": 1,
+  "react": 0.9447624718513165,
+  "skill": 0.21143220458712067,
+  "potAt": 0.32053124889290485,
+  "forget": 0.2,
+  "auto": true,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 466607441,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 553,
+  "kills": 415,
+  "deaths": 1,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 71,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    22,
+    2
+   ],
+   [
+    27,
+    3
+   ],
+   [
+    44,
+    4
+   ],
+   [
+    64,
+    5
+   ],
+   [
+    88,
+    6
+   ],
+   [
+    107,
+    7
+   ],
+   [
+    120,
+    8
+   ],
+   [
+    147,
+    9
+   ],
+   [
+    195,
+    10
+   ],
+   [
+    241,
+    11
+   ],
+   [
+    311,
+    12
+   ],
+   [
+    393,
+    13
+   ],
+   [
+    499,
+    14
+   ],
+   [
+    575,
+    15
+   ],
+   [
+    637,
+    16
+   ],
+   [
+    710,
+    17
+   ],
+   [
+    810,
+    18
+   ],
+   [
+    928,
+    20
+   ],
+   [
+    983,
+    21
+   ],
+   [
+    1075,
+    22
+   ],
+   [
+    1172,
+    23
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 30,
+  "skillUps": 31,
+  "jobs": [
+   "novice",
+   "occult"
+  ],
+  "warps": 4,
+  "autoOn": 1,
+  "afkSec": 151.89352732472753,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 66,
+  "lvl": 23,
+  "jlvl": 15,
+  "job": "occult",
+  "bia": 500
+ },
+ {
+  "id": 25,
+  "acc": "pt02519809",
+  "name": "ดาวเหนือ",
+  "kind": "casual",
+  "risk": 1,
+  "react": 0.7720659603234687,
+  "skill": 0.556297580318664,
+  "potAt": 0.3967162089174223,
+  "forget": 0.2,
+  "auto": true,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 231510542,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 668,
+  "kills": 548,
+  "deaths": 1,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 145,
+  "winsBad": [],
+  "maps": [
+   71,
+   31,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    22,
+    2
+   ],
+   [
+    24,
+    3
+   ],
+   [
+    36,
+    4
+   ],
+   [
+    56,
+    5
+   ],
+   [
+    83,
+    6
+   ],
+   [
+    99,
+    7
+   ],
+   [
+    128,
+    8
+   ],
+   [
+    172,
+    9
+   ],
+   [
+    211,
+    10
+   ],
+   [
+    259,
+    11
+   ],
+   [
+    302,
+    12
+   ],
+   [
+    371,
+    13
+   ],
+   [
+    424,
+    14
+   ],
+   [
+    463,
+    15
+   ],
+   [
+    491,
+    16
+   ],
+   [
+    522,
+    17
+   ],
+   [
+    570,
+    18
+   ],
+   [
+    626,
+    19
+   ],
+   [
+    747,
+    21
+   ],
+   [
+    768,
+    22
+   ],
+   [
+    821,
+    23
+   ],
+   [
+    877,
+    24
+   ],
+   [
+    949,
+    25
+   ],
+   [
+    1090,
+    26
+   ],
+   [
+    1115,
+    27
+   ],
+   [
+    1185,
+    28
+   ]
+  ],
+  "potions": 1,
+  "skillsUsed": 0,
+  "statUps": 89,
+  "skillUps": 44,
+  "jobs": [
+   "novice",
+   "catfolk"
+  ],
+  "warps": 4,
+  "autoOn": 1,
+  "afkSec": 191.01586099062854,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 73,
+  "lvl": 28,
+  "jlvl": 19,
+  "job": "catfolk",
+  "bia": 500
+ },
+ {
+  "id": 26,
+  "acc": "pt02625375",
+  "name": "BeamLv1",
+  "kind": "casual",
+  "risk": 1,
+  "react": 1.02061677929974,
+  "skill": 0.45310484741493356,
+  "potAt": 0.41658525241845534,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 283241188,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 257,
+  "kills": 184,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 66,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    21,
+    2
+   ],
+   [
+    25,
+    3
+   ],
+   [
+    36,
+    4
+   ],
+   [
+    55,
+    5
+   ],
+   [
+    167,
+    6
+   ],
+   [
+    202,
+    7
+   ],
+   [
+    318,
+    8
+   ],
+   [
+    372,
+    9
+   ],
+   [
+    416,
+    10
+   ],
+   [
+    536,
+    11
+   ],
+   [
+    720,
+    12
+   ],
+   [
+    940,
+    13
+   ],
+   [
+    1173,
+    14
+   ]
+  ],
+  "potions": 3,
+  "skillsUsed": 187,
+  "statUps": 35,
+  "skillUps": 20,
+  "jobs": [
+   "novice",
+   "muay"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 143.39583299048053,
+  "firstKillAt": 20,
+  "walkedOut": 12,
+  "noExpLongest": 129,
+  "lvl": 14,
+  "jlvl": 6,
+  "job": "muay",
+  "bia": 500
+ },
+ {
+  "id": 27,
+  "acc": "pt02718809",
+  "name": "ดาวเหนือza",
+  "kind": "casual",
+  "risk": 2,
+  "react": 0.6726214044134232,
+  "skill": 0.4739719902509693,
+  "potAt": 0.3736200750449766,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 398728326,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 429,
+  "kills": 295,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 119,
+  "winsBad": [],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    15,
+    2
+   ],
+   [
+    21,
+    3
+   ],
+   [
+    36,
+    4
+   ],
+   [
+    50,
+    5
+   ],
+   [
+    92,
+    6
+   ],
+   [
+    112,
+    7
+   ],
+   [
+    183,
+    8
+   ],
+   [
+    252,
+    9
+   ],
+   [
+    304,
+    10
+   ],
+   [
+    402,
+    11
+   ],
+   [
+    505,
+    12
+   ],
+   [
+    596,
+    13
+   ],
+   [
+    846,
+    14
+   ],
+   [
+    1055,
+    15
+   ],
+   [
+    1128,
+    16
+   ]
+  ],
+  "potions": 3,
+  "skillsUsed": 336,
+  "statUps": 81,
+  "skillUps": 27,
+  "jobs": [
+   "novice",
+   "blade"
+  ],
+  "warps": 3,
+  "autoOn": 0,
+  "afkSec": 125.64949497610772,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 71,
+  "lvl": 16,
+  "jlvl": 9,
+  "job": "blade",
+  "bia": 500
+ },
+ {
+  "id": 28,
+  "acc": "pt02834382",
+  "name": "Pim_x",
+  "kind": "casual",
+  "risk": 4,
+  "react": 0.8432145596683093,
+  "skill": 0.4535521746862457,
+  "potAt": 0.3756999768902082,
+  "forget": 0.2,
+  "auto": true,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 356865114,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 735,
+  "kills": 502,
+  "deaths": 4,
+  "stuck": [],
+  "issues": [
+   {
+    "k": "death-loop",
+    "t": 1121,
+    "map": 32,
+    "lvl": 25,
+    "mob": null,
+    "mobLv": null
+   }
+  ],
+  "winsOpened": 140,
+  "winsBad": [],
+  "maps": [
+   71,
+   31,
+   32
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    27,
+    2
+   ],
+   [
+    32,
+    3
+   ],
+   [
+    46,
+    4
+   ],
+   [
+    51,
+    5
+   ],
+   [
+    68,
+    6
+   ],
+   [
+    96,
+    7
+   ],
+   [
+    122,
+    8
+   ],
+   [
+    176,
+    9
+   ],
+   [
+    231,
+    10
+   ],
+   [
+    303,
+    11
+   ],
+   [
+    340,
+    12
+   ],
+   [
+    418,
+    13
+   ],
+   [
+    531,
+    14
+   ],
+   [
+    599,
+    15
+   ],
+   [
+    624,
+    16
+   ],
+   [
+    655,
+    17
+   ],
+   [
+    692,
+    18
+   ],
+   [
+    750,
+    19
+   ],
+   [
+    800,
+    20
+   ],
+   [
+    841,
+    21
+   ],
+   [
+    914,
+    22
+   ],
+   [
+    981,
+    23
+   ],
+   [
+    1042,
+    24
+   ],
+   [
+    1105,
+    25
+   ],
+   [
+    1185,
+    26
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 97,
+  "skillUps": 33,
+  "jobs": [
+   "novice",
+   "catfolk"
+  ],
+  "warps": 6,
+  "autoOn": 1,
+  "afkSec": 84.7676065749338,
+  "firstKillAt": 27,
+  "walkedOut": 12,
+  "noExpLongest": 39,
+  "lvl": 26,
+  "jlvl": 18,
+  "job": "catfolk",
+  "bia": 500
+ },
+ {
+  "id": 29,
+  "acc": "pt029244",
+  "name": "ต้นข้าวLv1",
+  "kind": "casual",
+  "risk": 3,
+  "react": 1.368113430574589,
+  "skill": 0.24121383560877938,
+  "potAt": 0.3904675394019427,
+  "forget": 0.2,
+  "auto": true,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 844991400,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 275,
+  "kills": 388,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 99,
+  "winsBad": [],
+  "maps": [
+   71,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    28,
+    3
+   ],
+   [
+    36,
+    4
+   ],
+   [
+    57,
+    5
+   ],
+   [
+    114,
+    6
+   ],
+   [
+    150,
+    7
+   ],
+   [
+    179,
+    8
+   ],
+   [
+    222,
+    9
+   ],
+   [
+    284,
+    10
+   ],
+   [
+    411,
+    11
+   ],
+   [
+    494,
+    12
+   ],
+   [
+    627,
+    13
+   ],
+   [
+    703,
+    14
+   ],
+   [
+    752,
+    15
+   ],
+   [
+    824,
+    16
+   ],
+   [
+    862,
+    17
+   ],
+   [
+    920,
+    18
+   ],
+   [
+    969,
+    19
+   ],
+   [
+    1037,
+    20
+   ],
+   [
+    1089,
+    21
+   ],
+   [
+    1166,
+    22
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 66,
+  "skillUps": 24,
+  "jobs": [
+   "novice",
+   "dogfolk"
+  ],
+  "warps": 3,
+  "autoOn": 1,
+  "afkSec": 119.56915403463371,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 46,
+  "lvl": 22,
+  "jlvl": 14,
+  "job": "dogfolk",
+  "bia": 500
+ },
+ {
+  "id": 30,
+  "acc": "pt03020270",
+  "name": "Gun007",
+  "kind": "casual",
+  "risk": 2,
+  "react": 1.262721306021661,
+  "skill": 0.5784951550785895,
+  "potAt": 0.33403570395150955,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 993050789,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 209,
+  "kills": 167,
+  "deaths": 4,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 62,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    18,
+    2
+   ],
+   [
+    34,
+    3
+   ],
+   [
+    49,
+    4
+   ],
+   [
+    86,
+    5
+   ],
+   [
+    254,
+    6
+   ],
+   [
+    345,
+    7
+   ],
+   [
+    452,
+    8
+   ],
+   [
+    571,
+    9
+   ],
+   [
+    652,
+    10
+   ],
+   [
+    756,
+    11
+   ],
+   [
+    984,
+    12
+   ],
+   [
+    1157,
+    13
+   ]
+  ],
+  "potions": 1,
+  "skillsUsed": 189,
+  "statUps": 40,
+  "skillUps": 14,
+  "jobs": [
+   "novice",
+   "ranger"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 188.05672405662793,
+  "firstKillAt": 17,
+  "walkedOut": 12,
+  "noExpLongest": 83,
+  "lvl": 13,
+  "jlvl": 5,
+  "job": "ranger",
+  "bia": 500
+ },
+ {
+  "id": 31,
+  "acc": "pt0312168",
+  "name": "MintGG",
+  "kind": "casual",
+  "risk": 4,
+  "react": 1.028459519719919,
+  "skill": 0.3595739683879418,
+  "potAt": 0.42984334909349836,
+  "forget": 0.2,
+  "auto": true,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 80985461,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 870,
+  "kills": 331,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 125,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    18,
+    2
+   ],
+   [
+    28,
+    3
+   ],
+   [
+    35,
+    4
+   ],
+   [
+    63,
+    5
+   ],
+   [
+    76,
+    6
+   ],
+   [
+    103,
+    7
+   ],
+   [
+    136,
+    8
+   ],
+   [
+    167,
+    9
+   ],
+   [
+    200,
+    10
+   ],
+   [
+    308,
+    12
+   ],
+   [
+    339,
+    13
+   ],
+   [
+    447,
+    14
+   ],
+   [
+    557,
+    15
+   ],
+   [
+    635,
+    16
+   ],
+   [
+    715,
+    17
+   ],
+   [
+    840,
+    18
+   ],
+   [
+    933,
+    19
+   ],
+   [
+    1029,
+    20
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 88,
+  "skillUps": 28,
+  "jobs": [
+   "novice",
+   "muay"
+  ],
+  "warps": 5,
+  "autoOn": 1,
+  "afkSec": 84.29437776761799,
+  "firstKillAt": 18,
+  "walkedOut": 12,
+  "noExpLongest": 67,
+  "lvl": 20,
+  "jlvl": 13,
+  "job": "muay",
+  "bia": 500
+ },
+ {
+  "id": 32,
+  "acc": "pt03237426",
+  "name": "ดาวเหนือ_x",
+  "kind": "casual",
+  "risk": 1,
+  "react": 0.9859029067614594,
+  "skill": 0.33507697197379405,
+  "potAt": 0.36933398280261737,
+  "forget": 0.2,
+  "auto": true,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 531741372,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 787,
+  "kills": 381,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 120,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    17,
+    2
+   ],
+   [
+    24,
+    3
+   ],
+   [
+    47,
+    4
+   ],
+   [
+    65,
+    5
+   ],
+   [
+    85,
+    6
+   ],
+   [
+    108,
+    7
+   ],
+   [
+    151,
+    8
+   ],
+   [
+    184,
+    9
+   ],
+   [
+    230,
+    10
+   ],
+   [
+    279,
+    11
+   ],
+   [
+    365,
+    12
+   ],
+   [
+    461,
+    13
+   ],
+   [
+    511,
+    14
+   ],
+   [
+    580,
+    15
+   ],
+   [
+    653,
+    16
+   ],
+   [
+    741,
+    17
+   ],
+   [
+    818,
+    18
+   ],
+   [
+    903,
+    19
+   ],
+   [
+    949,
+    20
+   ],
+   [
+    1006,
+    21
+   ],
+   [
+    1072,
+    22
+   ],
+   [
+    1126,
+    23
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 78,
+  "skillUps": 30,
+  "jobs": [
+   "novice",
+   "merchant"
+  ],
+  "warps": 5,
+  "autoOn": 1,
+  "afkSec": 106.96848801196018,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 64,
+  "lvl": 23,
+  "jlvl": 15,
+  "job": "merchant",
+  "bia": 0
+ },
+ {
+  "id": 33,
+  "acc": "pt03348525",
+  "name": "NutGG",
+  "kind": "casual",
+  "risk": -1,
+  "react": 1.0883650100270121,
+  "skill": 0.5753617640469977,
+  "potAt": 0.40258416996923474,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 27675558,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 343,
+  "kills": 118,
+  "deaths": 1,
+  "stuck": [
+   {
+    "map": 71,
+    "x": 486,
+    "y": 258,
+    "why": "not moving"
+   }
+  ],
+  "issues": [],
+  "winsOpened": 111,
+  "winsBad": [],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    20,
+    2
+   ],
+   [
+    27,
+    3
+   ],
+   [
+    34,
+    4
+   ],
+   [
+    72,
+    5
+   ],
+   [
+    119,
+    6
+   ],
+   [
+    253,
+    7
+   ],
+   [
+    315,
+    8
+   ],
+   [
+    556,
+    9
+   ],
+   [
+    795,
+    10
+   ],
+   [
+    971,
+    11
+   ],
+   [
+    1152,
+    12
+   ]
+  ],
+  "potions": 1,
+  "skillsUsed": 239,
+  "statUps": 87,
+  "skillUps": 14,
+  "jobs": [
+   "novice",
+   "ranger"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 102.93332858846213,
+  "firstKillAt": 19,
+  "walkedOut": 12,
+  "noExpLongest": 165,
+  "lvl": 12,
+  "jlvl": 4,
+  "job": "ranger",
+  "bia": 500
+ },
+ {
+  "id": 34,
+  "acc": "pt03437061",
+  "name": "TarGG",
+  "kind": "casual",
+  "risk": 3,
+  "react": 0.9064346903499377,
+  "skill": 0.5239203577506917,
+  "potAt": 0.3147263589616522,
+  "forget": 0.2,
+  "auto": true,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 822866528,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 817,
+  "kills": 340,
+  "deaths": 3,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 137,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    35,
+    2
+   ],
+   [
+    45,
+    3
+   ],
+   [
+    59,
+    4
+   ],
+   [
+    71,
+    5
+   ],
+   [
+    93,
+    6
+   ],
+   [
+    113,
+    7
+   ],
+   [
+    182,
+    8
+   ],
+   [
+    230,
+    9
+   ],
+   [
+    268,
+    10
+   ],
+   [
+    318,
+    11
+   ],
+   [
+    391,
+    12
+   ],
+   [
+    449,
+    13
+   ],
+   [
+    509,
+    14
+   ],
+   [
+    579,
+    15
+   ],
+   [
+    650,
+    16
+   ],
+   [
+    684,
+    17
+   ],
+   [
+    751,
+    18
+   ],
+   [
+    833,
+    19
+   ],
+   [
+    976,
+    20
+   ],
+   [
+    1058,
+    21
+   ],
+   [
+    1152,
+    22
+   ]
+  ],
+  "potions": 1,
+  "skillsUsed": 0,
+  "statUps": 96,
+  "skillUps": 30,
+  "jobs": [
+   "novice",
+   "occult"
+  ],
+  "warps": 4,
+  "autoOn": 1,
+  "afkSec": 174.11780236014994,
+  "firstKillAt": 13,
+  "walkedOut": 12,
+  "noExpLongest": 67,
+  "lvl": 22,
+  "jlvl": 14,
+  "job": "occult",
+  "bia": 500
+ },
+ {
+  "id": 35,
+  "acc": "pt03558221",
+  "name": "ภูผา007",
+  "kind": "casual",
+  "risk": 1,
+  "react": 1.240185873136011,
+  "skill": 0.4019849005164508,
+  "potAt": 0.4301114910189582,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 366793434,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 431,
+  "kills": 219,
+  "deaths": 3,
+  "stuck": [
+   {
+    "map": 71,
+    "x": 856,
+    "y": 469,
+    "why": "not moving"
+   }
+  ],
+  "issues": [],
+  "winsOpened": 78,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    37,
+    3
+   ],
+   [
+    50,
+    4
+   ],
+   [
+    80,
+    5
+   ],
+   [
+    222,
+    6
+   ],
+   [
+    264,
+    7
+   ],
+   [
+    336,
+    8
+   ],
+   [
+    411,
+    9
+   ],
+   [
+    479,
+    10
+   ],
+   [
+    749,
+    11
+   ],
+   [
+    919,
+    12
+   ],
+   [
+    1034,
+    13
+   ]
+  ],
+  "potions": 5,
+  "skillsUsed": 146,
+  "statUps": 45,
+  "skillUps": 23,
+  "jobs": [
+   "novice",
+   "ninja"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 165.83386078515736,
+  "firstKillAt": 37,
+  "walkedOut": 12,
+  "noExpLongest": 117,
+  "lvl": 13,
+  "jlvl": 6,
+  "job": "ninja",
+  "bia": 500
+ },
+ {
+  "id": 36,
+  "acc": "pt03681889",
+  "name": "ปลายฟ้าZz",
+  "kind": "casual",
+  "risk": 4,
+  "react": 0.7517435901573596,
+  "skill": 0.5772598894207086,
+  "potAt": 0.35348074794909023,
+  "forget": 0.2,
+  "auto": true,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 218213567,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 422,
+  "kills": 434,
+  "deaths": 0,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 152,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    20,
+    2
+   ],
+   [
+    30,
+    3
+   ],
+   [
+    41,
+    4
+   ],
+   [
+    56,
+    5
+   ],
+   [
+    80,
+    6
+   ],
+   [
+    102,
+    7
+   ],
+   [
+    138,
+    8
+   ],
+   [
+    176,
+    9
+   ],
+   [
+    227,
+    10
+   ],
+   [
+    286,
+    11
+   ],
+   [
+    360,
+    12
+   ],
+   [
+    477,
+    13
+   ],
+   [
+    567,
+    14
+   ],
+   [
+    687,
+    15
+   ],
+   [
+    771,
+    16
+   ],
+   [
+    837,
+    17
+   ],
+   [
+    920,
+    18
+   ],
+   [
+    1020,
+    19
+   ],
+   [
+    1133,
+    20
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 109,
+  "skillUps": 31,
+  "jobs": [
+   "novice",
+   "healer"
+  ],
+  "warps": 3,
+  "autoOn": 1,
+  "afkSec": 95.65893978143993,
+  "firstKillAt": 20,
+  "walkedOut": 12,
+  "noExpLongest": 74,
+  "lvl": 20,
+  "jlvl": 13,
+  "job": "healer",
+  "bia": 500
+ },
+ {
+  "id": 37,
+  "acc": "pt03784642",
+  "name": "MayTH",
+  "kind": "casual",
+  "risk": 0,
+  "react": 1.2869459680686453,
+  "skill": 0.5504426669098635,
+  "potAt": 0.39495137806281044,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "ipad",
+  "w": 1024,
+  "h": 768,
+  "touch": true,
+  "seed": 56013705,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 306,
+  "kills": 148,
+  "deaths": 1,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 71,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    32,
+    2
+   ],
+   [
+    41,
+    3
+   ],
+   [
+    56,
+    4
+   ],
+   [
+    80,
+    5
+   ],
+   [
+    202,
+    6
+   ],
+   [
+    233,
+    7
+   ],
+   [
+    274,
+    8
+   ],
+   [
+    329,
+    9
+   ],
+   [
+    477,
+    10
+   ],
+   [
+    643,
+    11
+   ],
+   [
+    928,
+    12
+   ]
+  ],
+  "potions": 2,
+  "skillsUsed": 205,
+  "statUps": 42,
+  "skillUps": 17,
+  "jobs": [
+   "novice",
+   "ranger"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 136.1356024682222,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 93,
+  "lvl": 12,
+  "jlvl": 5,
+  "job": "ranger",
+  "bia": 500
+ },
+ {
+  "id": 38,
+  "acc": "pt03846528",
+  "name": "ต้นข้าว",
+  "kind": "casual",
+  "risk": 2,
+  "react": 0.9769472280409872,
+  "skill": 0.2760308444854016,
+  "potAt": 0.3752016340965413,
+  "forget": 0.2,
+  "auto": true,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 833223023,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 632,
+  "kills": 322,
+  "deaths": 0,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 90,
+  "winsBad": [],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    20,
+    2
+   ],
+   [
+    27,
+    3
+   ],
+   [
+    40,
+    4
+   ],
+   [
+    63,
+    5
+   ],
+   [
+    87,
+    6
+   ],
+   [
+    111,
+    7
+   ],
+   [
+    154,
+    8
+   ],
+   [
+    192,
+    9
+   ],
+   [
+    251,
+    10
+   ],
+   [
+    309,
+    11
+   ],
+   [
+    391,
+    12
+   ],
+   [
+    549,
+    13
+   ],
+   [
+    683,
+    14
+   ],
+   [
+    814,
+    15
+   ],
+   [
+    1010,
+    16
+   ],
+   [
+    1097,
+    17
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 55,
+  "skillUps": 24,
+  "jobs": [
+   "novice",
+   "summoner"
+  ],
+  "warps": 3,
+  "autoOn": 1,
+  "afkSec": 187.01325121429434,
+  "firstKillAt": 19,
+  "walkedOut": 12,
+  "noExpLongest": 77,
+  "lvl": 17,
+  "jlvl": 10,
+  "job": "summoner",
+  "bia": 500
+ },
+ {
+  "id": 39,
+  "acc": "pt03913178",
+  "name": "Jayza",
+  "kind": "casual",
+  "risk": -1,
+  "react": 1.0509442778541447,
+  "skill": 0.5102389493539179,
+  "potAt": 0.3430108966738968,
+  "forget": 0.2,
+  "auto": true,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 988447401,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 472,
+  "kills": 520,
+  "deaths": 0,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 125,
+  "winsBad": [],
+  "maps": [
+   71,
+   31,
+   32
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    22,
+    2
+   ],
+   [
+    29,
+    3
+   ],
+   [
+    46,
+    4
+   ],
+   [
+    62,
+    5
+   ],
+   [
+    79,
+    6
+   ],
+   [
+    94,
+    7
+   ],
+   [
+    117,
+    8
+   ],
+   [
+    164,
+    9
+   ],
+   [
+    217,
+    10
+   ],
+   [
+    268,
+    11
+   ],
+   [
+    326,
+    12
+   ],
+   [
+    424,
+    13
+   ],
+   [
+    505,
+    14
+   ],
+   [
+    540,
+    15
+   ],
+   [
+    602,
+    16
+   ],
+   [
+    633,
+    17
+   ],
+   [
+    673,
+    18
+   ],
+   [
+    722,
+    19
+   ],
+   [
+    797,
+    20
+   ],
+   [
+    834,
+    21
+   ],
+   [
+    899,
+    22
+   ],
+   [
+    1011,
+    23
+   ],
+   [
+    1069,
+    24
+   ],
+   [
+    1131,
+    25
+   ],
+   [
+    1201,
+    26
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 83,
+  "skillUps": 32,
+  "jobs": [
+   "novice",
+   "rogue"
+  ],
+  "warps": 4,
+  "autoOn": 1,
+  "afkSec": 103.96146040361442,
+  "firstKillAt": 18,
+  "walkedOut": 12,
+  "noExpLongest": 49,
+  "lvl": 26,
+  "jlvl": 17,
+  "job": "rogue",
+  "bia": 500
+ },
+ {
+  "id": 40,
+  "acc": "pt04077789",
+  "name": "นภาza",
+  "kind": "casual",
+  "risk": 1,
+  "react": 0.9906652884514374,
+  "skill": 0.35575150370400005,
+  "potAt": 0.3077613775887347,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 584890325,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 359,
+  "kills": 220,
+  "deaths": 4,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 70,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    15,
+    2
+   ],
+   [
+    66,
+    3
+   ],
+   [
+    90,
+    4
+   ],
+   [
+    108,
+    5
+   ],
+   [
+    158,
+    6
+   ],
+   [
+    222,
+    7
+   ],
+   [
+    256,
+    8
+   ],
+   [
+    398,
+    9
+   ],
+   [
+    465,
+    10
+   ],
+   [
+    559,
+    11
+   ],
+   [
+    763,
+    12
+   ],
+   [
+    854,
+    13
+   ],
+   [
+    1046,
+    14
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 168,
+  "statUps": 41,
+  "skillUps": 19,
+  "jobs": [
+   "novice",
+   "ranger"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 125.24009355122227,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 77,
+  "lvl": 14,
+  "jlvl": 7,
+  "job": "ranger",
+  "bia": 500
+ },
+ {
+  "id": 41,
+  "acc": "pt04142549",
+  "name": "ใบเตยza",
+  "kind": "casual",
+  "risk": 2,
+  "react": 1.2011400188324695,
+  "skill": 0.28014826070524207,
+  "potAt": 0.3759088375260629,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 157461894,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 410,
+  "kills": 190,
+  "deaths": 3,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 102,
+  "winsBad": [],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    19,
+    2
+   ],
+   [
+    22,
+    3
+   ],
+   [
+    40,
+    4
+   ],
+   [
+    60,
+    5
+   ],
+   [
+    74,
+    6
+   ],
+   [
+    116,
+    7
+   ],
+   [
+    373,
+    8
+   ],
+   [
+    572,
+    9
+   ],
+   [
+    622,
+    10
+   ],
+   [
+    860,
+    11
+   ],
+   [
+    984,
+    12
+   ],
+   [
+    1118,
+    13
+   ]
+  ],
+  "potions": 4,
+  "skillsUsed": 93,
+  "statUps": 70,
+  "skillUps": 20,
+  "jobs": [
+   "novice",
+   "catfolk"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 94.46212372950377,
+  "firstKillAt": 18,
+  "walkedOut": 12,
+  "noExpLongest": 141,
+  "lvl": 13,
+  "jlvl": 6,
+  "job": "catfolk",
+  "bia": 500
+ },
+ {
+  "id": 42,
+  "acc": "pt04279590",
+  "name": "NutGG",
+  "kind": "casual",
+  "risk": 0,
+  "react": 0.8135551081102133,
+  "skill": 0.4103510062258462,
+  "potAt": 0.3346808199233752,
+  "forget": 0.2,
+  "auto": true,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "ipad",
+  "w": 1024,
+  "h": 768,
+  "touch": true,
+  "seed": 466983924,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 555,
+  "kills": 392,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 138,
+  "winsBad": [],
+  "maps": [
+   71,
+   31,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    19,
+    2
+   ],
+   [
+    22,
+    3
+   ],
+   [
+    30,
+    4
+   ],
+   [
+    36,
+    5
+   ],
+   [
+    62,
+    6
+   ],
+   [
+    82,
+    7
+   ],
+   [
+    110,
+    8
+   ],
+   [
+    154,
+    9
+   ],
+   [
+    220,
+    10
+   ],
+   [
+    303,
+    11
+   ],
+   [
+    329,
+    12
+   ],
+   [
+    359,
+    13
+   ],
+   [
+    397,
+    14
+   ],
+   [
+    500,
+    15
+   ],
+   [
+    557,
+    16
+   ],
+   [
+    617,
+    17
+   ],
+   [
+    690,
+    18
+   ],
+   [
+    753,
+    19
+   ],
+   [
+    833,
+    20
+   ],
+   [
+    975,
+    21
+   ],
+   [
+    1092,
+    22
+   ]
+  ],
+  "potions": 1,
+  "skillsUsed": 0,
+  "statUps": 93,
+  "skillUps": 33,
+  "jobs": [
+   "novice",
+   "merchant"
+  ],
+  "warps": 4,
+  "autoOn": 1,
+  "afkSec": 95.50493356329619,
+  "firstKillAt": 18,
+  "walkedOut": 12,
+  "noExpLongest": 46,
+  "lvl": 22,
+  "jlvl": 14,
+  "job": "merchant",
+  "bia": 0
+ },
+ {
+  "id": 43,
+  "acc": "pt04344750",
+  "name": "นภาGG",
+  "kind": "casual",
+  "risk": 1,
+  "react": 1.3724441766610573,
+  "skill": 0.23463857324544274,
+  "potAt": 0.3352502691025149,
+  "forget": 0.2,
+  "auto": true,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 960335534,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 384,
+  "kills": 315,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 106,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    18,
+    2
+   ],
+   [
+    39,
+    3
+   ],
+   [
+    44,
+    4
+   ],
+   [
+    58,
+    5
+   ],
+   [
+    78,
+    6
+   ],
+   [
+    90,
+    7
+   ],
+   [
+    105,
+    8
+   ],
+   [
+    205,
+    9
+   ],
+   [
+    245,
+    10
+   ],
+   [
+    288,
+    11
+   ],
+   [
+    348,
+    12
+   ],
+   [
+    425,
+    13
+   ],
+   [
+    606,
+    14
+   ],
+   [
+    697,
+    15
+   ],
+   [
+    800,
+    16
+   ],
+   [
+    903,
+    17
+   ],
+   [
+    1005,
+    18
+   ],
+   [
+    1191,
+    19
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 73,
+  "skillUps": 25,
+  "jobs": [
+   "novice",
+   "healer"
+  ],
+  "warps": 4,
+  "autoOn": 1,
+  "afkSec": 209.04077305879477,
+  "firstKillAt": 18,
+  "walkedOut": 12,
+  "noExpLongest": 78,
+  "lvl": 19,
+  "jlvl": 11,
+  "job": "healer",
+  "bia": 500
+ },
+ {
+  "id": 44,
+  "acc": "pt04423523",
+  "name": "Boss",
+  "kind": "casual",
+  "risk": 2,
+  "react": 1.3155847251022164,
+  "skill": 0.4162373985239478,
+  "potAt": 0.4009784970204246,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 697537044,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 371,
+  "kills": 158,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 41,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    22,
+    2
+   ],
+   [
+    39,
+    3
+   ],
+   [
+    54,
+    4
+   ],
+   [
+    72,
+    5
+   ],
+   [
+    93,
+    6
+   ],
+   [
+    341,
+    7
+   ],
+   [
+    607,
+    8
+   ],
+   [
+    697,
+    9
+   ],
+   [
+    965,
+    10
+   ],
+   [
+    1078,
+    11
+   ],
+   [
+    1190,
+    12
+   ]
+  ],
+  "potions": 2,
+  "skillsUsed": 164,
+  "statUps": 20,
+  "skillUps": 10,
+  "jobs": [
+   "novice",
+   "occult"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 85.89984750184223,
+  "firstKillAt": 21,
+  "walkedOut": 12,
+  "noExpLongest": 181,
+  "lvl": 12,
+  "jlvl": 3,
+  "job": "occult",
+  "bia": 500
+ },
+ {
+  "id": 45,
+  "acc": "pt04543185",
+  "name": "นภา_x",
+  "kind": "casual",
+  "risk": 3,
+  "react": 1.2336199625551791,
+  "skill": 0.42535533449861934,
+  "potAt": 0.4235534601721696,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "ipad",
+  "w": 1024,
+  "h": 768,
+  "touch": true,
+  "seed": 384812034,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 351,
+  "kills": 216,
+  "deaths": 3,
+  "stuck": [
+   {
+    "map": 71,
+    "x": 2350,
+    "y": 2755,
+    "why": "not moving"
+   },
+   {
+    "map": 71,
+    "x": 1007,
+    "y": 2148,
+    "why": "not moving"
+   }
+  ],
+  "issues": [],
+  "winsOpened": 110,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    30,
+    2
+   ],
+   [
+    37,
+    3
+   ],
+   [
+    46,
+    4
+   ],
+   [
+    64,
+    5
+   ],
+   [
+    93,
+    6
+   ],
+   [
+    169,
+    7
+   ],
+   [
+    204,
+    8
+   ],
+   [
+    235,
+    9
+   ],
+   [
+    284,
+    10
+   ],
+   [
+    334,
+    11
+   ],
+   [
+    546,
+    12
+   ],
+   [
+    689,
+    13
+   ],
+   [
+    1007,
+    14
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 164,
+  "statUps": 77,
+  "skillUps": 22,
+  "jobs": [
+   "novice",
+   "blade"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 106.92281963160393,
+  "firstKillAt": 28,
+  "walkedOut": 12,
+  "noExpLongest": 119,
+  "lvl": 14,
+  "jlvl": 7,
+  "job": "blade",
+  "bia": 500
+ },
+ {
+  "id": 46,
+  "acc": "pt04636133",
+  "name": "Jay",
+  "kind": "casual",
+  "risk": 0,
+  "react": 0.6399764340557048,
+  "skill": 0.5419635891644115,
+  "potAt": 0.34102154415614044,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "ipad",
+  "w": 1024,
+  "h": 768,
+  "touch": true,
+  "seed": 749437417,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 419,
+  "kills": 306,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 144,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    46,
+    2
+   ],
+   [
+    59,
+    3
+   ],
+   [
+    70,
+    4
+   ],
+   [
+    86,
+    5
+   ],
+   [
+    117,
+    6
+   ],
+   [
+    148,
+    7
+   ],
+   [
+    256,
+    8
+   ],
+   [
+    348,
+    9
+   ],
+   [
+    436,
+    10
+   ],
+   [
+    501,
+    11
+   ],
+   [
+    590,
+    12
+   ],
+   [
+    834,
+    13
+   ],
+   [
+    1011,
+    14
+   ]
+  ],
+  "potions": 5,
+  "skillsUsed": 399,
+  "statUps": 117,
+  "skillUps": 17,
+  "jobs": [
+   "novice",
+   "ninja"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 120.43122241060773,
+  "firstKillAt": 45,
+  "walkedOut": 12,
+  "noExpLongest": 76,
+  "lvl": 14,
+  "jlvl": 6,
+  "job": "ninja",
+  "bia": 500
+ },
+ {
+  "id": 47,
+  "acc": "pt0474844",
+  "name": "ภูผา",
+  "kind": "casual",
+  "risk": 1,
+  "react": 1.3320149719398537,
+  "skill": 0.48781669861069726,
+  "potAt": 0.3176267760189375,
+  "forget": 0.2,
+  "auto": true,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 975169061,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 409,
+  "kills": 473,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 115,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    22,
+    2
+   ],
+   [
+    23,
+    3
+   ],
+   [
+    47,
+    4
+   ],
+   [
+    61,
+    5
+   ],
+   [
+    81,
+    6
+   ],
+   [
+    107,
+    7
+   ],
+   [
+    150,
+    8
+   ],
+   [
+    187,
+    9
+   ],
+   [
+    263,
+    10
+   ],
+   [
+    313,
+    11
+   ],
+   [
+    364,
+    12
+   ],
+   [
+    414,
+    13
+   ],
+   [
+    501,
+    14
+   ],
+   [
+    628,
+    15
+   ],
+   [
+    723,
+    16
+   ],
+   [
+    756,
+    17
+   ],
+   [
+    825,
+    18
+   ],
+   [
+    922,
+    19
+   ],
+   [
+    964,
+    20
+   ],
+   [
+    1013,
+    21
+   ],
+   [
+    1138,
+    22
+   ],
+   [
+    1149,
+    23
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 80,
+  "skillUps": 23,
+  "jobs": [
+   "novice",
+   "rogue"
+  ],
+  "warps": 4,
+  "autoOn": 1,
+  "afkSec": 134.34816829364198,
+  "firstKillAt": 21,
+  "walkedOut": 12,
+  "noExpLongest": 71,
+  "lvl": 23,
+  "jlvl": 15,
+  "job": "rogue",
+  "bia": 500
+ },
+ {
+  "id": 48,
+  "acc": "pt04851285",
+  "name": "Ice007",
+  "kind": "casual",
+  "risk": 2,
+  "react": 1.054303957360938,
+  "skill": 0.34330568469283435,
+  "potAt": 0.3193213172579749,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 767358395,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 334,
+  "kills": 226,
+  "deaths": 5,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 69,
+  "winsBad": [],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    36,
+    2
+   ],
+   [
+    47,
+    3
+   ],
+   [
+    54,
+    4
+   ],
+   [
+    96,
+    5
+   ],
+   [
+    114,
+    6
+   ],
+   [
+    176,
+    7
+   ],
+   [
+    235,
+    8
+   ],
+   [
+    297,
+    9
+   ],
+   [
+    393,
+    10
+   ],
+   [
+    564,
+    11
+   ],
+   [
+    753,
+    12
+   ],
+   [
+    1077,
+    13
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 141,
+  "statUps": 37,
+  "skillUps": 19,
+  "jobs": [
+   "novice",
+   "rune"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 101.07521284887345,
+  "firstKillAt": 36,
+  "walkedOut": 12,
+  "noExpLongest": 110,
+  "lvl": 13,
+  "jlvl": 6,
+  "job": "rune",
+  "bia": 500
+ },
+ {
+  "id": 49,
+  "acc": "pt04974590",
+  "name": "เมฆาจัง",
+  "kind": "casual",
+  "risk": 0,
+  "react": 1.186855661024738,
+  "skill": 0.24154742343423302,
+  "potAt": 0.39377283060167584,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 618302084,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 367,
+  "kills": 204,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 82,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    34,
+    2
+   ],
+   [
+    39,
+    3
+   ],
+   [
+    52,
+    4
+   ],
+   [
+    68,
+    5
+   ],
+   [
+    90,
+    6
+   ],
+   [
+    120,
+    7
+   ],
+   [
+    186,
+    8
+   ],
+   [
+    265,
+    9
+   ],
+   [
+    687,
+    10
+   ],
+   [
+    799,
+    11
+   ],
+   [
+    898,
+    12
+   ],
+   [
+    979,
+    13
+   ]
+  ],
+  "potions": 1,
+  "skillsUsed": 83,
+  "statUps": 57,
+  "skillUps": 15,
+  "jobs": [
+   "novice",
+   "ninja"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 191.05272666833025,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 174,
+  "lvl": 13,
+  "jlvl": 6,
+  "job": "ninja",
+  "bia": 500
+ },
+ {
+  "id": 50,
+  "acc": "pt05022780",
+  "name": "Nutจัง",
+  "kind": "casual",
+  "risk": 4,
+  "react": 0.7730280251116622,
+  "skill": 0.24100902790250678,
+  "potAt": 0.2693659797401009,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 746155884,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 328,
+  "kills": 194,
+  "deaths": 3,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 49,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    15,
+    2
+   ],
+   [
+    21,
+    3
+   ],
+   [
+    34,
+    4
+   ],
+   [
+    53,
+    5
+   ],
+   [
+    90,
+    6
+   ],
+   [
+    117,
+    7
+   ],
+   [
+    182,
+    8
+   ],
+   [
+    294,
+    9
+   ],
+   [
+    415,
+    10
+   ],
+   [
+    687,
+    11
+   ],
+   [
+    770,
+    12
+   ],
+   [
+    1005,
+    13
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 135,
+  "statUps": 18,
+  "skillUps": 20,
+  "jobs": [
+   "novice",
+   "rune"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 171.35173466585192,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 87,
+  "lvl": 13,
+  "jlvl": 6,
+  "job": "rune",
+  "bia": 500
+ },
+ {
+  "id": 51,
+  "acc": "pt05138850",
+  "name": "Fernจัง",
+  "kind": "casual",
+  "risk": 4,
+  "react": 0.9419798144800493,
+  "skill": 0.4273709851444564,
+  "potAt": 0.3620736624636099,
+  "forget": 0.2,
+  "auto": true,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 553836899,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 383,
+  "kills": 355,
+  "deaths": 0,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 136,
+  "winsBad": [],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    20,
+    2
+   ],
+   [
+    29,
+    3
+   ],
+   [
+    40,
+    4
+   ],
+   [
+    61,
+    5
+   ],
+   [
+    84,
+    6
+   ],
+   [
+    115,
+    7
+   ],
+   [
+    142,
+    8
+   ],
+   [
+    170,
+    9
+   ],
+   [
+    217,
+    10
+   ],
+   [
+    268,
+    11
+   ],
+   [
+    322,
+    12
+   ],
+   [
+    401,
+    13
+   ],
+   [
+    476,
+    14
+   ],
+   [
+    579,
+    15
+   ],
+   [
+    628,
+    16
+   ],
+   [
+    687,
+    17
+   ],
+   [
+    801,
+    19
+   ],
+   [
+    880,
+    20
+   ],
+   [
+    978,
+    21
+   ],
+   [
+    1093,
+    22
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 97,
+  "skillUps": 27,
+  "jobs": [
+   "novice",
+   "occult"
+  ],
+  "warps": 3,
+  "autoOn": 1,
+  "afkSec": 132.10160755650213,
+  "firstKillAt": 17,
+  "walkedOut": 12,
+  "noExpLongest": 76,
+  "lvl": 22,
+  "jlvl": 14,
+  "job": "occult",
+  "bia": 500
+ },
+ {
+  "id": 52,
+  "acc": "pt05212048",
+  "name": "สมชายPro",
+  "kind": "casual",
+  "risk": 1,
+  "react": 1.165231922159545,
+  "skill": 0.526457869786051,
+  "potAt": 0.43870874810438076,
+  "forget": 0.2,
+  "auto": true,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 46402306,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 663,
+  "kills": 419,
+  "deaths": 0,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 133,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    21,
+    2
+   ],
+   [
+    29,
+    3
+   ],
+   [
+    34,
+    4
+   ],
+   [
+    56,
+    5
+   ],
+   [
+    80,
+    6
+   ],
+   [
+    125,
+    7
+   ],
+   [
+    154,
+    8
+   ],
+   [
+    193,
+    9
+   ],
+   [
+    259,
+    10
+   ],
+   [
+    352,
+    11
+   ],
+   [
+    424,
+    12
+   ],
+   [
+    514,
+    13
+   ],
+   [
+    587,
+    14
+   ],
+   [
+    690,
+    15
+   ],
+   [
+    747,
+    16
+   ],
+   [
+    785,
+    17
+   ],
+   [
+    845,
+    18
+   ],
+   [
+    909,
+    19
+   ],
+   [
+    972,
+    20
+   ],
+   [
+    1059,
+    21
+   ],
+   [
+    1147,
+    22
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 88,
+  "skillUps": 33,
+  "jobs": [
+   "novice",
+   "occult"
+  ],
+  "warps": 3,
+  "autoOn": 1,
+  "afkSec": 63.502633820056275,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 44,
+  "lvl": 22,
+  "jlvl": 14,
+  "job": "occult",
+  "bia": 500
+ },
+ {
+  "id": 53,
+  "acc": "pt0533130",
+  "name": "นภาZz",
+  "kind": "grinder",
+  "risk": 5,
+  "react": 0.3566220265145516,
+  "skill": 0.64059967810316,
+  "potAt": 0.43948137782955604,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 555198952,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 561,
+  "kills": 506,
+  "deaths": 1,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 318,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    17,
+    2
+   ],
+   [
+    23,
+    3
+   ],
+   [
+    34,
+    4
+   ],
+   [
+    39,
+    5
+   ],
+   [
+    56,
+    6
+   ],
+   [
+    75,
+    7
+   ],
+   [
+    99,
+    8
+   ],
+   [
+    154,
+    9
+   ],
+   [
+    215,
+    10
+   ],
+   [
+    272,
+    11
+   ],
+   [
+    349,
+    12
+   ],
+   [
+    436,
+    13
+   ],
+   [
+    546,
+    14
+   ],
+   [
+    670,
+    15
+   ],
+   [
+    727,
+    16
+   ],
+   [
+    758,
+    17
+   ],
+   [
+    821,
+    18
+   ],
+   [
+    851,
+    19
+   ],
+   [
+    894,
+    20
+   ],
+   [
+    961,
+    21
+   ],
+   [
+    1020,
+    22
+   ],
+   [
+    1085,
+    23
+   ],
+   [
+    1162,
+    24
+   ]
+  ],
+  "potions": 1,
+  "skillsUsed": 0,
+  "statUps": 275,
+  "skillUps": 34,
+  "jobs": [
+   "novice",
+   "blade"
+  ],
+  "warps": 3,
+  "autoOn": 1,
+  "afkSec": 108.89780472912723,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 58,
+  "lvl": 24,
+  "jlvl": 16,
+  "job": "blade",
+  "bia": 500
+ },
+ {
+  "id": 54,
+  "acc": "pt05444081",
+  "name": "BeamTH",
+  "kind": "grinder",
+  "risk": 4,
+  "react": 0.49203205788137017,
+  "skill": 0.8474472124583308,
+  "potAt": 0.4122713381248858,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 616021579,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 722,
+  "kills": 304,
+  "deaths": 0,
+  "stuck": [
+   {
+    "map": 31,
+    "x": 3742,
+    "y": 814,
+    "mob": "sunflower_serpent",
+    "d": 79
+   }
+  ],
+  "issues": [],
+  "winsOpened": 146,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    21,
+    2
+   ],
+   [
+    27,
+    3
+   ],
+   [
+    33,
+    4
+   ],
+   [
+    44,
+    5
+   ],
+   [
+    67,
+    6
+   ],
+   [
+    94,
+    7
+   ],
+   [
+    118,
+    8
+   ],
+   [
+    154,
+    9
+   ],
+   [
+    193,
+    10
+   ],
+   [
+    273,
+    11
+   ],
+   [
+    329,
+    12
+   ],
+   [
+    431,
+    13
+   ],
+   [
+    504,
+    14
+   ],
+   [
+    594,
+    15
+   ],
+   [
+    660,
+    16
+   ],
+   [
+    745,
+    17
+   ],
+   [
+    837,
+    18
+   ],
+   [
+    927,
+    19
+   ],
+   [
+    1042,
+    20
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 117,
+  "statUps": 103,
+  "skillUps": 32,
+  "jobs": [
+   "novice",
+   "ranger"
+  ],
+  "warps": 3,
+  "autoOn": 1,
+  "afkSec": 25.67306665269335,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 30,
+  "lvl": 20,
+  "jlvl": 13,
+  "job": "ranger",
+  "bia": 500
+ },
+ {
+  "id": 55,
+  "acc": "pt05516719",
+  "name": "สมชาย",
+  "kind": "grinder",
+  "risk": 3,
+  "react": 0.4283831613736149,
+  "skill": 0.7188190573448404,
+  "potAt": 0.4536700556537463,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "ipad",
+  "w": 1024,
+  "h": 768,
+  "touch": true,
+  "seed": 230991656,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 443,
+  "kills": 297,
+  "deaths": 1,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 161,
+  "winsBad": [],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    29,
+    3
+   ],
+   [
+    38,
+    4
+   ],
+   [
+    50,
+    5
+   ],
+   [
+    57,
+    6
+   ],
+   [
+    77,
+    7
+   ],
+   [
+    120,
+    8
+   ],
+   [
+    158,
+    9
+   ],
+   [
+    228,
+    10
+   ],
+   [
+    447,
+    11
+   ],
+   [
+    606,
+    12
+   ],
+   [
+    752,
+    13
+   ],
+   [
+    853,
+    14
+   ],
+   [
+    979,
+    15
+   ],
+   [
+    1061,
+    16
+   ]
+  ],
+  "potions": 4,
+  "skillsUsed": 863,
+  "statUps": 127,
+  "skillUps": 24,
+  "jobs": [
+   "novice",
+   "summoner"
+  ],
+  "warps": 3,
+  "autoOn": 0,
+  "afkSec": 72.10387017443026,
+  "firstKillAt": 29,
+  "walkedOut": 12,
+  "noExpLongest": 85,
+  "lvl": 16,
+  "jlvl": 9,
+  "job": "summoner",
+  "bia": 500
+ },
+ {
+  "id": 56,
+  "acc": "pt05669642",
+  "name": "BeamGG",
+  "kind": "grinder",
+  "risk": 5,
+  "react": 0.42177823321976615,
+  "skill": 0.8859200108265131,
+  "potAt": 0.4818379841427496,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 989294324,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 752,
+  "kills": 393,
+  "deaths": 3,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 366,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    22,
+    2
+   ],
+   [
+    24,
+    3
+   ],
+   [
+    34,
+    4
+   ],
+   [
+    42,
+    5
+   ],
+   [
+    54,
+    6
+   ],
+   [
+    80,
+    7
+   ],
+   [
+    104,
+    8
+   ],
+   [
+    140,
+    9
+   ],
+   [
+    167,
+    10
+   ],
+   [
+    225,
+    11
+   ],
+   [
+    307,
+    12
+   ],
+   [
+    395,
+    13
+   ],
+   [
+    504,
+    14
+   ],
+   [
+    650,
+    15
+   ],
+   [
+    751,
+    16
+   ],
+   [
+    837,
+    17
+   ],
+   [
+    972,
+    18
+   ],
+   [
+    1137,
+    19
+   ]
+  ],
+  "potions": 2,
+  "skillsUsed": 0,
+  "statUps": 323,
+  "skillUps": 31,
+  "jobs": [
+   "novice",
+   "muay"
+  ],
+  "warps": 5,
+  "autoOn": 1,
+  "afkSec": 25.682833078635312,
+  "firstKillAt": 22,
+  "walkedOut": 12,
+  "noExpLongest": 26,
+  "lvl": 19,
+  "jlvl": 12,
+  "job": "muay",
+  "bia": 500
+ },
+ {
+  "id": 57,
+  "acc": "pt05752469",
+  "name": "BossZz",
+  "kind": "grinder",
+  "risk": 2,
+  "react": 0.3661373535479127,
+  "skill": 0.9241884465907646,
+  "potAt": 0.42938079404615836,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 93461393,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 750,
+  "kills": 435,
+  "deaths": 1,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 328,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    19,
+    2
+   ],
+   [
+    27,
+    3
+   ],
+   [
+    36,
+    4
+   ],
+   [
+    49,
+    5
+   ],
+   [
+    70,
+    6
+   ],
+   [
+    87,
+    7
+   ],
+   [
+    126,
+    8
+   ],
+   [
+    162,
+    9
+   ],
+   [
+    226,
+    10
+   ],
+   [
+    272,
+    11
+   ],
+   [
+    338,
+    12
+   ],
+   [
+    440,
+    13
+   ],
+   [
+    522,
+    14
+   ],
+   [
+    673,
+    15
+   ],
+   [
+    739,
+    16
+   ],
+   [
+    801,
+    17
+   ],
+   [
+    881,
+    18
+   ],
+   [
+    983,
+    19
+   ],
+   [
+    1081,
+    20
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 80,
+  "statUps": 286,
+  "skillUps": 32,
+  "jobs": [
+   "novice",
+   "ranger"
+  ],
+  "warps": 4,
+  "autoOn": 1,
+  "afkSec": 25.14153639326875,
+  "firstKillAt": 19,
+  "walkedOut": 12,
+  "noExpLongest": 26,
+  "lvl": 20,
+  "jlvl": 13,
+  "job": "ranger",
+  "bia": 500
+ },
+ {
+  "id": 58,
+  "acc": "pt05851044",
+  "name": "มะลิ",
+  "kind": "grinder",
+  "risk": 1,
+  "react": 0.5268615721850011,
+  "skill": 0.6546382509426392,
+  "potAt": 0.45932154059844166,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 677475489,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 385,
+  "kills": 483,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 316,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31,
+   32
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    16,
+    2
+   ],
+   [
+    19,
+    3
+   ],
+   [
+    24,
+    4
+   ],
+   [
+    39,
+    5
+   ],
+   [
+    67,
+    6
+   ],
+   [
+    88,
+    7
+   ],
+   [
+    112,
+    8
+   ],
+   [
+    144,
+    9
+   ],
+   [
+    187,
+    10
+   ],
+   [
+    248,
+    11
+   ],
+   [
+    281,
+    12
+   ],
+   [
+    311,
+    13
+   ],
+   [
+    368,
+    14
+   ],
+   [
+    425,
+    15
+   ],
+   [
+    461,
+    16
+   ],
+   [
+    505,
+    17
+   ],
+   [
+    561,
+    18
+   ],
+   [
+    605,
+    19
+   ],
+   [
+    680,
+    20
+   ],
+   [
+    762,
+    21
+   ],
+   [
+    839,
+    22
+   ],
+   [
+    917,
+    23
+   ],
+   [
+    996,
+    24
+   ],
+   [
+    1101,
+    25
+   ]
+  ],
+  "potions": 1,
+  "skillsUsed": 0,
+  "statUps": 269,
+  "skillUps": 39,
+  "jobs": [
+   "novice",
+   "blade"
+  ],
+  "warps": 5,
+  "autoOn": 1,
+  "afkSec": 62.54486201915185,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 53,
+  "lvl": 25,
+  "jlvl": 17,
+  "job": "blade",
+  "bia": 500
+ },
+ {
+  "id": 59,
+  "acc": "pt05972682",
+  "name": "PimZz",
+  "kind": "grinder",
+  "risk": 5,
+  "react": 0.524786025762924,
+  "skill": 0.9313931245735814,
+  "potAt": 0.42467630427548486,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 964201834,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 614,
+  "kills": 307,
+  "deaths": 1,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 318,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    18,
+    2
+   ],
+   [
+    23,
+    3
+   ],
+   [
+    35,
+    4
+   ],
+   [
+    52,
+    5
+   ],
+   [
+    89,
+    6
+   ],
+   [
+    138,
+    7
+   ],
+   [
+    163,
+    8
+   ],
+   [
+    208,
+    9
+   ],
+   [
+    264,
+    10
+   ],
+   [
+    354,
+    11
+   ],
+   [
+    383,
+    12
+   ],
+   [
+    469,
+    13
+   ],
+   [
+    564,
+    14
+   ],
+   [
+    671,
+    15
+   ],
+   [
+    751,
+    16
+   ],
+   [
+    855,
+    17
+   ],
+   [
+    950,
+    18
+   ],
+   [
+    1076,
+    19
+   ]
+  ],
+  "potions": 5,
+  "skillsUsed": 0,
+  "statUps": 280,
+  "skillUps": 27,
+  "jobs": [
+   "novice",
+   "ninja"
+  ],
+  "warps": 4,
+  "autoOn": 1,
+  "afkSec": 63.12092558858959,
+  "firstKillAt": 18,
+  "walkedOut": 12,
+  "noExpLongest": 66,
+  "lvl": 19,
+  "jlvl": 12,
+  "job": "ninja",
+  "bia": 500
+ },
+ {
+  "id": 60,
+  "acc": "pt06041877",
+  "name": "ใบเตยZz",
+  "kind": "grinder",
+  "risk": 3,
+  "react": 0.6796127770001128,
+  "skill": 0.7329501625769539,
+  "potAt": 0.39002104256768755,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 763733779,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 285,
+  "kills": 147,
+  "deaths": 0,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 61,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    22,
+    2
+   ],
+   [
+    29,
+    3
+   ],
+   [
+    43,
+    4
+   ],
+   [
+    66,
+    5
+   ],
+   [
+    93,
+    6
+   ],
+   [
+    119,
+    7
+   ],
+   [
+    176,
+    8
+   ],
+   [
+    206,
+    9
+   ],
+   [
+    253,
+    10
+   ],
+   [
+    334,
+    11
+   ],
+   [
+    386,
+    12
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 36,
+  "skillUps": 15,
+  "jobs": [
+   "novice",
+   "muay"
+  ],
+  "warps": 2,
+  "autoOn": 1,
+  "afkSec": 48.73404930985256,
+  "firstKillAt": 17,
+  "walkedOut": 12,
+  "noExpLongest": 785,
+  "lvl": 12,
+  "jlvl": 4,
+  "job": "muay",
+  "bia": 500
+ },
+ {
+  "id": 61,
+  "acc": "pt06151593",
+  "name": "KenTH",
+  "kind": "grinder",
+  "risk": 6,
+  "react": 0.5248605710570051,
+  "skill": 0.6276655374922163,
+  "potAt": 0.42486655720270544,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 250799182,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 358,
+  "kills": 324,
+  "deaths": 1,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 78,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    16,
+    2
+   ],
+   [
+    24,
+    3
+   ],
+   [
+    40,
+    4
+   ],
+   [
+    50,
+    5
+   ],
+   [
+    66,
+    6
+   ],
+   [
+    78,
+    7
+   ],
+   [
+    105,
+    8
+   ],
+   [
+    128,
+    9
+   ],
+   [
+    177,
+    10
+   ],
+   [
+    231,
+    11
+   ],
+   [
+    303,
+    12
+   ],
+   [
+    401,
+    13
+   ],
+   [
+    535,
+    14
+   ],
+   [
+    667,
+    15
+   ],
+   [
+    819,
+    16
+   ],
+   [
+    974,
+    17
+   ],
+   [
+    1101,
+    18
+   ],
+   [
+    1187,
+    19
+   ]
+  ],
+  "potions": 1,
+  "skillsUsed": 0,
+  "statUps": 49,
+  "skillUps": 19,
+  "jobs": [
+   "novice",
+   "occult"
+  ],
+  "warps": 3,
+  "autoOn": 1,
+  "afkSec": 67.00319763831943,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 69,
+  "lvl": 19,
+  "jlvl": 11,
+  "job": "occult",
+  "bia": 500
+ },
+ {
+  "id": 62,
+  "acc": "pt06251265",
+  "name": "นภา",
+  "kind": "grinder",
+  "risk": 1,
+  "react": 0.40492088520197234,
+  "skill": 0.779652892649012,
+  "potAt": 0.4897857516025127,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 937232195,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 427,
+  "kills": 229,
+  "deaths": 0,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 281,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    32,
+    3
+   ],
+   [
+    45,
+    4
+   ],
+   [
+    64,
+    5
+   ],
+   [
+    69,
+    6
+   ],
+   [
+    90,
+    7
+   ],
+   [
+    108,
+    8
+   ],
+   [
+    129,
+    9
+   ],
+   [
+    165,
+    10
+   ],
+   [
+    208,
+    11
+   ],
+   [
+    272,
+    12
+   ],
+   [
+    340,
+    13
+   ],
+   [
+    478,
+    14
+   ],
+   [
+    603,
+    15
+   ],
+   [
+    724,
+    16
+   ],
+   [
+    842,
+    17
+   ],
+   [
+    959,
+    18
+   ],
+   [
+    1110,
+    19
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 0,
+  "statUps": 244,
+  "skillUps": 27,
+  "jobs": [
+   "novice",
+   "healer"
+  ],
+  "warps": 3,
+  "autoOn": 1,
+  "afkSec": 130.2887689789239,
+  "firstKillAt": 32,
+  "walkedOut": 12,
+  "noExpLongest": 73,
+  "lvl": 19,
+  "jlvl": 12,
+  "job": "healer",
+  "bia": 500
+ },
+ {
+  "id": 63,
+  "acc": "pt06388971",
+  "name": "KenZz",
+  "kind": "grinder",
+  "risk": 3,
+  "react": 0.5510852824203136,
+  "skill": 0.941548935226886,
+  "potAt": 0.3769804400284683,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 101227193,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 288,
+  "kills": 150,
+  "deaths": 0,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 68,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    19,
+    2
+   ],
+   [
+    23,
+    3
+   ],
+   [
+    29,
+    4
+   ],
+   [
+    57,
+    5
+   ],
+   [
+    71,
+    6
+   ],
+   [
+    93,
+    7
+   ],
+   [
+    120,
+    8
+   ],
+   [
+    178,
+    9
+   ],
+   [
+    211,
+    10
+   ],
+   [
+    272,
+    11
+   ],
+   [
+    489,
+    12
+   ],
+   [
+    881,
+    13
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 37,
+  "skillUps": 21,
+  "jobs": [
+   "novice",
+   "summoner"
+  ],
+  "warps": 2,
+  "autoOn": 1,
+  "afkSec": 36.9650769522251,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 226,
+  "lvl": 13,
+  "jlvl": 7,
+  "job": "summoner",
+  "bia": 500
+ },
+ {
+  "id": 64,
+  "acc": "pt06473258",
+  "name": "Boss99",
+  "kind": "grinder",
+  "risk": 0,
+  "react": 0.3609944310323309,
+  "skill": 0.8917270671304907,
+  "potAt": 0.4600645416928756,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 805192164,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 616,
+  "kills": 449,
+  "deaths": 1,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 224,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    22,
+    3
+   ],
+   [
+    30,
+    4
+   ],
+   [
+    38,
+    5
+   ],
+   [
+    50,
+    6
+   ],
+   [
+    67,
+    7
+   ],
+   [
+    103,
+    8
+   ],
+   [
+    134,
+    9
+   ],
+   [
+    169,
+    10
+   ],
+   [
+    279,
+    12
+   ],
+   [
+    355,
+    13
+   ],
+   [
+    475,
+    14
+   ],
+   [
+    585,
+    15
+   ],
+   [
+    684,
+    16
+   ],
+   [
+    734,
+    17
+   ],
+   [
+    816,
+    18
+   ],
+   [
+    918,
+    19
+   ],
+   [
+    966,
+    20
+   ],
+   [
+    1043,
+    21
+   ],
+   [
+    1135,
+    22
+   ]
+  ],
+  "potions": 4,
+  "skillsUsed": 77,
+  "statUps": 187,
+  "skillUps": 28,
+  "jobs": [
+   "novice",
+   "ranger"
+  ],
+  "warps": 4,
+  "autoOn": 1,
+  "afkSec": 73.75255870574739,
+  "firstKillAt": 22,
+  "walkedOut": 12,
+  "noExpLongest": 74,
+  "lvl": 22,
+  "jlvl": 14,
+  "job": "ranger",
+  "bia": 500
+ },
+ {
+  "id": 65,
+  "acc": "pt06516582",
+  "name": "TarNoob",
+  "kind": "grinder",
+  "risk": 4,
+  "react": 0.5191206601537395,
+  "skill": 0.9158183052045378,
+  "potAt": 0.4392523890543973,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 146657778,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 362,
+  "kills": 365,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 145,
+  "winsBad": [],
+  "maps": [
+   71,
+   31,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    25,
+    2
+   ],
+   [
+    32,
+    3
+   ],
+   [
+    43,
+    4
+   ],
+   [
+    60,
+    5
+   ],
+   [
+    78,
+    6
+   ],
+   [
+    107,
+    7
+   ],
+   [
+    140,
+    8
+   ],
+   [
+    177,
+    9
+   ],
+   [
+    219,
+    10
+   ],
+   [
+    250,
+    11
+   ],
+   [
+    328,
+    12
+   ],
+   [
+    455,
+    13
+   ],
+   [
+    616,
+    14
+   ],
+   [
+    737,
+    15
+   ],
+   [
+    909,
+    16
+   ],
+   [
+    997,
+    17
+   ],
+   [
+    1067,
+    18
+   ],
+   [
+    1168,
+    19
+   ]
+  ],
+  "potions": 1,
+  "skillsUsed": 0,
+  "statUps": 107,
+  "skillUps": 28,
+  "jobs": [
+   "novice",
+   "occult"
+  ],
+  "warps": 5,
+  "autoOn": 1,
+  "afkSec": 39.931588696749685,
+  "firstKillAt": 24,
+  "walkedOut": 12,
+  "noExpLongest": 42,
+  "lvl": 19,
+  "jlvl": 12,
+  "job": "occult",
+  "bia": 500
+ },
+ {
+  "id": 66,
+  "acc": "pt06649517",
+  "name": "KenPro",
+  "kind": "grinder",
+  "risk": 5,
+  "react": 0.3935858047071778,
+  "skill": 0.684542251138269,
+  "potAt": 0.45783494972057404,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 821563670,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 439,
+  "kills": 484,
+  "deaths": 0,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 375,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    17,
+    2
+   ],
+   [
+    22,
+    3
+   ],
+   [
+    27,
+    4
+   ],
+   [
+    39,
+    5
+   ],
+   [
+    57,
+    6
+   ],
+   [
+    76,
+    7
+   ],
+   [
+    104,
+    8
+   ],
+   [
+    125,
+    9
+   ],
+   [
+    144,
+    10
+   ],
+   [
+    187,
+    11
+   ],
+   [
+    220,
+    12
+   ],
+   [
+    300,
+    13
+   ],
+   [
+    388,
+    14
+   ],
+   [
+    498,
+    15
+   ],
+   [
+    559,
+    16
+   ],
+   [
+    593,
+    17
+   ],
+   [
+    653,
+    18
+   ],
+   [
+    701,
+    19
+   ],
+   [
+    756,
+    20
+   ],
+   [
+    822,
+    21
+   ],
+   [
+    880,
+    22
+   ],
+   [
+    954,
+    23
+   ],
+   [
+    1028,
+    24
+   ],
+   [
+    1104,
+    25
+   ]
+  ],
+  "potions": 2,
+  "skillsUsed": 0,
+  "statUps": 329,
+  "skillUps": 35,
+  "jobs": [
+   "novice",
+   "blade"
+  ],
+  "warps": 3,
+  "autoOn": 1,
+  "afkSec": 37.55771525323284,
+  "firstKillAt": 14,
+  "walkedOut": 12,
+  "noExpLongest": 40,
+  "lvl": 25,
+  "jlvl": 17,
+  "job": "blade",
+  "bia": 500
+ },
+ {
+  "id": 67,
+  "acc": "pt06734551",
+  "name": "มะลิจัง",
+  "kind": "grinder",
+  "risk": 4,
+  "react": 0.3473832505044449,
+  "skill": 0.9240048264730744,
+  "potAt": 0.4567650863233791,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 958106159,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 637,
+  "kills": 304,
+  "deaths": 3,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 399,
+  "winsBad": [],
+  "maps": [
+   71,
+   31,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    14,
+    2
+   ],
+   [
+    23,
+    3
+   ],
+   [
+    36,
+    4
+   ],
+   [
+    51,
+    5
+   ],
+   [
+    71,
+    6
+   ],
+   [
+    90,
+    7
+   ],
+   [
+    127,
+    8
+   ],
+   [
+    171,
+    9
+   ],
+   [
+    243,
+    10
+   ],
+   [
+    289,
+    11
+   ],
+   [
+    363,
+    12
+   ],
+   [
+    493,
+    13
+   ],
+   [
+    574,
+    14
+   ],
+   [
+    685,
+    15
+   ],
+   [
+    803,
+    16
+   ],
+   [
+    882,
+    17
+   ],
+   [
+    1053,
+    18
+   ],
+   [
+    1179,
+    19
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 1397,
+  "statUps": 359,
+  "skillUps": 28,
+  "jobs": [
+   "novice",
+   "muay"
+  ],
+  "warps": 6,
+  "autoOn": 0,
+  "afkSec": 25.35980640461659,
+  "firstKillAt": 14,
+  "walkedOut": 12,
+  "noExpLongest": 31,
+  "lvl": 19,
+  "jlvl": 11,
+  "job": "muay",
+  "bia": 500
+ },
+ {
+  "id": 68,
+  "acc": "pt06889222",
+  "name": "Boss",
+  "kind": "grinder",
+  "risk": 3,
+  "react": 0.499541366565759,
+  "skill": 0.6802793886653518,
+  "potAt": 0.3524365572968668,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 527654223,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 334,
+  "kills": 452,
+  "deaths": 1,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 133,
+  "winsBad": [],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    17,
+    2
+   ],
+   [
+    27,
+    3
+   ],
+   [
+    38,
+    4
+   ],
+   [
+    49,
+    5
+   ],
+   [
+    66,
+    6
+   ],
+   [
+    119,
+    7
+   ],
+   [
+    169,
+    8
+   ],
+   [
+    185,
+    9
+   ],
+   [
+    222,
+    10
+   ],
+   [
+    293,
+    11
+   ],
+   [
+    349,
+    12
+   ],
+   [
+    422,
+    13
+   ],
+   [
+    537,
+    14
+   ],
+   [
+    624,
+    15
+   ],
+   [
+    672,
+    16
+   ],
+   [
+    728,
+    17
+   ],
+   [
+    799,
+    18
+   ],
+   [
+    859,
+    19
+   ],
+   [
+    923,
+    20
+   ],
+   [
+    979,
+    21
+   ],
+   [
+    1047,
+    22
+   ],
+   [
+    1153,
+    23
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 94,
+  "skillUps": 27,
+  "jobs": [
+   "novice",
+   "rune"
+  ],
+  "warps": 3,
+  "autoOn": 1,
+  "afkSec": 72.00006499048325,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 43,
+  "lvl": 23,
+  "jlvl": 15,
+  "job": "rune",
+  "bia": 500
+ },
+ {
+  "id": 69,
+  "acc": "pt06913801",
+  "name": "IceNoob",
+  "kind": "grinder",
+  "risk": 4,
+  "react": 0.3882095102631531,
+  "skill": 0.7200841205055285,
+  "potAt": 0.4159200020907074,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 31106759,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 439,
+  "kills": 281,
+  "deaths": 0,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 310,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    16,
+    2
+   ],
+   [
+    22,
+    3
+   ],
+   [
+    33,
+    4
+   ],
+   [
+    42,
+    5
+   ],
+   [
+    66,
+    6
+   ],
+   [
+    99,
+    7
+   ],
+   [
+    139,
+    8
+   ],
+   [
+    157,
+    9
+   ],
+   [
+    234,
+    10
+   ],
+   [
+    265,
+    11
+   ],
+   [
+    330,
+    12
+   ],
+   [
+    433,
+    13
+   ],
+   [
+    542,
+    14
+   ],
+   [
+    672,
+    15
+   ],
+   [
+    746,
+    16
+   ],
+   [
+    903,
+    17
+   ],
+   [
+    978,
+    18
+   ],
+   [
+    1110,
+    19
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 267,
+  "skillUps": 32,
+  "jobs": [
+   "novice",
+   "healer"
+  ],
+  "warps": 3,
+  "autoOn": 1,
+  "afkSec": 103.2583742464233,
+  "firstKillAt": 14,
+  "walkedOut": 12,
+  "noExpLongest": 81,
+  "lvl": 19,
+  "jlvl": 12,
+  "job": "healer",
+  "bia": 500
+ },
+ {
+  "id": 70,
+  "acc": "pt07072258",
+  "name": "Ice007",
+  "kind": "grinder",
+  "risk": 3,
+  "react": 0.6046496830436632,
+  "skill": 0.8163200522848963,
+  "potAt": 0.4533366088770966,
+  "forget": 0.05,
+  "auto": true,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 822575928,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 211,
+  "kills": 240,
+  "deaths": 1,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 57,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    15,
+    2
+   ],
+   [
+    19,
+    3
+   ],
+   [
+    24,
+    4
+   ],
+   [
+    38,
+    5
+   ],
+   [
+    59,
+    6
+   ],
+   [
+    92,
+    7
+   ],
+   [
+    132,
+    8
+   ],
+   [
+    165,
+    9
+   ],
+   [
+    218,
+    10
+   ],
+   [
+    268,
+    11
+   ],
+   [
+    503,
+    12
+   ],
+   [
+    778,
+    13
+   ],
+   [
+    1088,
+    14
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 26,
+  "skillUps": 20,
+  "jobs": [
+   "novice",
+   "summoner"
+  ],
+  "warps": 2,
+  "autoOn": 1,
+  "afkSec": 52.997199901378345,
+  "firstKillAt": 14,
+  "walkedOut": 12,
+  "noExpLongest": 107,
+  "lvl": 14,
+  "jlvl": 7,
+  "job": "summoner",
+  "bia": 500
+ },
+ {
+  "id": 71,
+  "acc": "pt07111014",
+  "name": "กิ่งแก้วคุง",
+  "kind": "explorer",
+  "risk": 5,
+  "react": 0.591288703350019,
+  "skill": 0.636706975631745,
+  "potAt": 0.41706972239402573,
+  "forget": 0.15,
+  "auto": false,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 918152601,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 337,
+  "kills": 257,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 113,
+  "winsBad": [],
+  "maps": [
+   71,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    57,
+    2
+   ],
+   [
+    59,
+    3
+   ],
+   [
+    68,
+    4
+   ],
+   [
+    100,
+    5
+   ],
+   [
+    120,
+    6
+   ],
+   [
+    143,
+    7
+   ],
+   [
+    195,
+    8
+   ],
+   [
+    306,
+    9
+   ],
+   [
+    355,
+    10
+   ],
+   [
+    454,
+    11
+   ],
+   [
+    531,
+    12
+   ],
+   [
+    657,
+    13
+   ],
+   [
+    839,
+    14
+   ],
+   [
+    1008,
+    15
+   ],
+   [
+    1079,
+    16
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 483,
+  "statUps": 81,
+  "skillUps": 22,
+  "jobs": [
+   "novice",
+   "healer"
+  ],
+  "warps": 3,
+  "autoOn": 0,
+  "afkSec": 103.67763877551893,
+  "firstKillAt": 51,
+  "walkedOut": 12,
+  "noExpLongest": 76,
+  "lvl": 16,
+  "jlvl": 9,
+  "job": "healer",
+  "bia": 500
+ },
+ {
+  "id": 72,
+  "acc": "pt07283774",
+  "name": "Ploy",
+  "kind": "explorer",
+  "risk": 5,
+  "react": 0.8409187223021494,
+  "skill": 0.4834089918916155,
+  "potAt": 0.37746336221576826,
+  "forget": 0.15,
+  "auto": false,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 651467734,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 280,
+  "kills": 259,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 59,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    16,
+    2
+   ],
+   [
+    36,
+    3
+   ],
+   [
+    43,
+    4
+   ],
+   [
+    92,
+    5
+   ],
+   [
+    148,
+    6
+   ],
+   [
+    169,
+    7
+   ],
+   [
+    211,
+    8
+   ],
+   [
+    292,
+    9
+   ],
+   [
+    419,
+    10
+   ],
+   [
+    501,
+    11
+   ],
+   [
+    592,
+    12
+   ],
+   [
+    724,
+    13
+   ],
+   [
+    900,
+    14
+   ],
+   [
+    1186,
+    15
+   ]
+  ],
+  "potions": 1,
+  "skillsUsed": 279,
+  "statUps": 25,
+  "skillUps": 21,
+  "jobs": [
+   "novice",
+   "ninja"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 58.08059651780901,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 67,
+  "lvl": 15,
+  "jlvl": 7,
+  "job": "ninja",
+  "bia": 500
+ },
+ {
+  "id": 73,
+  "acc": "pt07346754",
+  "name": "ต้นข้าว",
+  "kind": "explorer",
+  "risk": 0,
+  "react": 0.9800194244273097,
+  "skill": 0.40655220193162195,
+  "potAt": 0.31142893340970806,
+  "forget": 0.15,
+  "auto": false,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 53644605,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 260,
+  "kills": 234,
+  "deaths": 3,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 64,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    19,
+    2
+   ],
+   [
+    29,
+    3
+   ],
+   [
+    38,
+    4
+   ],
+   [
+    58,
+    5
+   ],
+   [
+    77,
+    6
+   ],
+   [
+    130,
+    7
+   ],
+   [
+    203,
+    8
+   ],
+   [
+    261,
+    9
+   ],
+   [
+    619,
+    10
+   ],
+   [
+    692,
+    11
+   ],
+   [
+    773,
+    12
+   ],
+   [
+    821,
+    13
+   ],
+   [
+    1065,
+    14
+   ]
+  ],
+  "potions": 1,
+  "skillsUsed": 201,
+  "statUps": 34,
+  "skillUps": 19,
+  "jobs": [
+   "novice",
+   "blade"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 132.61824858729648,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 113,
+  "lvl": 14,
+  "jlvl": 7,
+  "job": "blade",
+  "bia": 500
+ },
+ {
+  "id": 74,
+  "acc": "pt07415664",
+  "name": "ToeyTH",
+  "kind": "explorer",
+  "risk": 2,
+  "react": 0.9340177176678636,
+  "skill": 0.6061604842106627,
+  "potAt": 0.31962906532903623,
+  "forget": 0.15,
+  "auto": false,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 582369989,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 187,
+  "kills": 182,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 78,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    49,
+    2
+   ],
+   [
+    54,
+    3
+   ],
+   [
+    72,
+    4
+   ],
+   [
+    90,
+    5
+   ],
+   [
+    122,
+    6
+   ],
+   [
+    158,
+    7
+   ],
+   [
+    378,
+    8
+   ],
+   [
+    514,
+    9
+   ],
+   [
+    626,
+    10
+   ],
+   [
+    692,
+    11
+   ],
+   [
+    759,
+    12
+   ],
+   [
+    810,
+    13
+   ],
+   [
+    923,
+    14
+   ],
+   [
+    1137,
+    15
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 300,
+  "statUps": 44,
+  "skillUps": 23,
+  "jobs": [
+   "novice",
+   "merchant"
+  ],
+  "warps": 3,
+  "autoOn": 0,
+  "afkSec": 137.39476697165276,
+  "firstKillAt": 45,
+  "walkedOut": 12,
+  "noExpLongest": 99,
+  "lvl": 15,
+  "jlvl": 8,
+  "job": "merchant",
+  "bia": 150
+ },
+ {
+  "id": 75,
+  "acc": "pt07580016",
+  "name": "Mint007",
+  "kind": "explorer",
+  "risk": 2,
+  "react": 0.6480971853007084,
+  "skill": 0.6253676300520858,
+  "potAt": 0.32687914372742133,
+  "forget": 0.15,
+  "auto": false,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 86636781,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 338,
+  "kills": 318,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 199,
+  "winsBad": [],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    16,
+    2
+   ],
+   [
+    18,
+    3
+   ],
+   [
+    31,
+    4
+   ],
+   [
+    75,
+    5
+   ],
+   [
+    99,
+    6
+   ],
+   [
+    139,
+    7
+   ],
+   [
+    195,
+    8
+   ],
+   [
+    280,
+    9
+   ],
+   [
+    386,
+    10
+   ],
+   [
+    511,
+    11
+   ],
+   [
+    628,
+    12
+   ],
+   [
+    734,
+    13
+   ],
+   [
+    921,
+    14
+   ],
+   [
+    1140,
+    15
+   ],
+   [
+    1196,
+    16
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 498,
+  "statUps": 166,
+  "skillUps": 21,
+  "jobs": [
+   "novice",
+   "rune"
+  ],
+  "warps": 3,
+  "autoOn": 0,
+  "afkSec": 94.36838878754918,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 48,
+  "lvl": 16,
+  "jlvl": 8,
+  "job": "rune",
+  "bia": 500
+ },
+ {
+  "id": 76,
+  "acc": "pt07649263",
+  "name": "Toeyจัง",
+  "kind": "explorer",
+  "risk": 3,
+  "react": 0.5033882272445542,
+  "skill": 0.44053445874738245,
+  "potAt": 0.48132408465320436,
+  "forget": 0.15,
+  "auto": false,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 810640977,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 374,
+  "kills": 263,
+  "deaths": 4,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 145,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    17,
+    2
+   ],
+   [
+    42,
+    3
+   ],
+   [
+    67,
+    4
+   ],
+   [
+    83,
+    5
+   ],
+   [
+    109,
+    6
+   ],
+   [
+    224,
+    7
+   ],
+   [
+    272,
+    8
+   ],
+   [
+    317,
+    9
+   ],
+   [
+    391,
+    10
+   ],
+   [
+    468,
+    11
+   ],
+   [
+    576,
+    12
+   ],
+   [
+    743,
+    13
+   ],
+   [
+    966,
+    14
+   ],
+   [
+    1121,
+    15
+   ]
+  ],
+  "potions": 3,
+  "skillsUsed": 442,
+  "statUps": 109,
+  "skillUps": 24,
+  "jobs": [
+   "novice",
+   "healer"
+  ],
+  "warps": 3,
+  "autoOn": 0,
+  "afkSec": 84.91132671707837,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 71,
+  "lvl": 15,
+  "jlvl": 8,
+  "job": "healer",
+  "bia": 500
+ },
+ {
+  "id": 77,
+  "acc": "pt07786780",
+  "name": "นภาZz",
+  "kind": "explorer",
+  "risk": 6,
+  "react": 0.9629762262864858,
+  "skill": 0.3236772574594604,
+  "potAt": 0.47183306160002625,
+  "forget": 0.15,
+  "auto": false,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 309584844,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 325,
+  "kills": 278,
+  "deaths": 5,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 68,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    52,
+    2
+   ],
+   [
+    61,
+    3
+   ],
+   [
+    76,
+    4
+   ],
+   [
+    94,
+    5
+   ],
+   [
+    109,
+    6
+   ],
+   [
+    126,
+    7
+   ],
+   [
+    176,
+    8
+   ],
+   [
+    276,
+    9
+   ],
+   [
+    449,
+    10
+   ],
+   [
+    527,
+    11
+   ],
+   [
+    571,
+    12
+   ],
+   [
+    677,
+    13
+   ],
+   [
+    846,
+    14
+   ],
+   [
+    1105,
+    15
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 157,
+  "statUps": 37,
+  "skillUps": 21,
+  "jobs": [
+   "novice",
+   "merchant"
+  ],
+  "warps": 3,
+  "autoOn": 0,
+  "afkSec": 108.9471731330022,
+  "firstKillAt": 52,
+  "walkedOut": 12,
+  "noExpLongest": 105,
+  "lvl": 15,
+  "jlvl": 8,
+  "job": "merchant",
+  "bia": 0
+ },
+ {
+  "id": 78,
+  "acc": "pt0784700",
+  "name": "สมชาย",
+  "kind": "explorer",
+  "risk": -2,
+  "react": 0.6437974132335733,
+  "skill": 0.5303566972866453,
+  "potAt": 0.30250564934802504,
+  "forget": 0.15,
+  "auto": false,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 617536409,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 349,
+  "kills": 308,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 111,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    16,
+    2
+   ],
+   [
+    34,
+    4
+   ],
+   [
+    55,
+    5
+   ],
+   [
+    82,
+    6
+   ],
+   [
+    110,
+    7
+   ],
+   [
+    187,
+    8
+   ],
+   [
+    308,
+    9
+   ],
+   [
+    387,
+    10
+   ],
+   [
+    460,
+    11
+   ],
+   [
+    697,
+    12
+   ],
+   [
+    885,
+    13
+   ],
+   [
+    1037,
+    14
+   ],
+   [
+    1169,
+    15
+   ]
+  ],
+  "potions": 5,
+  "skillsUsed": 388,
+  "statUps": 79,
+  "skillUps": 21,
+  "jobs": [
+   "novice",
+   "summoner"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 132.41752975034413,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 99,
+  "lvl": 15,
+  "jlvl": 8,
+  "job": "summoner",
+  "bia": 500
+ },
+ {
+  "id": 79,
+  "acc": "pt07993120",
+  "name": "Beamจัง",
+  "kind": "explorer",
+  "risk": -1,
+  "react": 0.5701297874423348,
+  "skill": 0.6264785982326039,
+  "potAt": 0.4629002487114166,
+  "forget": 0.15,
+  "auto": false,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 584682780,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 327,
+  "kills": 300,
+  "deaths": 5,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 124,
+  "winsBad": [],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    18,
+    2
+   ],
+   [
+    31,
+    3
+   ],
+   [
+    38,
+    4
+   ],
+   [
+    56,
+    5
+   ],
+   [
+    85,
+    6
+   ],
+   [
+    126,
+    7
+   ],
+   [
+    185,
+    8
+   ],
+   [
+    300,
+    9
+   ],
+   [
+    427,
+    10
+   ],
+   [
+    657,
+    11
+   ],
+   [
+    778,
+    12
+   ],
+   [
+    875,
+    13
+   ],
+   [
+    1090,
+    14
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 505,
+  "statUps": 93,
+  "skillUps": 21,
+  "jobs": [
+   "novice",
+   "blade"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 110.53754538322684,
+  "firstKillAt": 17,
+  "walkedOut": 12,
+  "noExpLongest": 78,
+  "lvl": 14,
+  "jlvl": 7,
+  "job": "blade",
+  "bia": 500
+ },
+ {
+  "id": 80,
+  "acc": "pt0803332",
+  "name": "มะลิจัง",
+  "kind": "explorer",
+  "risk": 1,
+  "react": 0.9494550155706029,
+  "skill": 0.4659695421187065,
+  "potAt": 0.42504719557475634,
+  "forget": 0.15,
+  "auto": false,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 533741067,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 190,
+  "kills": 228,
+  "deaths": 3,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 104,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    41,
+    2
+   ],
+   [
+    55,
+    3
+   ],
+   [
+    63,
+    4
+   ],
+   [
+    95,
+    5
+   ],
+   [
+    123,
+    6
+   ],
+   [
+    283,
+    7
+   ],
+   [
+    388,
+    8
+   ],
+   [
+    453,
+    9
+   ],
+   [
+    596,
+    10
+   ],
+   [
+    712,
+    11
+   ],
+   [
+    831,
+    12
+   ],
+   [
+    878,
+    13
+   ],
+   [
+    997,
+    14
+   ],
+   [
+    1137,
+    15
+   ],
+   [
+    1199,
+    16
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 269,
+  "statUps": 73,
+  "skillUps": 21,
+  "jobs": [
+   "novice",
+   "blade"
+  ],
+  "warps": 3,
+  "autoOn": 0,
+  "afkSec": 37.755150081475804,
+  "firstKillAt": 39,
+  "walkedOut": 12,
+  "noExpLongest": 77,
+  "lvl": 16,
+  "jlvl": 8,
+  "job": "blade",
+  "bia": 500
+ },
+ {
+  "id": 81,
+  "acc": "pt08191886",
+  "name": "MintZz",
+  "kind": "explorer",
+  "risk": 1,
+  "react": 1.1235420822275533,
+  "skill": 0.3981577154706035,
+  "potAt": 0.3683619582412587,
+  "forget": 0.15,
+  "auto": false,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 881721902,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 167,
+  "kills": 195,
+  "deaths": 0,
+  "stuck": [
+   {
+    "map": 71,
+    "x": 488,
+    "y": 2821,
+    "why": "not moving"
+   }
+  ],
+  "issues": [],
+  "winsOpened": 92,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    28,
+    3
+   ],
+   [
+    40,
+    4
+   ],
+   [
+    58,
+    5
+   ],
+   [
+    87,
+    6
+   ],
+   [
+    97,
+    7
+   ],
+   [
+    155,
+    8
+   ],
+   [
+    280,
+    9
+   ],
+   [
+    483,
+    10
+   ],
+   [
+    630,
+    11
+   ],
+   [
+    755,
+    12
+   ],
+   [
+    1090,
+    13
+   ]
+  ],
+  "potions": 2,
+  "skillsUsed": 180,
+  "statUps": 64,
+  "skillUps": 16,
+  "jobs": [
+   "novice",
+   "summoner"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 109.61840798129253,
+  "firstKillAt": 27,
+  "walkedOut": 12,
+  "noExpLongest": 124,
+  "lvl": 13,
+  "jlvl": 6,
+  "job": "summoner",
+  "bia": 500
+ },
+ {
+  "id": 82,
+  "acc": "pt08284960",
+  "name": "ดาวเหนือคุง",
+  "kind": "explorer",
+  "risk": 6,
+  "react": 1.0665695454303963,
+  "skill": 0.4339143155766252,
+  "potAt": 0.4489509491943526,
+  "forget": 0.15,
+  "auto": true,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 312391573,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 471,
+  "kills": 484,
+  "deaths": 0,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 144,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    16,
+    2
+   ],
+   [
+    25,
+    3
+   ],
+   [
+    36,
+    4
+   ],
+   [
+    62,
+    5
+   ],
+   [
+    81,
+    6
+   ],
+   [
+    109,
+    7
+   ],
+   [
+    140,
+    8
+   ],
+   [
+    167,
+    9
+   ],
+   [
+    197,
+    10
+   ],
+   [
+    263,
+    11
+   ],
+   [
+    342,
+    12
+   ],
+   [
+    382,
+    13
+   ],
+   [
+    418,
+    14
+   ],
+   [
+    454,
+    15
+   ],
+   [
+    526,
+    16
+   ],
+   [
+    555,
+    17
+   ],
+   [
+    595,
+    18
+   ],
+   [
+    655,
+    19
+   ],
+   [
+    701,
+    20
+   ],
+   [
+    758,
+    21
+   ],
+   [
+    818,
+    22
+   ],
+   [
+    882,
+    23
+   ],
+   [
+    967,
+    24
+   ],
+   [
+    1047,
+    25
+   ],
+   [
+    1114,
+    26
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 99,
+  "skillUps": 33,
+  "jobs": [
+   "novice",
+   "catfolk"
+  ],
+  "warps": 3,
+  "autoOn": 1,
+  "afkSec": 63.7972266198123,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 43,
+  "lvl": 26,
+  "jlvl": 18,
+  "job": "catfolk",
+  "bia": 500
+ },
+ {
+  "id": 83,
+  "acc": "pt08356894",
+  "name": "ใบเตยZz",
+  "kind": "explorer",
+  "risk": 7,
+  "react": 1.1299263176181942,
+  "skill": 0.5123544071858536,
+  "potAt": 0.42026078734559047,
+  "forget": 0.15,
+  "auto": false,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 251994633,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 268,
+  "kills": 193,
+  "deaths": 4,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 57,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    34,
+    2
+   ],
+   [
     50,
     3
    ],
    [
-    58,
+    63,
     4
    ],
    [
-    91,
+    80,
     5
    ],
    [
-    147,
+    141,
     6
    ],
    [
-    177,
+    176,
     7
    ],
    [
-    231,
+    240,
     8
+   ],
+   [
+    291,
+    9
+   ],
+   [
+    459,
+    10
+   ],
+   [
+    521,
+    11
+   ],
+   [
+    591,
+    12
+   ],
+   [
+    847,
+    13
+   ]
+  ],
+  "potions": 3,
+  "skillsUsed": 190,
+  "statUps": 26,
+  "skillUps": 19,
+  "jobs": [
+   "novice",
+   "summoner"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 105.87051477090945,
+  "firstKillAt": 34,
+  "walkedOut": 12,
+  "noExpLongest": 75,
+  "lvl": 13,
+  "jlvl": 5,
+  "job": "summoner",
+  "bia": 500
+ },
+ {
+  "id": 84,
+  "acc": "pt08476929",
+  "name": "MintPro",
+  "kind": "explorer",
+  "risk": 8,
+  "react": 0.9857963153094967,
+  "skill": 0.6878122344556321,
+  "potAt": 0.48011224892926974,
+  "forget": 0.15,
+  "auto": false,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 821313343,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 278,
+  "kills": 234,
+  "deaths": 3,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 88,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    16,
+    2
+   ],
+   [
+    48,
+    4
+   ],
+   [
+    68,
+    5
+   ],
+   [
+    98,
+    6
+   ],
+   [
+    132,
+    7
+   ],
+   [
+    232,
+    8
+   ],
+   [
+    265,
+    9
+   ],
+   [
+    414,
+    10
+   ],
+   [
+    519,
+    11
+   ],
+   [
+    666,
+    12
+   ],
+   [
+    928,
+    13
+   ],
+   [
+    1132,
+    14
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 315,
+  "statUps": 60,
+  "skillUps": 17,
+  "jobs": [
+   "novice",
+   "rune"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 91.14027575642814,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 88,
+  "lvl": 14,
+  "jlvl": 6,
+  "job": "rune",
+  "bia": 500
+ },
+ {
+  "id": 85,
+  "acc": "pt08531366",
+  "name": "Gun",
+  "kind": "explorer",
+  "risk": 6,
+  "react": 1.0535217534534267,
+  "skill": 0.3229201687606611,
+  "potAt": 0.3096381812401294,
+  "forget": 0.15,
+  "auto": false,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 228649456,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 188,
+  "kills": 158,
+  "deaths": 2,
+  "stuck": [],
+  "issues": [
+   {
+    "k": "walk-out-failed",
+    "t": 21,
+    "map": 0,
+    "lvl": 1,
+    "gate": "e",
+    "x": 1276,
+    "y": 774
+   }
+  ],
+  "winsOpened": 108,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    26,
+    2
+   ],
+   [
+    31,
+    3
+   ],
+   [
+    39,
+    4
+   ],
+   [
+    69,
+    5
+   ],
+   [
+    90,
+    6
+   ],
+   [
+    134,
+    7
+   ],
+   [
+    182,
+    8
+   ],
+   [
+    287,
+    9
+   ],
+   [
+    515,
+    10
+   ],
+   [
+    655,
+    11
+   ],
+   [
+    813,
+    12
+   ],
+   [
+    1103,
+    13
+   ]
+  ],
+  "potions": 2,
+  "skillsUsed": 153,
+  "statUps": 77,
+  "skillUps": 20,
+  "jobs": [
+   "novice",
+   "summoner"
+  ],
+  "warps": 3,
+  "autoOn": 0,
+  "afkSec": 137.99821854941464,
+  "firstKillAt": 25,
+  "walkedOut": 12,
+  "noExpLongest": 164,
+  "lvl": 13,
+  "jlvl": 6,
+  "job": "summoner",
+  "bia": 500
+ },
+ {
+  "id": 86,
+  "acc": "pt08619426",
+  "name": "Ploy",
+  "kind": "reckless",
+  "risk": 15,
+  "react": 0.4272826462412638,
+  "skill": 0.456336255304672,
+  "potAt": 0.20303287245474425,
+  "forget": 0.4,
+  "auto": false,
+  "afk": 0.02,
+  "curious": 0.2,
+  "statPlan": "one",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 12346895,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 451,
+  "kills": 355,
+  "deaths": 8,
+  "stuck": [],
+  "issues": [
+   {
+    "k": "death-loop",
+    "t": 1089,
+    "map": 71,
+    "lvl": 16,
+    "mob": "dewblob",
+    "mobLv": 1
+   }
+  ],
+  "winsOpened": 301,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   32
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    34,
+    2
+   ],
+   [
+    41,
+    3
+   ],
+   [
+    47,
+    4
+   ],
+   [
+    62,
+    5
+   ],
+   [
+    78,
+    6
+   ],
+   [
+    101,
+    7
+   ],
+   [
+    126,
+    8
+   ],
+   [
+    148,
+    9
+   ],
+   [
+    176,
+    10
+   ],
+   [
+    298,
+    11
+   ],
+   [
+    379,
+    12
+   ],
+   [
+    492,
+    13
+   ],
+   [
+    646,
+    14
+   ],
+   [
+    787,
+    15
+   ],
+   [
+    980,
+    16
+   ],
+   [
+    1147,
+    17
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 496,
+  "statUps": 262,
+  "skillUps": 28,
+  "jobs": [
+   "novice",
+   "merchant"
+  ],
+  "warps": 6,
+  "autoOn": 0,
+  "afkSec": 27.544324077919278,
+  "firstKillAt": 31,
+  "walkedOut": 12,
+  "noExpLongest": 46,
+  "lvl": 17,
+  "jlvl": 10,
+  "job": "merchant",
+  "bia": 10
+ },
+ {
+  "id": 87,
+  "acc": "pt08735748",
+  "name": "นภาZz",
+  "kind": "reckless",
+  "risk": 6,
+  "react": 0.2722947280957805,
+  "skill": 0.6964215822501209,
+  "potAt": 0.2372598641027044,
+  "forget": 0.4,
+  "auto": false,
+  "afk": 0.02,
+  "curious": 0.2,
+  "statPlan": "one",
+  "device": "ipad",
+  "w": 1024,
+  "h": 768,
+  "touch": true,
+  "seed": 600869984,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 376,
+  "kills": 244,
+  "deaths": 5,
+  "stuck": [],
+  "issues": [
+   {
+    "k": "death-loop",
+    "t": 166,
+    "map": 71,
+    "lvl": 9,
+    "mob": "kaipa",
+    "mobLv": 6
+   }
+  ],
+  "winsOpened": 309,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    34,
+    2
+   ],
+   [
+    40,
+    3
+   ],
+   [
+    44,
+    4
+   ],
+   [
+    52,
+    5
+   ],
+   [
+    65,
+    6
+   ],
+   [
+    86,
+    7
+   ],
+   [
+    129,
+    8
+   ],
+   [
+    157,
+    9
+   ],
+   [
+    215,
+    10
+   ],
+   [
+    275,
+    11
+   ],
+   [
+    533,
+    12
+   ],
+   [
+    624,
+    13
+   ],
+   [
+    726,
+    14
+   ],
+   [
+    930,
+    15
+   ],
+   [
+    1100,
+    16
+   ]
+  ],
+  "potions": 3,
+  "skillsUsed": 1274,
+  "statUps": 275,
+  "skillUps": 24,
+  "jobs": [
+   "novice",
+   "summoner"
+  ],
+  "warps": 3,
+  "autoOn": 0,
+  "afkSec": 47.018504343935525,
+  "firstKillAt": 34,
+  "walkedOut": 12,
+  "noExpLongest": 81,
+  "lvl": 16,
+  "jlvl": 9,
+  "job": "summoner",
+  "bia": 500
+ },
+ {
+  "id": 88,
+  "acc": "pt08839799",
+  "name": "ปลายฟ้า",
+  "kind": "reckless",
+  "risk": 10,
+  "react": 0.3312752569938429,
+  "skill": 0.8189204247290829,
+  "potAt": 0.1886735272773884,
+  "forget": 0.4,
+  "auto": false,
+  "afk": 0.02,
+  "curious": 0.2,
+  "statPlan": "one",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 982676611,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 380,
+  "kills": 399,
+  "deaths": 6,
+  "stuck": [
+   {
+    "map": 71,
+    "x": 220,
+    "y": 1695,
+    "why": "not moving"
+   }
+  ],
+  "issues": [
+   {
+    "k": "death-loop",
+    "t": 1109,
+    "map": 71,
+    "lvl": 20,
+    "mob": "dewblob",
+    "mobLv": 1
+   }
+  ],
+  "winsOpened": 355,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   2,
+   32
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    19,
+    2
+   ],
+   [
+    20,
+    3
+   ],
+   [
+    28,
+    4
+   ],
+   [
+    40,
+    5
+   ],
+   [
+    52,
+    6
+   ],
+   [
+    67,
+    7
+   ],
+   [
+    104,
+    8
+   ],
+   [
+    138,
+    9
+   ],
+   [
+    233,
+    10
+   ],
+   [
+    291,
+    11
+   ],
+   [
+    379,
+    12
+   ],
+   [
+    530,
+    13
+   ],
+   [
+    578,
+    14
+   ],
+   [
+    630,
+    15
+   ],
+   [
+    696,
+    16
+   ],
+   [
+    756,
+    17
+   ],
+   [
+    820,
+    18
+   ],
+   [
+    852,
+    19
+   ],
+   [
+    937,
+    20
+   ],
+   [
+    1146,
+    21
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 1247,
+  "statUps": 311,
+  "skillUps": 33,
+  "jobs": [
+   "novice",
+   "merchant"
+  ],
+  "warps": 6,
+  "autoOn": 0,
+  "afkSec": 40.323526740690475,
+  "firstKillAt": 18,
+  "walkedOut": 12,
+  "noExpLongest": 44,
+  "lvl": 21,
+  "jlvl": 13,
+  "job": "merchant",
+  "bia": 0
+ },
+ {
+  "id": 89,
+  "acc": "pt08958768",
+  "name": "กิ่งแก้ว_x",
+  "kind": "reckless",
+  "risk": 11,
+  "react": 0.3322303850121006,
+  "skill": 0.7515441430972629,
+  "potAt": 0.22072391147758993,
+  "forget": 0.4,
+  "auto": false,
+  "afk": 0.02,
+  "curious": 0.2,
+  "statPlan": "one",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 365993933,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 381,
+  "kills": 326,
+  "deaths": 4,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 405,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   2,
+   32
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    18,
+    3
+   ],
+   [
+    21,
+    4
+   ],
+   [
+    38,
+    5
+   ],
+   [
+    76,
+    6
+   ],
+   [
+    108,
+    7
+   ],
+   [
+    136,
+    8
+   ],
+   [
+    172,
+    9
+   ],
+   [
+    212,
+    10
+   ],
+   [
+    288,
+    11
+   ],
+   [
+    351,
+    12
+   ],
+   [
+    448,
+    13
+   ],
+   [
+    500,
+    14
+   ],
+   [
+    585,
+    15
+   ],
+   [
+    671,
+    16
+   ],
+   [
+    740,
+    17
+   ],
+   [
+    802,
+    18
+   ],
+   [
+    874,
+    19
+   ],
+   [
+    1017,
+    20
+   ],
+   [
+    1111,
+    21
+   ]
+  ],
+  "potions": 2,
+  "skillsUsed": 1196,
+  "statUps": 358,
+  "skillUps": 34,
+  "jobs": [
+   "novice",
+   "healer"
+  ],
+  "warps": 5,
+  "autoOn": 0,
+  "afkSec": 23.466057287746136,
+  "firstKillAt": 13,
+  "walkedOut": 12,
+  "noExpLongest": 29,
+  "lvl": 21,
+  "jlvl": 14,
+  "job": "healer",
+  "bia": 500
+ },
+ {
+  "id": 90,
+  "acc": "pt09061736",
+  "name": "มะลิza",
+  "kind": "reckless",
+  "risk": 14,
+  "react": 0.5573997480596414,
+  "skill": 0.5679509145524124,
+  "potAt": 0.17530626548701259,
+  "forget": 0.4,
+  "auto": false,
+  "afk": 0.02,
+  "curious": 0.2,
+  "statPlan": "one",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 964779321,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 422,
+  "kills": 328,
+  "deaths": 3,
+  "stuck": [
+   {
+    "map": 71,
+    "x": 1950,
+    "y": 471,
+    "why": "not moving"
+   }
+  ],
+  "issues": [],
+  "winsOpened": 238,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   2,
+   32
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    24,
+    3
+   ],
+   [
+    33,
+    4
+   ],
+   [
+    43,
+    5
+   ],
+   [
+    57,
+    6
+   ],
+   [
+    71,
+    7
+   ],
+   [
+    195,
+    8
+   ],
+   [
+    235,
+    9
+   ],
+   [
+    359,
+    10
+   ],
+   [
+    559,
+    11
+   ],
+   [
+    650,
+    12
+   ],
+   [
+    734,
+    13
+   ],
+   [
+    818,
+    14
+   ],
+   [
+    895,
+    15
+   ],
+   [
+    933,
+    16
+   ],
+   [
+    980,
+    17
+   ],
+   [
+    1032,
+    18
+   ],
+   [
+    1082,
+    19
+   ]
+  ],
+  "potions": 3,
+  "skillsUsed": 499,
+  "statUps": 200,
+  "skillUps": 27,
+  "jobs": [
+   "novice",
+   "dogfolk"
+  ],
+  "warps": 4,
+  "autoOn": 0,
+  "afkSec": 46.34001733331942,
+  "firstKillAt": 24,
+  "walkedOut": 12,
+  "noExpLongest": 100,
+  "lvl": 19,
+  "jlvl": 12,
+  "job": "dogfolk",
+  "bia": 500
+ },
+ {
+  "id": 91,
+  "acc": "pt0918597",
+  "name": "TarGG",
+  "kind": "reckless",
+  "risk": 6,
+  "react": 0.4779348468072409,
+  "skill": 0.6156718444152138,
+  "potAt": 0.1890067267180452,
+  "forget": 0.4,
+  "auto": false,
+  "afk": 0.02,
+  "curious": 0.2,
+  "statPlan": "one",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 615784525,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 512,
+  "kills": 406,
+  "deaths": 9,
+  "stuck": [],
+  "issues": [
+   {
+    "k": "death-loop",
+    "t": 609,
+    "map": 71,
+    "lvl": 13,
+    "mob": "hare",
+    "mobLv": 4
+   },
+   {
+    "k": "death-loop",
+    "t": 870,
+    "map": 2,
+    "lvl": 15,
+    "mob": "goldfrog",
+    "mobLv": 17
+   }
+  ],
+  "winsOpened": 228,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    25,
+    3
+   ],
+   [
+    27,
+    4
+   ],
+   [
+    37,
+    5
+   ],
+   [
+    62,
+    6
+   ],
+   [
+    102,
+    7
+   ],
+   [
+    134,
+    8
+   ],
+   [
+    168,
+    9
+   ],
+   [
+    231,
+    10
+   ],
+   [
+    372,
+    11
+   ],
+   [
+    404,
+    12
+   ],
+   [
+    530,
+    13
+   ],
+   [
+    632,
+    14
+   ],
+   [
+    781,
+    15
+   ],
+   [
+    911,
+    16
+   ],
+   [
+    1045,
+    17
+   ],
+   [
+    1070,
+    18
+   ],
+   [
+    1110,
+    19
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 576,
+  "statUps": 188,
+  "skillUps": 29,
+  "jobs": [
+   "novice",
+   "rogue"
+  ],
+  "warps": 6,
+  "autoOn": 0,
+  "afkSec": 82.77433672583399,
+  "firstKillAt": 25,
+  "walkedOut": 12,
+  "noExpLongest": 71,
+  "lvl": 19,
+  "jlvl": 12,
+  "job": "rogue",
+  "bia": 500
+ },
+ {
+  "id": 92,
+  "acc": "pt0929384",
+  "name": "ภูผาPro",
+  "kind": "reckless",
+  "risk": 6,
+  "react": 0.44215513665329437,
+  "skill": 0.5448310481593157,
+  "potAt": 0.15262792485422824,
+  "forget": 0.4,
+  "auto": false,
+  "afk": 0.02,
+  "curious": 0.2,
+  "statPlan": "one",
+  "device": "ipad",
+  "w": 1024,
+  "h": 768,
+  "touch": true,
+  "seed": 183762163,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 307,
+  "kills": 312,
+  "deaths": 6,
+  "stuck": [
+   {
+    "map": 71,
+    "x": 220,
+    "y": 1695,
+    "why": "not moving"
+   }
+  ],
+  "issues": [],
+  "winsOpened": 306,
+  "winsBad": [],
+  "maps": [
+   71,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    41,
+    2
+   ],
+   [
+    51,
+    3
+   ],
+   [
+    54,
+    4
+   ],
+   [
+    64,
+    5
+   ],
+   [
+    103,
+    6
+   ],
+   [
+    123,
+    7
+   ],
+   [
+    337,
+    8
+   ],
+   [
+    426,
+    9
+   ],
+   [
+    533,
+    10
+   ],
+   [
+    634,
+    11
+   ],
+   [
+    704,
+    12
+   ],
+   [
+    840,
+    13
+   ],
+   [
+    926,
+    14
+   ],
+   [
+    1110,
+    15
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 510,
+  "statUps": 274,
+  "skillUps": 20,
+  "jobs": [
+   "novice",
+   "occult"
+  ],
+  "warps": 3,
+  "autoOn": 0,
+  "afkSec": 53.122995364537,
+  "firstKillAt": 39,
+  "walkedOut": 12,
+  "noExpLongest": 148,
+  "lvl": 15,
+  "jlvl": 7,
+  "job": "occult",
+  "bia": 500
+ },
+ {
+  "id": 93,
+  "acc": "pt09388447",
+  "name": "KenTH",
+  "kind": "reckless",
+  "risk": 5,
+  "react": 0.35406349047742014,
+  "skill": 0.46440636541899594,
+  "potAt": 0.24333507988757225,
+  "forget": 0.4,
+  "auto": false,
+  "afk": 0.02,
+  "curious": 0.2,
+  "statPlan": "one",
+  "device": "ipad",
+  "w": 1024,
+  "h": 768,
+  "touch": true,
+  "seed": 544598512,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 333,
+  "kills": 224,
+  "deaths": 4,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 288,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   2
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    36,
+    2
+   ],
+   [
+    39,
+    3
+   ],
+   [
+    49,
+    4
+   ],
+   [
+    58,
+    5
+   ],
+   [
+    71,
+    6
+   ],
+   [
+    85,
+    7
+   ],
+   [
+    115,
+    8
+   ],
+   [
+    163,
+    9
+   ],
+   [
+    220,
+    10
+   ],
+   [
+    267,
+    11
+   ],
+   [
+    377,
+    12
+   ],
+   [
+    496,
+    13
+   ],
+   [
+    601,
+    14
+   ],
+   [
+    814,
+    15
+   ],
+   [
+    1054,
+    16
    ]
   ],
   "potions": 4,
-  "skillsUsed": 44,
-  "statUps": 17,
-  "skillUps": 5,
+  "skillsUsed": 673,
+  "statUps": 255,
+  "skillUps": 21,
   "jobs": [
-   "novice"
+   "novice",
+   "summoner"
   ],
-  "warps": 0,
+  "warps": 5,
   "autoOn": 0,
-  "afkSec": 0,
+  "afkSec": 16.31148984716809,
+  "firstKillAt": 35,
+  "walkedOut": 12,
+  "noExpLongest": 54,
+  "lvl": 16,
+  "jlvl": 9,
+  "job": "summoner",
+  "bia": 500
+ },
+ {
+  "id": 94,
+  "acc": "pt09445324",
+  "name": "NutGG",
+  "kind": "reckless",
+  "risk": 8,
+  "react": 0.25196308516988675,
+  "skill": 0.5336749315418652,
+  "potAt": 0.1523723280068358,
+  "forget": 0.4,
+  "auto": false,
+  "afk": 0.02,
+  "curious": 0.2,
+  "statPlan": "one",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 296356883,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 539,
+  "kills": 367,
+  "deaths": 5,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 421,
+  "winsBad": [],
+  "maps": [
+   71,
+   2,
+   32
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    22,
+    3
+   ],
+   [
+    24,
+    4
+   ],
+   [
+    28,
+    5
+   ],
+   [
+    37,
+    6
+   ],
+   [
+    54,
+    7
+   ],
+   [
+    75,
+    8
+   ],
+   [
+    97,
+    9
+   ],
+   [
+    121,
+    10
+   ],
+   [
+    165,
+    11
+   ],
+   [
+    237,
+    12
+   ],
+   [
+    291,
+    13
+   ],
+   [
+    458,
+    14
+   ],
+   [
+    621,
+    15
+   ],
+   [
+    737,
+    16
+   ],
+   [
+    808,
+    17
+   ],
+   [
+    905,
+    18
+   ],
+   [
+    983,
+    19
+   ],
+   [
+    1039,
+    20
+   ],
+   [
+    1106,
+    21
+   ],
+   [
+    1185,
+    22
+   ]
+  ],
+  "potions": 3,
+  "skillsUsed": 1014,
+  "statUps": 378,
+  "skillUps": 32,
+  "jobs": [
+   "novice",
+   "occult"
+  ],
+  "warps": 7,
+  "autoOn": 0,
+  "afkSec": 96.7102751073941,
+  "firstKillAt": 22,
+  "walkedOut": 12,
+  "noExpLongest": 75,
+  "lvl": 22,
+  "jlvl": 14,
+  "job": "occult",
+  "bia": 500
+ },
+ {
+  "id": 95,
+  "acc": "pt09559218",
+  "name": "MayZz",
+  "kind": "reckless",
+  "risk": 7,
+  "react": 0.2644982864682089,
+  "skill": 0.5038581042568471,
+  "potAt": 0.11294747421655221,
+  "forget": 0.4,
+  "auto": false,
+  "afk": 0.02,
+  "curious": 0.2,
+  "statPlan": "one",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 355030524,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 485,
+  "kills": 456,
+  "deaths": 8,
+  "stuck": [],
+  "issues": [
+   {
+    "k": "death-loop",
+    "t": 1121,
+    "map": 32,
+    "lvl": 22,
+    "mob": "orchard_crawler",
+    "mobLv": 21
+   }
+  ],
+  "winsOpened": 490,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   2,
+   32
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    16,
+    2
+   ],
+   [
+    23,
+    3
+   ],
+   [
+    30,
+    4
+   ],
+   [
+    39,
+    5
+   ],
+   [
+    49,
+    6
+   ],
+   [
+    67,
+    7
+   ],
+   [
+    90,
+    8
+   ],
+   [
+    114,
+    9
+   ],
+   [
+    186,
+    10
+   ],
+   [
+    269,
+    11
+   ],
+   [
+    454,
+    12
+   ],
+   [
+    563,
+    13
+   ],
+   [
+    636,
+    14
+   ],
+   [
+    789,
+    15
+   ],
+   [
+    827,
+    16
+   ],
+   [
+    887,
+    17
+   ],
+   [
+    934,
+    18
+   ],
+   [
+    987,
+    19
+   ],
+   [
+    1026,
+    20
+   ],
+   [
+    1084,
+    21
+   ],
+   [
+    1112,
+    22
+   ],
+   [
+    1189,
+    23
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 841,
+  "statUps": 449,
+  "skillUps": 29,
+  "jobs": [
+   "novice",
+   "catfolk"
+  ],
+  "warps": 6,
+  "autoOn": 0,
+  "afkSec": 68.74508499807915,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 77,
+  "lvl": 23,
+  "jlvl": 15,
+  "job": "catfolk",
+  "bia": 500
+ },
+ {
+  "id": 96,
+  "acc": "pt09687007",
+  "name": "ดาวเหนือจัง",
+  "kind": "newbie",
+  "risk": 5,
+  "react": 1.2155311587338948,
+  "skill": 0.05731473777318129,
+  "potAt": 0.3387977551383887,
+  "forget": 0.5,
+  "auto": false,
+  "afk": 0.15,
+  "curious": 0.6,
+  "statPlan": "none",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 573515628,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 191,
+  "kills": 202,
+  "deaths": 6,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 42,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    18,
+    2
+   ],
+   [
+    46,
+    3
+   ],
+   [
+    62,
+    4
+   ],
+   [
+    88,
+    5
+   ],
+   [
+    115,
+    6
+   ],
+   [
+    167,
+    7
+   ],
+   [
+    362,
+    8
+   ],
+   [
+    493,
+    9
+   ],
+   [
+    580,
+    10
+   ],
+   [
+    679,
+    11
+   ],
+   [
+    799,
+    12
+   ],
+   [
+    1012,
+    13
+   ]
+  ],
+  "potions": 1,
+  "skillsUsed": 14,
+  "statUps": 19,
+  "skillUps": 12,
+  "jobs": [
+   "novice",
+   "occult"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 168.18299592853663,
   "firstKillAt": 17,
   "walkedOut": 12,
-  "noExpLongest": 33,
-  "lvl": 8,
-  "jlvl": 7,
-  "job": "novice",
+  "noExpLongest": 117,
+  "lvl": 13,
+  "jlvl": 2,
+  "job": "occult",
+  "bia": 500
+ },
+ {
+  "id": 97,
+  "acc": "pt0973143",
+  "name": "ภูผา",
+  "kind": "newbie",
+  "risk": 0,
+  "react": 1.9582101557209204,
+  "skill": 0.1722925470780081,
+  "potAt": 0.2708387413624854,
+  "forget": 0.5,
+  "auto": false,
+  "afk": 0.15,
+  "curious": 0.6,
+  "statPlan": "none",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 220944800,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 197,
+  "kills": 131,
+  "deaths": 5,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 31,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    61,
+    2
+   ],
+   [
+    79,
+    3
+   ],
+   [
+    100,
+    4
+   ],
+   [
+    134,
+    5
+   ],
+   [
+    151,
+    6
+   ],
+   [
+    190,
+    7
+   ],
+   [
+    296,
+    8
+   ],
+   [
+    386,
+    9
+   ],
+   [
+    446,
+    10
+   ],
+   [
+    611,
+    11
+   ],
+   [
+    964,
+    12
+   ]
+  ],
+  "potions": 3,
+  "skillsUsed": 29,
+  "statUps": 10,
+  "skillUps": 12,
+  "jobs": [
+   "novice",
+   "summoner"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 104.905626999636,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 166,
+  "lvl": 12,
+  "jlvl": 4,
+  "job": "summoner",
+  "bia": 500
+ },
+ {
+  "id": 98,
+  "acc": "pt09854138",
+  "name": "ปลายฟ้าza",
+  "kind": "newbie",
+  "risk": 0,
+  "react": 1.2928655601073362,
+  "skill": 0.20715198400763424,
+  "potAt": 0.15339521758882105,
+  "forget": 0.5,
+  "auto": false,
+  "afk": 0.15,
+  "curious": 0.6,
+  "statPlan": "none",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 735331731,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 205,
+  "kills": 216,
+  "deaths": 2,
+  "stuck": [
+   {
+    "map": 71,
+    "x": 1680,
+    "y": 3077,
+    "why": "not moving"
+   }
+  ],
+  "issues": [],
+  "winsOpened": 38,
+  "winsBad": [],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    18,
+    2
+   ],
+   [
+    30,
+    3
+   ],
+   [
+    35,
+    4
+   ],
+   [
+    58,
+    5
+   ],
+   [
+    80,
+    6
+   ],
+   [
+    227,
+    7
+   ],
+   [
+    298,
+    8
+   ],
+   [
+    344,
+    9
+   ],
+   [
+    479,
+    10
+   ],
+   [
+    679,
+    11
+   ],
+   [
+    878,
+    12
+   ],
+   [
+    1169,
+    13
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 61,
+  "statUps": 14,
+  "skillUps": 12,
+  "jobs": [
+   "novice",
+   "rune"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 150.94497111204313,
+  "firstKillAt": 17,
+  "walkedOut": 12,
+  "noExpLongest": 111,
+  "lvl": 13,
+  "jlvl": 2,
+  "job": "rune",
+  "bia": 500
+ },
+ {
+  "id": 99,
+  "acc": "pt09988521",
+  "name": "May",
+  "kind": "newbie",
+  "risk": 0,
+  "react": 1.2979233617419021,
+  "skill": 0.2768047276776306,
+  "potAt": 0.3070580792180533,
+  "forget": 0.5,
+  "auto": false,
+  "afk": 0.15,
+  "curious": 0.6,
+  "statPlan": "none",
+  "device": "laptop",
+  "w": 1366,
+  "h": 768,
+  "touch": false,
+  "seed": 138411415,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 136,
+  "kills": 119,
+  "deaths": 5,
+  "stuck": [
+   {
+    "map": 71,
+    "x": 220,
+    "y": 1695,
+    "why": "not moving"
+   }
+  ],
+  "issues": [
+   {
+    "k": "death-loop",
+    "t": 305,
+    "map": 71,
+    "lvl": 7,
+    "mob": "kobna",
+    "mobLv": 3
+   }
+  ],
+  "winsOpened": 32,
+  "winsBad": [
+   "bag:not open",
+   "bag:not open"
+  ],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    44,
+    2
+   ],
+   [
+    46,
+    3
+   ],
+   [
+    70,
+    4
+   ],
+   [
+    83,
+    5
+   ],
+   [
+    114,
+    6
+   ],
+   [
+    152,
+    7
+   ],
+   [
+    345,
+    8
+   ],
+   [
+    415,
+    9
+   ],
+   [
+    833,
+    10
+   ],
+   [
+    1064,
+    11
+   ]
+  ],
+  "potions": 6,
+  "skillsUsed": 101,
+  "statUps": 10,
+  "skillUps": 11,
+  "jobs": [
+   "novice",
+   "rune"
+  ],
+  "warps": 2,
+  "autoOn": 0,
+  "afkSec": 193.47937814820529,
+  "firstKillAt": 43,
+  "walkedOut": 12,
+  "noExpLongest": 129,
+  "lvl": 11,
+  "jlvl": 2,
+  "job": "rune",
+  "bia": 500
+ },
+ {
+  "id": 100,
+  "acc": "pt1001259",
+  "name": "Toeyจัง",
+  "kind": "newbie",
+  "risk": 0,
+  "react": 1.2634657430292413,
+  "skill": 0.156532522293987,
+  "potAt": 0.39210219632000765,
+  "forget": 0.5,
+  "auto": true,
+  "afk": 0.15,
+  "curious": 0.6,
+  "statPlan": "none",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 755850269,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 202,
+  "kills": 352,
+  "deaths": 0,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 51,
+  "winsBad": [
+   "bag:not open"
+  ],
+  "maps": [
+   71,
+   31
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    22,
+    2
+   ],
+   [
+    27,
+    3
+   ],
+   [
+    36,
+    4
+   ],
+   [
+    59,
+    5
+   ],
+   [
+    80,
+    6
+   ],
+   [
+    119,
+    7
+   ],
+   [
+    151,
+    8
+   ],
+   [
+    189,
+    9
+   ],
+   [
+    250,
+    10
+   ],
+   [
+    358,
+    11
+   ],
+   [
+    399,
+    12
+   ],
+   [
+    466,
+    13
+   ],
+   [
+    525,
+    14
+   ],
+   [
+    697,
+    15
+   ],
+   [
+    781,
+    16
+   ],
+   [
+    863,
+    17
+   ],
+   [
+    942,
+    18
+   ],
+   [
+    1058,
+    19
+   ],
+   [
+    1144,
+    20
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 0,
+  "statUps": 21,
+  "skillUps": 21,
+  "jobs": [
+   "novice",
+   "summoner"
+  ],
+  "warps": 3,
+  "autoOn": 1,
+  "afkSec": 213.13969911687994,
+  "firstKillAt": 21,
+  "walkedOut": 12,
+  "noExpLongest": 77,
+  "lvl": 20,
+  "jlvl": 12,
+  "job": "summoner",
   "bia": 500
  }
 ]
