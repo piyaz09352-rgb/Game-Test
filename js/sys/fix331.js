@@ -16,3 +16,9 @@ if (typeof TIMG !== 'undefined'){ const blank = document.createElement('canvas')
 
 /* · the storm (Thunder Tempest): the owner preferred the original look, so it stays — only its hard angles are smoothed,
      in js/sys/mage2.js (the funnel, the debris, its lightning) and js/render/vfx.js (the lightning of every bolt) */
+/* (v333) the bosses of the two beginner fields (ทุ่งสุวรรณิน Lv 1–15, ป่าไผ่กระซิบ Lv 5–14) no longer charge at players on
+   sight: the 100-bot playtest saw the Golden Jelly King (Lv 25) wander into the field and kill Lv 10–17 players in one or
+   two blows (100–138 damage against 150–200 HP) while they fought rabbits. They still roam, and fight back in full once hit. */
+if (typeof spawnMob === 'function'){ const _sm = spawnMob; spawnMob = function(type){ const m = _sm.apply(this, arguments);
+  try { const mp = MAPS[MAP_ID]; if (m && m.def && m.def.boss && mp && mp.boss === type && mp.lv && mp.lv[1] <= 15) m.calm = true; } catch (e) {}
+  return m; }; }
