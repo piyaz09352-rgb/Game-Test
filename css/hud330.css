@@ -283,3 +283,55 @@ html body.h6w #ui#ui #dialog .dh *, html body.h6w #ui#ui #warpGrid .wghd *:not(b
 html body.h6w #ui#ui #dialog .dh small, html body.h6w #ui#ui #dialog .dh .sub, html body.h6w #ui#ui #warpGrid .wghd small{ color:#cfc8ff !important; -webkit-text-fill-color:#cfc8ff !important; }
 html body.h6w #ui#ui #dialog .dh button, html body.h6w #ui#ui #warpGrid .wghd button[data-wclose], html body.h6w #ui#ui #warpGrid .wghd .wgx, html body.h6w #ui#ui #dialog .dh .x{ border-radius:50% !important;
   background:radial-gradient(circle at 50% 30%, rgba(150,60,110,.95), rgba(48,14,36,.95)) padding-box, linear-gradient(135deg, #ff8ab0, #ffb36a) border-box !important; border:1.5px solid transparent !important; box-shadow:0 0 10px rgba(255,110,150,.6) !important; color:#fff !important; }
+/* (v333) the death card in the new palette: dark violet glass with a red-gold rim (it was the old cream parchment) */
+html body.h6w #dth .dthcard{ background:radial-gradient(ellipse at 50% 0%, rgba(80,30,70,.96), rgba(28,18,52,.97) 60%, rgba(14,10,32,.98)) padding-box,
+  linear-gradient(135deg, #ffb46a, #ff4a6a 40%, #b47cff 75%, #4fd8ff) border-box !important; border:2px solid transparent !important;
+  box-shadow:0 0 40px rgba(255,70,90,.35), 0 0 0 1px rgba(255,255,255,.08) inset, 0 26px 70px rgba(0,0,0,.7) !important; }
+html body.h6w #dth .dthcard::before{ border-color:rgba(255,190,220,.22) !important; box-shadow:inset 0 0 30px rgba(255,80,120,.14) !important; }
+html body.h6w #dth .dthc{ display:none !important; }
+html body.h6w #dth .dthloss{ color:#ffc4a8 !important; }
+html body.h6w #dth .dthcard > p, html body.h6w #dth .dthcard small:not(.dthb small){ color:#d8d0f0 !important; }
+html body.h6w #dth .dthb{ border:1px solid rgba(255,255,255,.35) !important; box-shadow:0 0 14px rgba(255,200,90,.35), inset 0 1px 0 rgba(255,255,255,.5) !important; }
+html body.h6w #dth .dthb.town{ background:linear-gradient(#ffe9a8, #ffc24a 55%, #e8902a) !important; color:#3a1a04 !important; }
+html body.h6w #dth .dthb.here:not(:disabled){ background:linear-gradient(135deg, #b47cff, #6a5cff 55%, #2fb4ff) !important; color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.5); }
+html body.h6w #dth .dthb.here:disabled{ background:rgba(255,255,255,.08) !important; color:#a8a0c8 !important; border-color:rgba(255,255,255,.18) !important; box-shadow:none !important; }
+html body.h6w #dth .dthb.here:disabled b, html body.h6w #dth .dthb.here:disabled small{ color:#c8c0e4 !important; -webkit-text-fill-color:#c8c0e4 !important; }
+/* (v333) the achievements window was made for the old dark windows: grey see-through cards with pale gold lettering on the
+   new light glass. Light cards with deep-indigo lettering; finished ones get their colour on the left edge. */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achhead > div{ background:linear-gradient(180deg, #ffffff, #f1edff) !important; box-shadow:inset 0 0 0 1px rgba(150,130,230,.45) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achhead b{ color:#5a3cc8 !important; -webkit-text-fill-color:#5a3cc8 !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achhead .achnow b{ color:#b0601a !important; -webkit-text-fill-color:#b0601a !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achhead small{ color:#6a6290 !important; -webkit-text-fill-color:#6a6290 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achc{ background:#f6f4fd !important; box-shadow:inset 0 0 0 1px rgba(150,130,230,.3) !important; opacity:1 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achc:not(.on) .achm, html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achc:not(.on) .achr{ opacity:.72; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achc.on{ background:linear-gradient(100deg, color-mix(in srgb, var(--tc) 22%, #fff), #ffffff 70%) !important; box-shadow:inset 3px 0 0 var(--tc), inset 0 0 0 1px color-mix(in srgb, var(--tc) 60%, transparent) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achc b{ color:#2a2350 !important; -webkit-text-fill-color:#2a2350 !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achc small{ color:#4a4470 !important; -webkit-text-fill-color:#4a4470 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achc em{ color:#7a72a0 !important; -webkit-text-fill-color:#7a72a0 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achr span{ color:#8a5a10 !important; -webkit-text-fill-color:#8a5a10 !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achr .tt{ color:#6a4cd0 !important; -webkit-text-fill-color:#6a4cd0 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achbar{ background:#e4e0f4 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achbar span{ color:#2a2350 !important; -webkit-text-fill-color:#2a2350 !important; text-shadow:none !important; }
+/* the chosen tier in the skill window: white lettering on a light tab (the gold it was made for became lavender) */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-skill .skt.on{ background:linear-gradient(135deg, #8a5cff, #4f9dff) !important; box-shadow:0 0 12px rgba(120,100,255,.45) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-skill .skt.on, html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-skill .skt.on *{ color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.4) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-skill .skdetail .nx{ color:#1f8a5a !important; -webkit-text-fill-color:#1f8a5a !important; }
+/* (v333) NPC windows: pieces made for the old dark windows, unreadable on the new light glass */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .dh .wallet{ background:rgba(10,8,30,.55) !important; border:1px solid rgba(255,224,138,.6) !important; color:#ffe08a !important; -webkit-text-fill-color:#ffe08a !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .dh .wallet small{ color:#f0e6c0 !important; -webkit-text-fill-color:#f0e6c0 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .qty{ background:#f1edff !important; border:1px solid rgba(130,110,230,.5) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .qty .qb{ color:#4a34b0 !important; -webkit-text-fill-color:#4a34b0 !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .qty .qb:disabled{ color:#a8a2c8 !important; -webkit-text-fill-color:#a8a2c8 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .bankz > div:not(.bankzb){ background:linear-gradient(180deg, #ffffff, #f1edff) !important; box-shadow:inset 0 0 0 1px rgba(150,130,230,.45) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .bankz b{ color:#8a5a10 !important; -webkit-text-fill-color:#8a5a10 !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .bankz small{ color:#6a6290 !important; -webkit-text-fill-color:#6a6290 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .hlpbuff{ color:#1f7a4a !important; -webkit-text-fill-color:#1f7a4a !important; text-shadow:none !important; }
+/* (v333) the tutorial card in the new palette (it was cream parchment over the dark glass HUD) */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox{ background:linear-gradient(var(--a6-glass, rgba(22,16,52,.86)), var(--a6-glass, rgba(22,16,52,.86))) padding-box, linear-gradient(135deg, #b47cff, #4fd8ff 50%, #ffd36a) border-box !important;
+  border:1.5px solid transparent !important; box-shadow:0 0 18px rgba(140,110,255,.45), 0 10px 26px rgba(0,0,0,.45) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox::before, html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox::after{ display:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox p, html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox p *{ color:#efeaff !important; -webkit-text-fill-color:#efeaff !important; text-shadow:0 1px 2px rgba(0,0,0,.6) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox .tuth b{ color:#ffe08a !important; -webkit-text-fill-color:#ffe08a !important; text-shadow:0 1px 2px rgba(0,0,0,.6) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox .tutx, html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox .tutfold{ color:#b8e8ff !important; -webkit-text-fill-color:#b8e8ff !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox .tutdots i{ background:rgba(255,255,255,.3) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox .tutdots i.on{ background:#ffd36a !important; box-shadow:0 0 6px #ffd36a !important; }

@@ -1,0 +1,298 @@
+[
+ {
+  "id": 1,
+  "acc": "pt0014244",
+  "name": "ใบเตย99",
+  "kind": "careful",
+  "risk": -1,
+  "react": 0.6553552776367195,
+  "skill": 0.7280756217092628,
+  "potAt": 0.5334870345580797,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.04,
+  "curious": 0.25,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 167187192,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 31,
+  "kills": 0,
+  "deaths": 0,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 4,
+  "winsBad": [],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ]
+  ],
+  "potions": 5,
+  "skillsUsed": 0,
+  "statUps": 2,
+  "skillUps": 0,
+  "jobs": [
+   "novice"
+  ],
+  "warps": 0,
+  "autoOn": 0,
+  "afkSec": 0,
+  "firstKillAt": null,
+  "walkedOut": 12,
+  "noExpLongest": 240,
+  "lvl": 1,
+  "jlvl": 1,
+  "job": "novice",
+  "bia": 500
+ },
+ {
+  "id": 2,
+  "acc": "pt00284670",
+  "name": "ToeyLv1",
+  "kind": "casual",
+  "risk": 3,
+  "react": 0.7101695675915897,
+  "skill": 0.40996125797273647,
+  "potAt": 0.2594313749156107,
+  "forget": 0.2,
+  "auto": false,
+  "afk": 0.1,
+  "curious": 0.4,
+  "statPlan": "random",
+  "device": "pc",
+  "w": 1920,
+  "h": 1080,
+  "touch": false,
+  "seed": 888583538,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 45,
+  "kills": 45,
+  "deaths": 0,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 16,
+  "winsBad": [],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    20,
+    2
+   ],
+   [
+    37,
+    3
+   ],
+   [
+    67,
+    4
+   ],
+   [
+    81,
+    5
+   ],
+   [
+    131,
+    6
+   ],
+   [
+    158,
+    7
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 26,
+  "statUps": 8,
+  "skillUps": 5,
+  "jobs": [
+   "novice"
+  ],
+  "warps": 0,
+  "autoOn": 0,
+  "afkSec": 53.15901589494153,
+  "firstKillAt": 15,
+  "walkedOut": 12,
+  "noExpLongest": 57,
+  "lvl": 7,
+  "jlvl": 6,
+  "job": "novice",
+  "bia": 500
+ },
+ {
+  "id": 3,
+  "acc": "pt00330541",
+  "name": "ต้นข้าวNoob",
+  "kind": "grinder",
+  "risk": 2,
+  "react": 0.5390577723454021,
+  "skill": 0.8134823348203126,
+  "potAt": 0.413257711480026,
+  "forget": 0.05,
+  "auto": false,
+  "afk": 0.02,
+  "curious": 0.1,
+  "statPlan": "job",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 676689445,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 47,
+  "kills": 41,
+  "deaths": 1,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 14,
+  "winsBad": [],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    16,
+    2
+   ],
+   [
+    29,
+    3
+   ],
+   [
+    53,
+    4
+   ],
+   [
+    103,
+    5
+   ],
+   [
+    151,
+    6
+   ],
+   [
+    223,
+    7
+   ]
+  ],
+  "potions": 0,
+  "skillsUsed": 127,
+  "statUps": 8,
+  "skillUps": 3,
+  "jobs": [
+   "novice"
+  ],
+  "warps": 0,
+  "autoOn": 0,
+  "afkSec": 0,
+  "firstKillAt": 16,
+  "walkedOut": 12,
+  "noExpLongest": 30,
+  "lvl": 7,
+  "jlvl": 6,
+  "job": "novice",
+  "bia": 500
+ },
+ {
+  "id": 4,
+  "acc": "pt00470429",
+  "name": "ต้นข้าวza",
+  "kind": "explorer",
+  "risk": 4,
+  "react": 1.0131959562251325,
+  "skill": 0.633963588221913,
+  "potAt": 0.3630136238704499,
+  "forget": 0.15,
+  "auto": false,
+  "afk": 0.06,
+  "curious": 0.8,
+  "statPlan": "random",
+  "device": "phone",
+  "w": 844,
+  "h": 390,
+  "touch": true,
+  "seed": 466074486,
+  "ok": true,
+  "fail": null,
+  "errors": [],
+  "realSec": 45,
+  "kills": 49,
+  "deaths": 1,
+  "stuck": [],
+  "issues": [],
+  "winsOpened": 24,
+  "winsBad": [],
+  "maps": [
+   71
+  ],
+  "lvLog": [
+   [
+    0,
+    1
+   ],
+   [
+    50,
+    3
+   ],
+   [
+    58,
+    4
+   ],
+   [
+    91,
+    5
+   ],
+   [
+    147,
+    6
+   ],
+   [
+    177,
+    7
+   ],
+   [
+    231,
+    8
+   ]
+  ],
+  "potions": 4,
+  "skillsUsed": 44,
+  "statUps": 17,
+  "skillUps": 5,
+  "jobs": [
+   "novice"
+  ],
+  "warps": 0,
+  "autoOn": 0,
+  "afkSec": 0,
+  "firstKillAt": 17,
+  "walkedOut": 12,
+  "noExpLongest": 33,
+  "lvl": 8,
+  "jlvl": 7,
+  "job": "novice",
+  "bia": 500
+ }
+]

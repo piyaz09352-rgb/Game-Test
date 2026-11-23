@@ -149,3 +149,15 @@ html body #title .authing #auBox .au-hint.au-wait{display:flex !important;flex-d
 html body #title .authing #auBox .au-hint.au-wait::before{content:"";width:42px;height:42px;border-radius:50%;border:4px solid rgba(227,176,75,.3);border-top-color:#e3b04b;
   animation:auWaitSpin .9s linear 9999}
 @keyframes auWaitSpin{to{transform:rotate(360deg)}}
+
+/* (v333) the slots screen: the account bar wraps cleanly (name and ID on their own row, coins and buttons under them; the
+   coins sat on top of the ID on a phone) and the coffee / Discord links are one slim row instead of two tall bars */
+html body #title .title-card:not(.authing) .accbar{flex-wrap:wrap;row-gap:7px}
+html body #title .title-card:not(.authing) .accbar .accn{flex:1 1 150px;min-width:150px}
+html body #title .title-card:not(.authing) .accbar .accn small{white-space:normal}
+html body #title .title-card:not(.authing) .accbar .tbtn{white-space:nowrap;flex:1 1 auto}
+html body #title .title-card:not(.authing) > .supbig,html body #title .title-card:not(.authing) > .supdcbig{display:inline-flex !important;align-items:center;justify-content:center;
+  width:calc(50% - 4px) !important;min-height:0 !important;height:34px !important;margin:8px 0 0 !important;padding:0 10px !important;border-radius:10px !important;font-size:13px !important;vertical-align:top;box-sizing:border-box}
+html body #title .title-card:not(.authing) > .supbig{margin-right:8px !important}
+/* (v333) the character maker on wide screens: it stretched across the whole page with small lettering; now a centred card */
+@media (min-width:1100px){html body #title .title-card:not(.authing):has(.maker){width:min(1040px,76vw) !important;max-width:1040px !important;justify-self:center;margin-left:auto !important;margin-right:auto !important}}

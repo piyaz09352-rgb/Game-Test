@@ -79,6 +79,13 @@ function h6ChatBtn(){ const ui = el('ui'), cb = el('chatBtn'), ex = el('h6Exp');
 function h6Chat(){ const cb = el('chatBox'), ui = el('ui'); if (!cb || !H6.chat || !ui || !ui.classList.contains('h6pc') || h6Hand()) return;
   const c = H6.chat, set = (n, v) => { v = Math.round(v) + 'px'; if (cb.style.getPropertyValue(n) !== v) cb.style.setProperty(n, v, 'important'); };
   set('left', c.left); set('width', c.width); set('bottom', c.bottom); if (cb.style.right !== 'auto') cb.style.setProperty('right', 'auto', 'important'); if (cb.style.top !== 'auto') cb.style.setProperty('top', 'auto', 'important'); }
+/* (v333) the chips (ออฟ / พักจอ) under the minimap: on a phone the skill wheel's top button reached up under them. When any
+   action button overlaps, the chips move to the minimap's left side, level with its bottom edge. */
+function h6Chips(){ const ui = el('ui'), ch = el('chips'), mc = el('mapCard'); if (!ui || !ch || !mc || !ch.offsetWidth || !ui.classList.contains('moba') || !ui.classList.contains('h6') || h6Hand()) return;
+  const U = brect(ui), M = brect(mc), m = Math.max(6, Math.round(U.right - M.right)), g = 8 * ((U.height / (ui.offsetHeight || 1)) || 1);
+  const hit = () => { const C = brect(ch); return [...document.querySelectorAll('#ui .mo')].some(b => { if (!b.offsetWidth) return false; const B = brect(b); return B.left < C.right && B.right > C.left && B.top < C.bottom && B.bottom > C.top; }); };
+  hudPut(ch, m, M.bottom - U.top + g, 'r'); if (!hit()) return;
+  hudPut(ch, U.right - M.left + g, M.bottom - U.top - brect(ch).height, 'r'); }
 function h6Layout(){
   const ui = el('ui'); if (!ui || ui.classList.contains('on-title') || !H6.on) return;
   h6Build(); h6Tick();
@@ -95,6 +102,7 @@ function h6Layout(){
       const sb = brect(slot); set('left', (sb.left - U.left) / k); set('top', (sb.top - U.top) / k); if (cs.style.right !== 'auto') cs.style.setProperty('right', 'auto', 'important'); } }
   hudPut(mc, m, I.b + g * k, 'r'); const M = R(mc);
   if (ch && ch.offsetWidth) hudPut(ch, m, M.b + g * k, 'r');
+  h6Chips();
   if (rl){ hudPut(rl, m, I.b + g * k, 'r'); rl.style.zIndex = rl.classList.contains('folded') ? '' : '45'; }
   // the open menu: as many columns as fit, as tall as the room under the orbs (down to the action buttons on PC)
   if (rl && !rl.classList.contains('folded')){ const top = I.b + g * k, low = moba ? U.height - m : (el('dock') && el('dock').offsetWidth ? Math.min(U.height - m, R(el('dock')).t - g * k) : U.height - m);
@@ -182,12 +190,24 @@ h6LiteCheck(); setInterval(h6LiteCheck, 3000);
    (on PC it sat below the row); under the new HUD the HUD places it */
 if (typeof cshPlace === 'function'){ const _cp = cshPlace; cshPlace = function(){ if (el('ui') && el('ui').classList.contains('h6') && el('h6Icons')) return; return _cp.apply(this, arguments); }; }
 /* the touch layout (js/sys/moblay244.js) runs after the HUD and puts the chat button back under the quest card: place it after that too */
-if (typeof mlyLayout === 'function'){ const _ml = mlyLayout; mlyLayout = function(){ const r = _ml.apply(this, arguments); try { h6ChatBtn(); } catch (e) {} return r; }; }
+if (typeof mlyLayout === 'function'){ const _ml = mlyLayout; mlyLayout = function(){ const r = _ml.apply(this, arguments); try { h6ChatBtn(); h6Chips(); } catch (e) {} return r; }; }
 /* (v332) the banner (festival, boss news) always sits under the target pill: it was placed once when it appeared, so a
    target picked afterwards slid under it, and the HUD's zoom on PC was not counted */
 function h6Banner(){ const b = el('banner'), ui = el('ui'); if (!b || !ui || !ui.classList.contains('h6') || b.hidden || !b.offsetWidth) return;
   const U = brect(ui), k = (U.height / (ui.offsetHeight || 1)) || 1; let y = 8;
-  for (const id of ['target', 'tSt']){ const e = el(id); if (e && !e.hidden && e.offsetWidth){ const r = brect(e); if (r.height) y = Math.max(y, (r.bottom - U.top) / k + 6); } }
+  for (const id of ['target', 'tSt', 'achPop']){ const e = el(id); if (id === 'achPop' && !(e && e.classList.contains('show'))) continue; if (e && !e.hidden && e.offsetWidth){ const r = brect(e); if (r.height) y = Math.max(y, (r.bottom - U.top) / k + 6); } }
   const v = Math.round(y) + 'px'; if (b.style.getPropertyValue('top') !== v) b.style.setProperty('top', v, 'important'); }
-setInterval(() => { try { h6Banner(); } catch (e) {} }, 200);
+/* (v333) the tutorial card sat on the open chat box on an iPad (both centred low on the screen): it goes just above the chat */
+function h6Tut(){ const ui = el('ui'), b = el('tutBox'), cb = el('chatBox'), c = cb && cb.classList.contains('idle') && el('chatForm') ? el('chatForm') : cb;   // an idle chat shows only its input row if (!ui || !b || !ui.classList.contains('h6')) return;
+  if (b.hidden || !b.offsetWidth || !c || !c.offsetWidth || cb.hidden){ if (b.style.getPropertyValue('top')) { b.style.removeProperty('top'); b.style.removeProperty('bottom'); } return; }
+  const U = brect(ui), k = (U.height / (ui.offsetHeight || 1)) || 1, C = brect(c); b.style.removeProperty('top'); b.style.removeProperty('bottom'); const B = brect(b);
+  if (B.bottom <= C.top || B.top >= C.bottom || B.right <= C.left || B.left >= C.right) return;
+  const top = Math.max(8, (C.top - U.top) / k - b.offsetHeight - 10); b.style.setProperty('top', Math.round(top) + 'px', 'important'); b.style.setProperty('bottom', 'auto', 'important'); }
+setInterval(() => { try { h6Tut(); const ap = el('achPop'); if (ap && ap.classList.contains('show') && typeof achPlace === 'function') achPlace(); h6Banner(); } catch (e) {} }, 200);
+// (v333) the achievement toast: the old spot (right of the name card) sat on the target pill. Centre it under the target instead;
+// h6Banner above then keeps the event banner below the toast.
+if (typeof achPlace === 'function'){ const _apl = achPlace; achPlace = function(){ const ui = el('ui'), p = el('achPop'); if (!ui || !p || !ui.classList.contains('h6')) return _apl.apply(this, arguments);
+  const U = brect(ui), k = (U.height / (ui.offsetHeight || 1)) || 1; let y = 8;
+  for (const id of ['target', 'tSt']){ const e = el(id); if (e && !e.hidden && e.offsetWidth){ const r = brect(e); if (r.height) y = Math.max(y, (r.bottom - U.top) / k + 6); } }
+  p.style.setProperty('--apx', Math.round((ui.offsetWidth - p.offsetWidth) / 2) + 'px'); p.style.setProperty('--apy', Math.round(y) + 'px'); }; }
 if (typeof banner === 'function'){ const _bn = banner; banner = function(){ const r = _bn.apply(this, arguments); requestAnimationFrame(() => { try { h6Banner(); } catch (e) {} }); return r; }; }
