@@ -141,7 +141,9 @@ const DINO = (() => {
   }
   /* membrane wing: an arm to the wrist, long finger bones fanned out, skin stretched between them and back to the body */
   function wing(cx, P, root, sd, span, o, opt = {}){
-    const fl = globalThis.DIEX ? -1 + (1 - globalThis.DIEX.k) * .6 : (opt.fold ? -.9 : 0) + o.flap * (opt.fold ? .15 : .55) + (opt.lift ?? .35);   // (v341) dying: the wings fold down along the body
+    // (v341) dying: once the body starts to go over, the wings fold the way a resting dragon folds them, along its sides
+    if (globalThis.DIEX && globalThis.DIEX.k > .28 && !opt.fold) opt = {...opt, fold:true};
+    const fl = (opt.fold ? -.9 : 0) + o.flap * (opt.fold ? .15 : .55) + (opt.lift ?? .35);
     const elbow = add(root, [sd * Math.cos(fl * .6 + .2) * span * .28, Math.sin(fl * .6 + .2) * span * .28 + 1, -span * .06]);
     const wrist = add(elbow, [sd * Math.cos(fl + .1) * span * .3, Math.sin(fl + .1) * span * .3, opt.fold ? -span * .2 : span * .05]);
     cx.gid = 80 + (sd > 0 ? 10 : 0); cap(cx, root, elbow, 1.2 * opt.bone, .9 * opt.bone, P.WG, {}); cap(cx, elbow, wrist, .9 * opt.bone, .7 * opt.bone, P.WG, {});
