@@ -798,7 +798,7 @@ function axeChop1(P, f){
   P.legL = [0, -.15, .3, .52, .22][f]; P.legR = -P.legL * .7; P.bob = [0, .35, -.1, -1.3, -.6][f];
   return P;
 }
-function humanPose(act, f, n, weapon){
+function humanPose(act, f, n, weapon, wk = {}){
   const P = {bob:0, legL:0, legR:0, liftL:0, liftR:0, armL:.1, armR:.1, outL:.16, outR:.16, elbL:.28, elbR:.28, lean:0, twist:0, hipX:0, fall:0, wpn:1.7,
     eyes:'open', sit:false, spin:0, draw:0, glow:0, ring:-1, mouth:0, kneel:0, head:0, sway:0, aura:-1, sparks:-1, lasso:null, ride:null, tuck:0, roll:0, noWeapon:false, breath:0};
   const ph = f / n * Math.PI * 2;
@@ -809,7 +809,8 @@ function humanPose(act, f, n, weapon){
     if (f === 5) P.eyes = 'closed';
     // (v338) a natural grip at rest: a sword or dagger hangs point-down and a little forward from the hand, a staff stands
     // upright beside you with its head up (it used to stick straight out toward the camera)
-    if (weapon === 'sword' || weapon === 'dagger'){ P.wpn = .75 + b * .04; P.elbR = .38 + b * .05; }
+    if (wk.two){ P.wpn = .55 + b * .03; P.elbR = .3; P.outR = .3; P.armL = .32; P.elbL = .5; P.outL = .05; }   // (v339) a greatsword is held low in front with both hands, its point near the ground
+    else if (weapon === 'sword' || weapon === 'dagger'){ P.wpn = .75 + b * .04; P.elbR = .38 + b * .05; }
     else if (weapon === 'staff'){ P.armR = .32 + b * .03; P.wpn = 2.78 - P.armR + .32; P.elbR = .5; P.outR = .55; }
   } else if (act === 'walk'){
     const s = Math.sin(ph), c = Math.cos(ph);
@@ -820,7 +821,7 @@ function humanPose(act, f, n, weapon){
     if (weapon === 'sword' || weapon === 'dagger') P.wpn = .8 - P.armR * .75;   // (v338) carried point-down: the blade keeps hanging while the arm swings
     else if (weapon === 'staff'){ P.armR = .3 + .2 * s; P.wpn = 2.78 - P.armR + .32; P.elbR = .5; P.outR = .55; }   // the staff stays upright, its foot swinging with the step
   } else if (act === 'attack'){
-    if (weapon === 'bow'){
+    if (weapon === 'bow' && !wk.xbow){
       P.armL = 1.5; P.outL = .05; P.elbL = .05; P.armR = [1.0, 1.35, 1.45, 1.2, .5][f]; P.elbR = [.6, 1.6, 2.2, .3, .3][f]; P.outR = .1; P.draw = [0, .6, 1, 0, 0][f];
       P.lean = [0, .05, .08, -.04, 0][f]; P.twist = [0, -.25, -.4, .1, 0][f]; P.arrow = f >= 1 && f <= 2; P.legL = .25; P.legR = -.2;
     } else if (weapon === 'shuriken'){
@@ -830,6 +831,16 @@ function humanPose(act, f, n, weapon){
       P.armL = [.4, 1.25, .9, .35, .2][f]; P.elbL = [.4, .15, .3, .5, .4][f]; P.outL = [.2, .1, .15, .25, .2][f];
       P.lean = [0, -.06, .14, .12, .03][f]; P.twist = [0, -.4, .3, .38, .06][f]; P.sway = [0, .4, -.5, -.5, -.1][f];
       P.legL = [0, -.1, .4, .36, .08][f]; P.legR = -P.legL * .6; P.bob = [0, .2, -.6, -.5, -.1][f]; P.thrown = f === 2 || f === 3;
+    } else if (weapon === 'dagger' && wk.twin){
+      // (v339) twin daggers: both blades drawn back crossed, the right cuts across, the left follows a beat later, then both settle
+      P.armR = [.5, 1.6, 1.3, .5, .4][f]; P.elbR = [.8, 1.7, .1, .3, .55][f]; P.outR = [.2, .9, -.4, -.3, .1][f]; P.wpn = [1.7, .9, 1.8, 1.6, 1.7][f];
+      P.armL = [.5, 1.6, 1.0, 1.4, .4][f]; P.elbL = [.8, 1.7, 1.2, .1, .55][f]; P.outL = [.2, .9, .4, -.4, .1][f];
+      P.lean = [0, -.1, .18, .22, .03][f]; P.twist = [0, -.2, .45, -.4, .05][f]; P.sway = [0, .3, -.6, .6, -.1][f];
+      P.legL = [0, -.1, .45, .5, .1][f]; P.legR = -P.legL * .6; P.bob = [0, .4, -.7, -.9, -.1][f];
+    } else if (weapon === 'bow' && wk.xbow){
+      // (v339) a crossbow is aimed, not drawn: raised to the shoulder and steadied, the shot kicks it up and the body back
+      P.armL = [1.3, 1.55, 1.75, 1.5, 1.2][f]; P.elbL = [.3, .1, .05, .15, .3][f]; P.outL = .05; P.armR = [1.2, 1.45, 1.65, 1.4, 1.1][f]; P.elbR = [.9, .7, .6, .8, .9][f]; P.outR = .1;
+      P.lean = [0, .04, -.14, -.06, 0][f]; P.twist = [0, -.12, -.05, -.08, 0][f]; P.bob = [0, -.3, .3, .1, 0][f]; P.legL = .3; P.legR = -.25; P.thrown = f >= 2 && f <= 3;
     } else if (weapon === 'dagger'){
       // one-handed knife slash: draw the blade up and back over the shoulder, cut down and across the body with the hips,
       // let it follow through low, then recover; the free hand guards in front, then swings back for balance
@@ -2424,7 +2435,7 @@ function newCanvas(w, h){ if (typeof OffscreenCanvas !== 'undefined' && !globalT
 function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
   if (kind === 'char'){
     const cfg = CHARS[key], A = ACTIONS[act], fs = Math.ceil(FS * K), F = new Frame(fs, fs), cx = new Ctx(F, -dir * Math.PI / 4, fs / 2, ANCHOR_Y * K, K * (cfg.bodyScale || 1));
-    let P = humanPose(act, f, A.n, cfg.weapon);
+    let P = humanPose(act, f, A.n, cfg.weapon, {twin:cfg.weapon === 'dagger' && !!cfg.offWeapon && !cfg.claw, xbow:!!cfg.xbow, two:!!cfg.twoHand && cfg.weapon === 'sword' && !cfg.axe && !cfg.spear && !cfg.mace});
     if (act === 'attack' && cfg.twoHand && cfg.weapon === 'sword') P = twoHandChop(P, f);   // (v197) greatswords and war axes: both hands, overhead chop
     else if (act === 'attack' && cfg.axe && cfg.weapon === 'sword') P = axeChop1(P, f);
     else if (act === 'attack' && cfg.spear && cfg.weapon === 'sword') P = spearThrust(P, f);
