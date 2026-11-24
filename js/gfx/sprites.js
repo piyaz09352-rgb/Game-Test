@@ -417,7 +417,7 @@ const ACTIONS = {
 };
 const MOB_ACTIONS = {
   idle:{n:4, fps:5, loop:true, th:'ยืน'}, walk:{n:4, fps:8, loop:true, th:'เดิน'}, attack:{n:4, fps:10, th:'โจมตี'},
-  hurt:{n:2, fps:8, th:'โดนตี'}, die:{n:4, fps:6, th:'ล้ม'},
+  hurt:{n:5, fps:16, th:'โดนตี', dur:[.6, 1, 1.2, 1, .8]}, die:{n:4, fps:6, th:'ล้ม'},   // (v340) five frames: struck, reels, shudders, recovers, settles (HURT_POSE)
   // (v304) a boss's skills have poses of their own, eight frames each (see BOSS_POSE); only a boss's sheet carries them (SPR.bossActs)
   bslam:{n:8, fps:10, boss:1, th:'ยกตัวทุบ'}, broar:{n:8, fps:10, boss:1, th:'คำราม'}, bcharge:{n:8, fps:10, boss:1, th:'ย่อแล้วพุ่ง'}, bcast:{n:8, fps:10, boss:1, th:'ร่าย'},
   // (v314) more of them: a breath / spit, a spin, a vanish
@@ -482,6 +482,36 @@ const BOSS_POSE = {
     return {act:'idle', f:0, ext:{head:-.6 * d, fold:.35 * d, spread:-.5 * d, sw:-.15 * d},
       post:p => [p[0] * (1 + d * .06), Math.max(.25, p[1] * (1 - d * .22)), p[2] - d * .8]}; }
 };
+/* (v340) the owner: a monster that is hit must act it out, not just be pushed. Five frames — struck, reels back, shudders,
+   recovers, settles a touch forward — through the same two layers as a boss's skill pose: the whole body (a turn back about
+   its feet, pushed back, a squash or a lift) and, for models that act with their own limbs, ext (gfx/beasts.js, dinos.js):
+     quad     head thrown up, a yelp, the front legs buckle, tail lashes, legs stagger
+     biped    pitches back hard, head up, jaw wide, wings jerk open
+     bird     wings flare up, head back, beak open, a hop back
+     serpent  the head recoils up and back with the jaw open, the body coils
+     bug      cowers: head down, legs tucked, flattened
+     squat    flinches into itself (a turtle's head goes in), squashed
+     float    tossed back and up, spinning a little
+     human    staggers a step back, arms up, head snapped back (humanPose 'hurt')
+   A boss only flinches (less than half as far). */
+const HURT_R = [.8, 1, .72, .3, -.08];
+function HURT_POSE(f, pl = 'float', n = 5, boss = false){
+  const i = Math.min(4, Math.round(n > 1 ? f / (n - 1) * 4 : 0)), r = HURT_R[i] * (boss ? .42 : 1), sh = i === 2 ? (boss ? .15 : .4) : 0;
+  const A = {quad:.2, biped:.27, bird:.2, serpent:.16, bug:.1, squat:.12, float:.36, human:.1}[pl] ?? .18;
+  const dz = -r * (pl === 'bug' || pl === 'squat' ? 1.5 : 2.3), lift = pl === 'float' ? r * 1.1 : pl === 'bird' ? Math.max(0, r) * .5 : 0;
+  const sq = pl === 'bug' ? .22 : pl === 'squat' ? .26 : pl === 'serpent' ? .12 : pl === 'quad' ? .07 : 0, spin = pl === 'float' ? r * .25 : 0;
+  const E = {
+    quad:{head:.75, jaw:.7, fold:.25, tail:.8, sw:-.3, spread:.4},
+    biped:{head:.85, jaw:.85, spread:.7, tail:.6, sw:-.3},
+    bird:{head:.6, jaw:.8, spread:1, tail:.5},
+    serpent:{head:.95, jaw:.9, curl:1, tail:.8},
+    bug:{head:-.5, jaw:.5, fold:.8, spread:-.5},
+    squat:{head:-.85, jaw:.35, fold:.5},
+    float:{head:.4, jaw:.6, spread:.5, curl:.4}}[pl] || {head:.5, jaw:.5};
+  const hr = Math.max(0, r), ext = {lun:-r * 2.4, tilt:r * .38, hurt:1}; for (const k in E) ext[k] = E[k] * hr;   // the limbs never swing past rest on the settle
+  return {ext, post:p => { let q = spin ? rotY(p, spin) : p; q = rotX([q[0], q[1], q[2] + 6], -r * A);
+    return [q[0] + (f % 2 ? sh : -sh), Math.max(.25, q[1] * (1 - Math.max(0, r) * sq) + lift), q[2] - 6 + dz]; }};
+}
 /* which body plan a monster is drawn with (set by BEAST.make / the dinosaur maker: mb.arch, mb.dplan, mb.fam) */
 function bpPlan(mb){ if (!mb) return 'float'; if (mb.plan) return mb.plan;
   const d = mb.dplan; let pl = 'float';
@@ -901,7 +931,10 @@ function humanPose(act, f, n, weapon, wk = {}){
     if (!moving && f === 3) P.eyes = 'closed';
     void s;
   } else if (act === 'hurt'){
-    P.lean = [-.25, -.15][f]; P.armL = [.6, .35][f]; P.armR = [.7, .4][f]; P.outL = P.outR = .5; P.elbL = P.elbR = .7; P.eyes = 'hurt'; P.bob = [.5, 0][f]; P.legL = .15; P.legR = -.1; P.head = [-.12, -.06][f]; P.sway = [.8, .4][f];
+    // (v340) any number of frames: a hero's is two (struck, easing), a monster in a human body plays five (HURT_POSE)
+    const R = n > 2 ? HURT_R[Math.min(4, Math.round(f / (n - 1) * 4))] : [1, .6][f], hr = Math.max(0, R);
+    P.lean = -.27 * R; P.armL = .25 + .42 * hr; P.armR = .3 + .48 * hr; P.outL = P.outR = .25 + .3 * hr; P.elbL = P.elbR = .35 + .4 * hr; P.eyes = hr > .25 ? 'hurt' : 'open';
+    P.bob = .5 * R; P.legL = .05 + .12 * hr; P.legR = -.04 - .14 * hr; P.head = -.13 * R; P.sway = .8 * R;
   } else if (act === 'die'){
     P.eyes = 'closed';
     if (f === 0){ P.lean = -.3; P.armL = P.armR = .7; P.outL = P.outR = .5; P.eyes = 'hurt'; }
@@ -2451,6 +2484,8 @@ function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
   let mAct = act, mF = f, mN = A.n; globalThis.BPX = null;
   if (BOSS_POSE[act]){ const pl = bpPlan(mb), q = BOSS_POSE[act](A.n > 1 ? f / (A.n - 1) : 0, pl); cx.post = q.post; mAct = q.act; mF = q.f; mN = MOB_ACTIONS[q.act].n;
     if (mb.native){ globalThis.BPX = q.ext; mAct = 'boss'; mF = 0; mN = 4; } else if (mb.limbs) globalThis.BPX = q.ext; }   // (v314) models that act with their own limbs read the pose's ext
+  if (act === 'hurt'){ const q = HURT_POSE(f, mb.human ? 'human' : bpPlan(mb), A.n, !!(typeof MOB !== 'undefined' && MOB[key] && MOB[key].boss)); cx.post = q.post;   // (v340)
+    if (!mb.human){ mF = f < 2 ? 0 : 1; mN = 2; if (mb.native || mb.limbs) globalThis.BPX = q.ext; } }
   if (mb.human && BOSS_POSE[act]){ const ha = BOSS_HUMAN[act], hn = ACTIONS[ha].n; cx.post = null; mAct = ha; mN = hn; mF = Math.min(hn - 1, Math.round(f / (A.n - 1) * (hn - 1))); }   // a human boss uses the people's own skill poses: slam, shout, lunge, invoke
   if (mb.human){ let HP = humanPose(mAct, mF, mN, mb.human.weapon); const hc = mb.human;   // (v330) a monster swings its own weapon the way a hero would
     if (mAct === 'attack' && hc.weapon === 'sword'){ const f5 = Math.min(4, Math.round(mF / Math.max(1, mN - 1) * 3)); HP = hc.twoHand ? twoHandChop(HP, f5) : hc.spear ? spearThrust(HP, f5) : hc.mace ? maceSmash(HP, f5) : hc.axe ? axeChop1(HP, f5) : HP; }

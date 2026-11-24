@@ -46,6 +46,7 @@ const BEAST = (() => {
     // (head down and forward, jaw wide, tail lashing) and recovers; a boss's skill pose (BPX below) replaces this
     if (act === 'attack' && !globalThis.BPX){ o.jaw = [0, .3, 1, .25][f]; o.head = [.15, .3, -.35, 0][f]; o.fold = [0, .5, .05, 0][f]; o.tail = [0, .4, .8, .2][f]; }
     const X = globalThis.BPX; if (X){ o.fold = X.fold || 0; o.head = X.head || 0; o.jaw = X.jaw || 0; o.curl = X.curl || 0; o.spread = X.spread ?? null; o.tail = X.tail || 0; if (act === 'boss') o.sw = X.sw || 0; if (o.jaw > .55) o.eyes = 'open'; }
+    if (X && X.hurt){ o.lun = X.lun; o.tilt = X.tilt; o.sw = X.sw || 0; o.eyes = 'hurt'; }   // (v340) a hit acted out with its limbs (HURT_POSE)
     return o;
   }
   /* two eyes painted on a head ellipsoid (n = surface normal) */
