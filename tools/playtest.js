@@ -55,6 +55,76 @@ async function playInPage(p, simMin){
   const mapAvg = id => { const ls = (MAPS[id].mobs || []).map(k => MOB[k] && !MOB[k].boss && MOB[k].lvl).filter(Boolean); return ls.length ? ls.reduce((a, b) => a + b, 0) / ls.length : null; };
   const goodMap = () => { let best = 1, gap = 1e9; MAPS.forEach((m, i) => { const a = mapAvg(i); if (a == null || MAPS[i].town) return; const g = Math.abs(a - (S.lvl + Math.max(0, p.risk) * .5)); if (g < gap){ gap = g; best = i; } }); return best; };
   const potId = () => ['redpot', 'orangepot', 'yellowpot', 'whitepot', 'elixirpot'].filter(k => S.inv[k]).pop();
+
+  // ---------- (v334) system checks: what a careful tester would notice is wrong ----------
+  out.sys = []; const sysSeen = new Set(); let lastAct = 'start', prev = null;
+  const sysBug = (k, msg, d) => { const key = k + '|' + msg; if (sysSeen.has(key) || out.sys.length >= 40) return; sysSeen.add(key); out.sys.push({k, msg, t:Math.round(t), map:MAP_ID, lvl:S.lvl, job:S.job, after:lastAct, ...(d || {})}); };
+  const fin = v => typeof v === 'number' && Number.isFinite(v);
+  const audit = () => {
+    if (!fin(S.bia) || S.bia < 0 || !Number.isInteger(S.bia)) sysBug('money', 'เงิน (เบี้ย) ผิดปกติ', {v:String(S.bia)});
+    for (const [k, v] of Object.entries(S.inv || {})){ if (!fin(v) || v < 1 || !Number.isInteger(v)) sysBug('inv', 'จำนวนของในกระเป๋าผิดปกติ', {id:k, v:String(v)}); if (!ITEMS[k] && !(typeof GEAR !== 'undefined' && GEAR[k])) sysBug('inv-unknown', 'มีของที่ไม่มีอยู่จริงในกระเป๋า', {id:k}); }
+    for (const [k, v] of Object.entries(S.cards || {})){ if (!fin(v) || v < 1 || !Number.isInteger(v)) sysBug('cards', 'จำนวนการ์ดผิดปกติ', {id:k, v:String(v)}); if (!CARDS[k]) sysBug('cards-unknown', 'มีการ์ดที่ไม่มีอยู่จริง', {id:k}); }
+    if (!fin(S.hp) || !fin(DER.maxhp) || S.hp > DER.maxhp + 1 || S.hp < 0) sysBug('hp', 'HP เกินค่าสูงสุดหรือผิดปกติ', {hp:String(S.hp), max:String(DER.maxhp)});
+    if (!fin(S.sp) || !fin(DER.maxsp) || S.sp > DER.maxsp + 1 || S.sp < 0) sysBug('sp', 'SP เกินค่าสูงสุดหรือผิดปกติ', {sp:String(S.sp), max:String(DER.maxsp)});
+    for (const k of ['maxhp', 'maxsp', 'atk', 'matk', 'def', 'mdef', 'hit', 'flee', 'crit', 'aspd']) if (k in DER && (!fin(DER[k]) || DER[k] < 0)) sysBug('stat', 'ค่าสเตตัสคำนวณผิด (NaN/ติดลบ)', {k, v:String(DER[k])});
+    for (const [k, v] of Object.entries(S.stats || {})) if (!Number.isInteger(v) || v < 1) sysBug('stats', 'ค่าสเตตัสพื้นฐานผิดปกติ', {k, v:String(v)});
+    if (!Number.isInteger(S.statPts) || S.statPts < 0) sysBug('statpts', 'แต้มสเตตัสคงเหลือผิดปกติ', {v:String(S.statPts)});
+    if (S.skPts != null && (!Number.isInteger(S.skPts) || S.skPts < 0)) sysBug('skpts', 'แต้มสกิลคงเหลือผิดปกติ', {v:String(S.skPts)});
+    if (!fin(S.exp) || S.exp < 0) sysBug('exp', 'EXP ผิดปกติ', {v:String(S.exp)});
+    else if (typeof nextBase === 'function' && S.lvl < 300 && S.exp >= nextBase(S.lvl) * 1.5) sysBug('exp-stuck', 'EXP เกินแต่เลเวลไม่ขึ้น', {exp:S.exp, need:nextBase(S.lvl)});
+    for (const [sl, id] of Object.entries(S.gear || {})){ if (!id) continue; if (!ITEMS[id] && !(typeof GEAR !== 'undefined' && GEAR[id])) sysBug('gear', 'สวมของที่ไม่มีอยู่จริง', {sl, id}); }
+    if (!fin(P.x) || !fin(P.y) || P.x < -50 || P.y < -50 || P.x > W + 50 || P.y > H + 50) sysBug('pos', 'ตัวละครหลุดออกนอกแผนที่', {x:String(P.x), y:String(P.y)});
+    for (const m of mobs){ if (m.dead) continue; if (!fin(m.hp) || !fin(m.x) || !fin(m.y) || m.hp > m.maxhp * 1.01 + 1){ sysBug('mob', 'มอนสเตอร์มีค่า HP/ตำแหน่งผิดปกติ', {type:m.type, hp:String(m.hp), max:String(m.maxhp)}); break; } }
+    if (prev){ const dz = S.bia - prev.bia, dl = S.lvl - prev.lvl;
+      if (dz > Math.max(60000, S.lvl * S.lvl * 60) && !/sell|reward|dungeon|tower/.test(lastAct)) sysBug('money-jump', 'เงินเพิ่มพรวดผิดสังเกต', {gain:dz, in:Math.round(t - prev.t) + 's'});
+      if (dl > 3) sysBug('level-jump', 'เลเวลขึ้นพรวดผิดสังเกต', {from:prev.lvl, to:S.lvl}); }
+    prev = {bia:S.bia, lvl:S.lvl, t}; };
+  const saveCheck = () => { try { save(); const raw = localStorage.getItem(slotKey(SLOT)); const o = JSON.parse(raw);
+      if (!o || o.lvl !== S.lvl || o.bia !== S.bia || o.job !== S.job || Object.keys(o.inv || {}).length !== Object.keys(S.inv || {}).length) sysBug('save', 'บันทึกเกมไม่ตรงกับสถานะจริง', {lvl:[o && o.lvl, S.lvl], bia:[o && o.bia, S.bia]}); }
+    catch (e) { sysBug('save', 'บันทึกเกมล้มเหลว', {e:String(e).slice(0, 100)}); } };
+  // ---------- (v334) things players do besides fighting, each checked for the right result ----------
+  out.acts = {};
+  const did = k => { out.acts[k] = (out.acts[k] || 0) + 1; lastAct = k; };
+  const near = id => { const n = NPCS.find(x => x.id === id); if (n && MAP_ID === 0){ P.x = n.x + 30; P.y = n.y + 10; } return n; };
+  const ACT = {
+    buyPots: async () => { const id = S.lvl < 30 ? 'orangepot' : S.lvl < 70 ? 'whitepot' : 'elixirpot', unit = qtyUnit(id, 'item'); if (!unit) return; const n = 1 + Math.floor(R() * 10), z0 = S.bia, i0 = S.inv[id] || 0;
+      did('buy'); qtyBuy(id, 'item', n); const paid = z0 - S.bia, got = (S.inv[id] || 0) - i0;
+      if (z0 >= unit * n){ if (paid !== unit * n || got !== n) sysBug('buy', 'ซื้อของแล้วเงิน/ของไม่ตรง', {id, n, unit, paid, got}); }
+      else if (paid !== 0 || got !== 0) sysBug('buy-poor', 'เงินไม่พอแต่ยังซื้อได้/เงินถูกหัก', {id, n, unit, have:z0, paid, got}); },
+    sellLoot: async () => { const id = Object.keys(S.inv).find(k => /^m_/.test(k) && typeof bslOk === 'function' && bslOk(k)); if (!id) return; const n = Math.max(1, Math.floor(S.inv[id] / 2)), unit = bslUnit(id), z0 = S.bia, i0 = S.inv[id];
+      did('sell'); const p0 = bslSellRaw(id, n); const gain = S.bia - z0, gone = i0 - (S.inv[id] || 0);
+      if (gain !== unit * n || gone !== n || p0 !== gain) sysBug('sell', 'ขายของแล้วเงิน/ของไม่ตรง', {id, n, unit, gain, gone}); if (unit > (ITEMS[id].sell || 0) * 3 + 5) sysBug('sell-price', 'ราคาขายสูงผิดปกติ', {id, unit, base:ITEMS[id].sell}); },
+    craft: async () => { const ok = RECIPES.filter(r => r.lv <= S.lvl && canCraft(r)); if (!ok.length) return; const r = pick(ok), z0 = S.bia, need = r.need.map(([id, n]) => [id, n, S.inv[id] || 0]), inv0 = new Set(Object.keys(S.inv)), o0 = S.inv[r.out] || 0;
+      did('craft'); doCraft(r.id);
+      if (z0 - S.bia !== r.bia) sysBug('craft-money', 'หลอมของแล้วเงินถูกหักไม่ตรง', {rid:r.id, want:r.bia, paid:z0 - S.bia});
+      for (const [id, n, h] of need) if (h - (S.inv[id] || 0) !== n) sysBug('craft-mats', 'หลอมของแล้ววัตถุดิบถูกใช้ไม่ตรง', {rid:r.id, id, want:n, used:h - (S.inv[id] || 0)});
+      const newKeys = Object.keys(S.inv).filter(k => !inv0.has(k)); if (r.kind === 'gear' ? !newKeys.some(k => ITEMS[k] && (ITEMS[k].base === r.out || k === r.out)) && (S.inv[r.out] || 0) <= o0 : (S.inv[r.out] || 0) - o0 !== r.n) sysBug('craft-out', 'หลอมของแล้วไม่ได้ของ', {rid:r.id}); },
+    refine: async () => { if (typeof rfTargets !== 'function') return; const ts = rfTargets().filter(id => id !== 'job'); if (!ts.length) return; const id = ts[0], info = rfInfo(id); if (!info || info.rf >= (typeof RF_MAX !== 'undefined' ? RF_MAX : 10)) return;
+      const c = rfCost(info, info.rf + 1); if (haveN(c.mat) < c.n){ const z = S.bia; fgBuy(c.mat, c.n); did('buy-ore'); if (S.bia === z) return; }
+      if (S.bia < c.z) return; const z0 = S.bia, m0 = haveN(c.mat), rf0 = info.rf; RF.luck = false; RF.guard = false; did('refine'); rfGo(id); await realWait(800);
+      const after = rfInfo(id), rf1 = after ? after.rf : null;
+      if (z0 - S.bia !== c.z || m0 - haveN(c.mat) !== c.n) sysBug('refine-cost', 'ตีบวกแล้วเงิน/แร่ถูกหักไม่ตรง', {want:[c.z, c.n], paid:[z0 - S.bia, m0 - haveN(c.mat)]});
+      if (!(rf1 === rf0 + 1 || rf1 === rf0 || rf1 === rf0 - 1)) sysBug('refine-result', 'ผลตีบวกผิดปกติ', {from:rf0, to:rf1}); },
+    card: async () => { if (typeof sockPut !== 'function') return; for (const [sl, key] of Object.entries(S.gear || {})){ if (!key || !ITEMS[key] || typeof sockData !== 'function') continue; const d = sockData(key); if (!d || (d.c || []).length >= (d.k | 0)) continue;
+        const c = Object.keys(S.cards || {}).find(c => CARDS[c] && CARDS[c].slot === ITEMS[key].slot && S.cards[c] > 0); if (!c) continue; const n0 = S.cards[c], k0 = (d.c || []).length;
+        did('card'); sockPut(c, key); const d1 = sockData(key); if ((S.cards[c] || 0) !== n0 - 1 || (d1.c || []).length !== k0 + 1) sysBug('card', 'ใส่การ์ดแล้วการ์ด/ช่องไม่ตรง', {c, key}); return; } },
+    tower: async () => { if (typeof twStart !== 'function' || S.lvl < (typeof TW_MIN !== 'undefined' ? TW_MIN : 10) || DG.active) return; const back = MAP_ID; did('tower'); if (!twStart(1)) return; await loadingWait(); run(1);
+      const f0 = TW.f, z0 = S.bia; let guard = 0; while (TW.active && t < simMin * 60 && guard++ < 120){ if (!P.target || P.target.dead){ const c = mobs.filter(m => !m.dead).sort((a, b) => Math.hypot(a.x - P.x, a.y - P.y) - Math.hypot(b.x - P.x, b.y - P.y)); P.target = c[0] || null; }
+        if (S.hp < DER.maxhp * .4){ const id = potId(); if (id && P.itemCd <= 0) useItem(id); } run(1); if (P.dead) break; audit(); }
+      const reached = TW.f; if (TW.active) twQuit(); await loadingWait(); run(1); if (P.dead){ const b = document.querySelector('[data-dth="town"]'); if (b) b.click(); run(1); }
+      if (!TW.active && DG.active) sysBug('tower-exit', 'ออกจากหอคอยแล้วยังค้างสถานะดันเจียน', {});
+      if (!P.dead && MAP_ID !== back && MAP_ID !== 0) sysBug('tower-return', 'ออกจากหอคอยแล้วไม่กลับที่เดิม', {back, now:MAP_ID});
+      out.towerFloors = Math.max(out.towerFloors || 0, reached - f0); },
+    dungeon: async () => { if (typeof dgEnter !== 'function' || DG.active || TW.active) return; const ok = DUNGEONS.filter(d => d.id !== 'tower' && d.min <= S.lvl); if (!ok.length) return; const D = ok[ok.length - 1], back = MAP_ID;
+      did('dungeon'); dgEnter(D.id, 'pt' + Math.floor(R() * 1e6), S.lvl, 1); await loadingWait(); run(1); if (!DG.active){ sysBug('dungeon-enter', 'เข้าดันเจียนไม่ได้', {did:D.id}); return; }
+      let guard = 0; while (DG.active && !DG.done && guard++ < 240){ if (!P.target || P.target.dead){ const c = mobs.filter(m => !m.dead).sort((a, b) => Math.hypot(a.x - P.x, a.y - P.y) - Math.hypot(b.x - P.x, b.y - P.y)); P.target = c[0] || null; }
+        if (S.hp < DER.maxhp * .4){ const id = potId(); if (id && P.itemCd <= 0) useItem(id); } run(1); if (P.dead) break; audit(); }
+      out.dungeons = (out.dungeons || 0) + (DG.done ? 1 : 0); if (DG.active && guard >= 240 && !P.dead) sysBug('dungeon-slow', 'ดันเจียนไม่จบใน 4 นาที (ตันหรือมอนไม่เกิด)', {did:D.id, wave:DG.wave, mobs:mobs.filter(m => !m.dead).length});
+      if (DG.active) dgExit(); await loadingWait(); run(1); if (P.dead){ const b = document.querySelector('[data-dth="town"]'); if (b) b.click(); run(1); }
+      if (DG.active) sysBug('dungeon-exit', 'ออกจากดันเจียนไม่ได้', {did:D.id}); if (!P.dead && MAP_ID !== back && MAP_ID !== 0) sysBug('dungeon-return', 'ออกจากดันเจียนแล้วไม่กลับที่เดิม', {back, now:MAP_ID}); },
+    market: async () => { if (typeof mkFee !== 'function') return; did('market'); for (const pz of [1, 100, 12345, 999999]){ const f = mkFee(pz); if (!fin(f) || f < 10 || f > pz * .02 + 10) sysBug('market-fee', 'ค่าธรรมเนียมตลาดคำนวณผิด', {price:pz, fee:f}); }
+      if (typeof mkValid === 'function'){ if (mkValid({i:'redpot', n:-1, p:10}) || mkValid({i:'redpot', n:1, p:0}) || mkValid({i:'__nope__', n:1, p:10})) sysBug('market-valid', 'ตลาดรับรายการขายที่ไม่ถูกต้อง', {}); } },
+  };
   const winFits = id => { const w = document.getElementById('win-' + (id === 'bag' ? 'equip' : id));   // the bag opens inside the equipment window
   if (!w || w.hidden) return 'not open'; const r = w.getBoundingClientRect(), u = el('ui').getBoundingClientRect();
     if (r.width < 40 || r.height < 40) return 'empty'; if (r.left < u.left - 3 || r.right > u.right + 3 || r.top < u.top - 3 || r.bottom > u.bottom + 3) return 'off screen'; return ''; };
@@ -101,6 +171,12 @@ async function playInPage(p, simMin){
     for (const sl of ['weapon', 'armor', 'head', 'pants', 'shoes', 'acc']){ const g = gp(sl); if (g) S.gear[sl] = g[0]; }
     const w = S.gear.weapon && ITEMS[S.gear.weapon]; if (!(w && w.st && w.st.hands === '2h')){ const g = gp('shield'); if (g) S.gear.shield = g[0]; }
     if (typeof usesArrows === 'function' && usesArrows()){ const a = GEAR_LIST.filter(g => g[1] === 'ammo' && g[4] <= lv && ammoFits(g[0])).sort((a, b) => b[4] - a[4])[0]; if (a){ S.inv[a[0]] = 99999; S.gear.ammo = a[0]; } }
+    // like a real player of this level: gear from drops (random rarity), refined +0..+7, a card or two in its sockets, some materials and ore
+    for (const sl of Object.keys(S.gear)){ const b = S.gear[sl]; if (!b || sl === 'ammo' || !ITEMS[b] || ITEMS[b].kind !== 'gear') continue; const key = makeInst(b, Math.min(3, Math.floor(R() * R() * 4))); S.gear[sl] = key;
+      const d = instStore()[key]; if (d){ d.rf = Math.floor(R() * (lv >= 100 ? 8 : lv >= 50 ? 6 : 4)); regInst(key, d); if (typeof sockRoll === 'function') try { sockRoll(key, 'mob'); } catch (e) {} } }
+    S.cards = S.cards || {}; const cs = Object.keys(CARDS); for (let i = 0; i < 4; i++){ const c = pick(cs); S.cards[c] = (S.cards[c] || 0) + 1; }
+    for (const k of (MAPS[goodMap()].mobs || [])) if (ITEMS['m_' + k]) S.inv['m_' + k] = 5 + Math.floor(R() * 20);
+    S.inv.ore = 3 + Math.floor(R() * 5); S.inv.ore_a = 3 + Math.floor(R() * 5);
     S.inv[lv < 30 ? 'orangepot' : lv < 70 ? 'whitepot' : 'elixirpot'] = 40; S.inv[lv < 70 ? 'bluepot' : 'bigbluepot'] = 20; S.bia = Math.max(S.bia || 0, lv * 2000);
     derive(); S.hp = DER.maxhp; S.sp = DER.maxsp; out.jobs = [S.job]; renderHotbar && renderHotbar();
     warpTo(goodMap()); out.warps++; await loadingWait(); run(.5); }
@@ -120,6 +196,11 @@ async function playInPage(p, simMin){
     if (t > nextAfk){ const s = 15 + R() * 60; P.target = null; P.tx = null; run(s); out.afkSec += s; nextAfk = t + 120 + R() * 400 / Math.max(.05, p.afk * 10); continue; }
     // potions
     if (S.hp < DER.maxhp * p.potAt && R() > p.forget){ const id = potId(); if (id){ useItem(id); out.potions++; } }
+    // (v334) system checks every few seconds, a save check now and then, and a non-fighting activity every couple of minutes
+    if (t - (out._aT || 0) > 5){ out._aT = t; audit(); }
+    if (t - (out._sT || 0) > 120){ out._sT = t; saveCheck(); }
+    if (t > (out._nextAct || 60)){ out._nextAct = t + 50 + R() * 80; const w = p.startLv > 1 ? ['buyPots', 'sellLoot', 'craft', 'refine', 'card', 'tower', 'dungeon', 'market'] : ['buyPots', 'sellLoot', 'craft', 'market', 'card'];
+      const a = pick(w); try { await ACT[a](); } catch (e) { issue('act-error', {a, e:String(e).slice(0, 140)}); } audit(); }
     // points, job
     if (S.statPts > 0 && R() < .15) await spendStats();
     if (S.skPts > 0 && R() < .1) await spendSkills();
@@ -210,5 +291,15 @@ function report(rows, mins){
   for (const [m, n] of Object.entries(byMap).sort((a, b) => b[1] - a[1]).slice(0, 10)){ const ex = st.find(s => String(s.map) === m); L.push(`- แมพ ${m}: ${n} ครั้ง · เช่น ${JSON.stringify(ex)}`); }
   const wb = {}; for (const r of ok) for (const w of r.winsBad || []) wb[w] = (wb[w] || 0) + 1;
   L.push('', '## หน้าต่างที่เปิดไม่ขึ้นหรือล้นจอ', ''); for (const [w, n] of Object.entries(wb)) L.push(`- ${w}: ${n} ครั้ง`); if (!Object.keys(wb).length) L.push('- ไม่มี');
+  // (v334) system checks and activities
+  const sys = {}; for (const r of ok) for (const b of (r.sys || [])){ const k = b.k + ' · ' + b.msg; (sys[k] = sys[k] || {n:0, ex:b}).n++; }
+  L.push('', `## บัคระบบที่บอทตรวจเจอ (${Object.keys(sys).length} แบบ)`, '');
+  if (!Object.keys(sys).length) L.push('- ไม่มี: เงิน ของในกระเป๋า การ์ด HP/SP สเตตัส EXP อุปกรณ์ ตำแหน่ง มอน การบันทึกเกม การซื้อ-ขาย หลอม ตีบวก ใส่การ์ด หอคอย ดันเจียน และค่าธรรมเนียมตลาด ถูกต้องทั้งหมด');
+  for (const [k, v] of Object.entries(sys).sort((a, b) => b[1].n - a[1].n)) L.push(`- **${k}** ${v.n} ครั้ง · เช่น ${JSON.stringify(v.ex)}`);
+  const acts = {}; for (const r of ok) for (const [k, n] of Object.entries(r.acts || {})) acts[k] = (acts[k] || 0) + n;
+  const ACTN = {buy:'ซื้อยา', sell:'ขายของ', craft:'หลอมของ', refine:'ตีบวก', 'buy-ore':'ซื้อแร่', card:'ใส่การ์ด', tower:'ลงหอคอย', dungeon:'ลงดันเจียน', market:'ตรวจตลาด'};
+  L.push('', '## กิจกรรมนอกการต่อสู้ที่บอททำ (ทุกครั้งถูกตรวจผล)', '', Object.entries(acts).map(([k, n]) => `${ACTN[k] || k} ${n}`).join(' · ') || '-');
+  const tf = ok.filter(r => r.towerFloors != null), dg = ok.reduce((a, r) => a + (r.dungeons || 0), 0), bd = ok.reduce((a, r) => a + (r.bossDodges || 0), 0);
+  if (tf.length) L.push(`- หอคอย: ขึ้นได้เฉลี่ย ${avg(tf, r => r.towerFloors).toFixed(1)} ชั้นต่อรอบ (${tf.length} บอท)`); if (dg) L.push(`- ดันเจียนผ่าน ${dg} ครั้ง`); if (bd) L.push(`- ถอยหนีเมื่อบอสเตือน ${bd} ครั้ง`);
   return L.join('\n') + '\n';
 }
