@@ -2215,13 +2215,15 @@ function heroKey(job, gear = {}, look = null){
   const base = CHARS[job]; if (!base) return job;
   const ids = [gear.head, gear.armor, gear.weapon, gear.acc, gear.shield, gear.pants, gear.shoes, gear.mask].map(x => x || ''), lk = lookKey(look);
   while (ids.length > 4 && !ids[ids.length - 1]) ids.pop();   // old keys stay the same when the new places are empty
-  if (!ids.some(Boolean) && lk === 'm00') return job;
+  if (!ids.some(Boolean) && lk === 'm00' && !(typeof JOBS !== 'undefined' && JOBS[job] && base.hat)) return job;
   const key = job + '|' + ids.join('|') + '|' + lk;
   if (CHARS[key]) return key;
   const cfg = {...base};
   if (lk !== 'm00') applyLook(cfg, look);
   cfg.rfTier = look && look.rft > 0 ? Math.min(4, look.rft | 0) : 0;   // a refined weapon glows (sys/refinefx.js picks the tier)
   cfg.sheathed = !!(look && look.sh);   // (v159) out of combat: weapon and shield carried on the back
+  // (v337) the owner: no hat comes with the class any more (headbands, caps, crowns, crests…); a worn headgear still shows its own
+  if (typeof JOBS !== 'undefined' && JOBS[job]){ delete cfg.hat; delete cfg.hatTex; }
   for (const id of ids){ const lk = GEAR_LOOK[id]; if (lk) Object.assign(cfg, lk); }
   // a wardrobe top re-colours the skirt too (the class skirt keeps its cut; heroines get one in the costume colours)
   if (cfg.cosTop){ if (base.skirt) cfg.skirt = [...base.skirt.slice(0, 4), cfg.skirtM || cfg.top, cfg.skirtT || cfg.belt || cfg.top];
