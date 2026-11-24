@@ -417,7 +417,8 @@ const ACTIONS = {
 };
 const MOB_ACTIONS = {
   idle:{n:4, fps:5, loop:true, th:'ยืน'}, walk:{n:4, fps:8, loop:true, th:'เดิน'}, attack:{n:4, fps:10, th:'โจมตี'},
-  hurt:{n:5, fps:16, th:'โดนตี', dur:[.6, 1, 1.2, 1, .8]}, die:{n:4, fps:6, th:'ล้ม'},   // (v340) five frames: struck, reels, shudders, recovers, settles (HURT_POSE)
+  hurt:{n:5, fps:16, th:'โดนตี', dur:[.6, 1, 1.2, 1, .8]}, die:{n:7, fps:10, th:'ล้ม', dur:[.7, .9, 1, 1, .9, 1.1, 1.4]},   // (v340) hurt: struck, reels, shudders, recovers, settles · (v341) die: seven frames, each body its own way (DIEX)
+  // (v340) five frames: struck, reels, shudders, recovers, settles (HURT_POSE)
   // (v304) a boss's skills have poses of their own, eight frames each (see BOSS_POSE); only a boss's sheet carries them (SPR.bossActs)
   bslam:{n:8, fps:10, boss:1, th:'ยกตัวทุบ'}, broar:{n:8, fps:10, boss:1, th:'คำราม'}, bcharge:{n:8, fps:10, boss:1, th:'ย่อแล้วพุ่ง'}, bcast:{n:8, fps:10, boss:1, th:'ร่าย'},
   // (v314) more of them: a breath / spit, a spin, a vanish
@@ -2342,7 +2343,7 @@ function slimeModel(big){
     if (act === 'walk'){ hop = Math.max(0, Math.sin(ph)) * 4; sq = 1 + Math.cos(ph) * .12; }
     if (act === 'attack'){ sq = [1.15, .8, 1.2, 1][f]; lun = [0, -1, 5, 1][f]; hop = [0, 0, 2, 0][f]; }
     if (act === 'hurt'){ const H = globalThis.HURTX, i = H ? H.i : f * 2; sq = [1.38, .76, 1.18, .94, 1.02][i]; eyes = i < 3 ? 'closed' : 'hurt'; }   // (v340) squash, spring, wobble, settle
-    if (act === 'die'){ melt = [.15, .45, .7, .9][f]; eyes = 'closed'; }
+    if (act === 'die'){ const D = globalThis.DIEX; melt = D ? Math.min(.92, D.k * 1.05) : [.15, .45, .7, .9][f]; eyes = 'closed'; }
     const body = big ? M.slimeRoyal : M.slime;
     const r = 9 * S, h = (1 - melt) / sq;
     const yc = (r * .82 * h) + hop * S;
@@ -2376,7 +2377,7 @@ function hareModel(cx, act, f, n){
   if (act === 'walk') hop = Math.max(0, Math.sin(ph)) * 4.5;
   if (act === 'attack'){ lun = [0, -2, 6, 1][f]; hop = [0, 1, 3, 0][f]; tilt = [0, -.2, .35, 0][f]; }
   if (act === 'hurt'){ tilt = -.3; eyes = 'hurt'; lun = -1.5; }
-  if (act === 'die'){ fall = [.3, .8, 1.3, 1.55][f]; eyes = 'closed'; }
+  if (act === 'die'){ fall = globalThis.DIEX ? 1.55 * Math.min(1, Math.max(0, (globalThis.DIEX.k - .15) / .6)) ** 1.6 : [.3, .8, 1.3, 1.55][f]; eyes = 'closed'; }
   if (fall) cx.pre = p => { const q = rotZ([p[0], p[1] - 6, p[2]], fall); return [q[0], Math.max(.5, q[1] + 6 - fall * 3), q[2]]; };
   const T = p => { const v = rotX([p[0], p[1] - 6, p[2]], -tilt); return [v[0], v[1] + 6 + hop, v[2] + lun]; };
   cx.gid = 1; ell(cx, T([0, 6.5, -2.5]), 7.4, 6.4, M.fur);
@@ -2405,7 +2406,7 @@ function boarModel(cx, act, f, n){
   if (act === 'walk'){ sw = Math.sin(ph) * .55; bob = Math.abs(Math.cos(ph)) * .8; }
   if (act === 'attack'){ lun = [0, -2.5, 7, 2][f]; head = [0, .25, -.35, 0][f]; sw = [0, -.3, .5, .1][f]; }
   if (act === 'hurt'){ lun = -2; head = .3; eyes = 'hurt'; }
-  if (act === 'die'){ fall = [.35, .9, 1.35, 1.55][f]; eyes = 'closed'; }
+  if (act === 'die'){ fall = globalThis.DIEX ? 1.55 * Math.min(1, Math.max(0, (globalThis.DIEX.k - .15) / .6)) ** 1.6 : [.35, .9, 1.35, 1.55][f]; eyes = 'closed'; }
   if (fall) cx.pre = p => { const q = rotZ([p[0], p[1] - 10, p[2]], fall); return [q[0], Math.max(.5, q[1] + 10 - fall * 4.5), q[2]]; };
   const T = p => [p[0], p[1] + bob, p[2] + lun];
   for (const [s, z, k] of [[-1, 6, 1], [1, 6, -1], [-1, -6.5, -1], [1, -6.5, 1]]){ cx.gid = 20 + s + z; const top = T([s * 5, 9, z]); cap(cx, top, add(top, rotX([0, -8.5, 0], sw * k)), 2.5, 2.1, M.boar, {tex:(nn, lo, q, t) => (t > .78 ? {m:M.lanternWood} : undefined)}); }
@@ -2431,7 +2432,7 @@ function lanternModel(cx, act, f, n){
   if (act === 'walk'){ sway = Math.sin(ph) * .2; }
   if (act === 'attack'){ lun = [0, -2, 7, 2][f]; sway = [0, -.25, .35, 0][f]; }
   if (act === 'hurt'){ sway = -.3; eyes = 'hurt'; }
-  if (act === 'die'){ dim = [.2, .45, .7, .9][f]; fl = -dim * 14; eyes = 'closed'; }
+  if (act === 'die'){ dim = globalThis.DIEX ? globalThis.DIEX.k * .95 : [.2, .45, .7, .9][f]; fl = -dim * 14; eyes = 'closed'; }
   const base = 21 + fl;
   cx.pre = p => { const v = rotX([p[0], p[1] - base, p[2]], sway); return [v[0], Math.max(.5, v[1] + base), v[2] + lun]; };
   cx.gid = 1;
@@ -2497,13 +2498,14 @@ function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
   let mAct = act, mF = f, mN = A.n; globalThis.BPX = null;
   if (BOSS_POSE[act]){ const pl = bpPlan(mb), q = BOSS_POSE[act](A.n > 1 ? f / (A.n - 1) : 0, pl); cx.post = q.post; mAct = q.act; mF = q.f; mN = MOB_ACTIONS[q.act].n;
     if (mb.native){ globalThis.BPX = q.ext; mAct = 'boss'; mF = 0; mN = 4; } else if (mb.limbs) globalThis.BPX = q.ext; }   // (v314) models that act with their own limbs read the pose's ext
+  if (act === 'die'){ const k = A.n > 1 ? f / (A.n - 1) : 1; globalThis.DIEX = {k, i:f}; mF = Math.min(3, Math.round(k * 3)); mN = 4; }   // (v341) every model reads how far its death has gone (k 0..1); old 4-frame models get the nearest of their frames
   if (act === 'hurt'){ const q = HURT_POSE(f, mb.human ? 'human' : hurtPlan(mb), A.n, !!(typeof MOB !== 'undefined' && MOB[key] && MOB[key].boss)); cx.post = q.post;   // (v340)
     if (!mb.human){ mF = f < 2 ? 0 : 1; mN = 2; globalThis.HURTX = {k:q.k, i:q.i}; if (mb.native || mb.limbs) globalThis.BPX = q.ext; } }
   if (mb.human && BOSS_POSE[act]){ const ha = BOSS_HUMAN[act], hn = ACTIONS[ha].n; cx.post = null; mAct = ha; mN = hn; mF = Math.min(hn - 1, Math.round(f / (A.n - 1) * (hn - 1))); }   // a human boss uses the people's own skill poses: slam, shout, lunge, invoke
   if (mb.human){ let HP = humanPose(mAct, mF, mN, mb.human.weapon); const hc = mb.human;   // (v330) a monster swings its own weapon the way a hero would
     if (mAct === 'attack' && hc.weapon === 'sword'){ const f5 = Math.min(4, Math.round(mF / Math.max(1, mN - 1) * 3)); HP = hc.twoHand ? twoHandChop(HP, f5) : hc.spear ? spearThrust(HP, f5) : hc.mace ? maceSmash(HP, f5) : hc.axe ? axeChop1(HP, f5) : HP; }
-    drawHuman(cx, mb.human, HP); const img = finish(F, K); if (mb.human.paint && cx.head) paintHead(img, F, cx); img.wsegs = cx.wsegs || null; return img; }   // (v166) where its weapon is, for the boss weapon glow
-  try { mb.model(cx, mAct, mF, mN); } finally { globalThis.BPX = null; globalThis.HURTX = null; }
+    globalThis.DIEX = null; drawHuman(cx, mb.human, HP); const img = finish(F, K); if (mb.human.paint && cx.head) paintHead(img, F, cx); img.wsegs = cx.wsegs || null; return img; }   // (v166) where its weapon is, for the boss weapon glow
+  try { mb.model(cx, mAct, mF, mN); } finally { globalThis.BPX = null; globalThis.HURTX = null; globalThis.DIEX = null; }
   return finish(F, K);
 }
 /* lazy sheet: each action is rasterised the first time it is drawn (or during warm-up) */

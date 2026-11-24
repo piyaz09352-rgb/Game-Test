@@ -40,6 +40,6 @@ window.addEventListener('focus', () => { if (performance.now() - last > 500) las
 /* a boss's sprite is the biggest there is: paint its frames in spare time the moment it appears, not mid-swing */
 { const _sm = spawnMob, warmed = new Set();
   spawnMob = function(type, x, y, opt){ const m = _sm.apply(this, arguments);
-    if (m && MOB[type] && MOB[type].boss && !warmed.has(type) && typeof SHEETS !== 'undefined' && SHEETS && SHEETS[type]){ warmed.add(type); SPR.warm(SHEETS, ['idle', 'walk', 'attack', 'hurt'].map(a => [type, a])); }
+    if (m && MOB[type] && MOB[type].boss && !warmed.has(type) && typeof SHEETS !== 'undefined' && SHEETS && SHEETS[type]){ warmed.add(type); SPR.warm(SHEETS, ['idle', 'walk', 'attack', 'hurt', 'die'].map(a => [type, a])); }
     return m; };
 }
