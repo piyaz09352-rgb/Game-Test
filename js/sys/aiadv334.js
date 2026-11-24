@@ -30,10 +30,16 @@ function aiaHero(r, lv){
   const gear = {}; if (typeof GEAR_LIST !== 'undefined') for (const sl of ['weapon', 'armor', 'head', 'shoes']){
     const ok = GEAR_LIST.filter(g => g[1] === sl && g[4] <= lv && ITEMS[g[0]] && !(ITEMS[g[0]].st && ITEMS[g[0]].st.line && ITEMS[g[0]].st.line !== line)).sort((a, b) => b[4] - a[4]);
     if (ok.length) gear[sl] = ok[Math.min(ok.length - 1, (r() * 2) | 0)][0]; }
+  // (v335) body armour of the line's kind (heavy, light or robe), and now and then a full line set (it glows)
+  const AK = {blade:'heavy', dogfolk:'heavy', merchant:'heavy', ranger:'light', rogue:'light', ninja:'light', catfolk:'light', muay:'light', rune:'robe', healer:'robe', summoner:'robe', occult:'robe'}[line];
+  if (AK && typeof GEAR_LIST !== 'undefined'){ const ak = GEAR_LIST.filter(g => g[1] === 'armor' && g[4] <= lv && ITEMS[g[0]] && ITEMS[g[0]].akind === AK).sort((a, b) => b[4] - a[4])[0]; if (ak) gear.armor = ak[0]; }
+  let setLine = null;
+  if (lv >= 40 && r() < .3 && typeof g10SetIds === 'function'){ const ids = g10SetIds(line).filter(id => ITEMS[id].lv <= lv).sort((a, b) => ITEMS[b].lv - ITEMS[a].lv); const top = ids.length ? ITEMS[ids[0]].st.cset : null;
+    const pieces = ids.filter(id => ITEMS[id].st.cset === top); if (pieces.length >= 4){ for (const id of pieces) gear[ITEMS[id].slot] = id; setLine = line; } }
   const sex = r() < .5 ? 'm' : 'f', HC = typeof HAIR_COLORS !== 'undefined' ? HAIR_COLORS.filter(Boolean) : ['hairBlack'];
   const look = {sex, hair:(r() * 12) | 0, color:HC[(r() * HC.length) | 0]};
   if (gear.weapon && typeof canWield === 'function'){ const s0 = S.job; try { S.job = job; if (!canWield(ITEMS[gear.weapon])) delete gear.weapon; } finally { S.job = s0; } }
-  const wt = (JOBS[job].weapon || {}).type; return {job, gear, look, hlv:lv, ranged:wt === 'bow' || wt === 'staff' || wt === 'shuriken' || /rune|healer|summoner|occult/.test(line)};
+  const wt = (JOBS[job].weapon || {}).type; return {job, gear, look, hlv:lv, setLine, line, ranged:wt === 'bow' || wt === 'staff' || wt === 'shuriken' || /rune|healer|summoner|occult/.test(line)};
 }
 function aiaPoints(id){
   if (aiaTown(id) && typeof tlPoints === 'function'){ const p = tlPoints(id); if (p.length > 4) return p; }
@@ -122,3 +128,52 @@ if (typeof renderSettings === 'function'){ const _rs = renderSettings; renderSet
   row.innerHTML = `<span><b>${L('นักผจญภัย AI ในเกม', 'AI adventurers')}</b><small>${L('นักผจญภัยที่คอมพิวเตอร์เล่น ใช้ชีวิตอยู่ในโลกเดียวกับคุณ', 'Computer-run adventurers who share your world')}</small></span><input type="checkbox" id="set-aiAdv" data-set="aiAdv" ${SETTINGS.aiAdv !== false ? 'checked' : ''}><i class="sw"></i>`;
   const g = pane.querySelector('#set-guideArrow'); const anchor = g ? g.closest('label') : null; if (anchor) anchor.after(row); else pane.appendChild(row); }; }
 document.addEventListener('change', e => { if (e.target && e.target.id === 'set-aiAdv') AIA.map = -1; });
+
+/* ---------- (v335) talk to them ---------- */
+// tap an AI adventurer: it turns to you and answers (your hero walks over as for any tap)
+const AIA_TALK = [['สวัสดี! วันนี้อากาศดีนะ', 'Hello! Lovely day, isn\'t it?'], ['ระวังบอสในทุ่งด้วยล่ะ มันตาไวมาก', 'Mind the field bosses, they have sharp eyes'],
+  ['ช่างตีเหล็กในเมืองมีของดีเยอะเลย', 'The smith in town has good stuff'], ['ลงดันเจียนคนเดียวไม่ไหวหรอก ชวนกันไปดีกว่า', 'Dungeons are no place to go alone, let\'s team up'],
+  ['ชุดเกราะแต่ละแบบเหมาะกับคนละสายนะ', 'Each kind of armour suits a different path'], ['เคยเห็นคนใส่ชุดประจำสายครบชุดไหม เรืองแสงสวยมาก', 'Ever seen a full line set? It glows'],
+  ['ขอให้ดรอปดีนะ!', 'Good drops to you!'], ['เดี๋ยวจะไปตีบวกอาวุธ ขอให้ติดเถอะ', 'Off to refine my weapon, wish me luck'], ['เหนื่อยแล้ว ขอนั่งพักแป๊บ', 'Tired, taking a seat']];
+function aiaAt(p){ if (AIA.map !== MAP_ID) return null; let best = null, bd = 1e9; for (const a of AIA.list){ const dx = Math.abs(p.x - a.x), dy = p.y - a.y; if (dx > 16 || dy < -46 || dy > 8) continue; const d = Math.hypot(dx, dy + 20); if (d < bd){ bd = d; best = a; } } return best; }
+function aiaTalk(a){ a.state = 'idle'; a.tx = null; a.foe = null; a.wait = 4; a.moving = false; a.act = 'idle'; a.dir = SPR.dirFromVec(P.x - a.x, P.y - a.y); a.sayCd = 6;
+  aiaSay(a, AIA_TALK[(Math.random() * AIA_TALK.length) | 0]); if (typeof SFX !== 'undefined') SFX.play('chat'); }
+if (typeof ghostAt === 'function'){ const _ga = ghostAt; ghostAt = function(p){ const r = _ga.apply(this, arguments); if (!r){ const a = aiaAt(p); if (a) aiaTalk(a); } return r; }; }
+
+/* ---------- (v335) an AI party for dungeons ---------- */
+/* Going into a dungeon without a party, the gatekeeper now offers three AI adventurers of your level to come along.
+   They follow you, fight beside you (each about as strong as you), and their blows count as your party's: the
+   guardian falls to the team and the reward is yours as usual. They stay in the dungeon when you leave. */
+const AIC = {list:[], on:false};
+function aicSpawn(){ AIC.list = []; const r = aiaRng((Date.now() / 1000) | 0), own = jobChain()[1];
+  for (let i = 0; i < 3; i++){ let h = aiaHero(r, Math.max(1, S.lvl)); for (let k = 0; k < 4 && h.line === own; k++) h = aiaHero(r, Math.max(1, S.lvl));
+    const a = Math.PI * 2 * i / 3; AIC.list.push({name:AIA_NAMES[(r() * AIA_NAMES.length) | 0], lv:S.lvl, ...h, x:P.x + Math.cos(a) * 40, y:P.y + Math.sin(a) * 30, dir:0, animT:r() * 3, act:'idle', moving:false, hitCd:1 + i * .3, foe:null, spd:70, fade:0}); }
+  AIC.on = true; }
+function aicUpd(dt){
+  if (!AIC.on) return; if (!(typeof DG !== 'undefined' && DG.active) || !DG.aiParty){ AIC.on = false; AIC.list = []; return; }
+  const pow = Math.max(DER.atk || 0, DER.matk || 0);
+  AIC.list.forEach((a, i) => { a.animT += dt; a.hitCd -= dt; a.fade = Math.min(1, a.fade + dt * 1.5);
+    if (a.foe && (a.foe.dead || !mobs.includes(a.foe))) a.foe = null;
+    if (a.foe && a.foe.def && a.foe.def.boss && mobs.some(m => !m.dead && !m.def.boss && Math.hypot(m.x - P.x, m.y - P.y) < 300)) a.foe = null;   // guards on you first, like a real party
+    if (!a.foe){ let best = null, bd = 1e9; for (const m of mobs){ if (m.dead || m.vanish) continue; const d = Math.hypot(m.x - P.x, m.y - P.y) + (m.def && m.def.boss ? 400 : 0); if (d < bd && d < 800){ bd = d; best = m; } } a.foe = best; }
+    const tx = a.foe ? a.foe.x : P.x + Math.cos(i * 2.1) * 46, ty = a.foe ? a.foe.y : P.y + Math.sin(i * 2.1) * 34, reach = a.foe ? (a.ranged ? 130 : 30) : 20;
+    const d = Math.hypot(tx - a.x, ty - a.y);
+    if (d > reach){ const ox = a.x, oy = a.y; navTo(a, tx, ty, a.spd * (d > 300 ? 1.6 : 1), dt, reach - 4); if (a.navFail){ a.navFail = false; a.x = P.x; a.y = P.y; }
+      a.moving = Math.hypot(a.x - ox, a.y - oy) > .01; if (a.moving) a.dir = SPR.dirFromVec(a.x - ox, a.y - oy); a.act = a.moving ? 'walk' : 'idle'; }
+    else if (a.foe){ a.moving = false; a.dir = SPR.dirFromVec(a.foe.x - a.x, a.foe.y - a.y);
+      if (a.hitCd <= 0){ a.hitCd = 1 + Math.random() * .4; a.act = 'attack'; a.animT = 0; const m = a.foe, dmg = Math.max(1, Math.round(pow * (1.05 + Math.random() * .3)));
+        m.hp -= dmg; m.flash = .12; m.hurtT = .2; if (typeof addText === 'function') addText(m.x, m.y - (MOB_H[m.type] || 30) - 6, String(dmg), '#bfe8ff', 11);
+        if (m.hp <= 0 && !m.dead){ m.hp = 0; killMob(m); if (typeof dgKilled === 'function') dgKilled(m); a.foe = null; } }
+      else if (a.animT > .45) a.act = 'idle'; }
+    else { a.moving = false; a.act = 'idle'; } }); }
+EV.on('tick', dt => { try { if (typeof DG !== 'undefined' && DG.active && DG.aiParty && !AIC.on && !DG.entering) aicSpawn(); aicUpd(dt); } catch (e) { if (!AIC.err){ AIC.err = true; console.warn('aiparty', e); } } });
+{ const _dg = drawGhostsInto; drawGhostsInto = function(ents, g){ _dg.apply(this, arguments); if (!AIC.on) return;
+    for (const a of AIC.list){ const x = a.x - cam.x, y = a.y - cam.y; if (x < -60 || x > VW + 60 || y < -80 || y > VH + 40) continue; const sh = heroSheet(a.job, a.gear, a.look); if (!sh) continue; const act = sh.index[a.act] ? a.act : 'idle';
+      ents.push({y:a.y, f:() => { g.save(); g.globalAlpha *= a.fade; shadowW(g, x, y, 9); SPR.draw(g, sh, act, a.dir, a.animT, x, y); g.restore(); }}); } }; }
+{ const _dt = drawGhostTags; drawGhostTags = function(){ _dt.apply(this, arguments); if (!AIC.on || SETTINGS.oName === false) return;
+    for (const a of AIC.list){ const x = sx(a.x), y = sy(a.y); if (x < -100 || x > SW + 100 || y < -80 || y > SH + 80) continue; const z = clamp(PX / 2, .5, 2.6);
+      nameTag(x, sy(a.y - HEAD_H(false)) - 6 * z, `AI · ${a.name} Lv${a.lv}`, '#dff6ff', 'rgba(24,60,96,.82)'); } }; }
+// with three companions beside you the dungeon's monsters spread their blows over the whole team: you take a share of them
+if (typeof HK !== 'undefined' && HK.atkMul) HK.atkMul.push((m, mult) => (AIC.on && AIC.list.length && typeof DG !== 'undefined' && DG.active && DG.aiParty ? mult * .4 : mult));
+// a boss's real blows go through bossPunch (bosshard.js), not the monster damage hook above: the same share applies
+if (typeof bossPunch === 'function'){ const _bp = bossPunch; bossPunch = function(){ const v = _bp.apply(this, arguments); return AIC.on && AIC.list.length && typeof DG !== 'undefined' && DG.active && DG.aiParty ? Math.max(1, Math.round(v * .4)) : v; }; }
