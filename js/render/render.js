@@ -91,7 +91,7 @@ function playerAct(){
 function mobAnim(m){
   if (m.dead) return ['die', m.deadT];
   if (m.atkT < .4) return ['attack', m.atkT];
-  if (m.hurtT > 0) return ['hurt', .25 - m.hurtT];
+  if (m.hurtT > 0) return ['hurt', .3 - m.hurtT];
   if (m.moving) return ['walk', T + m.id * .37];
   return ['idle', T + m.id * .37];
 }

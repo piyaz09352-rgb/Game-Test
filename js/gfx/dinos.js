@@ -43,6 +43,8 @@ const DINO = (() => {
     if (act === 'die'){ o.fall = [.35, .9, 1.35, 1.55][f]; o.eyes = 'closed'; o.jaw = .25; }
     // (v314) a boss's skill pose (gfx/sprites.js BOSS_POSE ext): the head goes up or down, the jaw opens, wings spread
     const X = globalThis.BPX; if (X){ o.hd = (X.head || 0) * 2.6; o.jaw = Math.max(o.jaw, X.jaw || 0); if (X.spread != null) o.flap = Math.max(-1, Math.min(1, X.spread)); o.tailK = X.tail || 0; }
+    if (X && X.hurt){ o.lun = X.lun * 1.3; o.tilt = X.tilt; o.eyes = 'hurt'; o.hd = (X.head || 0) * 4.4; o.jaw = Math.max(o.jaw, X.jaw || 0); }   // (v340) HURT_POSE: the head is thrown up hard, the jaw opens
+    { const H = globalThis.HURTX; if (act === 'hurt' && H) o.eyes = H.k > .55 ? 'closed' : H.k > 0 ? 'hurt' : 'open'; }
     return o;
   }
   const fallPre = (cx, o, h) => { if (o.fall) cx.pre = p => { const q = rotZ([p[0], p[1] - h, p[2]], o.fall); return [q[0], Math.max(.5, q[1] + h - o.fall * h * .45), q[2]]; }; };

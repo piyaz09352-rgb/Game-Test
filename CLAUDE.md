@@ -1,6 +1,7 @@
 # VAYRATHEN — notes for Claude
 
 - Explain work to the owner in Thai.
+- The owner will not accept sloppy, half-done work («ทำกาก ๆ ลวก ๆ ไม่เอา»). Finish every case (every monster model / class / screen), check each one visually before reporting, and never report something as done while you know a part of it still looks weak.
 - Before saying what the latest version is, or starting work: `git fetch origin` and compare `docs/UPDATES.md` / `?v=` on every branch (`git branch -r`), not only `main`. Work may sit on an unmerged `claude/*` branch (v253–v278 did) — continue from the newest one.
 - The game is played in landscape only (phones held sideways; Settings can turn the picture). Check layouts at PC 1920×1080, laptop 1366×768, tablet landscape 1024×768 and phone landscape 844×390 — not portrait.
 - Every finished version: bump `?v=NNN` in `index.html` for each changed file, then run `node tools/asset-manifest.js` (tests/vbump290.test.js fails if a changed file kept its ?v= — v290 shipped a fix players never got), and add a section to `docs/UPDATES.md`.

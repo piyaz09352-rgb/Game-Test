@@ -44,7 +44,7 @@ function applyDamage(m, res, sk){
     else if (sk) SFX.play(res.crit ? 'crit' : 'skill_hit');                                         // physical skill: heavy hit
     else if (w === 'fist') { if (res.crit) SFX.play('crit'); else SFX.play('mh_' + (P.mt || 'jab')); }   // (v184) a critical normal attack: the crit sound alone
     else { if (res.crit) SFX.play('crit'); else SFX.hit(w); } }                                         // basic attack: weapon voice
-  m.hp -= res.dmg; if (m.wb && typeof wbHit === 'function') wbHit(res.dmg); if (typeof nmHit === 'function') nmHit(m, res.dmg); m.flash = .12; m.aggro = true; if (m.atkT > .4) m.hurtT = .25;
+  m.hp -= res.dmg; if (m.wb && typeof wbHit === 'function') wbHit(res.dmg); if (typeof nmHit === 'function') nmHit(m, res.dmg); m.flash = .12; m.aggro = true; if (m.atkT > .4) m.hurtT = .3;
   if (m.hp > 0 && res.dmg > 0 && !res.poison) SFX.mob('hurt', m);
   if (!res.poison) unhide();
   const col = res.poison ? '#2f9e3a' : res.crit ? '#ffd56a' : res.magic ? '#ffb46b' : '#ffffff';
