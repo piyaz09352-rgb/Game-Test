@@ -45,7 +45,7 @@ function lifeBossBurst(m){ const el = (m.def && m.def.elem) || 'neutral', [c1, c
   LIFE_FX.push({x:m.x, y:m.y, z:h * .5, vx:0, vy:0, vz:0, t:0, life:.7, r:h * 1.2, col:c2, kind:'glow', grav:0}); }   // a short glow where it stood (local, not over the screen)
 if (typeof advance === 'function'){ const _adv = advance; advance = function(dt){ if (LIFE.slow > 0 && !document.hidden){ LIFE.slow -= dt; arguments[0] = dt * .35; } return _adv.apply(this, arguments); }; }
 EV.on('tick', dt => {
-  for (const m of mobs){ if (!m.dead || !m.def || !m.def.boss || m.vanish) continue;
+  for (const m of mobs){ if (!m.dead || !m.def || !m.def.boss || m.vanish || m.hp > 0) continue;   // only a boss brought down (a bound or captured one just leaves)
     if (m.bdT == null){ m.bdT = 0; if (SETTINGS.hitStop !== false && Math.hypot(m.x - P.x, m.y - P.y) < 520) LIFE.slow = 1.05; }
     m.bdT += dt; if (m.bdT < 3.2) m.deadT = Math.min(m.deadT, .78);   // it lies there a while before it fades
     if (!m.bdBurst && m.bdT > .5){ m.bdBurst = 1; try { lifeBossBurst(m); } catch (e) {} } }
