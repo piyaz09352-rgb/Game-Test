@@ -399,8 +399,8 @@ const nrm = a => { const l = Math.hypot(a[0], a[1], a[2]) || 1; return [a[0] / l
 
 /* ---------- actions ---------- */
 const ACTIONS = {
-  idle:{n:6, fps:5, loop:true, th:'ยืน'}, walk:{n:8, fps:12, loop:true, th:'เดิน'}, attack:{n:5, fps:12, th:'โจมตี'},
-  skill:{n:5, fps:10, th:'ใช้สกิล'}, cast:{n:4, fps:8, loop:true, th:'ร่ายเวท'}, roll:{n:6, fps:14, th:'กลิ้งหลบ'},
+  idle:{n:6, fps:5, loop:true, th:'ยืน'}, walk:{n:8, fps:12, loop:true, th:'เดิน'}, attack:{n:5, fps:12, th:'โจมตี', dur:[.7, 1.55, .5, 1.3, .95]},
+  skill:{n:5, fps:10, th:'ใช้สกิล', dur:[.6, 1.6, .55, 1.35, .9]}, cast:{n:4, fps:8, loop:true, th:'ร่ายเวท'}, roll:{n:6, fps:14, th:'กลิ้งหลบ'},
   capture:{n:6, fps:10, th:'จับสัตว์'}, rideIdle:{n:4, fps:5, loop:true, th:'ขี่ (หยุด)'}, ride:{n:6, fps:11, loop:true, th:'ขี่ (วิ่ง)'},
   hurt:{n:2, fps:8, th:'โดนตี'}, die:{n:4, fps:6, th:'ล้ม'}, sit:{n:4, fps:3, loop:true, th:'นั่งพับเพียบ'},
   // ---------- skill poses (each skill names one in SKILL_ACT, js/data/jobs.js) ----------
@@ -807,12 +807,18 @@ function humanPose(act, f, n, weapon){
     P.bob = -.35 + b * .35; P.breath = b * .25; P.hipX = Math.sin(ph) * .35; P.twist = Math.sin(ph) * .03;
     P.armL = P.armR = .1 + b * .03; P.elbL = P.elbR = .3 + b * .05; P.sway = Math.sin(ph - 1) * .4; P.head = Math.sin(ph - .6) * .02;
     if (f === 5) P.eyes = 'closed';
+    // (v338) a natural grip at rest: a sword or dagger hangs point-down and a little forward from the hand, a staff stands
+    // upright beside you with its head up (it used to stick straight out toward the camera)
+    if (weapon === 'sword' || weapon === 'dagger'){ P.wpn = .75 + b * .04; P.elbR = .38 + b * .05; }
+    else if (weapon === 'staff'){ P.armR = .32 + b * .03; P.wpn = 2.78 - P.armR + .32; P.elbR = .5; P.outR = .55; }
   } else if (act === 'walk'){
     const s = Math.sin(ph), c = Math.cos(ph);
     P.legL = .62 * s; P.legR = -.62 * s;
     P.liftL = Math.max(0, c) * 1.8 * Math.max(0, s + .3); P.liftR = Math.max(0, -c) * 1.8 * Math.max(0, -s + .3);
     P.armL = -.5 * s; P.armR = .5 * s; P.elbL = .3 + Math.max(0, -s) * .55; P.elbR = .3 + Math.max(0, s) * .55;
     P.bob = (Math.abs(c) - .6) * 1.1; P.lean = .07; P.twist = .13 * s; P.hipX = s * .25; P.sway = Math.sin(ph - .9) * .8; P.head = -c * .015;
+    if (weapon === 'sword' || weapon === 'dagger') P.wpn = .8 - P.armR * .75;   // (v338) carried point-down: the blade keeps hanging while the arm swings
+    else if (weapon === 'staff'){ P.armR = .3 + .2 * s; P.wpn = 2.78 - P.armR + .32; P.elbR = .5; P.outR = .55; }   // the staff stays upright, its foot swinging with the step
   } else if (act === 'attack'){
     if (weapon === 'bow'){
       P.armL = 1.5; P.outL = .05; P.elbL = .05; P.armR = [1.0, 1.35, 1.45, 1.2, .5][f]; P.elbR = [.6, 1.6, 2.2, .3, .3][f]; P.outR = .1; P.draw = [0, .6, 1, 0, 0][f];
@@ -832,19 +838,35 @@ function humanPose(act, f, n, weapon){
       P.lean = [0, -.08, .2, .16, .03][f]; P.twist = [0, -.45, .38, .5, .08][f]; P.sway = [0, .5, -.6, -.7, -.1][f];
       P.legL = [0, -.12, .52, .46, .1][f]; P.legR = -P.legL * .6; P.bob = [0, .25, -.85, -.65, -.1][f];
     } else {
-      P.armR = [.6, 2.6, 2.2, .9, .3][f]; P.elbR = [.4, .9, .2, .1, .4][f]; P.wpn = [1.7, 1.3, 1.1, .8, 1.5][f]; P.outR = [.2, .3, .25, .1, .2][f];
-      P.lean = [0, -.1, .12, .2, .04][f]; P.twist = [0, -.35, .1, .32, .08][f]; P.legL = [0, -.15, .38, .52, .1][f]; P.legR = -P.legL * .7; P.bob = [0, .3, 0, -1, -.2][f];
-      P.armL = [.2, .5, .3, -.2, .1][f]; P.elbL = [.3, .9, .6, .3, .3][f]; P.sway = [0, .4, -.2, -.6, -.2][f];
+      if (weapon === 'staff'){
+        // (v338) a staff is not swung like a sword: it is raised and drawn back (gathering power at the head), then thrust
+        // forward to point at the target with a flash, the body leaning into it, and brought back upright
+        P.armR = [.7, 2.35, 1.45, 1.35, .6][f]; P.elbR = [.5, .55, .05, .1, .4][f]; P.outR = [.2, .35, .05, .05, .15][f]; P.wpn = [1.9, 2.7, 1.55, 1.6, 1.9][f];
+        P.armL = [.3, 1.6, 1.2, .9, .3][f]; P.elbL = [.4, 1.2, .3, .35, .4][f]; P.outL = [.2, .35, .15, .2, .2][f];
+        P.lean = [0, -.16, .2, .16, .02][f]; P.twist = [0, -.3, .2, .16, .04][f]; P.legL = [0, -.2, .5, .44, .08][f]; P.legR = -P.legL * .6; P.bob = [0, .5, -.7, -.5, -.1][f];
+        P.sway = [0, .6, -.5, -.4, -.1][f]; P.glow = f === 1 ? 0 : f === 2 || f === 3 ? 1 : -1; P.mouth = f === 2 ? 1 : 0;
+      } else {
+      // (v338) more weight: a deeper wind-up (weapon far back, hips turned away, a little crouch), a lunge into the blow
+      // with the front foot, a follow-through that carries past the target, then the settle
+      P.armR = [.6, 2.85, 2.1, .65, .3][f]; P.elbR = [.4, 1.05, .15, .05, .4][f]; P.wpn = [1.7, 1.15, 1.1, .65, 1.5][f]; P.outR = [.2, .4, .2, -.05, .2][f];
+      P.lean = [0, -.2, .2, .3, .05][f]; P.twist = [0, -.55, .18, .5, .1][f]; P.legL = [0, -.25, .55, .66, .12][f]; P.legR = -P.legL * .7; P.bob = [0, .55, -.3, -1.4, -.25][f];
+      P.armL = [.2, .7, .3, -.35, .1][f]; P.elbL = [.3, 1.1, .6, .25, .3][f]; P.sway = [0, .7, -.3, -.85, -.25][f]; P.mouth = f === 2 ? 1 : 0;
+      }
     }
   } else if (act === 'skill'){
     P.aura = f; P.sparks = f;
-    P.armR = [-.2, 1.1, 1.65, 1.6, .5][f]; P.elbR = [.4, 1.8, .05, .05, .4][f]; P.outR = [.5, .1, .05, .05, .2][f];
-    P.armL = [-.2, 1.0, -.35, -.3, .1][f]; P.elbL = [.4, 1.8, .4, .4, .3][f]; P.outL = [.5, .15, .35, .35, .2][f];
-    P.legL = [.1, .1, .45, .45, .1][f]; P.legR = [-.1, -.1, -.38, -.38, -.1][f]; P.bob = [-1.2, -1, -1.4, -1.3, -.3][f];
-    P.lean = [-.05, .02, .16, .14, .02][f]; P.twist = [0, -.2, .25, .22, 0][f]; P.sway = [0, .6, -.8, -.6, 0][f]; P.mouth = f === 2 || f === 3 ? 1 : 0; P.wpn = 1.9;
+    // (v338) a bigger gather before the release: both hands drawn in and down to the hip with a crouch and a turn away,
+    // then thrown out with the whole body, holding the release a beat
+    P.armR = [-.2, .85, 1.75, 1.65, .5][f]; P.elbR = [.4, 2.1, .05, .05, .4][f]; P.outR = [.5, .35, .05, .05, .2][f];
+    P.armL = [-.2, .9, -.45, -.35, .1][f]; P.elbL = [.4, 2.0, .35, .4, .3][f]; P.outL = [.5, .3, .4, .35, .2][f];
+    P.legL = [.1, .05, .55, .5, .1][f]; P.legR = [-.1, -.05, -.45, -.4, -.1][f]; P.bob = [-1.2, -.3, -1.8, -1.5, -.3][f];
+    P.lean = [-.05, -.12, .22, .18, .02][f]; P.twist = [0, -.38, .3, .25, 0][f]; P.sway = [0, .8, -.9, -.7, 0][f]; P.mouth = f === 2 || f === 3 ? 1 : 0; P.wpn = 1.9;
   } else if (act === 'cast'){
-    P.armL = 1.25 + Math.sin(ph) * .08; P.armR = 1.35 + Math.sin(ph) * .08; P.elbL = P.elbR = .35; P.outL = .32; P.outR = .2; P.wpn = 2.3; P.glow = f; P.ring = f;
-    P.bob = Math.sin(ph) * .4 - .2; P.mouth = 1; P.sway = Math.sin(ph) * .5;
+    // (v338) casting is a living motion: the hands circle the gathering power (one rising as the other sinks), the body
+    // sways and breathes with it, the staff hand lifts the head toward the sky
+    P.armL = 1.25 + Math.sin(ph) * .22; P.armR = 1.45 + Math.sin(ph + Math.PI) * .18; P.elbL = .35 + Math.cos(ph) * .15; P.elbR = .3 + Math.cos(ph + Math.PI) * .12;
+    P.outL = .32 + Math.cos(ph) * .1; P.outR = .2 + Math.sin(ph) * .08; P.wpn = 2.3 + Math.sin(ph) * .12; P.glow = f; P.ring = f;
+    P.bob = Math.sin(ph) * .6 - .3; P.mouth = 1; P.sway = Math.sin(ph) * .8; P.lean = -.04 + Math.sin(ph) * .03; P.head = Math.sin(ph) * .03;
   } else if (act === 'roll'){
     const rot = [0, 1.25, 2.6, 3.95, 5.3, 0][f];
     P.tuck = f > 0 && f < 5 ? 1 : 0; P.roll = rot; P.noWeapon = P.tuck === 1;
@@ -2429,7 +2451,7 @@ function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
 function sheet(kind, key){
   const acts = kind === 'char' ? CHAR_ACTIONS[key] : Object.keys(MOB_ACTIONS).filter(a => !MOB_ACTIONS[a].boss), AT = kind === 'char' ? ACTIONS : MOB_ACTIONS;
   const K = kOf(kind, key), base = kind === 'char' ? FS : MOBS[key].fs, fs = Math.ceil(base * K);
-  const index = {}; acts.forEach(a => { index[a] = {n:AT[a].n, fps:AT[a].fps, loop:!!AT[a].loop}; });
+  const index = {}; acts.forEach(a => { index[a] = {n:AT[a].n, fps:AT[a].fps, loop:!!AT[a].loop, ...(AT[a].dur ? {dur:AT[a].dur} : {})}; });
   return {kind, key, K, fs, base, index, cache:{}, anchor:[fs / 2, kind === 'char' ? ANCHOR_Y * K : fs - 6 * K]};
 }
 // memory budget: cached (action, direction) strips are evicted least-recently-used beyond this many pixels.
@@ -2575,6 +2597,8 @@ function dirFromVec(dx, dy){
 }
 function frameAt(sh, act, t){
   const ix = sh.index[act] || sh.index.idle, n = ix.n;
+  // (v338) uneven frame times give a blow its weight: a held wind-up, a fast strike, a follow-through that settles
+  if (ix.dur && !ix.loop && ix.dur.length === n){ let u = t * ix.fps; for (let i = 0; i < n; i++){ if (u < ix.dur[i]) return i; u -= ix.dur[i]; } return n - 1; }
   const fr = Math.floor(t * ix.fps);
   return ix.loop ? fr % n : Math.min(n - 1, fr);
 }
