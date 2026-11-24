@@ -306,7 +306,7 @@
 "js/sys/jobfx.js":{"v":126,"sha":"ac13b74234494a83"},
 "js/sys/tutfold.js":{"v":127,"sha":"1e510ee1ed4ec762"},
 "js/sys/changelog.js":{"v":127,"sha":"0509d4ccdd277a38"},
-"js/sys/changelog272.js":{"v":380,"sha":"a8db7d364517c24f"},
+"js/sys/changelog272.js":{"v":381,"sha":"bf4eeeb3ebcfc5cb"},
 "js/sys/bossnature.js":{"v":279,"sha":"dab626b53dac17e4"},
 "js/sys/inspect.js":{"v":125,"sha":"7bfd122f80df54a5"},
 "js/sys/petnet.js":{"v":136,"sha":"3f84ce0bd40d9a52"},
@@ -469,4 +469,5 @@
 "js/sys/combo329.js":{"v":3,"sha":"6700e1031d0ef66c"},
 "js/sys/fix331.js":{"v":3,"sha":"dd0e42f7ab85ea2a"},
 "js/sys/fix334.js":{"v":2,"sha":"4aaa5bf5807b5ca4"},
+"js/sys/aiadv334.js":{"v":2,"sha":"8ea7347212ae8161"},
 "js/sys/hud326.js":{"v":15,"sha":"bf69186fdcaf31a3"}}
