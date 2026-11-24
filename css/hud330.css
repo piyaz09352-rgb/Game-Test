@@ -335,3 +335,35 @@ html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox .tuth b{ color:#ffe0
 html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox .tutx, html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox .tutfold{ color:#b8e8ff !important; -webkit-text-fill-color:#b8e8ff !important; }
 html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox .tutdots i{ background:rgba(255,255,255,.3) !important; }
 html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox .tutdots i.on{ background:#ffd36a !important; box-shadow:0 0 6px #ffd36a !important; }
+/* (v334) the warp window inside: the cards' cream body, boss box, monster tiles and search bar in the new palette; the
+   money pill in its dark header readable (white on cream before) */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #warpGrid .wgbia{ background:rgba(10,8,30,.55) !important; border:1px solid rgba(255,224,138,.6) !important; color:#ffe08a !important; -webkit-text-fill-color:#ffe08a !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #warpGrid .wgbd{ background:linear-gradient(180deg, #ffffff, #f6f4fd) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #warpGrid .wgboss{ background:#f1edff !important; border-color:rgba(150,130,230,.45) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #warpGrid .wgboss b{ color:#b0304a !important; -webkit-text-fill-color:#b0304a !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #warpGrid .wgmobs > span{ background:#ece8fb !important; border-color:rgba(150,130,230,.35) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .fdsearch input, html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #warpGrid .fdsearch input{ background:#ffffff !important; border:1.5px solid rgba(130,110,230,.55) !important; color:#2a2350 !important; box-shadow:0 0 0 3px rgba(150,120,255,.12) !important; }
+/* the coin shop's side tabs: light glass like other windows' tabs, the chosen one violet (they were dark navy blocks) */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-cshop .cshtabs button:not(.on):not(.tu){ background:linear-gradient(180deg, #ffffff, #efebfd) !important; border:1px solid rgba(150,130,230,.5) !important; box-shadow:0 2px 6px rgba(80,60,160,.12) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-cshop .cshtabs button:not(.on):not(.tu) span{ color:#2a2350 !important; -webkit-text-fill-color:#2a2350 !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-cshop .cshtabs button.on{ background:linear-gradient(135deg, #8a5cff, #4f9dff) !important; border:1px solid rgba(255,255,255,.5) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-cshop .cshtabs button.on span{ color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.4) !important; }
+/* (v334) shop rows: the amount box showed no number (white digits on the light box) and on a phone the − + MAX box and
+   the buy button dropped to a second line under every item. One line now: item · price · amount · buy. */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .qty .qn{ color:#2a2350 !important; -webkit-text-fill-color:#2a2350 !important; font-weight:800 !important; width:40px !important; min-width:40px !important; flex:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty){ flex-wrap:nowrap !important; gap:6px !important; align-items:center !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty) > .nm{ flex:1 1 auto !important; min-width:0 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty) > .pr{ flex:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty) > .qty{ margin-left:0 !important; height:auto !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty) > .qgo{ flex:none !important; min-width:64px !important; white-space:nowrap !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty) > .qty .qb{ width:30px !important; height:30px !important; min-height:30px !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty) > .qty{ width:auto !important; max-width:none !important; overflow:visible !important; flex:none !important; } html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty) > .qty .qm{ display:block !important; width:auto !important; padding:0 8px !important; }
+/* (v334) empty skill slots: faint grey squares that looked like a broken screen. Now a round glass socket with a dashed
+   rim and a soft "+" (hold to put a skill there), the slot number small in the corner. */
+html body #ui#ui.ui.h6 .mo.sk.empty, html body #ui#ui.ui.h6pc #hotbar > .hk.h6sk.empty{ border-radius:50% !important; background:radial-gradient(circle at 50% 40%, rgba(64,52,130,.72), rgba(18,14,44,.82)) !important;
+  border:1.5px dashed rgba(190,170,255,.6) !important; box-shadow:inset 0 0 10px rgba(120,100,255,.25) !important; opacity:1 !important; }
+html body #ui#ui.ui.h6 .mo.sk.empty::after, html body #ui#ui.ui.h6pc #hotbar > .hk.h6sk.empty::after{ content:'+' !important; position:absolute !important; inset:0 !important; display:grid !important; place-items:center !important;
+  font:300 24px/1 system-ui, sans-serif !important; color:rgba(220,210,255,.75) !important; background:none !important; border:0 !important; width:auto !important; height:auto !important; transform:none !important; animation:none !important; pointer-events:none; }
+html body #ui#ui.ui.h6 .mo.sk.mini.empty::after{ font-size:16px !important; }
+html body #ui#ui.ui.h6 .mo.sk.empty > b, html body #ui#ui.ui.h6pc #hotbar > .hk.h6sk.empty > kbd{ position:absolute !important; top:-2px !important; left:-2px !important; right:auto !important; bottom:auto !important; transform:none !important;
+  min-width:15px; height:15px; padding:0 3px; border-radius:8px; font:700 9px/15px system-ui, sans-serif !important; background:rgba(20,14,50,.85) !important; color:#d8d0ff !important; border:1px solid rgba(190,170,255,.5) !important; text-align:center; }

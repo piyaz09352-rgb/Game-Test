@@ -196,7 +196,10 @@ if (typeof mlyLayout === 'function'){ const _ml = mlyLayout; mlyLayout = functio
 function h6Banner(){ const b = el('banner'), ui = el('ui'); if (!b || !ui || !ui.classList.contains('h6') || b.hidden || !b.offsetWidth) return;
   const U = brect(ui), k = (U.height / (ui.offsetHeight || 1)) || 1; let y = 8;
   for (const id of ['target', 'tSt', 'achPop']){ const e = el(id); if (id === 'achPop' && !(e && e.classList.contains('show'))) continue; if (e && !e.hidden && e.offsetWidth){ const r = brect(e); if (r.height) y = Math.max(y, (r.bottom - U.top) / k + 6); } }
-  const v = Math.round(y) + 'px'; if (b.style.getPropertyValue('top') !== v) b.style.setProperty('top', v, 'important'); }
+  const v = Math.round(y) + 'px'; if (b.style.getPropertyValue('top') !== v) b.style.setProperty('top', v, 'important');
+  // (v334) a window or NPC dialog opened under it: the banner steps aside (it covered their title bars)
+  const B = brect(b), hit = [...document.querySelectorAll('#ui .win, #dialog')].some(w => { if (w.hidden || !w.offsetWidth) return false; const r = brect(w); return r.left < B.right && r.right > B.left && r.top < B.bottom && r.bottom > B.top; });
+  const o = hit ? '0' : ''; if (b.style.opacity !== o){ b.style.transition = 'opacity .25s'; b.style.opacity = o; } }
 /* (v333) the tutorial card sat on the open chat box on an iPad (both centred low on the screen): it goes just above the chat */
 function h6Tut(){ const ui = el('ui'), b = el('tutBox'), cb = el('chatBox'), c = cb && cb.classList.contains('idle') && el('chatForm') ? el('chatForm') : cb;   // an idle chat shows only its input row if (!ui || !b || !ui.classList.contains('h6')) return;
   if (b.hidden || !b.offsetWidth || !c || !c.offsetWidth || cb.hidden){ if (b.style.getPropertyValue('top')) { b.style.removeProperty('top'); b.style.removeProperty('bottom'); } return; }

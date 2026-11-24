@@ -11,6 +11,7 @@
    windows draw. It records everything that goes wrong: script errors, getting stuck, dying again and again, no EXP for
    a long while, windows that fail to open or do not fit the screen, and how far each bot got.
    Usage:  node tools/playtest.js            100 bots × 20 game minutes, 6 at a time
+           START_LV=50,100,150 BOTS=30 node tools/playtest.js   heroes that start high (mid and late game)
            BOTS=20 MIN=10 CONC=4 SEED=7 node tools/playtest.js
    Report: docs/PLAYTEST.md (in Thai) and docs/playtest-rows.json */
 'use strict';
@@ -18,6 +19,7 @@ const fs = require('fs'), path = require('path');
 const { serve } = require('../tests/serve');
 let chromium; try { ({ chromium } = require('playwright')); } catch (e) { console.error('playwright is needed'); process.exit(1); }
 
+const START = String(process.env.START_LV || '1').split(',').map(Number).filter(n => n >= 1);   // START_LV=50,100,150: heroes start at these levels (spread over the bots), set up like the balance report
 const BOTS = +(process.env.BOTS || 100), MIN = +(process.env.MIN || 20), CONC = +(process.env.CONC || 6), SEED = +(process.env.SEED || 1);
 const rng = s => () => (s = (s * 16807 + 11) % 2147483647) / 2147483647;
 const FIRST = ['สมชาย', 'มะลิ', 'ต้นข้าว', 'ปลายฟ้า', 'นภา', 'กิ่งแก้ว', 'ภูผา', 'ดาวเหนือ', 'ใบเตย', 'เมฆา', 'Ken', 'Mint', 'Bank', 'Ice', 'Fern', 'Boss', 'Toey', 'Nut', 'Pim', 'Beam', 'Gun', 'May', 'Jay', 'Ploy', 'Tar'];
@@ -38,7 +40,7 @@ function makePersonas(){ const r = rng(SEED * 7919 + 3), out = [], pool = [];
   for (let i = 0; i < BOTS; i++){ const K = pool[i]; let s = r(), d = SIZES[0]; for (const z of SIZES){ if (s < z[4]){ d = z; break; } s -= z[4]; }
     out.push({id:i + 1, acc:'pt' + String(i + 1).padStart(3, '0') + Math.floor(r() * 1e5), name:FIRST[Math.floor(r() * FIRST.length)] + LAST[Math.floor(r() * LAST.length)], kind:K.k,
       risk:Math.round(span(K.risk)), react:span(K.react), skill:span(K.skill), potAt:span(K.potAt), forget:K.forget, auto:r() < K.auto, afk:K.afk, curious:K.curious, statPlan:K.statPlan,
-      device:d[0], w:d[1], h:d[2], touch:d[3], seed:Math.floor(r() * 1e9)}); }
+      device:d[0], w:d[1], h:d[2], touch:d[3], seed:Math.floor(r() * 1e9), startLv:START[i % START.length]}); }
   return out; }
 
 /* ---------- what each bot does, inside its own page ---------- */
@@ -82,6 +84,26 @@ async function playInPage(p, simMin){
     await frame(); if (JOBS[S.job] !== j) out.jobs.push(S.job); else if (bs.length) issue('job-change-did-not-happen', {job:S.job}); const d = el('dialog'); if (d) d.hidden = true;
     warpTo(back || goodMap()); out.warps++; await loadingWait(); };
   // ---------- the play loop ----------
+  // (v334) START_LV: a hero of that level — its class line, job tier, stats by the class, every skill, the best shop gear it
+  // can wield, 40 potions — then off to the field of its level. Without it every bot starts at Lv 1.
+  if (p.startLv > 1){ const lv = p.startLv, LINES = ['blade', 'rune', 'ranger', 'muay', 'healer', 'rogue', 'summoner', 'occult', 'merchant', 'catfolk', 'dogfolk', 'ninja'].filter(k => JOBS[k]);
+    const kids = j => Object.keys(JOBS).filter(k => JOBS[k].parent === j); const line = pick(LINES); let job = line; const tier = lv < 40 ? 1 : lv < 70 ? 2 : lv < 100 ? 3 : 4;
+    for (let tt = 1; tt < tier; tt++){ const k = kids(job); if (!k.length) break; job = pick(k); }
+    S.job = job; S.lvl = lv; S.jlvl = JOBS[job].jobMax || 50; S.exp = S.jexp = 0; S.stats = {str:1, agi:1, vit:1, int:1, dex:1, luk:1};
+    let pts = 48; for (let l = 2; l <= lv; l++) pts += statGain(l);
+    const main = String(JOBS[job].stat || JOBS[line].stat || 'STR · VIT').toLowerCase().match(/str|agi|vit|int|dex|luk/g) || ['str'], cap = typeof STAT_CAP === 'function' ? STAT_CAP() : 99;
+    const want = {}; for (const [k, f] of [[main[0], .45], [main[1] || 'vit', .3], ['vit', .25]]) want[k] = (want[k] || 0) + f;
+    for (let g = 0; g < 2000 && pts > 0; g++){ let best = null, gap = -1e9; for (const k in want){ const d = want[k] - (S.stats[k] - 1) / Math.max(1, g); if (S.stats[k] < cap && statCost(S.stats[k]) <= pts && d > gap){ gap = d; best = k; } } if (!best) break; pts -= statCost(S.stats[best]); S.stats[best]++; }
+    S.statPts = pts; S.skills = {}; for (const j of jobChain()) for (const id of (JOBS[j].skills || [])) if (SKILLS[id]) S.skills[id] = SKILLS[id].max; S.skPts = 0;
+    S.hot = Object.keys(S.skills).filter(id => SKILLS[id].type !== 'passive').slice(-6);
+    const gp = slot => GEAR_LIST.filter(g => g[1] === slot && g[4] <= lv && ITEMS[g[0]] && (slot !== 'weapon' || canWield(ITEMS[g[0]])) && lineOk(ITEMS[g[0]].st)).sort((a, b) => b[4] - a[4])[0];
+    S.gear = {weapon:null, armor:null, head:null, ammo:null, acc:null, shield:null, pants:null, shoes:null};
+    for (const sl of ['weapon', 'armor', 'head', 'pants', 'shoes', 'acc']){ const g = gp(sl); if (g) S.gear[sl] = g[0]; }
+    const w = S.gear.weapon && ITEMS[S.gear.weapon]; if (!(w && w.st && w.st.hands === '2h')){ const g = gp('shield'); if (g) S.gear.shield = g[0]; }
+    if (typeof usesArrows === 'function' && usesArrows()){ const a = GEAR_LIST.filter(g => g[1] === 'ammo' && g[4] <= lv && ammoFits(g[0])).sort((a, b) => b[4] - a[4])[0]; if (a){ S.inv[a[0]] = 99999; S.gear.ammo = a[0]; } }
+    S.inv[lv < 30 ? 'orangepot' : lv < 70 ? 'whitepot' : 'elixirpot'] = 40; S.inv[lv < 70 ? 'bluepot' : 'bigbluepot'] = 20; S.bia = Math.max(S.bia || 0, lv * 2000);
+    derive(); S.hp = DER.maxhp; S.sp = DER.maxsp; out.jobs = [S.job]; renderHotbar && renderHotbar();
+    warpTo(goodMap()); out.warps++; await loadingWait(); run(.5); }
   out.lvLog.push([0, S.lvl]); let lastExp = S.exp + S.lvl * 1e7, lastExpT = 0, nextLook = 30 + R() * 60, nextAfk = 120 + R() * 300, nextMapCheck = 60, lastTarget = null, tgtSince = 0, tgtHp = 0, posAt = {x:P.x, y:P.y, t:0}, deathsRecent = [];
   await dismiss(); await leaveTown();
   if (p.auto){ setBot(true); out.autoOn++; }
@@ -163,7 +185,7 @@ async function oneBot(browser, url, p){
 
 function report(rows, mins){
   const ok = rows.filter(r => r.ok), L = [], avg = (a, f) => a.length ? a.reduce((s, r) => s + f(r), 0) / a.length : 0, med = a => { const s = [...a].sort((x, y) => x - y); return s.length ? s[Math.floor(s.length / 2)] : 0; };
-  L.push(`# รายงานบอทเทสเกม (${rows.length} บอท × ${MIN} นาทีในเกม)`, '', `รันเมื่อ ${new Date().toISOString().slice(0, 16).replace('T', ' ')} · ใช้เวลาจริง ${mins} นาที · \`node tools/playtest.js\``, '');
+  L.push(`# รายงานบอทเทสเกม (${rows.length} บอท × ${MIN} นาทีในเกม${START.some(v => v > 1) ? ` · เริ่มที่ Lv ${START.join('/')}` : ''})`, '', `รันเมื่อ ${new Date().toISOString().slice(0, 16).replace('T', ' ')} · ใช้เวลาจริง ${mins} นาที · \`node tools/playtest.js\``, '');
   L.push('## สรุป', '', `- เล่นจบ ${ok.length}/${rows.length} บอท · ล้มตั้งแต่ตอนเข้าเกม ${rows.length - ok.length}`, `- เลเวลเฉลี่ยตอนจบ ${avg(ok, r => r.lvl).toFixed(1)} (กลาง ${med(ok.map(r => r.lvl))}) · ฆ่ามอนเฉลี่ย ${avg(ok, r => r.kills).toFixed(0)} · ตายเฉลี่ย ${avg(ok, r => r.deaths).toFixed(1)}`,
     `- ฆ่าตัวแรกได้ที่ ${med(ok.filter(r => r.firstKillAt != null).map(r => r.firstKillAt))} วินาทีในเกม (กลาง) · ${ok.filter(r => r.firstKillAt == null).length} บอทไม่ได้ฆ่าเลย`, `- เปลี่ยนอาชีพสำเร็จ ${ok.filter(r => r.jobs && r.jobs.length > 1).length} บอท`, '');
   L.push('## แยกตามนิสัย', '', '| นิสัย | จำนวน | เลเวลเฉลี่ย | ฆ่า | ตาย | ใช้ยา | ใช้สกิล | ไม่ได้ EXP นานสุด (วิ) |', '|---|---|---|---|---|---|---|---|');
