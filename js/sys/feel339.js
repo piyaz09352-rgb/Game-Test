@@ -12,15 +12,19 @@
    Settings: the existing «สั่นจอ/หยุดภาพตอนโดน» (hitStop) switch also turns off the hit-stop here; «เอฟเฟคผู้เล่นอื่น» is
    not touched (this is your own hero). */
 'use strict';
-const FEEL = {trail:[], kb:new Map(), rings:[], lastAct:'', orbA:0};
+const FEEL = {trail:[], kb:new Map(), rings:[], lastAct:'', orbA:0, swT:-9};
 const FEEL_LINE = () => { try { return jobChain()[1] || 'novice'; } catch (e) { return 'novice'; } };
 // the grade colour of the weapon in hand (same steps as the sprite's look tiers)
 const FEEL_TIER_COL = ['226,232,245', '170,215,255', '255,170,90', '190,140,255', '110,235,200', '255,215,110'];
 function feelTierCol(){ const id = S && S.gear && S.gear.weapon, it = id && ITEMS[id], L = it && it.lv || 1; return FEEL_TIER_COL[L < 30 ? 0 : L < 80 ? 1 : L < 115 ? 2 : L < 170 ? 3 : L < 240 ? 4 : 5]; }
 
 // ---- 1. impact ----
+if (typeof basicAttack === 'function'){ const _ba = basicAttack; basicAttack = function(){ FEEL.swT = T; return _ba.apply(this, arguments); }; }
 if (typeof applyDamage === 'function'){ const _ad = applyDamage; applyDamage = function(m, res, sk){
-  const ok = m && !m.dead && res && !res.miss && !res.poison && res.dmg > 0 && !m.pvp, phys = ok && !res.magic;
+  // only real blows of the hero: a damage roll ('em' is set by physDamage/magicDamage; ticks of bleed, curse, reflect… are bare {dmg}),
+  // not a pet's or clone's, and a weapon hit only while the hero is actually swinging (pets bite with physDamage too)
+  const own = res && 'em' in res && !res.pet && !res._clone && !res._cd && (sk || T - FEEL.swT < .9);
+  const ok = own && m && !m.dead && !res.miss && !res.poison && res.dmg > 0, phys = ok && !res.magic;
   const r = _ad.apply(this, arguments);
   try { if (ok){
       if (phys && typeof skfxStop === 'function' && !sk) skfxStop(res.crit ? .075 : .04);   // skills already carry their own hit-stop (skillfx.js)
