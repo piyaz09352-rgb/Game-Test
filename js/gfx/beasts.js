@@ -50,6 +50,13 @@ const BEAST = (() => {
     // (v340) every model reads how hard this hurt frame is: hk 0..1 (struck 0.8, reeling 1, shudder 0.7, recovering 0.3, settled 0), hi the frame
     const H = globalThis.HURTX; o.hk = act === 'hurt' && H ? H.k : 0; o.hi = act === 'hurt' && H ? H.i : -1;
     if (o.hk > .55) o.eyes = 'closed'; else if (o.hk > 0) o.eyes = 'hurt'; else if (o.hi >= 0) o.eyes = 'open';   // settled: the eyes open again
+    /* (v341) a death in seven frames (DIEX.k 0..1): the legs give first (buckle), then the body goes over (fall, with a small
+       bounce as it lands) and lies still; models read dk / buckle / fk for their own limbs */
+    const D = act === 'die' && globalThis.DIEX; o.dk = D ? D.k : 0;
+    if (D){ const k = D.k, ss = (a, b) => { const t = Math.min(1, Math.max(0, (k - a) / (b - a))); return t * t * (3 - 2 * t); };
+      o.buckle = ss(0, .22) * (1 - ss(.35, .7) * .6); o.fk = ss(.18, .72) + (k > .72 && k < .9 ? Math.sin((k - .72) / .18 * Math.PI) * .06 : 0);
+      o.fall = 1.55 * o.fk; o.bob = -o.buckle * 2.2; o.eyes = k < .2 ? 'hurt' : 'closed'; o.lun = -ss(0, .3) * 1.5;
+      o.fold = o.buckle * .85; o.head = -.15 - ss(.3, .9) * .55; o.jaw = .2 + ss(.5, 1) * .2; o.tail = 0; o.curl = 0; o.spread = null; }
     return o;
   }
   /* two eyes painted on a head ellipsoid (n = surface normal) */
@@ -65,6 +72,11 @@ const BEAST = (() => {
         if (((ex + rx * .32) / (rx * .3)) ** 2 + ((ey - ry * .34) / (ry * .3)) ** 2 < 1) return {m:M.white, t:0};
         return {m:eyeM, t:r2 > .72 ? 3 : ey > ry * .3 && ex < 0 ? 0 : ey < -ry * .35 ? 1 : 2}; } }
   }
+  /* (v341) an insect, a crab or a frog dies on its back: it rolls over (about c, half its height, so the shell or the back ends
+     resting on the ground) with its legs drawn up — the way they are really found */
+  const flipPre = (cx, o, c, top) => { if (!o.dk) return fallPre(cx, o, c);
+    const a = Math.PI * Math.min(1, o.fk), pv = (top + 1) / 2;
+    cx.pre = p => { const q = rotZ([p[0], p[1] - pv, p[2]], a); return [q[0], Math.max(.3, q[1] + pv), q[2]]; }; };
   const fallPre = (cx, o, h) => { if (o.fall) cx.pre = p => { const q = rotZ([p[0], p[1] - h, p[2]], o.fall); return [q[0], Math.max(.5, q[1] + h - o.fall * h * .45), q[2]]; }; };
 
   /* ---------------- quadruped ---------------- */
@@ -305,8 +317,8 @@ const BEAST = (() => {
     if (kind === 'hornet' || kind === 'wasp' || kind === 'bee') return flyer(key, s, kind, SH, LG, AC, EY, DKB, sz);
     if (kind === 'beetle' || kind === 'ant') return beetle(key, s, SH, LG, AC, EY, DKB, sz, kind === 'ant');
     return (cx, act, f, n) => {
-      const o = motion(act, f, n), hk = o.hk, by = (kind === 'spider' ? 7 : 5) * sz;
-      fallPre(cx, o, by);
+      const o = motion(act, f, n), hk = o.hk, dk = o.dk ? o.fk : 0, by = (kind === 'spider' ? 7 : 5) * sz;
+      flipPre(cx, o, by, by + 6 * sz);
       // (v340) struck: the body drops toward the ground on splayed legs, the claws come up to guard, a spider draws its legs in
       const T = p => [p[0] * sz + (kind === 'crab' && act === 'walk' ? Math.sin(o.ph * 2) * .8 : 0), p[1] * sz + o.bob * .5 - hk * 1.6 * sz, p[2] * sz + o.lun];   // (v120) a crab's body shuffles side to side
       const nl = kind === 'spider' ? 4 : 3;
@@ -316,14 +328,14 @@ const BEAST = (() => {
       for (let i = 0; i < nl; i++) for (const sd of [-1, 1]){ cx.gid = 1 + i * 2 + (sd > 0 ? 1 : 0); const z = (i - (nl - 1) / 2) * 4.5;
         const ph = kind === 'spider' ? ((i + (sd > 0 ? 1 : 0)) % 2) * Math.PI : i * 1.5 + (sd > 0 ? Math.PI : 0), sw = Math.sin(o.ph * 2 + ph) * (act === 'walk' ? 1.6 : .3);
         const sx = crab ? sw * .9 : 0, sz2 = crab ? sw * .25 : sw, lift = kind === 'spider' && act === 'walk' ? Math.max(0, Math.cos(o.ph * 2 + ph)) * 1.4 : 0;
-        const LL = s.legLen ?? 1, spd = kind === 'spider' ? -hk * 2.6 : hk * 1.8, hip = T([sd * 6, by / sz, z]), knee = T([sd * (6 + 6 * LL + spd) + sx, by / sz + (kind === 'spider' ? 6 + hk * 2.2 : 3 + hk * .6) * LL + lift, z * (LL > 1 ? 1 + (LL - 1) * .5 : 1) * (1 - (kind === 'spider' ? hk * .3 : 0)) + sz2]), foot = [knee[0] + sd * (3 + spd * .5) * sz * LL + sx, .4 + lift * .6, knee[2] + sz2];
+        const LL = s.legLen ?? 1, spd = (kind === 'spider' ? -hk * 2.6 : hk * 1.8) - dk * 3.4, hip = T([sd * 6, by / sz, z]), knee = T([sd * (6 + 6 * LL + spd) + sx, by / sz + (kind === 'spider' ? 6 + hk * 2.2 : 3 + hk * .6) * LL + lift, z * (LL > 1 ? 1 + (LL - 1) * .5 : 1) * (1 - (kind === 'spider' ? hk * .3 : 0)) + sz2]), foot = [knee[0] + sd * (3 + spd * .5) * sz * LL + sx - sd * dk * 2.5, .4 + lift * .6 + dk * 3.5, knee[2] + sz2];   // dead: the legs curl in
         cap(cx, hip, knee, 1.2 * sz, 1 * sz, LG, {}); cap(cx, knee, foot, 1 * sz, .6, LG, {}); }
       if (kind === 'spider'){ cx.gid = 20; ell(cx, T([0, by / sz + 3, -9]), 9, 8, SH, {tex:nn => (Math.sin(nn[0] * 6) * Math.sin(nn[2] * 6) > .5 ? {m:AC, t:1} : undefined)}); }
       const shr = kind === 'shrimp';
       cx.gid = 21; ell(cx, T([0, by / sz, 0]), kind === 'spider' ? 6 : shr ? 6.2 : 9.5, kind === 'spider' ? 5 : shr ? 5 : 5.6, SH, {rz:kind === 'crab' ? 7 : shr ? 10 : 8, tex:nn => (shr && nn[2] < .4 && Math.sin(nn[2] * 11) > .75 ? {dt:1} : kind === 'beetle' && Math.abs(nn[0]) < .05 && nn[1] > 0 ? {m:SH, t:3} : nn[1] < -.4 ? {m:LG} : eyesTex(nn, o, EY, {glow:!!s.eyeGlow, sp:kind === 'spider' ? .25 : .3, y:.45, rx:.1, ry:.12, front:.3}))});
       if (kind === 'spider'){ cx.gid = 22; ell(cx, T([0, by / sz + 1.6, -8]), 7.2 * sz, 6 * sz, SH, {rz:7 * sz, tex:nn => (AC !== SH && nn[1] > .2 && Math.abs(Math.abs(nn[0]) - .25) < .09 && nn[2] < .6 ? {m:AC} : AC !== SH && nn[1] > .5 && Math.abs(nn[0]) < .12 && Math.sin(nn[2] * 12) > 0 ? {m:AC} : undefined)});   // the abdomen behind the head-body
         for (const sd of [-1, 1]){ cx.gid = 24 + sd; cap(cx, T([sd * 1.4, by / sz - .5, 5]), T([sd * 1.6, by / sz - 2.2, 7]), .9 * sz, .3, DKB, {}); } }   // fangs
-      if (kind === 'crab' || kind === 'scorpion' || shr){ for (const sd of [-1, 1]){ cx.gid = 30 + sd; const a = act === 'attack' ? [0, .5, -.4, 0][f] : hk ? hk * 1.9 : Math.sin(o.ph) * .1;
+      if (kind === 'crab' || kind === 'scorpion' || shr){ for (const sd of [-1, 1]){ cx.gid = 30 + sd; const a = act === 'attack' ? [0, .5, -.4, 0][f] : hk ? hk * 1.9 : dk ? -dk * .5 : Math.sin(o.ph) * .1;
         const sh = T([sd * 6, by / sz + 1, 6]), el = T([sd * (9 - hk * 2), by / sz + 3 + a * 3, (shr ? 17 : 11) - hk * 3]); cap(cx, sh, el, 1.6, 1.4, LG, {}); cx.gid = 33 + sd;   // v21: a real pincer — the palm and two fingers that open when it strikes
         const big = s.bigClaw && sd > 0 ? 1.5 : 1, palm = add(el, [sd * 1 * sz, 1 * sz, 3.2 * sz * big]), op = act === 'attack' ? [.2, .7, .1, .3][f] : hk ? .25 + hk * .7 : .25 + Math.sin(o.ph) * .08;
         ell(cx, palm, 2.8 * sz * big, 2.1 * sz * big, AC, {rz:3 * sz * big, tex:nn => (nn[1] > .5 ? {dt:-1} : undefined)});
@@ -360,8 +372,8 @@ const BEAST = (() => {
     const EYE = s.eyeGlow ? EY : mat(key, 'cmpeye', s.eyeCol || (hor ? '#3a1a10' : '#1e1a20')), PO = bee ? mat(key, 'pollen', '#f0a830') : null;
     const ab = bee ? [3.6, 4.3, 4.1, 3.3, 2.1] : hor ? [3.0, 3.9, 3.8, 3.0, 1.7] : [2.4, 3.3, 3.2, 2.5, 1.3];   // abdomen segment radii, waist to tip
     return (cx, act, f, n) => {
-      const o = motion(act, f, n), hk = o.hk, atk = act === 'attack', H = 14 + Math.sin(o.ph * 2) * 1.2 + hk * 1.5;   // (v340) struck: knocked up, the sting curls, legs flail, wings flung wide
-      fallPre(cx, o, H);
+      const o = motion(act, f, n), hk = o.hk, dk = o.dk, atk = act === 'attack', H = (14 + (dk ? 0 : Math.sin(o.ph * 2) * 1.2) + hk * 1.5) * (1 - Math.min(1, dk * 1.6) * .72);   // (v340) struck: knocked up, the sting curls, legs flail, wings flung wide · (v341) dead: drops out of the air onto its back
+      if (dk){ const a = Math.PI * Math.min(1, o.fk), pv = H * .5 + 2; cx.pre = p => { const q = rotZ([p[0], p[1] - pv, p[2]], a); return [q[0], Math.max(.3, q[1] + pv), q[2]]; }; } else fallPre(cx, o, H);
       const T = p => [p[0] * sz, (p[1] + o.bob * .4) * sz, p[2] * sz + o.lun];
       const fuzz = (nn, k) => (h3(Math.floor((nn[0] + 2) * 11), Math.floor((nn[1] + 2) * 11) + k, 3) > .7 ? {dt:1} : undefined);
       // legs (under the body, far pairs first)
@@ -375,7 +387,7 @@ const BEAST = (() => {
         if (PO && i === 2) ell(cx, lerp3(knee, ankle, .65), 1.2 * sz, 1.5 * sz, PO, {rz:1 * sz});   // a bee's pollen basket
         cap(cx, ankle, foot, .36, .2, DKB, {}); }
       // the abdomen: banded segments from the waist back, drooping a little, curling under to sting
-      const curl = atk ? [0, .35, 1, .3][f] : hk ? .08 + hk * .85 : .08 + Math.sin(o.ph) * .05;
+      const curl = atk ? [0, .35, 1, .3][f] : hk ? .08 + hk * .85 : dk ? .08 + dk * .7 : .08 + Math.sin(o.ph) * .05;
       let prev = T([0, H - .4, bee ? -1.6 : -2.8]);
       if (!bee){ cx.gid = 20; cap(cx, T([0, H - .2, -1.4]), prev, .7, .6, SH, {}); }   // the narrow waist (petiole)
       const segs = []; for (let i = 0; i < 5; i++){ const k = (i + 1) / 5, a = curl * k * 1.6;
@@ -395,7 +407,7 @@ const BEAST = (() => {
         cap(cx, a0, el, .38 * sz, .3 * sz, DKB, {}); cap(cx, el, at, .3 * sz, .22 * sz, DKB, {}); }
       if (s.crown){ cx.gid = 48; const b = add(hd, [0, 2.6 * sz, -.3 * sz]); frustum(cx, b, b[1] + 2.6 * sz, b[1], 1.8 * sz, 2.4 * sz, M.gold, {tex:(nn, kk) => (kk > .8 ? {m:M.gem} : undefined)}); }
       // two pairs of wings, beating: up on even frames, down on odd (a blur of two wing positions reads as buzzing)
-      const up = atk ? (f % 2 ? -1 : 1) : hk > .5 ? 1.25 : (f % 2 ? -.8 : 1);
+      const up = atk ? (f % 2 ? -1 : 1) : dk ? .1 - dk * .3 : hk > .5 ? 1.25 : (f % 2 ? -.8 : 1);   // dead: the wings stop, lying flat
       for (const sd of [-1, 1]) for (const [fore, zb, len] of [[1, 2.6, 10], [0, 1.2, 7]]){ cx.gid = 50 + (sd > 0 ? 1 : 0) + (fore ? 2 : 0);
         const base = T([sd * 1.4, H + 2.8, zb]), tip = add(base, [sd * len * .8 * sz, up * len * .3 * sz + .8 * sz, -len * .5 * sz]);   // spread out to the side, not up like ears
         for (const [dw, r1] of [[0, 1.05], [-.12, .9], [.1, .85], [-.22, .6]]){ const t2 = add(tip, [0, dw * len * .5 * sz, dw * len * sz]); cap(cx, base, t2, .3 * sz, r1 * sz, WG, {step:.4, tex:(nn, lo, q, t) => (t > .25 && (Math.abs(nn[1]) < .1 || Math.abs(t - .7) < .03) ? {m:VN} : undefined)}); } }
@@ -414,8 +426,8 @@ const BEAST = (() => {
     if (ant) return antOf(key, s, SH, LG, AC, EY, DKB, sz);
     const EL = SH, wb = key === 'waterbug', LK = clamp(s.legLen ?? 1, .85, 1.15), EYE = s.eyeGlow ? EY : DKB;
     return (cx, act, f, n) => {
-      const o = motion(act, f, n), hk = o.hk, walk = act === 'walk', by = (wb ? 3 : 3.8) - hk * 1.3, fl = wb ? .62 : 1;   // (v340) struck: hunkers down, legs pulled in, jaws gaping, antennae back
-      fallPre(cx, o, by);
+      const o = motion(act, f, n), hk = o.hk, dk = o.dk ? o.fk : 0, walk = act === 'walk', by = (wb ? 3 : 3.8) - hk * 1.3, fl = wb ? .62 : 1;   // (v340) struck: hunkers down, legs pulled in, jaws gaping, antennae back · (v341) dead: on its back, legs folded
+      flipPre(cx, o, by, by + 5.8 * fl);
       const T = p => [p[0] * sz, (p[1] + o.bob * .25) * sz, p[2] * sz + o.lun];
       // legs: far side first is handled by depth; tripod gait
       for (let i = 0; i < 3; i++) for (const sd of [-1, 1]){ cx.gid = 1 + i * 2 + (sd > 0 ? 1 : 0);
@@ -425,7 +437,7 @@ const BEAST = (() => {
         if (wb && i === 0){   // a water bug's front legs: thick grasping arms folded forward, the shin closing on the thigh
           const kn = T([sd * 3.8, by + .8, z + 3.4]), cl = T([sd * 2.6, by - .6 + (act === 'attack' ? [0, 1, -1, 0][f] : 0), z + 6.4]);
           cap(cx, cox, kn, 1.2, 1.05, LG, {}); cap(cx, kn, cl, .8, .4, LG, {}); cap(cx, cl, add(cl, [-sd * .6 * sz, -.4 * sz, .8 * sz]), .35, .12, DKB, {}); continue; }
-        const kn = T([sd * 5.4 * LK * (1 - hk * .12), by + .7 + lift * .5 + hk * 1.4, z + dz + sw * .9]), ft = T([sd * 7.2 * LK * (1 - hk * .26), .45 + lift, z + fz * (1 - hk * .35) + sw * 1.6]);
+        const kn = T([sd * 5.4 * LK * (1 - hk * .12), by + .7 + lift * .5 + hk * 1.4, z + dz + sw * .9]), ft = T([sd * 7.2 * LK * (1 - hk * .26 - dk * .4), .45 + lift + dk * 3.2, z + fz * (1 - hk * .35 - dk * .4) + sw * 1.6]);
         cap(cx, cox, kn, 1.1, .9, LG, {tex:nn => (nn[1] > .5 ? {t:1} : undefined)});   // the thick thigh, catching the light on top
         ell(cx, kn, .78 * sz, .72 * sz, LG, {tex:() => ({t:2})});                        // the knee
         if (wb && i === 2){ ell(cx, lerp3(kn, ft, .55), 1 * sz, .35 * sz, LG, {rz:2.6 * sz}); cap(cx, kn, ft, .7, .5, LG, {}); continue; }   // a swimming paddle
@@ -456,13 +468,13 @@ const BEAST = (() => {
   function antOf(key, s, SH, LG, AC, EY, DKB, sz){
     const EYE = s.eyeGlow ? EY : DKB;
     return (cx, act, f, n) => {
-      const o = motion(act, f, n), hk = o.hk, walk = act === 'walk', by = 4.4 - hk * 1.4, atk = act === 'attack';   // (v340) struck: crouches, the gaster curls under, jaws gape, antennae swept back
-      fallPre(cx, o, by);
+      const o = motion(act, f, n), hk = o.hk, dk = o.dk ? o.fk : 0, walk = act === 'walk', by = 4.4 - hk * 1.4, atk = act === 'attack';   // (v340) struck: crouches, the gaster curls under, jaws gape, antennae swept back · (v341) dead: on its back, legs curled
+      flipPre(cx, o, by, by + 5);
       const T = p => [p[0] * sz, (p[1] + o.bob * .25) * sz, p[2] * sz + o.lun];
       for (let i = 0; i < 3; i++) for (const sd of [-1, 1]){ cx.gid = 1 + i * 2 + (sd > 0 ? 1 : 0);
         const ph = ((i + (sd > 0 ? 1 : 0)) % 2) * Math.PI, sw = walk ? Math.sin(o.ph * 2 + ph) : Math.sin(o.ph) * .12, lift = walk ? Math.max(0, Math.cos(o.ph * 2 + ph)) * 1.3 : 0;
         const z = [2.6, 1.2, -.2][i], dz = [2.4, .2, -2.4][i], fz = [4.6, -.2, -5.4][i];
-        const cox = T([sd * 1.3, by - .9, z]), kn = T([sd * 5.2, by + 1.6 + lift * .5 + hk * 1.5, z + dz + sw * .9]), ft = T([sd * 7.6 * (1 - hk * .15), .45 + lift, z + fz + sw * 1.7]);
+        const cox = T([sd * 1.3, by - .9, z]), kn = T([sd * 5.2, by + 1.6 + lift * .5 + hk * 1.5, z + dz + sw * .9]), ft = T([sd * 7.6 * (1 - hk * .15 - dk * .45), .45 + lift + dk * 3.6, z + fz * (1 - dk * .4) + sw * 1.7]);
         cap(cx, cox, kn, .82, .62, LG, {tex:nn => (nn[1] > .5 ? {t:1} : undefined)}); ell(cx, kn, .6 * sz, .58 * sz, LG, {tex:() => ({t:2})});
         cap(cx, kn, ft, .55, .36, LG, {}); const toe = add(ft, [sd * .5 * sz, 0, (i === 2 ? -1.2 : 1.2) * sz]); cap(cx, ft, toe, .3, .14, DKB, {}); }
       // the abdomen (gaster), raised a little behind the waist, with dark bands
@@ -495,8 +507,9 @@ const BEAST = (() => {
         if (s.horns){ for (const sd of [-1, 1]){ cx.gid = 78 + sd; const b = T([head[0] + sd * 2.4, head[1], head[2]]); cap(cx, b, add(b, [sd * 2.6 * sz, 4.6 * sz, -2.4 * sz]), 1.2 * sz, .2, XA, {}); } }
         if (s.spines){ for (let i = 0; i < 5; i++){ cx.gid = 82 + i; const b = T([0, top - .8, rear[2] + 1 + i * len / 5]); cap(cx, b, add(b, [0, (3.6 - Math.abs(i - 2) * .8) * sz, -1.4 * sz]), 1.1 * sz, .2, XA, {}); } }
       };
-      const o = motion(act, f, n), hk = o.hk, hop = kind === 'frog' || kind === 'toad' ? (act === 'walk' ? Math.max(0, Math.sin(o.ph)) * 5 : act === 'attack' ? [0, 0, 4, 0][f] : -hk * 1.3) : 0;   // (v340) a frog flattens to the ground
-      fallPre(cx, o, 6);
+      const o = motion(act, f, n), dk = o.dk, hk = o.hk || ((kind === 'turtle' || kind === 'clam') ? Math.min(1, dk * 2) : 0), hop = kind === 'frog' || kind === 'toad' ? (act === 'walk' ? Math.max(0, Math.sin(o.ph)) * 5 : act === 'attack' ? [0, 0, 4, 0][f] : -hk * 1.3) : 0;   // (v340) a frog flattens to the ground
+      if (dk && (kind === 'turtle' || kind === 'clam')){ const a = .32 * o.fk; cx.pre = p => { const q = rotZ([p[0], p[1], p[2]], a); return [q[0], Math.max(.3, q[1] + Math.abs(a) * 4), q[2]]; }; }   // (v341) dead: drawn into the shell, tipped a little on its side
+      else if (dk) flipPre(cx, o, 6, kind === 'frog' || kind === 'toad' ? 10 : 13); else fallPre(cx, o, 6);
       const T = p => [p[0] * sz, p[1] * sz + hop + o.bob * .3, p[2] * sz + o.lun];
       if (kind === 'clam'){ const open = act === 'attack' ? [.2, .6, .9, .3][f] : act === 'die' ? 0 : hk ? .25 * (1 - hk) : .25 + Math.sin(o.ph) * .1;   // (v340) struck, it snaps shut
         cx.gid = 1; ell(cx, T([0, 4, 0]), 11, 4.5, SH, {tex:nn => (Math.sin(Math.atan2(nn[0], nn[2]) * 7) > .6 ? {dt:1} : undefined)});
@@ -509,7 +522,7 @@ const BEAST = (() => {
                    // folded hind legs with big thighs and webbed feet, thin front legs
         const sh = nn => { const y = nn[1]; return y > .55 ? 0 : y > -.15 ? 1 : y > -.6 ? 2 : 3; };
         const coat = nn => (nn[1] < -.35 ? {m:BE} : s.warts && Math.sin(nn[0] * 17) * Math.sin(nn[2] * 15) > .65 ? {dt:1} : s.stripe && Math.abs(nn[0]) < .1 && nn[1] > .2 ? {m:mat(key, 'stripe', s.stripe)} : spot(nn));
-        const leap = act === 'walk' ? Math.max(0, Math.sin(o.ph)) : act === 'attack' ? [0, .2, 1, .2][f] : hk * 1.3;   // (v340) struck: the hind legs kick out
+        const leap = act === 'walk' ? Math.max(0, Math.sin(o.ph)) : act === 'attack' ? [0, .2, 1, .2][f] : hk ? hk * 1.3 : dk * 1.6;   // (v340) struck: the hind legs kick out · (v341) dead: legs stretched out
         for (const sd of [-1, 1]){ cx.gid = 1 + (sd > 0 ? 1 : 0);
           const hip = T([sd * 3.6, 4, -4]), knee = T([sd * 7.2, 3.2 - leap * 1.5, -.6 - leap * 4]), ft = T([sd * 6, .5 - leap * 2, -6 - leap * 5]);
           cap(cx, hip, knee, 2.8 * sz, 1.9 * sz, SK, {tex:nn => ({...(coat(nn) || {}), t:sh(nn)})}); cap(cx, knee, ft, 1.5 * sz, 1 * sz, SK, {tex:nn => ({...(coat(nn) || {}), t:sh(nn)})});
@@ -566,7 +579,7 @@ const BEAST = (() => {
     const kind = s.kind || 'wisp', sz = s.size ?? 1, nt = s.tails ?? 3;
     return (cx, act, f, n) => {
       // (v340) struck: the spirit is flung back and up, its tails and hair whip forward after it, arms thrown up before its face
-      const o = motion(act, f, n), hk = o.hk, fl = hk ? 0 : Math.sin(o.ph) * 1.6, dim = act === 'die' ? [.2, .45, .7, .9][f] : 0, base = (kind === 'krasue' ? 24 : 20) + fl - dim * 12 + hk * 2.5;
+      const o = motion(act, f, n), hk = o.hk, fl = hk || o.dk ? 0 : Math.sin(o.ph) * 1.6, dim = act === 'die' ? (o.dk ? o.dk * .95 : [.2, .45, .7, .9][f]) : 0, soul = ['wisp', 'mask', 'krasue', 'star', 'vortex', 'pearl'].includes(kind), base = (kind === 'krasue' ? 24 : 20) + fl + (soul ? dim * 9 : -dim * 12) + hk * 2.5;   // (v341) a spirit dies rising and thinning away; a jar or a lantern drops
       const sway = act === 'walk' ? Math.sin(o.ph) * .2 : act === 'attack' ? [0, -.25, .35, 0][f] : hk ? -hk * (kind === 'vortex' || kind === 'pearl' || kind === 'star' ? .18 : .5) : Math.sin(o.ph) * .06;
       cx.pre = p => { const v = rotX([p[0], p[1] - base, p[2]], sway); return [v[0], Math.max(.5, v[1] + base), v[2] + o.lun]; };
       const P = p => [p[0] * sz, base + p[1] * sz, p[2] * sz];
@@ -578,7 +591,7 @@ const BEAST = (() => {
             cx.gid = 5 + k; cap(cx, p0, p1, r0, r1, C, {tex:nn => (Math.sin(Math.atan2(nn[0], nn[2]) * 5 + o.ph * 2 + t * 4) > .6 ? {dt:1} : undefined)}); p0 = p1; r0 = r1; } }
         for (let j = 0; j < Math.max(0, nt - 1); j++){ const a = (nt > 2 ? j / (nt - 2) - .5 : 0) * 2.8; let q0 = P([Math.sin(a) * 5, -6, Math.cos(a) * 3 - 1]);
           for (let k = 1; k <= 3; k++){ const t = k / 3, q1 = P([Math.sin(a) * (5 + t * 2.4) + Math.sin(o.ph + j + t * 3) * 1.4, -6 - t * 8, Math.cos(a) * 3 - 1 - t * 2]); cx.gid = 40 + j * 4 + k; cap(cx, q0, q1, 1.9 * (1 - t * .6), 1.7 * (1 - t * .75), C, {}); q0 = q1; } }
-        if (!s.puffs && !s.hood){ const reach = act === 'attack' ? [0, .4, 1, .4][f] : .25 + Math.sin(o.ph) * .1;   // thin arms reaching forward
+        if (!s.puffs && !s.hood){ const reach = act === 'attack' ? [0, .4, 1, .4][f] : dim ? .25 - dim * .9 : .25 + Math.sin(o.ph) * .1;   // thin arms reaching forward
           for (const sd of [-1, 1]){ const sh = P([sd * 6.2, -2.5, .5]), el = P([sd * (8.2 + hk * 1.5), -6 + reach * 4 + hk * 8, 3.5 + reach * 4 + hk * 1]), hd = P([sd * (6.4 - hk * 2.4), -8.5 + reach * 7 + hk * 16, 7.5 + reach * 6 + hk * 1.5]);
             cx.gid = 60 + (sd > 0 ? 2 : 0); cap(cx, sh, el, 1.9, 1.3, C, {}); cx.gid = 61 + (sd > 0 ? 2 : 0); cap(cx, el, hd, 1.3, .6, C, {}); } }
         if (s.veil){ cx.gid = 70; ell(cx, P([0, 1.6, -1.4]), 8.8, 9.2, H, {tex:nn => (nn[2] > .2 && nn[1] < .5 && Math.abs(nn[0]) < .6 ? false : undefined)});   // long wet hair over the face
@@ -643,7 +656,7 @@ const BEAST = (() => {
       if (act === 'attack'){ sq = [1.15, .8, 1.2, 1][f]; lun = [0, -1, 5, 1][f]; hop = [0, 0, 2, 0][f]; }
       if (act === 'hurt'){ const H = globalThis.HURTX, i = H ? H.i : f * 2;   // (v340) struck: it squashes flat, springs up tall, wobbles and settles, shoved back a little
         sq = [1.42, .74, 1.2, .93, 1.02][i]; lun = -[1.5, 3, 2.4, 1.2, .3][i]; o.eyes = i < 3 ? 'closed' : 'hurt'; }
-      if (act === 'die'){ melt = [.15, .45, .7, .9][f]; o.eyes = 'closed'; }
+      if (act === 'die'){ const D = globalThis.DIEX; melt = D ? Math.min(.92, D.k * 1.05) : [.15, .45, .7, .9][f]; o.eyes = 'closed'; if (D && D.k < .3){ sq = 1 - D.k; } }   // (v341) it sags, then spreads into a puddle
       const jl = s.jelly ? .72 : 1, r = 9 * sz, h = (1 - melt) / sq, yc = r * .82 * h + hop * sz + (s.jelly ? 8 * sz * (1 - melt) + Math.sin(ph) * sz : 0);   // jellyfish: a bell that drifts above its tentacles
       if (s.jelly && melt < .6){ for (let i = 0; i < 8; i++){ const a = i / 8 * Math.PI * 2; let p0 = [Math.cos(a) * r * .55, yc - r * .3, lun + Math.sin(a) * r * .55];
         for (let k = 1; k <= 3; k++){ const t = k / 3, p1 = [Math.cos(a) * r * (.55 - t * .15) + Math.sin(ph * 2 + i + t * 3) * 1.4 * t, Math.max(.6, yc - r * .3 - t * (yc - r * .3 - .6)), lun + Math.sin(a) * r * (.55 - t * .15)]; cx.gid = 30 + i; cap(cx, p0, p1, .9 * sz, .4 * sz, TP, {}); p0 = p1; } } }
@@ -917,10 +930,11 @@ const BEAST = (() => {
       CR = mat(key, 'crest', s.crest), EY = s.eyeGlow ? emis(key, 'eye', s.eyeGlow) : M.slimeE, TL = mat(key, 'tail', s.tailCol) ?? W,
       HD = mat(key, 'head', s.headCol) ?? B, BA = mat(key, 'bars', s.bars), MA = mat(key, 'mantle', s.mantle), WGL = s.wingGlow ? emis(key, 'wglow', s.wingGlow) : null,
       HN = mat(key, 'horn', s.horns), CQ = mat(key, 'casque', s.casque), LG = mat(key, 'legs', s.legCol || '#5a4a3a');
-    const sz = s.size ?? 1, fly = s.fly ?? true, bl = s.beakLen ?? 1, nk = s.neckLen ?? 1, lgk = s.legLen ?? 1;
+    // (v341) a flier struck dead stops flying (fly below): it drops, wings folded, and lies on its side
+    const sz = s.size ?? 1, FLY = s.fly ?? true, bl = s.beakLen ?? 1, nk = s.neckLen ?? 1, lgk = s.legLen ?? 1;
     const top = (nn, t) => { const y = nn[1] + (h3(Math.floor(t * 30), Math.floor((nn[0] + 2) * 12), 3) - .5) * .16; return y > .5 ? 0 : y > 0 ? 1 : y > -.5 ? 2 : 3; };
     return (cx, act, f, n) => {
-      const o = motion(act, f, n), lift = fly ? 13 + Math.sin(o.ph * 2) * 1.2 : 6.5 * sz * lgk, fl = act === 'die' ? -.2 : fly ? Math.sin(o.ph * (act === 'walk' ? 4 : 2) + 1) : o.flap * .25;
+      const o = motion(act, f, n), fly = FLY && !(o.dk > .3), lift = fly ? 13 + Math.sin(o.ph * 2) * 1.2 : 6.5 * sz * lgk * (o.dk ? 1 - o.fk * .25 : 1), fl = act === 'die' ? -.2 : fly ? Math.sin(o.ph * (act === 'walk' ? 4 : 2) + 1) : o.flap * .25;
       fallPre(cx, o, lift);
       const T = p => [p[0] * sz, (p[1] + (act === 'die' ? -lift * o.fall * .5 : 0)) * sz + lift + o.bob * .5, p[2] * sz + o.lun];
       const pitch = (fly ? .12 : act === 'attack' ? [0, -.1, .35, 0][f] : 0) - o.hk * .4;   // (v340) struck: the bird rears back
@@ -1051,10 +1065,13 @@ const BEAST = (() => {
     const eyes = (nn, o) => eyesTex(nn, o, EY, {glow:true, sp:.36, y:.05, rx:.17, ry:.09, front:.35});
     return (cx, act, f, n) => {
       const o = motion(act, f, n), hk = o.hk, walk = act === 'walk', ph = o.ph, atk = act === 'attack';   // (v340) struck: a golem throws its fists up before its face, a spire and a stump lift their arms, coral branches whip back
+      // (v341) dead: a golem or a coral does not keel over — it comes apart: the stones slump, slide out and settle in a heap; a stump or a spire topples
+      const heap = o.dk && (form === 'golem' || form === 'coral') ? o.fk : 0; if (heap){ o.fall = 0; o.bob = 0; }
       fallPre(cx, o, 10);
-      const T = p => [p[0] * sz, p[1] * sz + o.bob * .5 - hk * .8 * sz, p[2] * sz + o.lun];
-      const lump = (gid, c, rx, ry, part, m = C) => { cx.gid = gid; const W = T(c); ell(cx, W, rx * sz, ry * sz, m, {rz:Math.min(rx, ry) * sz, tex:(nn, lo) => stone(nn, lo, W[1] + lo[1], part)}); };
-      const limb = (gid, a, b, r0, r1, part, m = C) => { cx.gid = gid; const A0 = T(a), B0 = T(b); cap(cx, A0, B0, r0 * sz, r1 * sz, m, {step:.4, tex:(nn, lo, q, t) => stone(nn, lo, A0[1] + (B0[1] - A0[1]) * t, part + Math.floor(t * 3))}); };
+      const T = p => [p[0] * sz * (1 + heap * .45), (p[1] * (1 - heap * .78) + heap * 1.2) * sz + o.bob * .5 - hk * .8 * sz, p[2] * sz * (1 + heap * .3) + o.lun];
+      const J = (c, part) => heap ? [c[0] + (h3(part, 3, 7) - .5) * 9 * heap, c[1], c[2] + (h3(part, 5, 9) - .5) * 9 * heap] : c;
+      const lump = (gid, c, rx, ry, part, m = C) => { cx.gid = gid; const W = T(J(c, part)); ell(cx, W, rx * sz, ry * sz, m, {rz:Math.min(rx, ry) * sz, tex:(nn, lo) => stone(nn, lo, W[1] + lo[1], part)}); };
+      const limb = (gid, a, b, r0, r1, part, m = C) => { cx.gid = gid; const A0 = T(J(a, part)), B0 = T(J(b, part)); cap(cx, A0, B0, r0 * sz, r1 * sz, m, {step:.4, tex:(nn, lo, q, t) => stone(nn, lo, A0[1] + (B0[1] - A0[1]) * t, part + Math.floor(t * 3))}); };
       // feet and legs (the far one first)
       const legs = (hipY, spread, r) => { for (const sd of [-1, 1]){ const sw = walk ? Math.sin(ph + (sd > 0 ? Math.PI : 0)) * 2.2 : o.sw * sd * 1.4, lift = walk ? Math.max(0, Math.cos(ph + (sd > 0 ? Math.PI : 0))) * 1.6 : 0;
         limb(2 + (sd > 0 ? 1 : 0), [sd * spread, hipY, 0], [sd * (spread + .4), 2 + lift, sw + .6], r, r * .9, 10 + sd);
@@ -1301,10 +1318,12 @@ const BEAST = (() => {
       : k => Math.max(.14, Math.sin(Math.pow(k, .75) * Math.PI) ** .6);
     return (cx, act, f, n) => {
       // (v340) struck: the body bends hard into a C and whips back (a fish's startle), a puffer blows itself up, an octopus pulls its arms in, a ray beats down
-      const o = motion(act, f, n), hkF = o.hk, dim = act === 'die' ? [.25, .55, .8, 1][f] : 0;
+      const o = motion(act, f, n), hkF = o.hk, dim = act === 'die' ? (o.dk ? Math.min(1, o.dk * 1.15) : [.25, .55, .8, 1][f]) : 0;
       const hov = (kind === 'octopus' ? 0 : kind === 'seahorse' ? 15 : kind === 'manta' ? 16 : 13) + (kind === 'octopus' || hkF ? 0 : Math.sin(o.ph) * 1.4) - dim * (kind === 'octopus' ? 0 : 9) + hkF * 1.6;
       const wag = act === 'walk' ? Math.sin(o.ph * 2) : act === 'attack' ? [0, -.7, .9, .2][f] : hkF ? [1.5, 1.7, -.9, .5, 0][o.hi] : Math.sin(o.ph) * .45;
-      cx.pre = dim && kind !== 'octopus' ? p => { const q = rotZ([p[0], p[1] - hov, p[2]], dim * 2.6); return [q[0], Math.max(.5, q[1] + hov), q[2]]; } : null;
+      // dead: belly-up and sinking; a seahorse (upright) tips onto its side instead, about its middle
+      const piv = kind === 'seahorse' ? hov + 6 : hov, rz = kind === 'seahorse' ? 1.45 : 2.6;
+      cx.pre = dim && kind !== 'octopus' ? p => { const q = rotZ([p[0], p[1] - piv, p[2]], dim * rz); return [q[0], Math.max(.5, q[1] + piv), q[2]]; } : null;
       const P = p => [p[0] * sz, hov + p[1] * sz, p[2] * sz + o.lun];
       const eye = (c, r, sd) => { cx.gid = 140 + (sd > 0 ? 1 : 0); ell(cx, P(c), r * 1.15, r * 1.15, M.white, {}); ell(cx, P(add(c, [sd * r * .45, 0, r * .15])), r * .78, r * .78, EY, {tex:nn => (nn[1] > .35 && nn[0] * sd < 0 ? {m:M.white, t:0} : undefined)}); };
 
@@ -1321,10 +1340,10 @@ const BEAST = (() => {
         cx.pre = null; return; }
 
       if (kind === 'octopus'){   // a soft mantle and eight curling arms that spread over the sea floor, suckers beneath
-        const lift = act === 'attack' ? [0, 2, 4, 1][f] : hkF * 2.5, br = (1 + Math.sin(o.ph) * .05) * (1 - hkF * .12);
+        const lift = act === 'attack' ? [0, 2, 4, 1][f] : dim ? -dim * 4 : hkF * 2.5, br = (1 + (dim ? 0 : Math.sin(o.ph) * .05)) * (1 - hkF * .12 - dim * .22);   // (v341) dead: the mantle sags, the arms go slack and flat
         for (let i = 0; i < 8; i++){ const a = (i + .5) / 8 * Math.PI * 2, reach = act === 'attack' && Math.cos(a) > .3 ? [0, .2, .55, .2][f] : 0;
           let prev = P([Math.sin(a) * 3, 4 + lift * .3, Math.cos(a) * 3]), pr = 2.1;
-          for (let k = 1; k <= 6; k++){ const t = k / 6, R = 3 + t * 13 * (1 + reach) * (1 - hkF * .4), cu = Math.sin(o.ph * 1.5 + i * 1.7 + t * 3) * t * 2.2 + hkF * t * 3;
+          for (let k = 1; k <= 6; k++){ const t = k / 6, R = 3 + t * 13 * (1 + reach + dim * .25) * (1 - hkF * .4), cu = Math.sin(o.ph * 1.5 + i * 1.7 + t * 3) * t * 2.2 * (1 - dim) + hkF * t * 3;
             const p = P([Math.sin(a + cu * .12) * R + Math.cos(a) * cu, Math.max(.7, 4 - t * 4) + (t > .75 ? (t - .75) * 10 * Math.max(0, Math.sin(o.ph + i)) : 0) + lift * (1 - t) * .3, Math.cos(a + cu * .12) * R - Math.sin(a) * cu]), r = 2.1 * (1 - t * .78);
             cx.gid = 10 + i * 8 + k; cap(cx, prev, p, pr, r, SK, {tex:(nn, lo, q, tt) => (nn[1] < -.2 && Math.sin((k + tt) * 9) > .3 ? {m:BE, t:1} : SP && Math.sin(nn[0] * 9 + k) * Math.sin(nn[2] * 9) > .6 ? {m:SP} : undefined)}); prev = p; pr = r; } }
         cx.gid = 1; ell(cx, P([0, 9 + lift, -2.5]), 7.6 * br, 9.2 * br, SK, {rz:8, tex:nn => (SP && Math.sin(nn[0] * 7) * Math.sin(nn[1] * 7 + 1) > .55 ? {m:SP} : nn[1] > .5 ? {dt:-1} : undefined)});
@@ -1345,7 +1364,7 @@ const BEAST = (() => {
         cx.pre = null; return; }
 
       /* the fish family */
-      const [L0, R0] = DIM, L = L0, puff = kind === 'puffer' ? (act === 'attack' ? [1, 1.15, 1.3, 1.2][f] : hkF ? [1.2, 1.42, 1.38, 1.25, 1.1][o.hi] : 1 + Math.sin(o.ph) * .03) : 1, R = R0 * puff, N = 10;
+      const [L0, R0] = DIM, L = L0, puff = kind === 'puffer' ? (act === 'attack' ? [1, 1.15, 1.3, 1.2][f] : hkF ? [1.2, 1.42, 1.38, 1.25, 1.1][o.hi] : dim ? 1 - dim * .18 : 1 + Math.sin(o.ph) * .03) : 1, R = R0 * puff, N = 10;
       const spine = k => [wag * 2.8 * (1 - k) ** 1.6 * (L / 20), 0, -L * .5 + k * L];
       const pat = (nn, k) => { if (nn[1] < -.22 && kind !== 'lionfish') return BE;
         if (ST && kind === 'lionfish') return Math.sin(k * 26 + nn[1] * 2) > .1 ? ST : null;
@@ -1411,9 +1430,10 @@ const BEAST = (() => {
     const kind = s.kind || 'mole', sz = s.size ?? 1;
     return (cx, act, f, n) => {
       const o = motion(act, f, n), hk = o.hk, P = p => [p[0] * sz, p[1] * sz, p[2] * sz + o.lun];   // (v340) struck: the mole ducks into its hole, the mantis rears with its scythes up, the snail pulls into its shell
+      if (o.dk && (kind === 'snail' || kind === 'mole')) o.fall = 0;   // (v341) the snail dies in its shell, the mole sinks back into its hole
       fallPre(cx, o, 6 * sz);
       if (kind === 'mole'){
-        const rise = act === 'die' ? -o.fall * 3 : act === 'attack' ? [0, 1.5, 3, 1][f] : hk ? -hk * 4.5 : Math.sin(o.ph) * .6, dig = act === 'walk' ? Math.sin(o.ph * 2) : act === 'attack' ? [0, -1, 1, .3][f] : Math.sin(o.ph) * .2;
+        const rise = act === 'die' ? -(o.dk ? o.fk * 1.55 : o.fall) * 5 : act === 'attack' ? [0, 1.5, 3, 1][f] : hk ? -hk * 4.5 : Math.sin(o.ph) * .6, dig = act === 'walk' ? Math.sin(o.ph * 2) : act === 'attack' ? [0, -1, 1, .3][f] : Math.sin(o.ph) * .2;
         cx.gid = 1; ell(cx, P([0, .3, 0]), 13, 4, DK, {rz:2, tex:nn => (nn[1] > .2 ? {m:GL, t:Math.sin(nn[0] * 9 + o.ph * 3) > .3 ? 0 : 1} : undefined)});   // the hole, glowing at the rim
         cx.gid = 2; ell(cx, P([0, 7 + rise, -1]), 9.5, 8.5, SK, {rz:10, tex:nn => (nn[1] < -.35 ? {m:BE} : Math.sin(nn[0] * 21 + nn[1] * 17) * Math.sin(nn[2] * 19) > .55 ? {dt:1} : undefined)});   // the furry body
         cx.gid = 3; ell(cx, P([0, 9 + rise, 7]), 5.6, 5, SK, {rz:5.6, tex:nn => eyesTex(nn, o, EY, {glow:!!s.eyeGlow, sp:.42, y:.32, rx:.08, ry:.08, front:.2}) || (nn[1] < -.3 ? {m:BE} : undefined)});   // the head
@@ -1445,7 +1465,7 @@ const BEAST = (() => {
           for (let i = 1; i <= 3; i++){ const b0 = lerp3(el, tip, i / 4); cap(cx, b0, add(b0, [0, -.4 * sz, 1.6 * sz]), .45, .1, GL, {}); } }   // its spines
         return; }
       // the snail
-      const crawl = act === 'walk' ? Math.sin(o.ph * 2) * .6 : hk ? -hk * 7 : 0, look = act === 'attack' ? [0, 1, 2.4, .8][f] : hk ? -hk * 4 : Math.sin(o.ph) * .3;
+      const hs = hk || (o.dk ? Math.min(1, o.dk * 1.6) : 0), crawl = act === 'walk' ? Math.sin(o.ph * 2) * .6 : hs ? -hs * 7 : 0, look = act === 'attack' ? [0, 1, 2.4, .8][f] : hs ? -hs * 4 : Math.sin(o.ph) * .3;   // (v341) dead: drawn into its shell
       let pf = P([0, 2, -11]); for (let i = 1; i <= 8; i++){ const t = i / 8, q = P([Math.sin(o.ph * 2 + t * 4) * .6, 2 + (t > .75 ? (t - .75) * 18 * (1 - hk * .7) + look * (1 - hk * .5) : 0), -11 + t * 22 + crawl * t]); cx.gid = i;
         cap(cx, pf, q, 2.6 + Math.sin(t * Math.PI) * 1.4, 2.6 + Math.sin(t * Math.PI) * 1.4, SK, {tex:nn => (nn[1] < -.4 ? {m:GL, t:1} : Math.sin(nn[0] * 13 + nn[2] * 9) > .8 ? {dt:1} : undefined)}); pf = q; }   // the foot, glowing beneath
       const hd = pf; for (const sd of [-1, 1]){ const tip = add(hd, [sd * 2 * sz, (5 + look) * sz, 2.4 * sz]); cx.gid = 20 + (sd > 0 ? 1 : 0); cap(cx, add(hd, [sd * .8, 1, 0]), tip, .6, .45, SK, {}); ell(cx, tip, 1.1, 1.1, EY, {}); }   // eye stalks
@@ -1466,7 +1486,7 @@ const BEAST = (() => {
       EY = s.eyeGlow ? emis(key, 'eye', s.eyeGlow) : M.slimeE, GD = M.gold;
     const kind = s.kind || 'whale', sz = s.size ?? 1;
     return (cx, act, f, n) => {
-      const o = motion(act, f, n), hk = o.hk, dim = act === 'die' ? [.25, .55, .8, 1][f] : 0;   // (v340) struck: the whale's body flexes hard, the lotus snaps its petals shut, the chakra lurches off its spin
+      const o = motion(act, f, n), hk = o.hk, dim = act === 'die' ? (o.dk ? Math.min(1, o.dk * 1.15) : [.25, .55, .8, 1][f]) : 0;   // (v340) struck: the whale's body flexes hard, the lotus snaps its petals shut, the chakra lurches off its spin
       if (kind === 'whale'){
         const hov = 20 + Math.sin(o.ph) * 2.4 - dim * 14, wav = act === 'walk' ? Math.sin(o.ph * 2) : act === 'attack' ? [0, -.5, .8, .2][f] : hk ? [1.1, 1.3, -.7, .35, 0][o.hi] : Math.sin(o.ph) * .5;
         cx.pre = dim ? p => { const q = rotZ([p[0], p[1] - hov, p[2]], dim * 2.4); return [q[0], Math.max(.5, q[1] + hov), q[2]]; } : null;
@@ -1487,7 +1507,7 @@ const BEAST = (() => {
         for (let i = 0; i < 4; i++){ const k = (o.ph / 6.283 + i / 4) % 1; cx.gid = 80 + i; ell(cx, add(tb, [Math.sin(i * 2 + o.ph) * 3 * sz, 1 * sz, -k * 14 * sz]), (2 + k * 3) * sz, (1.6 + k * 2) * sz, BE, {}); }   // wisps of cloud in its wake
         cx.pre = null; return; }
       if (kind === 'lotus'){
-        const open = act === 'attack' ? [.7, .85, 1, .8][f] : .62 + Math.sin(o.ph) * .06 - dim * .3 - hk * .42, sway = hk ? -hk * 2.2 : Math.sin(o.ph) * .6, P = p => [p[0] * sz, p[1] * sz, p[2] * sz + o.lun * .4];
+        const open = act === 'attack' ? [.7, .85, 1, .8][f] : .62 + Math.sin(o.ph) * .06 - dim * .55 - hk * .42, sway = hk ? -hk * 2.2 : Math.sin(o.ph) * .6, P = p => [p[0] * sz, p[1] * sz, p[2] * sz + o.lun * .4];
         fallPre(cx, o, 8 * sz);
         for (let i = 0; i < 3; i++){ const a = i * 2.2 + .6; cx.gid = 1 + i; ell(cx, P([Math.cos(a) * 9, .6, Math.sin(a) * 7]), 7 * sz, 2.4 * sz, AC, {rz:1.6, tex:nn => (nn[1] > .3 && Math.abs(Math.atan2(nn[0], nn[2]) - a) < .25 ? false : undefined)}); }   // floating leaf pads
         cx.gid = 5; cap(cx, P([0, .5, 0]), P([sway, 10, 0]), 1.2, 1, AC, {});   // the stem
@@ -1500,7 +1520,7 @@ const BEAST = (() => {
         for (let i = 0; i < 6; i++){ const a = o.ph * 1.2 + i * 1.047; cx.gid = 52 + i; ell(cx, add(c, [Math.cos(a) * 12 * sz, (6 + Math.sin(o.ph * 2 + i) * 2) * sz, Math.sin(a) * 12 * sz]), .9, .9, GL, {}); }   // seeds of light circling
         return; }
       // the chakra
-      const hov = 16 + Math.sin(o.ph) * 1.6 - dim * 12, spin = o.ph * 2 + (act === 'attack' ? f * .9 : 0), tilt = act === 'attack' ? [0, .3, -.6, -.1][f] : hk ? .15 + [.32, .45, .3, .12, 0][o.hi] : .15, P = p => [p[0] * sz, hov + p[1] * sz, p[2] * sz + o.lun];
+      const hov = 16 + Math.sin(o.ph) * 1.6 - dim * 12, spin = o.ph * 2 + (act === 'attack' ? f * .9 : 0), tilt = act === 'attack' ? [0, .3, -.6, -.1][f] : hk ? .15 + [.32, .45, .3, .12, 0][o.hi] : dim ? .15 + dim * 1.35 : .15, P = p => [p[0] * sz, hov + p[1] * sz, p[2] * sz + o.lun];
       cx.pre = p => { const q = rotX([p[0], p[1] - hov, p[2]], tilt); return [q[0], Math.max(.5, q[1] + hov), q[2]]; };
       const Rr = 10;
       for (let i = 0; i < 16; i++){ const a0 = i / 16 * 6.283 + spin, a1 = (i + 1) / 16 * 6.283 + spin; cx.gid = 1 + i;
@@ -1527,7 +1547,7 @@ const BEAST = (() => {
     const kind = s.kind || 'pangolin', sz = s.size ?? 1;
     return (cx, act, f, n) => {
       const o = motion(act, f, n), hk = o.hk, P = p => [p[0] * sz, p[1] * sz, p[2] * sz + o.lun];   // (v340) struck: the pangolin hunches and tucks its head, the empty armour rattles apart, the camel throws its head up, the beetle is jolted off its ball, the automaton jerks its fists up, the ram rears its head
-      if (kind === 'pangolin'){ fallPre(cx, o, 6 * sz);
+      if (kind === 'pangolin'){ const hk = o.hk || (o.dk ? Math.min(1, o.dk * 1.8) : 0); if (o.dk) o.fall = o.fk * .5; fallPre(cx, o, 6 * sz);   // (v341) dead: curled tight in its plates, rolled half over
         const wav = act === 'walk' ? Math.sin(o.ph * 2) : Math.sin(o.ph) * .3, N = 10;
         let prev = null, pr = 0;
         for (let i = 0; i <= N; i++){ const k = i / N, z = (-14 + k * 24) * (1 - hk * .18), y = 5 + Math.sin(k * Math.PI) * (2.6 + hk * 4.5) - (k < .3 ? (.3 - k) * 8 * (1 - hk * .6) : 0) - (k > .85 ? hk * (k - .85) * 20 : 0), x = wav * (1 - k) ** 2 * 3;
@@ -1540,7 +1560,9 @@ const BEAST = (() => {
           cx.gid = 30 + (zz > 0 ? 0 : 4) + (sd > 0 ? 1 : 0); cap(cx, hip, P([sd * 5, .6, zz + ph]), 1.6 * sz, 1.1 * sz, BE, {}); for (let c = -1; c <= 1; c++) cap(cx, P([sd * 5 + c * .6, .5, zz + ph + .6]), P([sd * 5 + c * .8, .3, zz + ph + 2.4]), .45, .15, DK, {}); }   // legs and digging claws
         return; }
       if (kind === 'armor'){ const hov = 4 + Math.sin(o.ph) * 1.2, sep = .6 + Math.sin(o.ph * 1.3) * .3 + (act === 'attack' ? [0, .4, .9, .3][f] : 0) + (act === 'die' ? o.fall * 3 : 0) + hk * 1.7, slash = act === 'attack' ? [0, -1, 1.2, .3][f] : 0;
-        const Q = (p, d) => P([p[0] + d[0] * sep, p[1] + hov + d[1] * sep - (act === 'die' ? o.fall * p[1] * .4 : 0), p[2] + d[2] * sep]);
+        // (v341) dead: the spirit leaves the armour — the pieces drop into a heap and scatter on the ground
+        const hp = o.dk ? o.fk : 0, Q = (p, d) => hp ? P([p[0] * (1 + hp * .25) + d[0] * (sep + hp * 5), Math.max(1.2, (p[1] + hov) * (1 - hp * .86) + d[1] * sep * (1 - hp)), p[2] + d[2] * (sep + hp * 5) + (p[1] > 14 ? hp * 4 : 0)])
+          : P([p[0] + d[0] * sep, p[1] + hov + d[1] * sep - (act === 'die' ? o.fall * p[1] * .4 : 0), p[2] + d[2] * sep]);
         const rust = nn => (Math.sin(nn[0] * 13 + nn[1] * 7) * Math.sin(nn[2] * 11) > .6 ? {m:AC} : nn[1] > .5 ? {dt:-1} : undefined);
         cx.gid = 1; ell(cx, Q([0, 22, 0], [0, 1.6, 0]), 4.4 * sz, 4.8 * sz, SK, {rz:4.6, tex:nn => (nn[2] > .45 && Math.abs(nn[1] + .05) < .12 ? {m:DK} : nn[2] > .55 && Math.abs(nn[1] + .05) < .2 && Math.abs(Math.abs(nn[0]) - .3) < .1 ? {m:GL, t:0} : rust(nn))});   // the helm: an empty visor, two embers for eyes
         cx.gid = 2; cap(cx, Q([0, 26, -1], [0, 1.6, 0]), Q([0, 29, -4], [0, 1.6, 0]), 1.2 * sz, .5 * sz, AC, {});   // the crest
@@ -1565,7 +1587,7 @@ const BEAST = (() => {
           ell(cx, add(ft, [0, 0, .9 * sz]), 2 * sz, 1 * sz, BE, {rz:2.5 * sz, tex:nn => (Math.abs(nn[0]) < .13 && nn[2] > 0 ? {m:DK} : undefined)}); }   // a broad two-toed pad
         cx.gid = 20; cap(cx, P([0, H0 + 2, -8.6]), P([Math.sin(o.ph * 2) * 1.2, H0 - 6, -10.4]), .8 * sz, .5 * sz, SK, {});   // the tail
         return; }
-      if (kind === 'dungbeetle'){ fallPre(cx, o, 6 * sz);
+      if (kind === 'dungbeetle'){ flipPre(cx, o, 6 * sz, 10 * sz);   // (v341) dead: on its back beside its ball
         const roll = o.ph * (act === 'walk' ? 2 : .4), push = act === 'attack' ? [0, -1, 3, 1][f] : -hk * 2.6;
         const ball = P([0, 7.4, 7.4 + push]); cx.gid = 1; ell(cx, ball, 7.2 * sz, 7.2 * sz, AC, {rz:7.2, tex:nn => { const a = Math.atan2(nn[1], nn[2]) + roll; return Math.sin(a * 5) * Math.sin(nn[0] * 7) > .45 ? {dt:1} : Math.sin(a * 9 + nn[0] * 4) > .85 ? {m:DK} : undefined; }});   // the ball of packed sand, rolling
         const bd = P([0, 7.5, -5]); cx.gid = 2; ell(cx, bd, 5.6 * sz, 4.2 * sz, SK, {rz:6.6, tex:nn => (nn[1] > .2 && Math.abs(nn[0]) < .04 ? {m:DK} : nn[1] > .5 ? {t:0} : undefined)});   // the shining wing cases

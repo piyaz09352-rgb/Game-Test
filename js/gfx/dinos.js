@@ -40,7 +40,9 @@ const DINO = (() => {
     if (act === 'walk'){ o.bob = Math.abs(Math.cos(ph)) * .8; }
     if (act === 'attack'){ o.lun = [0, -2.5, 6, 2][f]; o.tilt = [0, .25, -.35, 0][f]; o.jaw = [0, .55, .75, .2][f]; o.flap = [0, 1, -1, 0][f]; }
     if (act === 'hurt'){ o.lun = -2; o.tilt = .3; o.eyes = 'hurt'; o.jaw = .3; }
-    if (act === 'die'){ o.fall = [.35, .9, 1.35, 1.55][f]; o.eyes = 'closed'; o.jaw = .25; }
+    if (act === 'die'){ o.fall = [.35, .9, 1.35, 1.55][f]; o.eyes = 'closed'; o.jaw = .25;
+      const D = globalThis.DIEX; if (D){ const k = D.k, ss = (a, b) => { const t = Math.min(1, Math.max(0, (k - a) / (b - a))); return t * t * (3 - 2 * t); };   // (v341) knees give, then over, a small bounce, still
+        o.fall = 1.55 * (ss(.2, .74) + (k > .74 && k < .9 ? Math.sin((k - .74) / .16 * Math.PI) * .06 : 0)); o.bob = -ss(0, .22) * (1 - ss(.4, .7) * .6) * 2.4; o.hd = -ss(.3, .9) * 2.2; o.jaw = .25 + ss(.5, 1) * .2; o.eyes = k < .2 ? 'hurt' : 'closed'; o.flap = -1; } }   // the wings fold down
     // (v314) a boss's skill pose (gfx/sprites.js BOSS_POSE ext): the head goes up or down, the jaw opens, wings spread
     const X = globalThis.BPX; if (X){ o.hd = (X.head || 0) * 2.6; o.jaw = Math.max(o.jaw, X.jaw || 0); if (X.spread != null) o.flap = Math.max(-1, Math.min(1, X.spread)); o.tailK = X.tail || 0; }
     if (X && X.hurt){ o.lun = X.lun * 1.3; o.tilt = X.tilt; o.eyes = 'hurt'; o.hd = (X.head || 0) * 4.4; o.jaw = Math.max(o.jaw, X.jaw || 0); }   // (v340) HURT_POSE: the head is thrown up hard, the jaw opens
@@ -139,7 +141,7 @@ const DINO = (() => {
   }
   /* membrane wing: an arm to the wrist, long finger bones fanned out, skin stretched between them and back to the body */
   function wing(cx, P, root, sd, span, o, opt = {}){
-    const fl = (opt.fold ? -.9 : 0) + o.flap * (opt.fold ? .15 : .55) + (opt.lift ?? .35);
+    const fl = globalThis.DIEX ? -1 + (1 - globalThis.DIEX.k) * .6 : (opt.fold ? -.9 : 0) + o.flap * (opt.fold ? .15 : .55) + (opt.lift ?? .35);   // (v341) dying: the wings fold down along the body
     const elbow = add(root, [sd * Math.cos(fl * .6 + .2) * span * .28, Math.sin(fl * .6 + .2) * span * .28 + 1, -span * .06]);
     const wrist = add(elbow, [sd * Math.cos(fl + .1) * span * .3, Math.sin(fl + .1) * span * .3, opt.fold ? -span * .2 : span * .05]);
     cx.gid = 80 + (sd > 0 ? 10 : 0); cap(cx, root, elbow, 1.2 * opt.bone, .9 * opt.bone, P.WG, {}); cap(cx, elbow, wrist, .9 * opt.bone, .7 * opt.bone, P.WG, {});

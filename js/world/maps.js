@@ -257,7 +257,7 @@ function loadMap(id){
   // (v85) painting a new map's ground takes a moment: a soft fade from cream hides that pause as a scene change
   { const f = document.getElementById('mapFade') || (() => { const d = document.createElement('div'); d.id = 'mapFade'; const w = document.getElementById('wrap'), ui = document.getElementById('ui'); if (w){ if (ui && ui.parentNode === w) w.insertBefore(d, ui); else w.appendChild(d); } return d; })();
     if (f && f.isConnected && typeof T !== 'undefined' && T > 1){ f.classList.remove('go'); void f.offsetWidth; f.classList.add('go'); } }
-  const mp = MAPS[id]; if (mp && mp.mobs && typeof SHEETS !== 'undefined' && SHEETS) SPR.warm(SHEETS, mp.mobs.flatMap(k => [[k, 'idle'], [k, 'walk'], [k, 'attack'], [k, 'hurt']]));
+  const mp = MAPS[id]; if (mp && mp.mobs && typeof SHEETS !== 'undefined' && SHEETS) SPR.warm(SHEETS, mp.mobs.flatMap(k => [[k, 'idle'], [k, 'walk'], [k, 'attack'], [k, 'hurt'], [k, 'die']]));   // (v341) the death too: painted in spare time, ready for the first kill
 }
 /* paint the current map again (quality change, lost canvas): same seed → same ground, props and water */
 function repaintMap(){
