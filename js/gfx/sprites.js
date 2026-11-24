@@ -174,6 +174,10 @@ mat('ember',['#fff2c0','#ffa048','#e0561e','#8a2410'], {emissive:true});
 mat('obsid',['#c4b0ec','#5e4c80','#30264a','#160f22']);
 mat('jade',['#e8fff6','#66e6c8','#26a48e','#0e5a50'], {emissive:true});
 mat('sun',['#ffffff','#fff2a8','#ffcc48','#d68c12'], {emissive:true});
+// (v336) blade metals that stay metal (the glowing ember / jade / sun tiers made swords read as thin sticks of light)
+mat('bronzeM',['#ffe6bc','#d9a05a','#a5682e','#5e3614']);
+mat('jadeM',['#e4fff6','#86dcc6','#3f9e8a','#155c50']);
+mat('goldM',['#fff6c8','#f0c860','#c08a2c','#7a5018']);
 
 /* ---------- raster core ---------- */
 function Frame(w, h){ const n = w * h; this.w = w; this.h = h; this.m = new Int16Array(n).fill(-1); this.t = new Uint8Array(n); this.d = new Float32Array(n).fill(-1e9); this.g = new Int16Array(n).fill(-1); }
@@ -1810,10 +1814,25 @@ function hairTex(n, cfg){
   if (y > .55 && Math.sin(a * 3 + 1) > .3 && z > -.2) return {dt:-1};
 }
 /* (v101) held weapons drawn bigger (length × WPN_BIG, sword blades a little wider) so the weapon reads at game zoom */
-const WPN_BIG = 1.3;
-const AXE_K = [.55, .5];   // (v210) smaller again: the war axe stood nearly as tall as the character
+const WPN_BIG = 1.7;   // (v336) weapons read at game size beside the big-headed heroes (1.3 left them as specks)
+const AXE_K = [.98, .9];   // (v336) bigger again: at .55/.5 the merchant's axe was a speck of gold at the hand   // (v210) smaller again: the war axe stood nearly as tall as the character
 function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
   if (!w || w === 'fist') return;
+  if (w === 'bow' && cfg.xbow){
+    // (v336) หน้าไม้: a wooden stock held at the shoulder, a short steel-tipped prod across its front, the string drawn back
+    // to the nut, a bolt in the groove and a trigger under the grip (it was drawn as a plain bow)
+    G(); const bw = cfg.wTier ?? -1, wood = M[['wood', 'wood', 'lacquer', 'charcoal', 'teal', 'goldM'][bw] || 'wood'], metal = M[['steel', 'steel', 'bronzeM', 'obsid', 'jadeM', 'goldM'][bw] || 'steel'];
+    let f = add(hL, mul(hR, -1)); if (Math.hypot(...f) < 2) f = [0, 0, 1]; f = nrm(f); const side = nrm(Math.abs(f[1]) > .9 ? [1, 0, 0] : [f[2], 0, -f[0]]), up = nrm([f[1] * side[2] - f[2] * side[1], f[2] * side[0] - f[0] * side[2], f[0] * side[1] - f[1] * side[0]]);
+    const butt = add(hR, mul(f, -4.2)), nose = add(hL, mul(f, 4.6)), nut = add(hR, mul(f, 1.8));
+    cap(cx, butt, nose, 1.05, .8, wood, {tex:(n, lo, q, t) => (t > .28 && t < .34 ? {m:metal, t:1} : undefined)});
+    G(); cap(cx, add(hR, mul(up, -.6)), add(add(hR, mul(up, -2.4)), mul(f, -.6)), .45, .3, metal, {});   // the trigger
+    const PW = 7 * WPN_BIG * .8, pts = []; for (let i = 0; i <= 12; i++){ const k = -1 + i / 6; pts.push(add(add(nose, mul(side, k * PW)), mul(f, -1.6 * k * k))); }
+    G(); for (let i = 0; i < pts.length - 1; i++) cap(cx, pts[i], pts[i + 1], .78, .78, i < 1 || i > pts.length - 3 ? metal : (i > 4 && i < 7 ? metal : wood), {});
+    G(); line(cx, pts[0], nut, M.white, {t:1}); line(cx, nut, pts[pts.length - 1], M.white, {t:1});
+    if (!P.thrown){ G(); cap(cx, add(nut, mul(up, .5)), add(nose, mul(add(f, mul(up, .1)), 1.2)), .3, .3, M.wood, {}); G(); dot(cx, add(add(nose, mul(f, 1.4)), mul(up, .5)), metal, 1); }
+    (cx.wsegs || (cx.wsegs = [])).push([proj(cx, butt), proj(cx, nose)]);
+    return;
+  }
   if (w === 'bow'){
     G();
     const fwd = rotX([0, 0, 1], 0), c = add(hL, [0, 0, .6]);
@@ -1829,11 +1848,25 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
     (cx.wsegs || (cx.wsegs = [])).push([proj(cx, tp), proj(cx, bt)]);   // where the weapon is in this frame (refine glow)
     void fwd; return;
   }
+  if (w === 'shuriken' && cfg.kunai){
+    // (v336) คุไน: a throwing knife (it was drawn as a star): a ring pommel, a cord-wrapped grip and a leaf blade with a ridge
+    if (P.thrown) return;
+    const st = cfg.wTier ?? -1, met = M[['steel', 'steel', 'bronzeM', 'obsid', 'jadeM', 'goldM'][st] || 'steel'];
+    let d0 = P.wdir || rotX(rotX([0, -1, 0], P.armR + P.wpn), P.lean); d0 = nrm(d0);
+    const wvR = [-d0[1], d0[0], 0], wv = Math.hypot(...wvR) < .25 ? [1, 0, 0] : nrm(wvR), L0 = (9.5 + Math.max(0, st) * .3) * WPN_BIG;
+    G(); ell(cx, add(hR, mul(d0, -3.4)), 1.25, 1.25, M[st >= 3 ? 'gold' : 'steel'], {rz:.35}); G(); ell(cx, add(hR, mul(d0, -3.4)), .6, .6, M.charcoal);
+    G(); cap(cx, add(hR, mul(d0, -2.6)), add(hR, mul(d0, .6)), .55, .55, M.charcoal, {tex:(n, lo, q, t) => (Math.abs(Math.sin(t * 20)) < .3 ? {m:M[st >= 3 ? 'scarlet' : 'white'], t:1} : undefined)});
+    const half = t => 1.3 * Math.sin(Math.min(1, t * 1.15) * Math.PI) * (1 - t * .25), b0 = add(hR, mul(d0, .7));
+    for (const u of [-1, -.5, 0, .5, 1]){ const tone = Math.abs(u) > .8 ? 0 : u === 0 ? 2 : 1; let p0 = b0;
+      for (let r = 1; r <= 6; r++){ const t = r / 6, p1 = add(add(b0, mul(d0, L0 * t)), mul(wv, u * half(t))); G(); cap(cx, p0, p1, .32, .32, met, {tex:() => ({t:tone})}); p0 = p1; } }
+    (cx.wsegs || (cx.wsegs = [])).push([proj(cx, b0), proj(cx, add(b0, mul(d0, L0)))]);
+    return;
+  }
   if (w === 'shuriken'){
     // (v184) a ninja's throwing star, held flat between the fingers: four leaf blades with bright edges round a ringed
     // hole; it leaves the hand at the release of a throw (P.thrown) and a fresh one is back in the hand for the next
     if (P.thrown) return;
-    const st = cfg.wTier ?? -1, met = M[['steel', 'steel', 'ember', 'obsid', 'jade', 'sun'][st] || 'steel'];
+    const st = cfg.wTier ?? -1, met = M[['steel', 'steel', 'bronzeM', 'obsid', 'jadeM', 'goldM'][st] || 'steel'];
     let dir0 = P.wdir || rotX(rotX([0, -1, 0], P.armR + P.wpn), P.lean); dir0 = nrm(dir0);
     const R = (4 + Math.max(0, st) * .16) * WPN_BIG, c = add(hR, mul(dir0, R * .55)), sp = .4 + (P.spinStar || 0);
     // the star is a flat disc: lay it in whichever plane the camera sees most of (it reads as a star, never as a sliver)
@@ -1847,7 +1880,7 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
     (cx.wsegs || (cx.wsegs = [])).push([proj(cx, add(c, mul(dir, -R))), proj(cx, add(c, mul(dir, R)))]);
     return;
   }
-  const wt = cfg.wTier ?? -1, BL = ['steel', 'steel', 'ember', 'obsid', 'jade', 'sun'], SH = ['wood', 'wood', 'lacquer', 'charcoal', 'teal', 'gold'], ORB = ['orb', 'rune', 'ember', 'auraViolet', 'jade', 'sun'];
+  const wt = cfg.wTier ?? -1, BL = ['steel', 'steel', 'bronzeM', 'obsid', 'steel', 'goldM'], EDGE = [null, null, 'ember', 'orb', 'jade', 'sun'], SH = ['wood', 'wood', 'lacquer', 'charcoal', 'teal', 'gold'], ORB = ['orb', 'rune', 'ember', 'auraViolet', 'jade', 'sun'];
   const RFM = ['', 'rune', 'orb', 'auraGold', 'auraWhite'], rft = cfg.rfTier || 0;   // refine glow: blue → violet → gold → radiant
   const blade = M[BL[wt] || 'steel'],   // (v166) a refined blade stays its own metal (it used to turn into glowing white at +13 and vanish into a blob of light); the glow is laid over it by refinefx.js
         _rfm = RFM[rft], guard = M[wt === 0 ? 'leather' : wt >= 3 ? 'gold' : 'gold'];
@@ -1894,7 +1927,7 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
     const wvR = [-dir[1], dir[0], 0], wv = Math.hypot(...wvR) < .25 ? [1, 0, 0] : nrm(wvR), hl = axeHL, grip = two ? 5.6 + len * .22 : 3.4 + len * .12;   // (v211) total length kept; the hands moved up the haft
     cap(cx, add(base, mul(dir, -grip)), add(base, mul(dir, hl)), two ? 1.05 : .9, two ? .95 : .82, M[SH[wt] || 'wood'], {tex:(n, lo, q, t) => (t < grip / (hl + grip) && Math.abs(Math.sin(t * 40)) < .35 ? {m:M.leather, t:1} : undefined)});
     G(); ell(cx, add(base, mul(dir, -grip - .6)), 1.1, 1.1, M.steel);
-    const hd = add(base, mul(dir, hl - (two ? 2.2 : 1.7))), bw = two ? 4.6 : 3.7, bh = two ? 3.9 : 2.9, metal = blade;
+    const hd = add(base, mul(dir, hl - (two ? 2.2 : 1.7))), bw = two ? 4.6 : 3.7, bh = two ? 3.9 : 2.9, metal = cfg.sig === 'maxe' || cfg.sig === 'mgaxe' ? M.goldM : blade;   // (v336) the merchant's own axes are gold
     for (const sd of (two ? [-1, 1] : [1])){
       G(); cap(cx, add(hd, mul(wv, sd * .6)), add(hd, mul(wv, sd * bw * .55)), two ? 1.5 : 1.2, two ? 1.1 : .9, metal, {tex:() => ({t:1})});   // the cheek
       const edge = []; for (let i = 0; i <= 8; i++){ const u = -1 + i / 4; edge.push(add(add(hd, mul(wv, sd * bw * (1 - .22 * u * u))), mul(dir, u * bh))); }
@@ -1902,6 +1935,7 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
       G(); for (let i = 0; i < edge.length - 1; i++) cap(cx, edge[i], edge[i + 1], .5, .5, M.white, {rz:.4, tex:() => ({t:0})});
     }
     if (!two){ G(); cap(cx, add(hd, mul(wv, -.6)), add(add(hd, mul(wv, -2.6)), mul(dir, -.6)), .9, .5, M.steel, {}); }   // a short spike on the back
+    if (cfg.sig === 'maxe' || cfg.sig === 'mgaxe'){ G(); const pz = add(base, mul(dir, -grip * .4)); line(cx, pz, add(pz, mul(wv, -1.6)), M.leather, {t:1}); G(); ell(cx, add(add(pz, mul(wv, -1.8)), [0, -1.2, 0]), 1.2, 1.3, M.leather); G(); ell(cx, add(add(pz, mul(wv, -1.8)), [0, -.4, 0]), .5, .5, M.gold); }   // a coin pouch hangs from the haft
     G(); ell(cx, add(hd, mul(dir, two ? 2.6 : 2)), 1, 1, M.steel);
   } else if (w === 'sword'){
     // (v159) a real sword, not a stick: a FLAT blade (laid as thin strips across its width) with bevelled bright edges, a
@@ -1924,10 +1958,15 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
     G(); cap(cx, add(base, mul(dir, .3)), b0, hw0 * .62, hw0 * .72, blade, {rz:.5, tex:() => ({t:2})});
     const strips = two ? 9 : 7, rows = 9;
     for (let i = 0; i < strips; i++){ const u = -1 + 2 * i / (strips - 1), au = Math.abs(u);
-      const tone = au > .78 ? 0 : au < .2 ? 2 : 1, mat = wt === 3 && au < .2 ? M.ember : blade, th = .42 * (1 - au * .55);
+      const tone = au > .78 ? 0 : au < .2 ? 2 : 1, mat = au > .9 && EDGE[wt] ? M[EDGE[wt]] : wt === 3 && au < .2 ? M.ember : blade, th = .42 * (1 - au * .55);
       let p0 = add(b0, mul(wv, u * half(0)));
       for (let r = 1; r <= rows; r++){ const t = r / rows, p1 = add(add(b0, mul(dir, BL * t)), mul(wv, u * half(t)));
         cap(cx, p0, p1, th, th, mat, {tex:() => ({t:tone})}); p0 = p1; } }
+    // (v336) class blades: the warlord's ดาบขุนพล wears a scarlet tassel at the pommel and a gold-lined fuller;
+    // the dog line's ดาบปลอกคอเงิน a silver collar ring with a little bell at the guard
+    if (cfg.sig === 'bsword'){ G(); const pm = add(base, mul(dir, -gl - 1.2)); for (let i = 0; i < 5; i++){ const a = i / 5 * 6.28; cap(cx, pm, add(add(pm, mul(dir, -3.2)), mul(wv, Math.cos(a) * .9)), .4, .25, M.scarlet || M.ember, {}); }
+      G(); cap(cx, add(b0, mul(dir, BL * .05)), add(b0, mul(dir, BL * .72)), .22, .22, M.gold, {}); }
+    if (cfg.sig === 'collar'){ G(); ell(cx, add(base, mul(dir, .9)), 1.9, 1.9, M.steel, {rz:.3}); G(); ell(cx, add(add(base, mul(dir, .3)), mul(wv, 1.6)), .85, .85, M.gold, {}); }
     void tv;
   } else if (kat){  } else if (kat){
     // the katana: a long cord-wrapped hilt for two hands, a round guard, a slim blade with a gentle curve and a pale edge
@@ -1944,8 +1983,30 @@ function drawWeapon(cx, w, P, hR, hL, G, cfg = {}){
     ell(cx, hR, 1.35, 1.1, M[wt >= 3 ? 'gold' : 'steel'], {});
     for (const k of [-1, 0, 1]){ G(); const b0 = add(hR, mul(sd, k * .95)), t0 = add(add(b0, mul(dir, len * 1.25)), mul(sd, k * .7)); cap(cx, b0, t0, .5, .22, blade, {}); }
   } else if (w === 'dagger'){
-    cap(cx, add(base, mul(dir, -1.5)), base, .9, .9, M.wood, {});
-    G(); cap(cx, add(base, mul(dir, .8)), tip, 1.3, .6, blade, {});
+    // (v336) a real dagger, not a speck: a wrapped grip and pommel, a small guard, a flat leaf blade with bright edges and a point
+    const wvR = [-dir[1], dir[0], 0], wv = Math.hypot(...wvR) < .25 ? [1, 0, 0] : nrm(wvR), dl = len * 1.15, hw = 1.4 + Math.max(0, wt) * .06;
+    cap(cx, add(base, mul(dir, -2.6)), add(base, mul(dir, -.2)), .8, .75, M.leather, {tex:(n, lo, q, t) => (Math.abs(Math.sin(t * 16)) < .3 ? {m:M[wt >= 3 ? 'gold' : 'charcoal'], t:1} : undefined)});
+    G(); ell(cx, add(base, mul(dir, -3.1)), .95, .95, guard, {});
+    G(); for (const sd of [-1, 1]) cap(cx, add(base, mul(wv, sd * .3)), add(add(base, mul(wv, sd * 2.1)), mul(dir, .5)), .62, .48, guard, {});
+    const half = t => (t < .7 ? hw * (1 - t * .1) : hw * .93 * Math.max(0, (1 - t) / .3)), b0 = add(base, mul(dir, .5));
+    for (let i = 0; i < 5; i++){ const u = -1 + i / 2, au = Math.abs(u), tone = au > .78 ? 0 : au < .2 ? 2 : 1, mat = au > .9 && EDGE[wt] ? M[EDGE[wt]] : blade, th = .36 * (1 - au * .5);
+      let p0 = add(b0, mul(wv, u * half(0))); for (let r = 1; r <= 6; r++){ const t = r / 6, p1 = add(add(b0, mul(dir, dl * t)), mul(wv, u * half(t))); G(); cap(cx, p0, p1, th, th, mat, {tex:() => ({t:tone})}); p0 = p1; } }
+  } else if (w === 'staff' && cfg.sig && ['estaff', 'hstaff', 'sstaff', 'hexrod'].includes(cfg.sig)){
+    // (v336) class staves get their own heads: the mage's four-element ring, the herbalist's lotus with a gourd, the
+    // summoner's conch shell, the hexer's skull with black sai-sin thread
+    const shaftM = cfg.sig === 'hexrod' ? M.charcoal : cfg.sig === 'hstaff' ? M.wood : M[SH[wt] || 'wood'];
+    cap(cx, base, tip, two ? 1.1 : .9, two ? 1.0 : .85, shaftM, {tex:(n, lo, q, t) => (t > .8 && t < .86 ? {m:M.gold} : undefined)});
+    const hd = add(tip, mul(dir, 1.6)), sd = nrm(Math.abs(dir[1]) > .9 ? [1, 0, 0] : [-dir[1], dir[0], 0]), up2 = nrm([dir[1] * sd[2] - dir[2] * sd[1], dir[2] * sd[0] - dir[0] * sd[2], dir[0] * sd[1] - dir[1] * sd[0]]);
+    if (cfg.sig === 'estaff'){ G(); for (let a = 0; a < 6.28; a += .5) cap(cx, add(add(hd, mul(sd, Math.cos(a) * 3)), mul(up2, Math.sin(a) * 3)), add(add(hd, mul(sd, Math.cos(a + .5) * 3)), mul(up2, Math.sin(a + .5) * 3)), .4, .4, M.gold, {});
+      const EL = ['ember', 'rune', 'jade', 'auraGold']; EL.forEach((e, i) => { const a = i / 4 * 6.28 + .4; G(); ell(cx, add(add(hd, mul(sd, Math.cos(a) * 3)), mul(up2, Math.sin(a) * 3)), .95, .95, M[e] || M.orb); });
+      G(); ell(cx, hd, 1.6 + Math.max(0, wt) * .15, 1.6 + Math.max(0, wt) * .15, M[ORB[wt] || 'orb']); }
+    else if (cfg.sig === 'hstaff'){ G(); for (let i = 0; i < 6; i++){ const a = i / 6 * 6.28; cap(cx, add(hd, mul(dir, -.6)), add(add(add(hd, mul(sd, Math.cos(a) * 2.6)), mul(up2, Math.sin(a) * 2.6)), mul(dir, 1.6)), .9, .35, M.tipPink || M.orb, {}); }
+      G(); ell(cx, add(hd, mul(dir, .6)), 1.2, 1.2, M.auraGold || M.gold); G(); ell(cx, add(add(tip, mul(dir, -3)), mul(sd, 1.4)), 1.1, 1.4, M.wood); }
+    else if (cfg.sig === 'sstaff'){ G(); for (let i = 0; i < 10; i++){ const k = i / 10, r = 2.6 * (1 - k * .8), a = k * 9; ell(cx, add(add(add(hd, mul(sd, Math.cos(a) * r * .5)), mul(up2, Math.sin(a) * r * .5)), mul(dir, k * 3.4)), r * .6 + .4, r * .6 + .4, M.white || M.steel); }
+      G(); ell(cx, add(hd, mul(dir, -.6)), 1, 1, M.tipAqua || M.orb); }
+    else { G(); ell(cx, hd, 2.1, 2.3, M.white || M.steel); G(); for (const s2 of [-1, 1]) ell(cx, add(add(hd, mul(sd, s2 * .8)), mul(up2, .9)), .55, .55, M.charcoal);
+      G(); ell(cx, add(hd, mul(up2, -.9)), .7, .4, M.charcoal); G(); for (let i = 0; i < 3; i++) line(cx, add(hd, mul(dir, -1.4)), add(add(hd, mul(dir, -6 - i)), mul(sd, (i - 1) * 1.4)), M.charcoal, {t:1});
+      G(); ell(cx, add(hd, mul(dir, 2.1)), .9, .9, M.tipViolet || M.orb); }
   } else if (w === 'staff'){
     cap(cx, base, tip, two ? 1.1 : .85, two ? 1.1 : .85, M[SH[wt] || 'wood'], {tex:(n, lo, q, t) => (t > .78 && t < .84 ? {m:M.gold} : undefined)});   // (v159) the shaft never takes the refine glow
     G(); for (let a = 0; a < 6.28; a += .9) line(cx, tip, add(tip, rotX(rotY([0, 3.2, 1.6], a), 0)), M.gold, {t:1});
@@ -2172,12 +2233,19 @@ function heroKey(job, gear = {}, look = null){
   // the boxer's pairs, worn on both fists: นวมคู่ (big padded gloves) or กรงเล็บคู่ (three blades strapped over each fist)
   { const gm = /^w_(glove|claw)(\d+)$/.exec(ids[2] || ''); if (gm && base.weapon === 'fist'){ const t = Math.min(5, +gm[2]);
       if (gm[1] === 'glove'){ cfg.glove = ['scarlet', 'scarlet', 'navy', 'charcoal', 'teal', 'gold'][t]; cfg.gloveCuff = t >= 3 ? 'gold' : 'white'; }
-      else { cfg.fistClaw = ['steel', 'steel', 'ember', 'obsid', 'jade', 'sun'][t]; cfg.clawTier = t; cfg.handWrap = 'steel'; } } }
+      else { cfg.fistClaw = ['steel', 'steel', 'bronzeM', 'obsid', 'jadeM', 'goldM'][t]; cfg.clawTier = t; cfg.handWrap = 'steel'; } } }
   if (base.weapon === 'dagger' && (/^w_tdagger\d+$/.test(ids[2] || '') || (!ids[2] && base.twin))){ cfg.offWeapon = true; cfg.offTier = wm ? Math.min(5, +wm[2]) : 0; cfg.shield = null; }
   if (wm && wm[1] === base.weapon){ cfg.wTier = Math.min(5, +wm[2]); if (base.weapon === 'fist') cfg.handWrap = FIST_WRAP[cfg.wTier]; }
   // one- or two-handed: a worn weapon decides; with none, the class's own weapon does (the Warlord's is a greatsword)
   const wi = ids[2] && typeof ITEMS !== 'undefined' && ITEMS[ids[2]];
   if (wi && wi.st && wi.st.wtype === base.weapon) cfg.twoHand = (wi.st.hands || '') === '2h' && (base.weapon === 'sword' || base.weapon === 'staff');
+  // (v336) the weapon's look tier follows its level for every family (class weapons, axes and crossbows had no tier and all
+  // looked like the starter piece); the kunai and the crossbow get their own models
+  if (wi && wi.st && wi.st.wtype === base.weapon && wi.lv){ const L = wi.lv; cfg.wTier = L < 30 ? 0 : L < 80 ? 1 : L < 115 ? 2 : L < 170 ? 3 : L < 240 ? 4 : 5; if (base.weapon === 'fist') cfg.handWrap = FIST_WRAP[cfg.wTier]; }
+  const wb = wi ? String(wi.base || ids[2]) : '';
+  if (/^w_xbow\d+$/.test(wb)) cfg.xbow = true;
+  { const sm = /^w_(bsword|collar|estaff|hstaff|sstaff|hexrod|moonstar|maxe|mgaxe|wbow|ndagger|kfist)\d+$/.exec(wb); cfg.sig = sm ? sm[1] : null; }
+  if (wi && wi.st && wi.st.wtype === 'shuriken' && wi.st.hands === '1h') cfg.kunai = true;
   CHARS[key] = cfg; CHAR_ACTIONS[key] = CHAR_ACTIONS[job];
   return key;
 }
