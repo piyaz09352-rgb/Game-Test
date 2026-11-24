@@ -131,6 +131,10 @@ async function playInPage(p, simMin){
     if (t > nextMapCheck){ nextMapCheck = t + 90; const a = mapAvg(MAP_ID); if (a == null || a < S.lvl - 8 || a > S.lvl + 10 + p.risk){ const to = goodMap(); if (to !== MAP_ID){ warpTo(to); out.warps++; await loadingWait(); posAt = {x:P.x, y:P.y, t}; } } }
     if (MAPS[MAP_ID].town || MAP_ID === 0){ await leaveTown(); continue; }
     if (p.auto && BOT.on) continue;   // Auto does the fighting
+    // (v334) a boss warns before it charges (fix334.js): most people back off; the reckless often stay and fight
+    { const bz = mobs.find(m => !m.dead && m.def.boss && (m.warnT > 0 || m.aggro) && Math.hypot(m.x - P.x, m.y - P.y) < 700);
+      if (bz && (p.kind !== 'reckless' || R() < .3) && R() > p.forget * .5){ P.target = null; const d = Math.max(1, Math.hypot(P.x - bz.x, P.y - bz.y)); P.tx = clamp(P.x + (P.x - bz.x) / d * 400, 60, W - 60); P.ty = clamp(P.y + (P.y - bz.y) / d * 400, 60, H - 60);
+        if (!out.bossDodges) out.bossDodges = 0; out.bossDodges++; run(p.react); continue; } }
     // fight: keep the target, or pick one
     if (!P.target || P.target.dead){ let cand = mobs.filter(m => !m.dead && !m.def.boss && m.def.lvl <= S.lvl + Math.max(1, p.risk) && Math.hypot(m.x - P.x, m.y - P.y) < 900);
       if (!cand.length){ const near = mobs.filter(m => !m.dead && !m.def.boss && Math.hypot(m.x - P.x, m.y - P.y) < 900).sort((a, b) => a.def.lvl - b.def.lvl); if (near.length) cand = [near[0]]; }   // nothing that easy here: the weakest one in sight

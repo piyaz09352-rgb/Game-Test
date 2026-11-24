@@ -51,3 +51,47 @@ if (typeof renderSettings === 'function'){ const _rs = renderSettings; renderSet
   row.innerHTML = `<span><b>${L('ลูกศรนำทางมือใหม่', 'New-player guide arrow')}</b><small>${L('เลเวล 1–20 · ชี้ไปหามอนที่เหมาะกับเลเวลเมื่อแถวนี้ไม่มี (ในเมืองชี้ไปประตูทุ่งที่เหมาะ)', 'Lv 1–20 · points to monsters of your level when none are near (in town, to the right field gate)')}</small></span><input type="checkbox" id="set-guideArrow" data-set="guideArrow" ${guideOn() ? 'checked' : ''}><i class="sw"></i>`;
   const secs = [...pane.querySelectorAll('.sec')], anchor = secs.find(n => /การควบคุม|^Controls?$/.test(n.textContent.trim()));
   if (anchor && anchor.nextSibling) anchor.parentNode.insertBefore(row, anchor.nextSibling); else pane.appendChild(row); }; }
+
+// ---- 3. field bosses: a warning before they charge, and they give up a long chase ----
+/* The high-level playtest (bots starting at Lv 50/100/150): players fighting by hand died again and again to the field
+   boss, which spotted them across the screen, ran them down (it speeds up the longer you run: "Frenzy") and hit for
+   1,800–3,700 against ~5,600 HP. The owner chose: warn first, and let it give up the chase.
+   · Spotted: the boss stops, roars, a red «!» and «บอสเห็นคุณแล้ว!» appear, and you get 2 seconds. Still close after
+     that → it charges. Walk away in those 2 seconds → it forgets you.
+   · Giving up: once it has chased you 1,100 px from where the chase began, or you have stayed out of its reach for
+     6 s, it stops, goes back to roaming and recovers its HP (no wearing it down by running it around).
+   Only the map's own field boss; tower floors, dungeons, invasions and the world boss are unchanged. */
+const FBOSS = {warn:2, leash:1100, lost:6, far:420};
+const fieldBoss = m => m && m.def && m.def.boss && !m.wb && !m.calm && typeof MAPS !== 'undefined' && MAPS[MAP_ID] && MAPS[MAP_ID].boss === m.type
+  && !(typeof TW !== 'undefined' && TW.active) && !(typeof DG !== 'undefined' && DG.active);
+if (typeof updMob === 'function'){ const _um = updMob; updMob = function(m, dt){
+  if (m && !m.dead && fieldBoss(m)){
+    m.warnSight = true;   // mobs.js leaves the spotting to this
+    const d = m.def, dp = Math.hypot(m.x - P.x, m.y - P.y), sight = (bossSeesYou(m) ? BOSS_SIGHT : 240) * (typeof wxSight === 'function' ? wxSight() : 1);
+    const free = P.dead || hideBuff() || inVillage(P);
+    if (!m.aggro){
+      if (m.warnT > 0){
+        m.warnT -= dt; m.moving = false; m.dir = SPR.dirFromVec(P.x - m.x, P.y - m.y);
+        if (free || dp > sight * 1.6){ m.warnT = 0; m.spotCd = 4; }   // you got away in time
+        else if (m.warnT <= 0){ m.aggro = true; m.chase = {x:m.x, y:m.y}; m.lostT = 0; }
+        return;   // stands and stares while it warns
+      }
+      m.spotCd = Math.max(0, (m.spotCd || 0) - dt);
+      if (!free && d.aggro && !m.spotCd && dp < sight){
+        m.warnT = FBOSS.warn; m.tx = null;
+        addText(m.x, m.y - MOB_H[m.type] - 30, L('! บอสเห็นคุณแล้ว', '! The boss has seen you'), '#ff5a4a', 16);
+        if (typeof SFX !== 'undefined') SFX.play('roar'); if (typeof VFX !== 'undefined') VFX.play('roar', {x:m.x, y:m.y, r:90});
+        if (typeof sysMsg === 'function') sysMsg(L(`${nm(d)} เห็นคุณแล้ว! ถอยออกไปภายใน 2 วินาที หรือเตรียมสู้`, `${nm(d)} has seen you! Back off within 2 seconds or get ready`), 'warn');
+        return; }
+    } else {
+      if (!m.chase) m.chase = {x:m.x, y:m.y};
+      const reach = (d.range || d.reach || d.r + 12) + 60; m.lostT = dp > Math.max(FBOSS.far, reach) ? (m.lostT || 0) + dt : 0;
+      if (!free && (Math.hypot(m.x - m.chase.x, m.y - m.chase.y) > FBOSS.leash || m.lostT > FBOSS.lost)){
+        m.aggro = false; m.flee = 0; m.charge = null; m.enraged = false; m.furyMsg = false; m.chase = null; m.lostT = 0; m.spotCd = 8; m.hp = m.maxhp;
+        m.hx = m.x; m.hy = m.y; m.tx = null; m.wait = 1; m.roamT = 0;
+        if (P.target === m){ P.target = null; P.pending = null; }
+        addText(m.x, m.y - MOB_H[m.type] - 24, L('บอสเลิกไล่ กลับไปพักฟื้น', 'The boss gave up and went back to rest'), '#ffd27a', 14); }
+    }
+    if (!m.aggro && m.chase) m.chase = null; if (m.aggro) m.warnT = 0;
+  }
+  return _um.apply(this, arguments); }; }

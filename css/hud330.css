@@ -367,3 +367,8 @@ html body #ui#ui.ui.h6 .mo.sk.empty::after, html body #ui#ui.ui.h6pc #hotbar > .
 html body #ui#ui.ui.h6 .mo.sk.mini.empty::after{ font-size:16px !important; }
 html body #ui#ui.ui.h6 .mo.sk.empty > b, html body #ui#ui.ui.h6pc #hotbar > .hk.h6sk.empty > kbd{ position:absolute !important; top:-2px !important; left:-2px !important; right:auto !important; bottom:auto !important; transform:none !important;
   min-width:15px; height:15px; padding:0 3px; border-radius:8px; font:700 9px/15px system-ui, sans-serif !important; background:rgba(20,14,50,.85) !important; color:#d8d0ff !important; border:1px solid rgba(190,170,255,.5) !important; text-align:center; }
+/* (v334) the NPC speech bubble's tail was a dark brown diamond floating at its corner: now the bubble's own white */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .say::before{ background:#ffffff !important; border:0 !important; box-shadow:-1px -1px 0 rgba(150,130,230,.55) !important; }
+/* the coin shop's sub tabs (ด้านหลัง · ส่วนหัว …): the chosen one violet like every other chosen tab (it was old gold) */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-cshop .cshsub button.on{ background:linear-gradient(135deg, #8a5cff, #4f9dff) !important; border-color:rgba(255,255,255,.5) !important; color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.35) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-cshop .cshsub button.on *{ color:#fff !important; -webkit-text-fill-color:#fff !important; }
