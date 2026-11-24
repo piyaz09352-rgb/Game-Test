@@ -121,3 +121,62 @@ function g335Aura(g, x, y, line, t){ const col = G335_COL[line] || '255,220,140'
   g.strokeStyle = `rgba(${col},${a + .15})`; g.lineWidth = 1.2 * PX; g.beginPath(); g.ellipse(x, y - 2 * PX, r * .75, r * .32, 0, t * .8, t * .8 + 4.2); g.stroke(); g.restore(); }
 EV.on('draw', () => { if (typeof ctx === 'undefined' || P.dead || (typeof SETTINGS !== 'undefined' && SETTINGS.oFx === false)) return; const line = g335Full(S && S.gear); if (line) g335Aura(ctx, sx(P.x), sy(P.y), line, T);
   if (typeof AIA !== 'undefined' && AIA.map === MAP_ID) for (const a of AIA.list) if (a.setLine){ const x = sx(a.x), y = sy(a.y); if (x > -60 && x < SW + 60 && y > -60 && y < SH + 60) g335Aura(ctx, x, y, a.setLine, T + a.animT); } });
+
+// ---- 6. (v336) every set looks like its own ----
+/* The line sets (Lv 40 / 90 / 150), class sets and land sets borrowed the plain armour of their level, so a full set
+   looked like any shop piece. Now the body piece wears the line's (or the land's) colours: higher grades add gold
+   shoulder plates, and the top grade a cape. Robed lines keep a long skirt. */
+{ const LINE = {blade:['navy', 'scarlet'], rune:['plum', 'gold', 1], ranger:['greenD', 'leather'], muay:['scarlet', 'gold'], healer:['teal', 'cream', 1], rogue:['charcoal', 'plum'],
+    summoner:['cream', 'navy', 1], occult:['charcoal', 'plum', 1], merchant:['brownCl', 'gold'], catfolk:['cream', 'scarlet'], dogfolk:['brownCl', 'steel'], ninja:['charcoal', 'scarlet']};
+  const LAND = {fertile:['greenD', 'gold'], arid:['cream', 'brownCl', 1], volcanic:['scarlet', 'charcoal'], frozen:['cream', 'teal'], dark:['charcoal', 'plum', 1], light:['cream', 'gold', 1]};
+  for (const id in ITEMS){ const it = ITEMS[id], st = it && it.st; if (!st || !st.cset || it.slot !== 'armor' || it.base) continue;
+    const cs = String(st.cset), m = /^z_([a-z]+)(\d)$/.exec(cs), lm = /^([a-z]+)(\d)?$/.exec(cs);
+    const pal = m ? LAND[m[1]] : lm ? LINE[lm[1]] : null; if (!pal) continue;
+    const grade = m ? +m[2] : lm[2] ? +lm[2] : 3, [c, trim, robe] = pal;
+    SPR.GEAR_LOOK[id] = {...(SPR.GEAR_LOOK[it.artAs] || {}), top:c, sleeve:c, chestTrim:trim === 'cream' ? 'gold' : trim, ...(robe ? {skirt:[11.6, 1.1, 6.4, 9.2, c, trim === 'gold' ? 'gold' : 'tech'], skirtAll:true, skirtStripes:false, runeLines:grade >= 2} : {}),
+      ...(grade >= 2 ? {pauldron:'gold'} : {}), ...(grade >= 3 ? {cape:trim === 'cream' || trim === 'steel' ? 'gold' : trim, capeTex:'gold'} : {})}; } }
+
+// ---- 7. (v336) new kinds of sets: boss sets, two cross-line sets, and a 4-piece bonus you choose ----
+/* · Boss sets (ชุดบอส): four great bosses each leave their own 4-piece set (25% a kill, field or dungeon): the Golden
+     Jelly King (Lv 25), the Water Elephant King (Lv 75), the Phantom General of Ayodhya (Lv 105), the Garuda King (Lv 205).
+   · Cross-line sets (ชุดข้ามสาย) for anyone: นักรบเวท (ATK and MATK together) and ผู้พิทักษ์ศักดิ์สิทธิ์ (toughness and
+     healing), Lv 120, from dungeon guardians of Lv 90 and up.
+   · On these sets the 4-piece bonus follows a path the wearer picks in the item card: บุก (power), ทน (toughness) or
+     ไว (speed). Two pieces always give the set's own bonus. */
+const G336_PATH = {atk:['บุก', 'Power', {atkPct:.08, matkPct:.08, crit:3}], def:['ทน', 'Toughness', {dmgRed:.08, hpPct:.1}], spd:['ไว', 'Speed', {castPct:.08, critDmg:.15, crit:2}]};
+const G336_SETS = {
+  bjelly:{th:'ราชาเจลลี่ทองคำ', en:'Golden Jelly King', lv:25, boss:'boss', col:['cream', 'gold'], b2:{hpPct:.05, healPow:.05}},
+  bwater:{th:'วารีกุญชร', en:'Water Elephant', lv:75, boss:'waterelephantking', col:['teal', 'gold'], b2:{hpPct:.06, dmgRed:.03}},
+  bphantom:{th:'แม่ทัพผีอโยธยา', en:'Phantom General', lv:105, boss:'phantomgeneral', col:['charcoal', 'steel'], b2:{atkPct:.05, critRes:6}},
+  bgaruda:{th:'พญาครุฑ', en:'Garuda King', lv:205, boss:'garudaking', col:['gold', 'scarlet'], b2:{atkPct:.06, matkPct:.06}},
+  xspell:{th:'นักรบเวท', en:'Spellblade', lv:120, cross:true, col:['plum', 'steel'], b2:{atkPct:.05, matkPct:.05}},
+  xward:{th:'ผู้พิทักษ์ศักดิ์สิทธิ์', en:'Holy Warden', lv:120, cross:true, col:['cream', 'gold'], b2:{dmgRed:.05, healPow:.1}}};
+const g336Path = key => (S && S.setPath && G336_PATH[S.setPath[key]] ? S.setPath[key] : 'atk');
+if (typeof CSET !== 'undefined' && typeof g10Near === 'function'){
+  const SL = [['armor', 'เกราะ', 'Armour'], ['head', 'มงกุฎ', 'Crown'], ['pants', 'สนับ', 'Greaves'], ['shoes', 'รองเท้า', 'Boots']];
+  for (const key in G336_SETS){ const D = G336_SETS[key];
+    const arr = [D.th, D.en, D.b2, null]; Object.defineProperty(arr, 3, {get:() => G336_PATH[g336Path(key)][2], enumerable:true}); CSET[key] = arr;
+    for (const [slot, sth, sen] of SL){ const id = `cs_${key}_${slot === 'pants' ? 'legs' : slot}`, near = g10Near(slot, D.lv); if (!near || ITEMS[id]) continue;
+      const st = {}; for (const s in near[6]) st[s] = typeof near[6][s] === 'number' ? Math.round(near[6][s] * 1.2 * 100) / 100 : near[6][s]; st.cset = key;
+      ITEMS[id] = {name:`${sth}${D.th}`, en:`${D.en} ${sen}`, kind:'gear', slot, lv:D.lv, st, buy:0, sell:Math.round(500 + D.lv * D.lv * 2.2), artAs:near[0], desc:[D.cross ? 'ชุดข้ามสาย · ใส่ได้ทุกอาชีพ' : 'ชุดบอส', D.cross ? 'Cross-line set · any class' : 'Boss set']};
+      SPR.GEAR_LOOK[id] = {...(SPR.GEAR_LOOK[near[0]] || {}), ...(slot === 'armor' ? {top:D.col[0], sleeve:D.col[0], chestTrim:D.col[1] === 'steel' ? 'charcoal' : D.col[1], pauldron:'gold', cape:D.col[1] === 'steel' ? 'charcoal' : D.col[1], capeTex:'gold'} : {})}; } }
+  // boss sets drop from their boss
+  EV.on('kill', m => { if (!m || !m.def || m.minion) return; for (const key in G336_SETS){ const D = G336_SETS[key]; if (D.boss !== m.type || Math.random() >= .25) continue;
+      const ids = Object.keys(ITEMS).filter(id => id.startsWith(`cs_${key}_`) && !ITEMS[id].base); if (!ids.length) return;
+      const id = makeInst(ids[Math.floor(Math.random() * ids.length)], Math.max(1, rollRarity('boss'))); dropLoot(id, m.x + rand(-12, 12), m.y + rand(-8, 8));
+      banner(L(`✦ ชุดบอส: ${nm(ITEMS[id])} ✦`, `✦ Boss set: ${nm(ITEMS[id])} ✦`)); SFX.play('drop3'); } });
+  // cross-line sets from dungeon guardians Lv 90+
+  if (typeof dgReward === 'function'){ const _r = dgReward; dgReward = function(){ const r = _r.apply(this, arguments);
+    try { if (DG.lv >= 90 && Math.random() < .15){ const key = Math.random() < .5 ? 'xspell' : 'xward', ids = Object.keys(ITEMS).filter(id => id.startsWith(`cs_${key}_`) && !ITEMS[id].base);
+        if (ids.length){ const id = makeInst(ids[Math.floor(Math.random() * ids.length)], Math.max(1, rollRarity('boss'))); addItem(id, 1); banner(L(`✦ ชุดข้ามสาย: ${nm(ITEMS[id])} ✦`, `✦ Cross-line set: ${nm(ITEMS[id])} ✦`)); } } } catch (e) {}
+    return r; }; }
+  // the path picker in the item card
+  if (typeof gearLines === 'function'){ const _gl = gearLines; gearLines = function(id){ const s = _gl.apply(this, arguments), it = ITEMS[id], cs = it && it.st && it.st.cset; if (!cs || !G336_SETS[cs]) return s;
+    const cur = g336Path(cs); return `${s}<span class="g336p">${L('โบนัส 4 ชิ้น เลือกทาง', '4-piece path')}: ${Object.entries(G336_PATH).map(([k, v]) => `<button class="g336b${k === cur ? ' on' : ''}" data-setpath="${cs}|${k}">${L(v[0], v[1])}</button>`).join('')}</span>`; }; }
+  document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-setpath]'); if (!b) return; e.preventDefault(); e.stopPropagation();
+    const [cs, k] = b.dataset.setpath.split('|'); if (!G336_SETS[cs] || !G336_PATH[k]) return; S.setPath = S.setPath || {}; S.setPath[cs] = k; derive(); dirty = true; save();
+    for (const x of document.querySelectorAll(`[data-setpath^="${cs}|"]`)) x.classList.toggle('on', x.dataset.setpath === `${cs}|${k}`);
+    toast(L(`ทางของชุด: ${G336_PATH[k][0]}`, `Set path: ${G336_PATH[k][1]}`)); }, true);
+  const st = document.createElement('style'); st.textContent = `.g336p{display:flex;flex-wrap:wrap;gap:4px;align-items:center;margin-top:4px;font:600 11px var(--thai,sans-serif)}
+    .g336b{border:1px solid rgba(130,110,230,.55);background:#fff;color:#3a2a90;border-radius:9px;padding:1px 9px;font:700 11px var(--thai,sans-serif);cursor:pointer}
+    .g336b.on{background:linear-gradient(135deg,#8a5cff,#4f9dff);color:#fff;border-color:transparent}`; document.head.appendChild(st); }
