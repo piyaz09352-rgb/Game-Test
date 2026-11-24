@@ -70,16 +70,16 @@ EV.on('tick', dt => {
   for (const r of W344.ring) r.t += dt; W344.ring = W344.ring.filter(r => r.t < .9);
   for (const m of mobs){ if (m.dead || !m.def || !m.def.boss) continue; const roar = (m.bAct === 'broar' || m.rageT > 0 || (typeof mobAnim === 'function' && mobAnim(m)[0] === 'broar'));
     if (roar && (!m.leafT || T - m.leafT > 1.2)){ m.leafT = T; for (let i = 0; i < 18; i++){ const a = Math.random() * 6.28, d = 30 + Math.random() * 90;
-        W344.leaf.push({x:m.x + Math.cos(a) * d, y:m.y + Math.sin(a) * d * .5, z:8 + Math.random() * 30, vx:Math.cos(a) * (60 + Math.random() * 60), vy:Math.sin(a) * 25, vz:20 + Math.random() * 30, t:0, life:1.2 + Math.random() * .6, rot:Math.random() * 6, col:Math.random() < .5 ? '96,140,60' : '150,130,60'}); } } }
+        W344.leaf.push({x:m.x + Math.cos(a) * d, y:m.y + Math.sin(a) * d * .5, z:8 + Math.random() * 30, vx:Math.cos(a) * (60 + Math.random() * 60), vy:Math.sin(a) * 25, vz:20 + Math.random() * 30, t:0, life:1.2 + Math.random() * .6, rot:Math.random() * 6, col:['170,205,90', '225,180,70', '205,120,60', '140,190,80'][Math.floor(Math.random() * 4)]}); } } }
   for (const l of W344.leaf){ l.t += dt; l.x += l.vx * dt; l.y += l.vy * dt; l.z = Math.max(0, l.z + l.vz * dt); l.vz -= 30 * dt; l.vx *= .985; l.rot += dt * 6; }
   W344.leaf = W344.leaf.filter(l => l.t < l.life); if (W344.leaf.length > 120) W344.leaf.splice(0, W344.leaf.length - 120);
 });
 function w344Draw(g){
   for (const r of W344.ring){ const k = r.t / .9, x = r.x - cam.x, y = r.y - cam.y; g.strokeStyle = `rgba(220,240,255,${(1 - k) * .5})`; g.lineWidth = 1; g.beginPath(); g.ellipse(x, y, r.r * (1 + k * 1.8), r.r * .4 * (1 + k * 1.8), 0, 0, 7); g.stroke(); }
   for (const s of W344.sway){ const k = s.t / .7, a = Math.sin(k * Math.PI * 3) * (1 - k) * .55 * s.dir, x = s.x - cam.x, y = s.y - cam.y, sc = s.big ? 1.6 : 1;   // blades or leaves flicked aside, then swaying back
-    g.save(); g.translate(x, y); g.scale(sc, sc); g.strokeStyle = s.big ? `rgba(70,130,60,${(1 - k) * .9})` : `rgba(120,170,75,${(1 - k) * .8})`; g.lineWidth = 1.2; g.lineCap = 'round';
-    for (let i = -2; i <= 2; i++){ const sp = s.big ? 1 : -1; g.beginPath(); g.moveTo(i * 2.6, 0); g.quadraticCurveTo(i * 2.6 + a * 8 + i * sp * k * 2, -5, i * 3.2 + a * 13 + i * k * 3, -9 + Math.abs(i)); g.stroke(); } g.restore(); }
-  for (const l of W344.leaf){ const a = Math.min(1, (l.life - l.t) * 2); g.save(); g.translate(l.x - cam.x, l.y - cam.y - l.z); g.rotate(l.rot); g.fillStyle = `rgba(${l.col},${a})`; g.beginPath(); g.ellipse(0, 0, 3.2, 1.4, 0, 0, 7); g.fill(); g.restore(); } }
+    g.save(); g.translate(x, y); g.scale(sc, sc); g.strokeStyle = s.big ? `rgba(150,200,90,${(1 - k) * .95})` : `rgba(170,215,105,${(1 - k) * .9})`; g.lineWidth = 1.6; g.lineCap = 'round';
+    for (let i = -2; i <= 2; i++){ const sp = s.big ? 1 : -1; g.beginPath(); g.moveTo(i * 2.6, 0); g.quadraticCurveTo(i * 3 + a * 10 + i * sp * k * 3, -7, i * 4 + a * 16 + i * k * 4, -13 + Math.abs(i) * 1.5); g.stroke(); } g.restore(); }
+  for (const l of W344.leaf){ const a = Math.min(1, (l.life - l.t) * 2); g.save(); g.translate(l.x - cam.x, l.y - cam.y - l.z); g.rotate(l.rot); g.fillStyle = `rgba(${l.col},${a})`; g.beginPath(); g.ellipse(0, 0, 4.6, 2, 0, 0, 7); g.fill(); g.strokeStyle = `rgba(60,50,20,${a * .6})`; g.lineWidth = .6; g.beginPath(); g.moveTo(-4.6, 0); g.lineTo(4.6, 0); g.stroke(); g.restore(); } }
 if (typeof LIVE !== 'undefined'){ const _o = LIVE.drawOver; LIVE.drawOver = function(g){ const r = _o.apply(this, arguments); try { if (S) w344Draw(g); } catch (e) {} return r; }; }
 
 // ---- 2. the sliders ----
