@@ -1,0 +1,16 @@
+/* VAYRATHEN — css/hud343.css — (v343) the owner: the quest card and the chips were too big / in the way */
+/* the quest card: smaller on every screen (it held a third of a phone's height) */
+/* no zoom (the layout measures the card): smaller text, and no forced golden-ratio height — the card is as tall as its lines */
+html body #ui#ui.ui #goalCard#goalCard{ aspect-ratio:auto !important; min-height:0 !important; }
+html body #ui#ui.ui.h6 #goalCard #goal{ font-size:.82em !important; line-height:1.3 !important; }
+html body #ui#ui.ui.h6 #goalCard .gt{ font-size:.86em !important; }
+html body #ui#ui.ui.h6.moba #goalCard #goal{ font-size:.74em !important; }
+html body #ui#ui.ui.h6.moba #goalCard .gt{ font-size:.8em !important; }
+/* the chips (Auto · ออนไลน์ · พักจอ · GM): smaller, in one row, tucked against the minimap */
+html body #ui#ui.ui.h6 #chips#chips{ flex-direction:row !important; gap:4px !important; flex-wrap:nowrap !important; min-width:0 !important; justify-content:flex-end !important; }
+html body #ui#ui.ui.h6 #chips#chips > *{ font-size:.8em !important; padding:1px 7px !important; min-height:0 !important; line-height:1.5 !important; }
+html body #ui#ui.ui.h6.moba #chips#chips > *{ font-size:.72em !important; }
+html body #ui#ui.ui.h6 #chips.inmap > *{ opacity:.9; }
+/* inside the minimap card: a row along its bottom edge (the layout's own top/right are overruled) */
+html body #ui#ui.ui #mapCard #chips.inmap{ position:absolute !important; top:auto !important; left:auto !important; right:10px !important; bottom:9px !important; min-width:0 !important; transform:none !important; z-index:2 !important; }
+html body #ui#ui.ui.h6.moba #mapCard #chips.inmap{ right:8px !important; bottom:7px !important; }

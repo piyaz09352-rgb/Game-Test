@@ -16,14 +16,14 @@ const droNum = s => typeof s === 'string' && s.length < 14 && /^[^\d]{0,3}[\d,]+
 { const _at = addText;
   addText = function(x, y, s, col, size){
     if (!droNum(s) || typeof texts === 'undefined') return _at.apply(this, arguments);
-    const crit = /!$/.test(s), hurt = col === '#ff8a80', heal = /^\+/.test(String(s).trim());
+    const crit = /^[+-]?[\d,.]+!$/.test(String(s).trim()),   /* (v343) only a number is a critical: «Resist!» «Dodge!» are words */ hurt = col === '#ff8a80', heal = /^\+/.test(String(s).trim());
     const near = texts.filter(t => t.stk && t.t < t.life && t.stk.hurt === hurt && Math.abs(t.stk.x0 - x) < 70 && Math.abs(t.stk.y0 - y) < 90);
     while (near.length >= DSTK.max){ const i = texts.indexOf(near.shift()); if (i >= 0) texts.splice(i, 1); }
     const a = near[near.length - 1];   // join the column already on this target, at its anchor
     const n0 = texts.length; _at.call(this, a ? a.stk.x0 : x, a ? a.stk.y0 : y, s, col, size); if (texts.length === n0) return;   // numbers switched off in Settings
     const t = texts[texts.length - 1];
     t.stk = {x0:a ? a.stk.x0 : x, y0:a ? a.stk.y0 : y, g:a ? a.stk.g : ++DSTK.grp, n:++DSTK.seq, crit, heal, hurt, oy:0};
-    t.size = crit ? 40 : size && size <= 24 ? Math.max(15, Math.min(size, 20)) : 26;
+    t.size = crit ? 30 : size && size <= 24 ? Math.max(14, Math.min(size, 18)) : 22;   // (v343) smaller: they covered the fight
     if (hurt) t.col = '#ff4d4d'; else if (heal) t.col = '#3fd46a';
     t.life = crit ? 1.3 : 1.05;
   };
@@ -34,7 +34,7 @@ function droStar(r1, r2, n){ ctx.beginPath(); for (let i = 0; i < n * 2; i++){ c
 { const _dt = drawDmgText;
   drawDmgText = function(t){
     const o = t.stk; if (!o) return _dt(t);
-    const tt = t.t, k = tt / t.life, z = clamp(PX / 2.2, 1.15, 2.6);
+    const tt = t.t, k = tt / t.life, z = clamp(PX / 2.2, 1.15, 2.6) * .78;   // (v343) smaller
     // how far up this number sits: one line for every newer number in its column, eased so it slides
     let want = 0; for (const u of texts) if (u.stk && u.stk.g === o.g && u.stk.n > o.n && u.t < u.life) want += (u.size * .92 + 4) * z;
     o.oy += (want - o.oy) * .35;
