@@ -20,7 +20,7 @@
 "css/hud330-pc.css":{"v":1,"sha":"d6e3a743fafaa2ac"},
 "css/hud330-touch.css":{"v":2,"sha":"3a21d0504e7e502a"},
 "css/hud343.css":{"v":1,"sha":"1a34e826bfda139b"},
-"js/gfx/sprites.js":{"v":366,"sha":"e3c0774f86d2eb58"},
+"js/gfx/sprites.js":{"v":367,"sha":"6b0c8e4e1de6b6da"},
 "js/gfx/beasts.js":{"v":342,"sha":"5ad645f874732d60"},
 "js/gfx/variety.js":{"v":158,"sha":"01104208cb4ff965"},
 "js/gfx/dinos.js":{"v":157,"sha":"5cab6a9cad5e57bf"},
@@ -473,7 +473,8 @@
 "js/sys/aiadv334.js":{"v":5,"sha":"610660ade30cf9c6"},
 "js/sys/gear335.js":{"v":3,"sha":"d87a182bbd5b4943"},
 "js/sys/feel339.js":{"v":2,"sha":"07289e6977fb44fa"},
-"js/sys/feel341.js":{"v":1,"sha":"145e309a25286906"},
-"js/sys/life342.js":{"v":2,"sha":"b7e424a1396ce165"},
+"js/sys/feel341.js":{"v":2,"sha":"ba70e0d10b9b9ab5"},
+"js/sys/life342.js":{"v":3,"sha":"c893b6079941eb39"},
 "js/sys/hud326.js":{"v":15,"sha":"bf69186fdcaf31a3"},
-"js/sys/ui343.js":{"v":2,"sha":"e21ec1adf823c5a7"}}
+"js/sys/ui343.js":{"v":2,"sha":"e21ec1adf823c5a7"},
+"js/sys/world344.js":{"v":1,"sha":"f21efd3dd5fdb66d"}}

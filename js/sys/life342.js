@@ -112,7 +112,7 @@ function lifeGround(x, y){
   if (LIFE_STONE.includes(bi)) return 'stone';
   return r > g ? 'dirt' : 'grass'; }
 function lifeStepSound(kind, ride){ const raw = SFX.raw && SFX.raw(); if (!raw || !(raw.vol && raw.vol.s > 0) || typeof f341Noise !== 'function') return;
-  const {ac, out, nb} = raw, t = ac.currentTime, v = .055 * (.85 + Math.random() * .3);
+  const {ac, out, nb} = raw, t = ac.currentTime, v = .055 * (.85 + Math.random() * .3) * ((SETTINGS.stepVol ?? 100) / 100); if (v <= 0) return;   // (v344) its own slider
   if (ride){ f341Tone(ac, out, t, 260, 180, .05, 'triangle', v * 1.4); f341Noise(ac, out, nb, t, .04, 'bandpass', 1500, 1100, 2, v); return; }   // a hoof
   switch (kind){
     case 'water': f341Noise(ac, out, nb, t, .14, 'bandpass', 1100, 420, 1.5, v * 1.6); f341Tone(ac, out, t + .02, 620, 300, .08, 'sine', v * .6); break;

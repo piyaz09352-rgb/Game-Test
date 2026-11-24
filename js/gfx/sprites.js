@@ -402,6 +402,7 @@ const ACTIONS = {
   idle:{n:6, fps:5, loop:true, th:'ยืน'}, walk:{n:8, fps:12, loop:true, th:'เดิน'}, attack:{n:5, fps:12, th:'โจมตี', dur:[.7, 1.55, .5, 1.3, .95]},
   skill:{n:5, fps:10, th:'ใช้สกิล', dur:[.6, 1.6, .55, 1.35, .9]}, cast:{n:4, fps:8, loop:true, th:'ร่ายเวท'}, roll:{n:6, fps:14, th:'กลิ้งหลบ'},
   capture:{n:6, fps:10, th:'จับสัตว์'}, rideIdle:{n:4, fps:5, loop:true, th:'ขี่ (หยุด)'}, ride:{n:6, fps:11, loop:true, th:'ขี่ (วิ่ง)'},
+  cheer:{n:6, fps:7, th:'ฉลองชัย'}, tired:{n:6, fps:4, loop:true, th:'เหนื่อยหอบ'},   // (v344)
   hurt:{n:5, fps:16, th:'โดนตี', dur:[.6, 1, 1.2, 1, .8]}, die:{n:7, fps:9, th:'ล้ม', dur:[.7, .9, 1, 1, .9, 1.1, 1.4]}, sit:{n:4, fps:3, loop:true, th:'นั่งพับเพียบ'},   // (v342) hurt and death as the monsters have them
   // ---------- skill poses (each skill names one in SKILL_ACT, js/data/jobs.js) ----------
   punch:{n:6, fps:14, th:'หมัดชุด'}, knee:{n:5, fps:11, th:'เข่าลอย'}, kick:{n:6, fps:14, th:'เตะตัด'}, spinkick:{n:8, fps:16, th:'จระเข้ฟาดหาง'},
@@ -548,6 +549,21 @@ const GUARD = P => { P.armL = P.armR = 1.05; P.elbL = P.elbR = 1.45; P.outL = P.
 const WAI = (P, up = 0) => { P.armL = P.armR = .92 + up; P.elbL = P.elbR = 1.72; P.outL = P.outR = -.44; P.noWeapon = true; };
 const pick = (a, f) => a[Math.min(f, a.length - 1)];
 const SK_POSE = {
+  /* (v344) a short victory (a boss down, a level up), by what is in the hand: a blade thrust up at the sky, a staff raised
+     and spun once over the head, a bow held up high, bare fists or claws: a wai, then a fist raised. Feet on the ground. */
+  cheer(P, f, n, weapon){ const k = f / (n - 1), up = Math.min(1, k * 2.2) * (k > .85 ? 1 - (k - .85) / .15 * .3 : 1);
+    P.eyes = k > .25 && k < .8 ? 'closed' : 'open'; P.mouth = k > .2 && k < .85 ? 1 : 0; P.head = .12 * up; P.lean = -.06 * up; P.bob = .35 * Math.sin(k * Math.PI);
+    // the raised hand sits beside the head (a chibi's short arm held straight up hides behind the hair), the weapon carries the line on up
+    if (weapon === 'sword' || weapon === 'dagger'){ P.armR = .5 + 2.05 * up; P.elbR = .5 - .2 * up; P.outR = .2 + .4 * up; P.wpn = 1.7 - .25 * up; P.armL = .4 + .2 * up; P.outL = .45; P.elbL = .6; }
+    else if (weapon === 'staff'){ P.armR = .5 + 2.05 * up; P.elbR = .3; P.outR = .2 + .4 * up; P.wpn = 1.7 - .25 * up + Math.sin(k * Math.PI * 2) * .5 * up; P.armL = .5 + 1.6 * up; P.outL = .55; P.elbL = .5; P.glow = up; }
+    else if (weapon === 'bow'){ P.armL = .5 + 1.95 * up; P.elbL = .15; P.outL = .25 + .55 * up; P.armR = .5 + 1.85 * up; P.outR = .25 + .55 * up; P.elbR = .3; }   // the bow held up overhead in both hands
+    else { if (k < .4 && typeof WAI === 'function'){ WAI(P, 0); P.head = .15; P.eyes = 'closed'; }   // a wai first, head bowed…
+      else { const u = Math.min(1, (k - .4) * 4); P.armR = .5 + 1.9 * u; P.elbR = .5 + .9 * u; P.outR = .2 + .55 * u; P.armL = .5 + 1.9 * u; P.elbL = .5 + .9 * u; P.outL = .2 + .55 * u; P.head = .1 * u; } } },   // …then both fists up
+  /* (v344) worn out (low HP, standing): bent over, hands near the knees, the shoulders rising and falling as it pants */
+  tired(P, f, n, weapon){ const b = Math.sin(f / n * Math.PI * 2);
+    P.lean = .34 + b * .03; P.head = -.1 + b * .04; P.bob = -1.2 + b * .25; P.breath = .3 + b * .2; P.mouth = 1; P.eyes = f % 3 === 2 ? 'closed' : 'hurt';
+    P.armL = .6 + b * .04; P.elbL = .9; P.outL = .15; P.armR = .55 + b * .04; P.elbR = .5; P.outR = .25; P.legL = .18; P.legR = -.12;
+    if (weapon === 'sword' || weapon === 'dagger') P.wpn = .8 - P.armR * .75; else if (weapon === 'staff'){ P.armR = .45; P.outR = .5; P.wpn = 2.78 - P.armR + .32; } },
   punch(P, f){ GUARD(P); P.lean = .06;
     if (f === 1){ P.armR = 1.58; P.elbR = .04; P.outR = -.06; P.lean = .14; P.twist = .32; P.legL = .45; }
     if (f === 3){ P.armL = 1.58; P.elbL = .04; P.outL = -.06; P.lean = .16; P.twist = -.36; P.legR = -.36; }
@@ -970,7 +986,7 @@ function humanPose(act, f, n, weapon, wk = {}){
       P.armL = .4 + .6 * kn; P.elbL = .9; P.outL = .15;
       P.fall = 1.38 * fl; if (fl > .3){ P.armR = .5 + .9 * fl; P.armL = .6 + .8 * fl; P.outL = P.outR = .25; P.wpn = .8 - P.armR * .75; } }
     else if (staff){   // the staff slips: the arm drops, the staff swings down, the body goes over backwards
-      P.armR = .5 - .3 * kn; P.elbR = .3; P.outR = .5; P.wpn = 2.78 - P.armR + .32 + 1.3 * ss(.3, .7);   // upright, then tipping away P.lean = -.3 * st + .15 * kn - .2 * fl;
+      P.armR = .5 - .3 * kn; P.elbR = .3; P.outR = .5; P.wpn = 2.78 - P.armR + .32 + 1.3 * ss(.3, .7); P.lean = -.3 * st + .15 * kn - .2 * fl;   // upright, then tipping away
       P.fall = -1.5 * fl; if (fl > .3){ P.armL = P.armR = .6 + 1.7 * fl; P.outL = P.outR = .5; P.legL = .1; P.legR = -.1; } }
     else {   // a hand to the chest, onto the knees, then back
       const hc = ss(.05, .3) * (1 - ss(.55, .75)); P.armL = .5 + .55 * hc; P.elbL = .5 + 1.7 * hc; P.outL = .3 - .7 * hc; P.lean = -.3 * st + .25 * kn - .15 * fl;

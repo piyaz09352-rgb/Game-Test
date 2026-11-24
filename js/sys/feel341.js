@@ -97,7 +97,7 @@ function f341Noise(ac, out, nb, t, dur, ftype, f0, f1, q, gain){ if (!nb) return
   g.gain.setValueAtTime(gain, t); g.gain.exponentialRampToValueAtTime(.0008, t + dur); s.connect(fl); fl.connect(g); g.connect(out); s.start(t, Math.random() * .5, dur + .02); }
 function f341Hit(m, crit){ const raw = SFX.raw && SFX.raw(); if (!raw || !(raw.vol && raw.vol.s > 0)) return;
   const now = performance.now(); if (now - F341.last < 55) return; F341.last = now;
-  const {ac, out, nb} = raw, t = ac.currentTime + .075, v = .22;   // a hair after the weapon's own sound, under it
+  const {ac, out, nb} = raw, t = ac.currentTime + .075, v = .22 * ((SETTINGS.hitVol ?? 100) / 100); if (v <= 0) return;   // (v344) its own slider in Settings   // a hair after the weapon's own sound, under it
   switch (f341Mat(m)){
     case 'metal': for (const [f, gn] of [[1870, 1], [2890, .6], [4210, .35]]) f341Tone(ac, out, t, f * (.97 + Math.random() * .06), f * .98, .42, 'sine', v * .5 * gn); f341Noise(ac, out, nb, t, .04, 'highpass', 3000, 2500, .7, v * .8); break;
     case 'stone': f341Tone(ac, out, t, 110, 52, .16, 'sine', v * 1.4); f341Noise(ac, out, nb, t, .14, 'lowpass', 900, 250, .8, v * 1.1); f341Noise(ac, out, nb, t + .03, .1, 'bandpass', 2400, 1600, 2, v * .35); break;
