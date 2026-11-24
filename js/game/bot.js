@@ -34,7 +34,7 @@ function botShun(m){
   for (const b of botBosses()) if (dist(m, b) < BOT_BOSS.near) return true;
   return false;
 }
-const botOk = m => !(m.dead || m.vanish || m.dummy || inVillage(m) || BOT.skip.has(m) || (m.def.boss && S.lvl < 22) || botShun(m));
+const botOk = m => !(m.dead || m.vanish || m.dummy || inVillage(m) || BOT.skip.has(m) || (m.def.boss && S.lvl < 22 && !(typeof DG !== 'undefined' && DG.active)) || botShun(m));
 /* who comes first: the closest; two about as close (within TGT_TIE px) → the one with less HP (v30) */
 const TGT_TIE = 20;
 function tgtCmp(a, b){ const da = dist(a, P), db = dist(b, P); return Math.abs(da - db) <= TGT_TIE ? (a.hp - b.hp) || (da - db) : da - db; }

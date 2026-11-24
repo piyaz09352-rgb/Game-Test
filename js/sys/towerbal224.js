@@ -23,7 +23,7 @@ const twbEase = (f, k) => f <= 30 ? 1 : 1 - (1 - TWB_TOP[k]) * Math.min(1, (f - 
     return m; }; }
 // Auto: no keeping away from the tower's guardian (restored when the climb ends)
 EV.on('tick', () => {
-  const on = typeof TW !== 'undefined' && TW.active;
+  const on = (typeof TW !== 'undefined' && TW.active) || (typeof DG !== 'undefined' && DG.active);   // (v334) and in dungeons: Auto stood idle at the last wave, never touching the dungeon's boss
   if (on){ if (typeof botSet === 'function' && !S.bot) botSet(); if (S.bot && S.bot.avoidBoss !== false){ S.bot.avoidBoss = false; S.bot._twAvoid = true; } }
   else if (S && S.bot && S.bot._twAvoid){ S.bot.avoidBoss = true; delete S.bot._twAvoid; }
 });

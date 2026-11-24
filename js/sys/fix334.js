@@ -95,3 +95,16 @@ if (typeof updMob === 'function'){ const _um = updMob; updMob = function(m, dt){
     if (!m.aggro && m.chase) m.chase = null; if (m.aggro) m.warnT = 0;
   }
   return _um.apply(this, arguments); }; }
+
+// ---- 4. dungeons are party content: a clear warning before going in alone ----
+/* The playtest bots cleared the first three waves alone without trouble, but the guardian at the end (×3.3 a field
+   boss's HP) beat every solo hero of the dungeon's level in one to two minutes. The owner chose to keep dungeons as
+   party content and say so plainly: entering alone (no party members) asks first. */
+if (typeof dgOpen === 'function'){ const _dgo = dgOpen; dgOpen = function(did){
+  const mates = typeof partyMembers === 'function' ? partyMembers().filter(p => !p.isMe) : [], D = DUNGEONS.find(d => d.id === did);
+  if (mates.length || !D || D.tower || did === 'tower' || typeof askConfirm !== 'function' || window.__dgSoloOk) return _dgo.apply(this, arguments);
+  const a = arguments, me = this;
+  askConfirm(L('ดันเจียนนี้สำหรับปาร์ตี้', 'This dungeon is made for a party'),
+    L(`${nm(D)} ออกแบบให้ลงกัน 2–5 คน · คนเดียวผ่าน 3 ด่านแรกได้ แต่ผู้พิทักษ์ท้ายดันเจียนแข็งแกร่งมาก (เลือดราว 3 เท่าของบอสทุ่ง) · ชวนเพื่อนตั้งปาร์ตี้ได้ที่เมนู ปาร์ตี้`,
+      `${nm(D)} is meant for 2–5 players · alone you can clear the first three waves, but the guardian at the end is very strong (about 3× a field boss's HP) · invite friends from the Party menu`),
+    L('เข้าคนเดียว', 'Go in alone'), () => _dgo.apply(me, a)); }; }

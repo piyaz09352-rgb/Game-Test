@@ -8,6 +8,7 @@
 if (typeof WN !== 'undefined'){ WN.ver = 'v334'; WN.items = [
   ['นักผจญภัย AI ในเกม: เดินเล่นในเมือง ล่ามอนในทุ่ง พูดคุย มีป้าย «AI» ไม่แย่งมอนของคุณ · ปิดได้ในตั้งค่า', 'AI adventurers: they stroll in town, hunt in the fields and chat, tagged «AI», never taking your monsters · can be turned off in Settings'],
   ['ลูกศรทองนำทางมือใหม่ (Lv 1–20): ชี้ไปหามอนที่เหมาะกับเลเวล ในเมืองชี้ไปประตูทุ่งที่เหมาะ · ปิดได้ในตั้งค่า', 'A gold guide arrow for new players (Lv 1–20) points to monsters of your level, and in town to the right field gate · can be turned off in Settings'],
+  ['ดันเจียน: Auto สู้ผู้พิทักษ์ท้ายดันเจียนแล้ว (เคยยืนเฉยจนดันเจียนไม่จบ) · เข้าคนเดียวมีคำเตือนว่าดันเจียนสำหรับปาร์ตี้', 'Dungeons: Auto now fights the guardian at the end (it used to stand idle) · going in alone warns that dungeons are made for parties'],
   ['หัวหน้าฝูงในทุ่งมือใหม่ตีเบาลง 30%', 'Pack leaders in the beginner fields hit 30% softer'],
   ['บอสทุ่งเตือนก่อนบุก «! บอสเห็นคุณแล้ว» ให้เวลาถอย 2 วินาที และเลิกไล่ถ้าวิ่งหนีไกลพอ (กลับไปฟื้นเลือด)', 'Field bosses warn before they charge ("The boss has seen you", 2 seconds to back off) and give up a long chase (and heal back up)'],
   ['หน้าต่างวาร์ป ร้านเหรียญ ร้านยา (ตัวเลขจำนวนเห็นแล้ว ปุ่มอยู่แถวเดียว) และช่องสกิลว่าง เข้ากับ UI ใหม่ · รางวัลเข้าเกมรอจังหวะว่าง · แบนเนอร์ไม่บังหน้าต่าง', 'Warp window, coin shop, potion shop (amount visible, one row) and empty skill slots in the new look · login reward waits for a quiet moment · the banner no longer covers windows'],
