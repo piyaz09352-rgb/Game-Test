@@ -18,3 +18,7 @@ html body #ui#ui.ui.h6.moba #joy > .arrow{ filter:hue-rotate(195deg) saturate(1.
 html body #ui#ui.ui.h6 #heBar{ background:linear-gradient(rgba(16,14,38,.86), rgba(16,14,38,.86)) padding-box, var(--a6-rim2) border-box !important; border:1.5px solid transparent !important; border-radius:14px !important; box-shadow:0 0 14px rgba(140,110,255,.45) !important; }
 html body #ui#ui.ui.h6 #heBar, html body #ui#ui.ui.h6 #heBar > :not(button){ color:#f0ecff !important; -webkit-text-fill-color:#f0ecff !important; text-shadow:0 1px 2px rgba(0,0,0,.7) !important; }
 html body #ui#ui.ui.h6 #heBar button, html body #ui#ui.ui.h6 #heBar button *{ -webkit-text-fill-color:currentColor !important; text-shadow:none !important; }
+/* (v333) the name and quest cards: hudfit.js shrinks them to .6 for the old HUD, but #ui already has its own zoom here, so the text
+   ended up ~5px. Back to full size inside the HUD's own scale. */
+html body #ui#ui.ui.h6.moba #charCard#charCard{ zoom:1 !important; }
+html body #ui#ui.ui.h6.moba #goalCard#goalCard{ zoom:.9 !important; }

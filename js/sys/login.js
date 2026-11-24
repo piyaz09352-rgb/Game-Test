@@ -55,6 +55,9 @@ document.addEventListener('click', e => { if (e.target.closest && e.target.close
 /* opens by itself once a day, a few seconds after you enter the world */
 EV.on('tick', dt => { if (LGN.auto || (LGN.t += dt) < 3 || PAUSED || !S || !S.lvl || P.dead) return;
   if (S.lvl < 5 || (typeof TUT !== 'undefined' && TUT.on)) return;   // a brand-new hero sees the tutorial first; the quest card still points here
+  // (v334) wait for a quiet moment: it popped up over open windows, the NPC dialog, the tutorial card and fights
+  if ((typeof UIS !== 'undefined' && Object.values(UIS.open || {}).some(Boolean)) || (el('dialog') && !el('dialog').hidden) || (el('tutBox') && !el('tutBox').hidden && el('tutBox').offsetWidth)
+    || (typeof LD !== 'undefined' && LD.busy) || (typeof mobs !== 'undefined' && mobs.some(m => !m.dead && m.aggro && Math.hypot(m.x - P.x, m.y - P.y) < 500))) return;
   LGN.auto = true; if (lgnReady()) openWin('login'); });
 { const _qt = questTracker; questTracker = function(){ let h = _qt(); try { if (lgnReady()) h += `${h ? '<br>' : ''}<span class="lgnq">📅 ${L('รับรางวัลเข้าเกมวันนี้ได้', "Today's login reward is waiting")}</span>`; } catch (e) {} return h; }; }
 { const st = document.createElement('style');

@@ -73,7 +73,7 @@ function updMob(m, dt){
   const spd = mobSpeedMul(m), rooted = mobRooted(m);
   if (hideBuff() && m.aggro && !m.taunt && !d.boss){ m.aggro = false; m.tx = m.hx; m.ty = m.hy; } m.atkCd -= dt; m.atkT += dt; m.hurtT = Math.max(0, m.hurtT - dt); m.moved = false;
   const dp = dist(m, P);
-  if (!P.dead && d.aggro && !m.aggro && !hideBuff() && dp < (d.boss ? (bossSeesYou(m) ? BOSS_SIGHT : 240) : 150) * (typeof wxSight === 'function' ? wxSight() : 1) && !inVillage(P)) m.aggro = true;
+  if (!P.dead && d.aggro && !m.aggro && !m.calm && !m.warnSight && !hideBuff() && dp < (d.boss ? (bossSeesYou(m) ? BOSS_SIGHT : 240) : 150) * (typeof wxSight === 'function' ? wxSight() : 1) && !inVillage(P)) m.aggro = true;
   if (m.aggro){
     if (P.dead || inVillage(P) || (!d.boss && Math.hypot(m.x - m.hx, m.y - m.hy) > 400)){
       if (d.boss){ m.hx = m.x; m.hy = m.y; m.flee = 0; }                       // a boss gives up only when you die or reach the village

@@ -204,3 +204,171 @@ html body.h6lite #ui.ui.h6 #goalCard, html body.h6lite #ui.ui.h6 #mapCard, html 
    turning — on phone graphics chips that stack flickers. While the death screen is up the HUD is plain and still. */
 html body #wrap.dthon #ui.ui.h6 *, html body #wrap.dthon #ui.ui.h6 *::before, html body #wrap.dthon #ui.ui.h6 *::after{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
 html body #wrap.dthon #ui.ui.h6 :not(#dth):not(#dth *), html body #wrap.dthon #ui.ui.h6 :not(#dth):not(#dth *)::before, html body #wrap.dthon #ui.ui.h6 :not(#dth):not(#dth *)::after, html body #wrap.dthon #h6Icons *, html body #wrap.dthon #h6Icons *::before, html body #wrap.dthon #h6Icons *::after{ animation-play-state:paused !important; }
+
+/* (v330) the chat button and the open chat in the same glass (the owner: the cream «แชท» pill did not match) */
+html body #ui#ui.ui.h6 #chatBtn.chatbtn{ background:linear-gradient(rgba(16,14,38,.78), rgba(16,14,38,.78)) padding-box, var(--a6-rim2) border-box !important; border:1.5px solid transparent !important;
+  border-radius:20px !important; box-shadow:0 0 12px rgba(140,110,255,.45), 0 4px 10px rgba(0,0,0,.4) !important; color:#fff !important; backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+html body #ui#ui.ui.h6 #chatBtn.chatbtn::before, html body #ui#ui.ui.h6 #chatBtn.chatbtn::after{ display:none !important; }
+html body #ui#ui.ui.h6 #chatBtn.chatbtn svg{ color:#9fe4ff !important; stroke:#9fe4ff !important; filter:drop-shadow(0 0 4px rgba(80,200,255,.8)); }
+html body #ui#ui.ui.h6 #chatBtn.chatbtn .cbl, html body #ui#ui.ui.h6 #chatBtn.chatbtn .cprev{ color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.8) !important; }
+html body #ui#ui.ui.h6 #chatBtn.chatbtn .cbadge{ background:linear-gradient(135deg, #ff5f8f, #ff9a3c) !important; color:#fff !important; border:1px solid #fff !important; box-shadow:0 0 8px rgba(255,100,130,.8) !important; }
+html body #ui#ui.ui.h6 #chatBox.chatbox:not(.idle){ background:linear-gradient(rgba(16,14,38,.8), rgba(16,14,38,.8)) padding-box, var(--a6-rim2) border-box !important; border:1.5px solid transparent !important; border-radius:14px !important;
+  box-shadow:0 0 14px rgba(140,110,255,.4), 0 6px 16px rgba(0,0,0,.4) !important; }
+html body #ui#ui.ui.h6 #chatBox.chatbox:not(.idle) .clog, html body #ui#ui.ui.h6 #chatBox.chatbox:not(.idle) .clog *{ color:#f0ecff !important; -webkit-text-fill-color:currentColor !important; text-shadow:0 1px 2px rgba(0,0,0,.6); }
+html body #ui#ui.ui.h6 #chatBox.chatbox .ctab{ background:rgba(255,255,255,.08) !important; color:#dcd6ff !important; border:1px solid rgba(190,170,255,.35) !important; border-radius:10px !important; }
+html body #ui#ui.ui.h6 #chatBox.chatbox .ctab.on{ background:linear-gradient(135deg, #9a6cff, #3fc6ff) !important; color:#fff !important; border-color:rgba(255,255,255,.6) !important; }
+html body #ui#ui.ui.h6 #chatBox.chatbox input{ background:rgba(255,255,255,.1) !important; color:#fff !important; border:1px solid rgba(190,170,255,.45) !important; border-radius:10px !important; }
+html body #ui#ui.ui.h6 #chatBox.chatbox button:not(.ctab){ background:linear-gradient(135deg, #9a6cff, #3fc6ff) !important; color:#fff !important; border:0 !important; border-radius:10px !important; }
+html body #ui#ui.ui.h6 #chatBox #chatForm.cin{ background:rgba(255,255,255,.06) !important; border:1px solid rgba(190,170,255,.35) !important; border-radius:12px !important; box-shadow:none !important; }
+html body #ui#ui.ui.h6 #chatBox select{ background:rgba(255,255,255,.1) !important; color:#fff !important; border:1px solid rgba(190,170,255,.45) !important; border-radius:10px !important; }
+html body #ui#ui.ui.h6 #chatBox select option{ background:#1a1640; color:#fff; }
+html body #ui#ui.ui.h6 #chatBox input::placeholder{ color:rgba(230,225,255,.6) !important; }
+
+/* (v331) the shop orb, redesigned (the owner: «it bounces about — make it stand out, easy to see, a glowing frame»).
+   It never moves now (the coin shop's own pulse is off), it is a size up from the other orbs, in a double gold frame
+   with a light that runs slowly round it, and the coin count sits in a gold pill across its foot */
+html body #ui#ui.ui.h6 #cshBtn#cshBtn, html body #ui#ui.ui.h6 #cshBtn#cshBtn *{ animation:none !important; transition:none !important; }
+html body #ui#ui.ui.h6 #cshBtn#cshBtn{ width:54px !important; }
+html body #ui#ui.ui.h6 #cshBtn#cshBtn > i{ width:48px !important; height:48px !important; font-size:23px !important; margin-top:-3px !important;
+  background:radial-gradient(circle at 50% 32%, #5a3a12, #24140a 72%) padding-box, conic-gradient(from var(--a6-ang, 0deg), #fff6c8, #ffbf3a, #b86a10, #ffd56a, #fff6c8) border-box !important;
+  border:3px solid transparent !important; box-shadow:0 0 0 2px rgba(255,214,110,.55), 0 0 16px rgba(255,190,60,.95), 0 0 30px rgba(255,170,40,.45), 0 4px 10px rgba(0,0,0,.5) !important;
+  color:#ffe28a !important; -webkit-text-fill-color:#ffe28a !important; text-shadow:0 0 8px rgba(255,200,80,1), 0 0 2px #fff !important; animation:a6spin 5s linear infinite !important; }
+html body #ui#ui.ui.h6 #cshBtn#cshBtn > i::after{ content:''; position:absolute; inset:-9px; border-radius:50%; border:1.5px solid rgba(255,214,110,.6); box-shadow:0 0 10px rgba(255,190,60,.55); pointer-events:none; }
+html body #ui#ui.ui.h6 #cshBtn#cshBtn > b{ position:absolute !important; top:38px !important; left:50% !important; right:auto !important; transform:translateX(-50%) !important; min-width:30px; height:15px; padding:0 6px !important;
+  font:900 9.5px/15px system-ui, sans-serif !important; border-radius:8px !important; background:linear-gradient(#fff3b0, #f0b030) !important; color:#3a2200 !important; -webkit-text-fill-color:#3a2200 !important;
+  border:1px solid #fff !important; box-shadow:0 0 8px rgba(255,190,60,.9) !important; white-space:nowrap; z-index:2; }
+html body #ui#ui.ui.h6 #cshBtn#cshBtn > span{ margin-top:7px !important; color:#ffe9a8 !important; -webkit-text-fill-color:#ffe9a8 !important; text-shadow:0 0 6px rgba(255,180,60,.9), 0 1px 2px rgba(0,0,0,.95) !important; }
+html body.h6lite #ui#ui.ui.h6 #cshBtn#cshBtn > i, html body #wrap.dthon #ui#ui.ui.h6 #cshBtn#cshBtn > i{ animation:none !important; }
+
+/* (v331) the open menu, redesigned (the owner: «this doesn't pass either»). It was a strip about a row and a half tall
+   with a gold scrollbar, squeezed over the minimap on cream tiles. Now: a dark glass panel under the orbs that uses the
+   free height, each entry a round glowing icon with a white name under it, no visible scrollbar (it still scrolls). */
+html body #ui#ui.ui.h6 #rail:not(.folded){ z-index:46 !important; }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu{ display:grid !important; grid-template-columns:repeat(var(--h6c, 5), 62px) !important; grid-auto-rows:66px !important; gap:6px 6px !important; padding:12px 12px 10px !important;
+  max-height:var(--h6mh, 360px) !important; overflow-y:auto !important; overflow-x:hidden !important; scrollbar-width:none !important; -ms-overflow-style:none;
+  background:linear-gradient(rgba(16,14,38,.9), rgba(16,14,38,.9)) padding-box, var(--a6-rim2) border-box !important; border:1.5px solid transparent !important; border-radius:18px !important;
+  box-shadow:0 0 22px rgba(140,110,255,.5), 0 12px 30px rgba(0,0,0,.55) !important; -webkit-mask-image:linear-gradient(#000 calc(100% - 18px), transparent); mask-image:linear-gradient(#000 calc(100% - 18px), transparent); }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu::-webkit-scrollbar{ display:none !important; width:0 !important; }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb{ all:unset; box-sizing:border-box; cursor:pointer; position:relative; display:flex !important; flex-direction:column !important; align-items:center !important; justify-content:flex-start !important; gap:4px !important;
+  width:62px !important; height:66px !important; padding:4px 0 0 !important; background:none !important; border:0 !important; box-shadow:none !important; border-radius:12px !important; }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb::before, html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb::after{ display:none !important; }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb svg.mico{ width:38px !important; height:38px !important; border-radius:50% !important; padding:3px; box-sizing:border-box;
+  background:radial-gradient(circle at 50% 30%, rgba(70,58,140,.95), rgba(16,12,40,.95)) padding-box, linear-gradient(135deg, var(--mc, #c79bff), #59dcff) border-box !important; border:1.5px solid transparent;
+  box-shadow:0 0 10px color-mix(in srgb, var(--mc, #a08cff) 70%, transparent), 0 3px 8px rgba(0,0,0,.45); transition:transform .15s, box-shadow .15s; }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb:hover svg.mico{ transform:translateY(-2px) scale(1.06); box-shadow:0 0 16px var(--mc, #a08cff), 0 5px 10px rgba(0,0,0,.45); }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb:active svg.mico{ transform:scale(.93); }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb[aria-pressed="true"] svg.mico{ box-shadow:0 0 0 2px #fff, 0 0 16px var(--mc, #a08cff) !important; }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb > span, html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb > b, html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb > em{ display:block !important; max-width:62px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  font:700 10.5px/1.15 system-ui, sans-serif !important; color:#f0ecff !important; -webkit-text-fill-color:#f0ecff !important; text-shadow:0 1px 2px rgba(0,0,0,.85) !important; background:none !important; position:static !important; transform:none !important; }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb .dot{ position:absolute !important; top:2px !important; right:9px !important; left:auto !important; width:10px !important; height:10px !important; border-radius:50% !important; background:#ff3b6a !important; border:1.5px solid #fff !important; box-shadow:0 0 8px #ff3b6a !important; }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb > span.tip{ all:unset !important; display:block !important; position:static !important; font-size:0 !important; line-height:0 !important; max-width:62px !important; text-align:center !important; opacity:1 !important; visibility:visible !important; }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb > span.tip > span{ display:block !important; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:62px; font:700 10.5px/1.15 system-ui, sans-serif !important;
+  color:#f0ecff !important; -webkit-text-fill-color:#f0ecff !important; text-shadow:0 1px 2px rgba(0,0,0,.85) !important; }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb > span.tip kbd{ display:none !important; }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb > span.dot{ display:block !important; }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb > span.dot[hidden]{ display:none !important; }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb > svg:not(.mico){ width:38px !important; height:38px !important; border-radius:50% !important; padding:8px; box-sizing:border-box; color:#ffe9a8 !important; stroke:#ffe9a8;
+  background:radial-gradient(circle at 50% 30%, rgba(70,58,140,.95), rgba(16,12,40,.95)) padding-box, linear-gradient(135deg, #ffd56a, #59dcff) border-box !important; border:1.5px solid transparent; box-shadow:0 0 10px rgba(255,200,90,.55), 0 3px 8px rgba(0,0,0,.45); }
+html body #ui#ui.ui.h6 #rail:not(.folded) .menu .mb:not(:has(.tip))::after{ content:attr(aria-label) !important; display:block !important; position:static !important; max-width:62px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center;
+  font:700 10.5px/1.15 system-ui, sans-serif; color:#f0ecff; text-shadow:0 1px 2px rgba(0,0,0,.85); background:none !important; border:0 !important; width:auto !important; height:auto !important; }
+
+/* (v332) the NPC dialog and the warp list in the same style as the other windows (they kept the old bright blue header) */
+html body.h6w #ui#ui #dialog.dialog, html body.h6w #ui#ui #warpGrid{ background:linear-gradient(180deg, rgba(250,249,255,.97), rgba(236,234,252,.97)) padding-box, linear-gradient(135deg, #c79bff, #59dcff 50%, #ffd76a) border-box !important;
+  border:2px solid transparent !important; border-radius:18px !important; box-shadow:0 0 0 1px rgba(255,255,255,.4), 0 0 26px rgba(140,110,255,.45), 0 18px 40px rgba(10,6,30,.45) !important; overflow:hidden; }
+html body.h6w #ui#ui #dialog.dialog::before, html body.h6w #ui#ui #dialog.dialog::after, html body.h6w #ui#ui #warpGrid::before, html body.h6w #ui#ui #warpGrid::after{ display:none !important; }
+html body.h6w #ui#ui #dialog .dh, html body.h6w #ui#ui #warpGrid .wghd{ background:linear-gradient(100deg, #2c2468, #1a1640 60%, #20305e) !important; border:0 !important; position:relative;
+  box-shadow:0 4px 14px rgba(20,10,60,.35) !important; }
+html body.h6w #ui#ui #dialog .dh::after, html body.h6w #ui#ui #warpGrid .wghd::after{ content:'' !important; display:block !important; position:absolute !important; left:0; right:0; bottom:0; top:auto !important; height:1.5px; background:linear-gradient(90deg, transparent, #b47cff, #4fd8ff, #ffd36a, transparent) !important; box-shadow:0 0 8px rgba(120,180,255,.8); }
+html body.h6w #ui#ui #dialog .dh *, html body.h6w #ui#ui #warpGrid .wghd *:not(button):not(button *){ color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:0 0 6px rgba(160,130,255,.7), 0 1px 2px rgba(0,0,0,.6) !important; }
+html body.h6w #ui#ui #dialog .dh small, html body.h6w #ui#ui #dialog .dh .sub, html body.h6w #ui#ui #warpGrid .wghd small{ color:#cfc8ff !important; -webkit-text-fill-color:#cfc8ff !important; }
+html body.h6w #ui#ui #dialog .dh button, html body.h6w #ui#ui #warpGrid .wghd button[data-wclose], html body.h6w #ui#ui #warpGrid .wghd .wgx, html body.h6w #ui#ui #dialog .dh .x{ border-radius:50% !important;
+  background:radial-gradient(circle at 50% 30%, rgba(150,60,110,.95), rgba(48,14,36,.95)) padding-box, linear-gradient(135deg, #ff8ab0, #ffb36a) border-box !important; border:1.5px solid transparent !important; box-shadow:0 0 10px rgba(255,110,150,.6) !important; color:#fff !important; }
+/* (v333) the death card in the new palette: dark violet glass with a red-gold rim (it was the old cream parchment) */
+html body.h6w #dth .dthcard{ background:radial-gradient(ellipse at 50% 0%, rgba(80,30,70,.96), rgba(28,18,52,.97) 60%, rgba(14,10,32,.98)) padding-box,
+  linear-gradient(135deg, #ffb46a, #ff4a6a 40%, #b47cff 75%, #4fd8ff) border-box !important; border:2px solid transparent !important;
+  box-shadow:0 0 40px rgba(255,70,90,.35), 0 0 0 1px rgba(255,255,255,.08) inset, 0 26px 70px rgba(0,0,0,.7) !important; }
+html body.h6w #dth .dthcard::before{ border-color:rgba(255,190,220,.22) !important; box-shadow:inset 0 0 30px rgba(255,80,120,.14) !important; }
+html body.h6w #dth .dthc{ display:none !important; }
+html body.h6w #dth .dthloss{ color:#ffc4a8 !important; }
+html body.h6w #dth .dthcard > p, html body.h6w #dth .dthcard small:not(.dthb small){ color:#d8d0f0 !important; }
+html body.h6w #dth .dthb{ border:1px solid rgba(255,255,255,.35) !important; box-shadow:0 0 14px rgba(255,200,90,.35), inset 0 1px 0 rgba(255,255,255,.5) !important; }
+html body.h6w #dth .dthb.town{ background:linear-gradient(#ffe9a8, #ffc24a 55%, #e8902a) !important; color:#3a1a04 !important; }
+html body.h6w #dth .dthb.here:not(:disabled){ background:linear-gradient(135deg, #b47cff, #6a5cff 55%, #2fb4ff) !important; color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.5); }
+html body.h6w #dth .dthb.here:disabled{ background:rgba(255,255,255,.08) !important; color:#a8a0c8 !important; border-color:rgba(255,255,255,.18) !important; box-shadow:none !important; }
+html body.h6w #dth .dthb.here:disabled b, html body.h6w #dth .dthb.here:disabled small{ color:#c8c0e4 !important; -webkit-text-fill-color:#c8c0e4 !important; }
+/* (v333) the achievements window was made for the old dark windows: grey see-through cards with pale gold lettering on the
+   new light glass. Light cards with deep-indigo lettering; finished ones get their colour on the left edge. */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achhead > div{ background:linear-gradient(180deg, #ffffff, #f1edff) !important; box-shadow:inset 0 0 0 1px rgba(150,130,230,.45) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achhead b{ color:#5a3cc8 !important; -webkit-text-fill-color:#5a3cc8 !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achhead .achnow b{ color:#b0601a !important; -webkit-text-fill-color:#b0601a !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achhead small{ color:#6a6290 !important; -webkit-text-fill-color:#6a6290 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achc{ background:#f6f4fd !important; box-shadow:inset 0 0 0 1px rgba(150,130,230,.3) !important; opacity:1 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achc:not(.on) .achm, html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achc:not(.on) .achr{ opacity:.72; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achc.on{ background:linear-gradient(100deg, color-mix(in srgb, var(--tc) 22%, #fff), #ffffff 70%) !important; box-shadow:inset 3px 0 0 var(--tc), inset 0 0 0 1px color-mix(in srgb, var(--tc) 60%, transparent) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achc b{ color:#2a2350 !important; -webkit-text-fill-color:#2a2350 !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achc small{ color:#4a4470 !important; -webkit-text-fill-color:#4a4470 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achc em{ color:#7a72a0 !important; -webkit-text-fill-color:#7a72a0 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achr span{ color:#8a5a10 !important; -webkit-text-fill-color:#8a5a10 !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achr .tt{ color:#6a4cd0 !important; -webkit-text-fill-color:#6a4cd0 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achbar{ background:#e4e0f4 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-ach .achbar span{ color:#2a2350 !important; -webkit-text-fill-color:#2a2350 !important; text-shadow:none !important; }
+/* the chosen tier in the skill window: white lettering on a light tab (the gold it was made for became lavender) */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-skill .skt.on{ background:linear-gradient(135deg, #8a5cff, #4f9dff) !important; box-shadow:0 0 12px rgba(120,100,255,.45) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-skill .skt.on, html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-skill .skt.on *{ color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.4) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-skill .skdetail .nx{ color:#1f8a5a !important; -webkit-text-fill-color:#1f8a5a !important; }
+/* (v333) NPC windows: pieces made for the old dark windows, unreadable on the new light glass */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .dh .wallet{ background:rgba(10,8,30,.55) !important; border:1px solid rgba(255,224,138,.6) !important; color:#ffe08a !important; -webkit-text-fill-color:#ffe08a !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .dh .wallet small{ color:#f0e6c0 !important; -webkit-text-fill-color:#f0e6c0 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .qty{ background:#f1edff !important; border:1px solid rgba(130,110,230,.5) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .qty .qb{ color:#4a34b0 !important; -webkit-text-fill-color:#4a34b0 !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .qty .qb:disabled{ color:#a8a2c8 !important; -webkit-text-fill-color:#a8a2c8 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .bankz > div:not(.bankzb){ background:linear-gradient(180deg, #ffffff, #f1edff) !important; box-shadow:inset 0 0 0 1px rgba(150,130,230,.45) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .bankz b{ color:#8a5a10 !important; -webkit-text-fill-color:#8a5a10 !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .bankz small{ color:#6a6290 !important; -webkit-text-fill-color:#6a6290 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .hlpbuff{ color:#1f7a4a !important; -webkit-text-fill-color:#1f7a4a !important; text-shadow:none !important; }
+/* (v333) the tutorial card in the new palette (it was cream parchment over the dark glass HUD) */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox{ background:linear-gradient(var(--a6-glass, rgba(22,16,52,.86)), var(--a6-glass, rgba(22,16,52,.86))) padding-box, linear-gradient(135deg, #b47cff, #4fd8ff 50%, #ffd36a) border-box !important;
+  border:1.5px solid transparent !important; box-shadow:0 0 18px rgba(140,110,255,.45), 0 10px 26px rgba(0,0,0,.45) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox::before, html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox::after{ display:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox p, html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox p *{ color:#efeaff !important; -webkit-text-fill-color:#efeaff !important; text-shadow:0 1px 2px rgba(0,0,0,.6) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox .tuth b{ color:#ffe08a !important; -webkit-text-fill-color:#ffe08a !important; text-shadow:0 1px 2px rgba(0,0,0,.6) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox .tutx, html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox .tutfold{ color:#b8e8ff !important; -webkit-text-fill-color:#b8e8ff !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox .tutdots i{ background:rgba(255,255,255,.3) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #ui.h6 .tutbox .tutdots i.on{ background:#ffd36a !important; box-shadow:0 0 6px #ffd36a !important; }
+/* (v334) the warp window inside: the cards' cream body, boss box, monster tiles and search bar in the new palette; the
+   money pill in its dark header readable (white on cream before) */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #warpGrid .wgbia{ background:rgba(10,8,30,.55) !important; border:1px solid rgba(255,224,138,.6) !important; color:#ffe08a !important; -webkit-text-fill-color:#ffe08a !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #warpGrid .wgbd{ background:linear-gradient(180deg, #ffffff, #f6f4fd) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #warpGrid .wgboss{ background:#f1edff !important; border-color:rgba(150,130,230,.45) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #warpGrid .wgboss b{ color:#b0304a !important; -webkit-text-fill-color:#b0304a !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #warpGrid .wgmobs > span{ background:#ece8fb !important; border-color:rgba(150,130,230,.35) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .fdsearch input, html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #warpGrid .fdsearch input{ background:#ffffff !important; border:1.5px solid rgba(130,110,230,.55) !important; color:#2a2350 !important; box-shadow:0 0 0 3px rgba(150,120,255,.12) !important; }
+/* the coin shop's side tabs: light glass like other windows' tabs, the chosen one violet (they were dark navy blocks) */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-cshop .cshtabs button:not(.on):not(.tu){ background:linear-gradient(180deg, #ffffff, #efebfd) !important; border:1px solid rgba(150,130,230,.5) !important; box-shadow:0 2px 6px rgba(80,60,160,.12) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-cshop .cshtabs button:not(.on):not(.tu) span{ color:#2a2350 !important; -webkit-text-fill-color:#2a2350 !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-cshop .cshtabs button.on{ background:linear-gradient(135deg, #8a5cff, #4f9dff) !important; border:1px solid rgba(255,255,255,.5) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-cshop .cshtabs button.on span{ color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.4) !important; }
+/* (v334) shop rows: the amount box showed no number (white digits on the light box) and on a phone the − + MAX box and
+   the buy button dropped to a second line under every item. One line now: item · price · amount · buy. */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .qty .qn{ color:#2a2350 !important; -webkit-text-fill-color:#2a2350 !important; font-weight:800 !important; width:40px !important; min-width:40px !important; flex:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty){ flex-wrap:nowrap !important; gap:6px !important; align-items:center !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty) > .nm{ flex:1 1 auto !important; min-width:0 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty) > .pr{ flex:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty) > .qty{ margin-left:0 !important; height:auto !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty) > .qgo{ flex:none !important; min-width:64px !important; white-space:nowrap !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty) > .qty .qb{ width:30px !important; height:30px !important; min-height:30px !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty) > .qty{ width:auto !important; max-width:none !important; overflow:visible !important; flex:none !important; } html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .srow:has(.qty) > .qty .qm{ display:block !important; width:auto !important; padding:0 8px !important; }
+/* (v334) empty skill slots: faint grey squares that looked like a broken screen. Now a round glass socket with a dashed
+   rim and a soft "+" (hold to put a skill there), the slot number small in the corner. */
+html body #ui#ui.ui.h6 .mo.sk.empty, html body #ui#ui.ui.h6pc #hotbar > .hk.h6sk.empty{ border-radius:50% !important; background:radial-gradient(circle at 50% 40%, rgba(64,52,130,.72), rgba(18,14,44,.82)) !important;
+  border:1.5px dashed rgba(190,170,255,.6) !important; box-shadow:inset 0 0 10px rgba(120,100,255,.25) !important; opacity:1 !important; }
+html body #ui#ui.ui.h6 .mo.sk.empty::after, html body #ui#ui.ui.h6pc #hotbar > .hk.h6sk.empty::after{ content:'+' !important; position:absolute !important; inset:0 !important; display:grid !important; place-items:center !important;
+  font:300 24px/1 system-ui, sans-serif !important; color:rgba(220,210,255,.75) !important; background:none !important; border:0 !important; width:auto !important; height:auto !important; transform:none !important; animation:none !important; pointer-events:none; }
+html body #ui#ui.ui.h6 .mo.sk.mini.empty::after{ font-size:16px !important; }
+html body #ui#ui.ui.h6 .mo.sk.empty > b, html body #ui#ui.ui.h6pc #hotbar > .hk.h6sk.empty > kbd{ position:absolute !important; top:-2px !important; left:-2px !important; right:auto !important; bottom:auto !important; transform:none !important;
+  min-width:15px; height:15px; padding:0 3px; border-radius:8px; font:700 9px/15px system-ui, sans-serif !important; background:rgba(20,14,50,.85) !important; color:#d8d0ff !important; border:1px solid rgba(190,170,255,.5) !important; text-align:center; }
+/* (v334) the NPC speech bubble's tail was a dark brown diamond floating at its corner: now the bubble's own white */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .say::before{ background:#ffffff !important; border:0 !important; box-shadow:-1px -1px 0 rgba(150,130,230,.55) !important; }
+/* the coin shop's sub tabs (ด้านหลัง · ส่วนหัว …): the chosen one violet like every other chosen tab (it was old gold) */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-cshop .cshsub button.on{ background:linear-gradient(135deg, #8a5cff, #4f9dff) !important; border-color:rgba(255,255,255,.5) !important; color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.35) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-cshop .cshsub button.on *{ color:#fff !important; -webkit-text-fill-color:#fff !important; }

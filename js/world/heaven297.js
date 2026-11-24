@@ -47,7 +47,9 @@ function hvnFloor(g){
       for (let j = 0; j < 40; j++){ const x = cx + (R() - .5) * r * 2, y = cy + (R() - .5) * r, h = 4 + R() * 5, p = P[j % 2]; p.moveTo(x, y); p.lineTo(x + (R() - .5) * 2, y - h); } }
     g.lineWidth = .9; g.strokeStyle = '#a8cc88'; g.stroke(P[0]); g.strokeStyle = '#d8e8a8'; g.stroke(P[1]); }
   // courts of white marble inlaid with gold
+  const HVN_NO_COURT = true;
   for (let c = 0; c < Math.max(3, Math.round(5 * A)); c++){ const cx = 280 + R() * (W - 560), cy = 220 + R() * (H - 440), rw = 90 + R() * 110, rh = 60 + R() * 60;
+    if (HVN_NO_COURT) continue;   // (v332) the owner: «remove all» — no marble courts with gold rings (the random numbers are still drawn, so the rest of the map lays out as before)
     for (let by = cy - rh; by < cy + rh; by += 18) for (let bx = cx - rw; bx < cx + rw; bx += 18){ const d = ((bx - cx) / rw) ** 2 + ((by - cy) / rh) ** 2; if (d > 1) continue;
       g.globalAlpha = 1 - d * .55; g.fillStyle = (Math.floor(bx / 18) + Math.floor(by / 18)) % 2 ? '#fffcf2' : '#f7efdf'; g.fillRect(bx, by, 17.4, 17.4); g.fillStyle = 'rgba(200,180,140,.25)'; g.fillRect(bx, by + 17, 17.4, .6); g.globalAlpha = 1; }   // soft marble, fading into the grass at its rim
     g.strokeStyle = 'rgba(214,170,70,.8)'; g.lineWidth = 2; g.beginPath(); g.ellipse(cx, cy, rw, rh, 0, 0, 7); g.stroke(); g.lineWidth = 1; g.beginPath(); g.ellipse(cx, cy, rw * .6, rh * .6, 0, 0, 7); g.stroke();

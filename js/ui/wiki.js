@@ -87,7 +87,7 @@ const WIKI_SYS = [
     <tr><td>INT</td><td>${L('พลังเวท (ยิ่งสูงยิ่งคุ้ม) · SP สูงสุด · ป้องกันเวท (MDEF) · ร่ายเร็วขึ้น · ฟื้น SP เร็วขึ้น · ต้านใบ้ แช่แข็ง ตาพร่า', 'Magic ATK (pays more the higher it goes) · Max SP · MDEF · faster casts · faster SP recovery · resists silence, freeze, blind')}</td></tr>
     <tr><td>DEX</td><td>${L('ความแม่น (HIT) · พลังโจมตีของธนู (หลัก) · ร่ายเร็วขึ้นมาก · เพิ่มพลังโจมตีระยะใกล้เล็กน้อย', 'HIT · bow ATK (main) · much faster casts · a little close-range ATK')}</td></tr>
     <tr><td>LUK</td><td>${L('คริติคอล · หลบแน่นอน (Perfect Dodge) · เพิ่มพลังโจมตีเล็กน้อย · ต้านคำสาป', 'Critical hits · Perfect Dodge · a little ATK · resists curse')}</td></tr></table>
-    <ul><li>${L('คริติคอลแรงกว่าตีปกติและไม่พลาด · เวทไม่คริ ยกเว้นดาวกระจายของนินจา', 'Crits hit harder than normal hits and never miss · spells never crit, except the ninja\'s stars')}</li>
+    <ul><li>${L('คริติคอลแรงกว่าตีปกติและไม่พลาด · เวทก็คริได้ (โอกาสเท่ากับตีปกติ)', 'Crits hit harder than normal hits and never miss · spells can crit too, with the same chance as a weapon hit')}</li>
     <li>${L('ตีมอนที่เลเวลสูงกว่าเรา ต้องมีความแม่น (DEX) มากขึ้น ไม่งั้นจะตีพลาดบ่อย', 'Monsters above your level need more HIT (DEX), or you miss often')}</li>
     <li>${L('บอสสายเวทยิงเข้าทางป้องกันเวท (MDEF) เกราะหนาช่วยไม่ได้', 'Caster bosses hit your MDEF: heavy armour does not help')}</li></ul>
     <h4>${L('แต้มสเตตัส', 'Stat points')}</h4>

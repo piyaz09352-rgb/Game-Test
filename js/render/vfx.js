@@ -71,7 +71,10 @@ const VFX = (() => {
     let s = seed * 9973; const rr = () => { s = (s * 9301 + 49297) % 233280; return s / 233280 - .5; };
     const seg = 9, pts = [];
     for (let i = 0; i <= seg; i++){ const k = i / seg; pts.push([x0 + (x1 - x0) * k + (i && i < seg ? rr() * amp : 0), y0 + (y1 - y0) * k]); }
-    const path = () => { g.beginPath(); pts.forEach((p, i) => (i ? g.lineTo(sx(p[0]), sy(p[1])) : g.moveTo(sx(p[0]), sy(p[1])))); };
+    // (v331) the bolt bends through its points in curves (straight zig-zag strokes looked angular to the owner); still forked and jagged enough to read as lightning
+    const path = () => { g.beginPath(); g.lineCap = 'round'; g.lineJoin = 'round'; g.moveTo(sx(pts[0][0]), sy(pts[0][1]));
+      for (let i = 1; i < pts.length - 1; i++){ const a = pts[i], b = pts[i + 1]; g.quadraticCurveTo(sx(a[0]), sy(a[1]), sx((a[0] + b[0]) / 2), sy((a[1] + b[1]) / 2)); }
+      const L = pts[pts.length - 1]; g.lineTo(sx(L[0]), sy(L[1])); };
     g.strokeStyle = col; g.lineWidth = w * 3; g.globalAlpha *= .35; path(); g.stroke(); g.globalAlpha /= .35;
     g.strokeStyle = WHITE; g.lineWidth = w; path(); g.stroke();
     for (let b = 0; b < branches; b++){ const i = 2 + Math.floor((rr() + .5) * (seg - 4)), p = pts[i]; g.lineWidth = w * .6; g.beginPath(); g.moveTo(sx(p[0]), sy(p[1])); let bx = p[0], by = p[1]; for (let k = 0; k < 3; k++){ bx += rr() * 18 + (b ? 6 : -6); by += 8; g.lineTo(sx(bx), sy(by)); } g.stroke(); }
@@ -366,7 +369,7 @@ const VFX = (() => {
       burst(o.x, o.y, 10, 6 * s, {s0:8, s1:30, vz0:15, vz1:40, p:{size:9, grow:22, shape:'smoke', col:'rgba(70,55,50,1)', add:false, life:1.1}});
     },
     wrath(o){
-      add({x:o.x, y:o.y, r:o.r, life:.25 + o.hits * o.every + .5, layer:'under', draw(k){ yantra(this.x, this.y, this.r, 'rgba(180,230,255,1)', Math.min(1, k * 4) * (1 - k), -k * 3); disc(this.x, this.y, this.r, 'rgba(60,70,130,1)', .25 * (1 - k)); }});
+      add({x:o.x, y:o.y, r:o.r, life:.25 + o.hits * o.every + .5, layer:'under', draw(k){ yantra(this.x, this.y, this.r, 'rgba(180,230,255,1)', Math.min(1, k * 4) * (1 - k), -k * 3); glow(this.x, this.y, this.r * 1.1, 'rgba(60,70,130,1)', .3 * (1 - k)); }});   // (v331) a soft shade, no hard rim
       add({x:o.x, y:o.y, r:o.r, life:.25 + o.hits * o.every + .6, draw(k){ // storm cloud above the area
         for (let i = 0; i < 7; i++){ const a = i / 7 * TAU + k * 2; glow(this.x + Math.cos(a) * this.r * .5, this.y - 150 + Math.sin(a) * 10, 34, 'rgba(70,80,120,1)', .5 * Math.sin(k * Math.PI)); } }});
       for (let i = 0; i < o.hits; i++) later(.25 + i * o.every, () => {

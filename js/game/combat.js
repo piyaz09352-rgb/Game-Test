@@ -26,14 +26,17 @@ function magicDamage(m, mult, elem){
   let dmg = (DER.matk * rand(.9, 1.1) * mult - d.lvl / 2) * em * (1 - (d.defPct || 0) / 2);
   if (pas.luckyElem && elem === luckyElem()) dmg *= 1 + pas.luckyElem;
   dmg *= 1 + ((DER.race || {})[d.race] || 0);
-  return {dmg: em === 0 ? 0 : Math.max(1, Math.round(dmg)), em, magic:true, elem};
+  // (v331) the owner: «spells can crit too» — the same chance as a weapon hit (CRIT and crit buffs), for the same crit damage
+  const crit = em !== 0 && Math.random() * 100 < (DER.crit || 0) + (typeof buffSum === 'function' ? buffSum('crit') : 0);
+  if (crit) dmg *= DER.critDmg || 1.5;
+  return {dmg: em === 0 ? 0 : Math.max(1, Math.round(dmg)), em, magic:true, elem, crit};
 }
 function applyDamage(m, res, sk){
   if (!m || m.dead) return;
   if (m.pvp){ if (typeof pvpDeal === 'function') pvpDeal(m, res, sk); return; }   // a duel opponent: the damage travels to them
   const y = m.y - MOB_H[m.type] - 4;
   if (res.miss){ addText(m.x, y, 'Miss', '#cfcfcf'); return; }
-  if (res.magic && !res.shur) res.crit = false; // spells never crit (a thrown star can: v184)
+  // (v331) spells can crit (magicDamage rolls it); before, they never did
   if (m.st && m.st.shock > 0 && !res.poison) res.dmg = Math.round(res.dmg * 1.15);
   if (!res.poison){ const w = JOBS[S.job].weapon.type;
     if (res.magic && !res.shur) sk ? SFX.impact(res.elem || sk.elem) : SFX.play('orbhit', {elem:res.elem});   // spell hit by element · caster basic orb pop
@@ -146,7 +149,7 @@ function shurShot(t, mul = 1){
   return {k:'shuriken', elem, x:P.x, y:P.y - 30, t, delay:.06, speed:760, hit:() => {
     const r = magicDamage(t, .95 * mul, elem); r.shur = true;
     const hb = hideBuff() || P.buffs.smokescreen; let cr = (DER.crit || 0) + buffSum('crit'); if (hb && hb.sureCrit){ cr = 100; hb.sureCrit = 0; }
-    if (r.dmg > 0 && Math.random() * 100 < cr){ r.crit = true; r.dmg = Math.round(r.dmg * (DER.critDmg || 1.5)); }
+    if (r.dmg > 0 && !r.crit && Math.random() * 100 < cr){ r.crit = true; r.dmg = Math.round(r.dmg * (DER.critDmg || 1.5)); }
     applyDamage(t, r); VFX.play('slashHit', {x:t.x, y:t.y - MOB_H[t.type] * .5}); }};
 }
 function basicAttack(t){
