@@ -103,7 +103,26 @@ if (typeof updMob === 'function'){ const _um = updMob; updMob = function(m, dt){
 if (typeof dgOpen === 'function'){ const _dgo = dgOpen; dgOpen = function(did){
   const mates = typeof partyMembers === 'function' ? partyMembers().filter(p => !p.isMe) : [], D = DUNGEONS.find(d => d.id === did);
   if (mates.length || !D || D.tower || did === 'tower' || typeof askConfirm !== 'function' || window.__dgSoloOk) return _dgo.apply(this, arguments);
-  const a = arguments, me = this;
-  askConfirm(L('ดันเจียนนี้สำหรับปาร์ตี้', 'This dungeon is made for a party'),
-    L('ผู้พิทักษ์ที่รออยู่ข้างในแข็งแกร่งเกินกว่าจะสู้ลำพัง ชวนเพื่อนมาด้วยจะดีกว่า', 'The guardian waiting inside is too strong to face alone. Better bring friends.'),
-    L('เข้าคนเดียว', 'Go in alone'), () => _dgo.apply(me, a)); }; }
+  const a = arguments, me = this, d = el('confirm'); if (!d) return _dgo.apply(this, arguments);
+  // (v335) three choices: cancel, alone, or with three AI adventurers (aiadv334.js)
+  d.innerHTML = `<h3>${L('ดันเจียนนี้สำหรับปาร์ตี้', 'This dungeon is made for a party')}</h3><p>${L('ผู้พิทักษ์ที่รออยู่ข้างในแข็งแกร่งเกินกว่าจะสู้ลำพัง ชวนเพื่อนมาด้วยจะดีกว่า', 'The guardian waiting inside is too strong to face alone. Better bring friends.')}</p>
+    <div class="row"><button class="btn" data-cf="no">${L('ยกเลิก', 'Cancel')}</button><button class="btn" data-cf="solo">${L('เข้าคนเดียว', 'Go in alone')}</button><button class="btn gold" data-cf="ai">${L('ชวนนักผจญภัย AI 3 คน', 'Bring 3 AI adventurers')}</button></div>`;
+  d.hidden = false; d.onclick = e => { const btn = e.target.closest('[data-cf]'); if (!btn) return; d.hidden = true; const c = btn.dataset.cf; if (c === 'no') return;
+    _dgo.apply(me, a); if (typeof DG !== 'undefined' && DG.active) DG.aiParty = c === 'ai'; };
+  const ai = d.querySelector('[data-cf="ai"]'); if (ai) ai.focus(); }; }
+if (typeof dgEnter === 'function'){ const _de = dgEnter; dgEnter = function(){ if (typeof DG !== 'undefined') DG.aiParty = false; return _de.apply(this, arguments); }; }
+
+// ---- 5. Auto steps out of the dungeon's red danger circles ----
+/* (v335) A dungeon's red circles (dungeon3.js) blow up 1.2 s after they appear for 12% Max HP; players step out, Auto
+   stood in them until it fell — the playtest bots lost almost every guardian fight that way, AI party or not. */
+const DZ = [];
+if (typeof dg3Hazard === 'function'){ const _hz = dg3Hazard; dg3Hazard = function(){ const n0 = typeof VFX !== 'undefined' && VFX.list ? VFX.list.length : 0;
+  const _play = VFX.play; VFX.play = function(kind, o){ if (kind === 'warnCircle' && o) DZ.push({x:o.x, y:o.y, r:o.r || 48, until:T + (o.t || 1.2) + .1}); return _play.apply(this, arguments); };
+  try { return _hz.apply(this, arguments); } finally { VFX.play = _play; void n0; } }; }
+EV.on('tick', () => { for (let i = DZ.length - 1; i >= 0; i--) if (T > DZ[i].until) DZ.splice(i, 1);
+  if (!DZ.length || !(typeof BOT !== 'undefined' && BOT.on) || P.dead || !(typeof DG !== 'undefined' && DG.active)) return;
+  const hit = DZ.find(z => Math.hypot(P.x - z.x, (P.y - z.y) * 1.6) < z.r + 14); if (!hit) return;
+  // the nearest way out that is clear of every circle
+  for (let k = 0; k < 16; k++){ const a = k * Math.PI / 8 + Math.atan2(P.y - hit.y, P.x - hit.x), d = hit.r + 34, x = hit.x + Math.cos(a) * d, y = hit.y + Math.sin(a) * d / 1.6;
+    if (!walkable(x, y, 12) || DZ.some(z => Math.hypot(x - z.x, (y - z.y) * 1.6) < z.r + 14)) continue;
+    P.target = null; P.pending = null; P.cast = null; P.tx = x; P.ty = y; if (typeof BOT !== 'undefined') BOT.pause = Math.max(BOT.pause || 0, .4); return; } });

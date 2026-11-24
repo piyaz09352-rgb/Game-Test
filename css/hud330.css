@@ -372,3 +372,11 @@ html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #dialog .say::before{ background:#f
 /* the coin shop's sub tabs (ด้านหลัง · ส่วนหัว …): the chosen one violet like every other chosen tab (it was old gold) */
 html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-cshop .cshsub button.on{ background:linear-gradient(135deg, #8a5cff, #4f9dff) !important; border-color:rgba(255,255,255,.5) !important; color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.35) !important; }
 html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #win-cshop .cshsub button.on *{ color:#fff !important; -webkit-text-fill-color:#fff !important; }
+/* (v335) the yes / no dialog (#confirm) in the new palette: a dark glass header band, light body, violet main button */
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #confirm{ background:linear-gradient(180deg, rgba(30,22,64,.97) 0 46px, #f8f6ff 46px) padding-box, linear-gradient(135deg, #b47cff, #4fd8ff 50%, #ffd36a) border-box !important;
+  border:1.5px solid transparent !important; border-radius:16px !important; box-shadow:0 0 24px rgba(140,110,255,.4), 0 18px 40px rgba(0,0,0,.45) !important; overflow:hidden; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #confirm::before, html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #confirm::after{ display:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #confirm > h3{ margin:-2px 0 12px !important; min-height:30px; display:flex; align-items:center; color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:0 1px 3px rgba(0,0,0,.6) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #confirm > p, html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #confirm > p *{ color:#2a2350 !important; -webkit-text-fill-color:#2a2350 !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #confirm .btn:not(.gold){ background:#ffffff !important; border:1px solid rgba(130,110,230,.5) !important; color:#3a2a90 !important; -webkit-text-fill-color:#3a2a90 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z, html) body.h6w #confirm .btn.gold{ background:linear-gradient(135deg, #8a5cff, #4f9dff) !important; border:1px solid rgba(255,255,255,.5) !important; color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:0 1px 2px rgba(0,0,0,.35) !important; }
