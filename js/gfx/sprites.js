@@ -496,10 +496,10 @@ const BOSS_POSE = {
    A boss only flinches (less than half as far). */
 const HURT_R = [.8, 1, .72, .3, -.08];
 function HURT_POSE(f, pl = 'float', n = 5, boss = false){
-  const i = Math.min(4, Math.round(n > 1 ? f / (n - 1) * 4 : 0)), r = HURT_R[i] * (boss ? .42 : 1), sh = i === 2 ? (boss ? .15 : .4) : 0;
-  const A = {quad:.2, biped:.27, bird:.2, serpent:.16, bug:.1, squat:.12, float:.36, human:.1}[pl] ?? .18;
-  const dz = -r * (pl === 'bug' || pl === 'squat' ? 1.5 : 2.3), lift = pl === 'float' ? r * 1.1 : pl === 'bird' ? Math.max(0, r) * .5 : 0;
-  const sq = pl === 'bug' ? .22 : pl === 'squat' ? .26 : pl === 'serpent' ? .12 : pl === 'quad' ? .07 : 0, spin = pl === 'float' ? r * .25 : 0;
+  const i = Math.min(4, Math.round(n > 1 ? f / (n - 1) * 4 : 0)), r = HURT_R[i] * (boss ? .42 : 1), sh = (pl === 'heavy' ? (i < 3 ? .75 : 0) : i === 2 ? .4 : 0) * (boss ? .4 : 1);   // a stone or iron body does not reel: it jolts and shudders
+  const A = {quad:.2, biped:.27, bird:.2, serpent:.16, bug:.1, squat:.12, float:.36, human:.1, heavy:.07, slime:0, fish:.13}[pl] ?? .18;
+  const dz = -r * (pl === 'bug' || pl === 'squat' || pl === 'slime' ? 1.5 : pl === 'heavy' ? 1.1 : 2.3), lift = pl === 'float' ? r * 1.1 : pl === 'bird' || pl === 'fish' ? Math.max(0, r) * .6 : 0;
+  const sq = pl === 'bug' ? .22 : pl === 'squat' ? .26 : pl === 'serpent' ? .12 : pl === 'quad' ? .07 : 0, spin = pl === 'float' ? r * .25 : pl === 'fish' ? r * .32 : 0;
   const E = {
     quad:{head:.75, jaw:.7, fold:.25, tail:.8, sw:-.3, spread:.4},
     biped:{head:.85, jaw:.85, spread:.7, tail:.6, sw:-.3},
@@ -508,10 +508,21 @@ function HURT_POSE(f, pl = 'float', n = 5, boss = false){
     bug:{head:-.5, jaw:.5, fold:.8, spread:-.5},
     squat:{head:-.85, jaw:.35, fold:.5},
     float:{head:.4, jaw:.6, spread:.5, curl:.4}}[pl] || {head:.5, jaw:.5};
-  const hr = Math.max(0, r), ext = {lun:-r * 2.4, tilt:r * .38, hurt:1}; for (const k in E) ext[k] = E[k] * hr;   // the limbs never swing past rest on the settle
-  return {ext, post:p => { let q = spin ? rotY(p, spin) : p; q = rotX([q[0], q[1], q[2] + 6], -r * A);
+  const hr = Math.max(0, HURT_R[i]) * (boss ? .7 : 1), ext = {lun:-r * 2.4, tilt:r * .38, hurt:1}; for (const k in E) ext[k] = E[k] * hr;   // the limbs never swing past rest on the settle
+  // k: how far the limbs act (a boss's whole body barely moves, but its limbs still answer the blow)
+  return {ext, k:hr, i, post:p => { let q = spin ? rotY(p, spin) : p; q = rotX([q[0], q[1], q[2] + 6], -r * A);
     return [q[0] + (f % 2 ? sh : -sh), Math.max(.25, q[1] * (1 - Math.max(0, r) * sq) + lift), q[2] - 6 + dz]; }};
 }
+/* (v340) how a body takes a blow — mostly its boss-pose plan, but a body made of stone or iron shudders instead of reeling,
+   a jelly bounces, a fish twists in the water, and ground animals of the newer kinds (land, cave) take the hit on their feet */
+function hurtPlan(mb){ const sp = mb.spec || {}, a = sp.arch, k = sp.kind || '';
+  if (a === 'rock' || k === 'armor' || k === 'automaton') return 'heavy';
+  if (a === 'slime' || mb.name === 'dewblob') return 'slime';
+  if (a === 'fish' || k === 'whale') return 'fish';
+  if (k === 'pangolin' || k === 'camel' || k === 'sheep' || mb.name === 'hare' || mb.name === 'boar') return 'quad';
+  if (k === 'dungbeetle' || k === 'mantis') return 'bug';
+  if (k === 'mole' || k === 'snail') return 'squat';
+  return bpPlan(mb); }
 /* which body plan a monster is drawn with (set by BEAST.make / the dinosaur maker: mb.arch, mb.dplan, mb.fam) */
 function bpPlan(mb){ if (!mb) return 'float'; if (mb.plan) return mb.plan;
   const d = mb.dplan; let pl = 'float';
@@ -935,6 +946,8 @@ function humanPose(act, f, n, weapon, wk = {}){
     const R = n > 2 ? HURT_R[Math.min(4, Math.round(f / (n - 1) * 4))] : [1, .6][f], hr = Math.max(0, R);
     P.lean = -.27 * R; P.armL = .25 + .42 * hr; P.armR = .3 + .48 * hr; P.outL = P.outR = .25 + .3 * hr; P.elbL = P.elbR = .35 + .4 * hr; P.eyes = hr > .25 ? 'hurt' : 'open';
     P.bob = .5 * R; P.legL = .05 + .12 * hr; P.legR = -.04 - .14 * hr; P.head = -.13 * R; P.sway = .8 * R;
+    if (n > 2){ P.lean = -.42 * R; P.head = -.26 * R; P.armL = .3 + 1.05 * hr; P.elbL = .35 + 1.25 * hr; P.outL = .2 - .35 * hr;   // a monster in a human body: the off hand comes up across the face,
+      P.armR = .3 + .55 * hr; P.outR = .3 + .35 * hr; P.elbR = .4 + .5 * hr; P.legL = .1 + .3 * hr; P.legR = -.1 - .35 * hr; P.bob = -.6 * hr; }   // it staggers back a step on bent knees
   } else if (act === 'die'){
     P.eyes = 'closed';
     if (f === 0){ P.lean = -.3; P.armL = P.armR = .7; P.outL = P.outR = .5; P.eyes = 'hurt'; }
@@ -2328,7 +2341,7 @@ function slimeModel(big){
     if (act === 'idle') sq = 1 + Math.sin(ph) * .07;
     if (act === 'walk'){ hop = Math.max(0, Math.sin(ph)) * 4; sq = 1 + Math.cos(ph) * .12; }
     if (act === 'attack'){ sq = [1.15, .8, 1.2, 1][f]; lun = [0, -1, 5, 1][f]; hop = [0, 0, 2, 0][f]; }
-    if (act === 'hurt'){ sq = [.78, .9][f]; eyes = 'hurt'; }
+    if (act === 'hurt'){ const H = globalThis.HURTX, i = H ? H.i : f * 2; sq = [1.38, .76, 1.18, .94, 1.02][i]; eyes = i < 3 ? 'closed' : 'hurt'; }   // (v340) squash, spring, wobble, settle
     if (act === 'die'){ melt = [.15, .45, .7, .9][f]; eyes = 'closed'; }
     const body = big ? M.slimeRoyal : M.slime;
     const r = 9 * S, h = (1 - melt) / sq;
@@ -2484,13 +2497,13 @@ function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
   let mAct = act, mF = f, mN = A.n; globalThis.BPX = null;
   if (BOSS_POSE[act]){ const pl = bpPlan(mb), q = BOSS_POSE[act](A.n > 1 ? f / (A.n - 1) : 0, pl); cx.post = q.post; mAct = q.act; mF = q.f; mN = MOB_ACTIONS[q.act].n;
     if (mb.native){ globalThis.BPX = q.ext; mAct = 'boss'; mF = 0; mN = 4; } else if (mb.limbs) globalThis.BPX = q.ext; }   // (v314) models that act with their own limbs read the pose's ext
-  if (act === 'hurt'){ const q = HURT_POSE(f, mb.human ? 'human' : bpPlan(mb), A.n, !!(typeof MOB !== 'undefined' && MOB[key] && MOB[key].boss)); cx.post = q.post;   // (v340)
-    if (!mb.human){ mF = f < 2 ? 0 : 1; mN = 2; if (mb.native || mb.limbs) globalThis.BPX = q.ext; } }
+  if (act === 'hurt'){ const q = HURT_POSE(f, mb.human ? 'human' : hurtPlan(mb), A.n, !!(typeof MOB !== 'undefined' && MOB[key] && MOB[key].boss)); cx.post = q.post;   // (v340)
+    if (!mb.human){ mF = f < 2 ? 0 : 1; mN = 2; globalThis.HURTX = {k:q.k, i:q.i}; if (mb.native || mb.limbs) globalThis.BPX = q.ext; } }
   if (mb.human && BOSS_POSE[act]){ const ha = BOSS_HUMAN[act], hn = ACTIONS[ha].n; cx.post = null; mAct = ha; mN = hn; mF = Math.min(hn - 1, Math.round(f / (A.n - 1) * (hn - 1))); }   // a human boss uses the people's own skill poses: slam, shout, lunge, invoke
   if (mb.human){ let HP = humanPose(mAct, mF, mN, mb.human.weapon); const hc = mb.human;   // (v330) a monster swings its own weapon the way a hero would
     if (mAct === 'attack' && hc.weapon === 'sword'){ const f5 = Math.min(4, Math.round(mF / Math.max(1, mN - 1) * 3)); HP = hc.twoHand ? twoHandChop(HP, f5) : hc.spear ? spearThrust(HP, f5) : hc.mace ? maceSmash(HP, f5) : hc.axe ? axeChop1(HP, f5) : HP; }
     drawHuman(cx, mb.human, HP); const img = finish(F, K); if (mb.human.paint && cx.head) paintHead(img, F, cx); img.wsegs = cx.wsegs || null; return img; }   // (v166) where its weapon is, for the boss weapon glow
-  try { mb.model(cx, mAct, mF, mN); } finally { globalThis.BPX = null; }
+  try { mb.model(cx, mAct, mF, mN); } finally { globalThis.BPX = null; globalThis.HURTX = null; }
   return finish(F, K);
 }
 /* lazy sheet: each action is rasterised the first time it is drawn (or during warm-up) */
