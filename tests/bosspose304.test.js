@@ -5,7 +5,7 @@ const test = require('node:test'), assert = require('node:assert');
 const { chromium, openGame, enterWorld } = require('./browser');
 const skip = !chromium && 'playwright not installed (run npm install)';
 
-test('boss skill poses: each skill has its pose, timed to the warning; ordinary monsters keep five actions', { skip, timeout: 200000 }, async () => {
+test('boss skill poses: each skill has its pose, timed to the warning; ordinary monsters keep their own actions', { skip, timeout: 200000 }, async () => {
   const { page, errors, close } = await openGame();
   try {
     await enterWorld(page);
@@ -25,7 +25,7 @@ test('boss skill poses: each skill has its pose, timed to the warning; ordinary 
     assert.ok(Object.values(r.acts).filter(Boolean).length >= 6, 'most skills were cast: ' + JSON.stringify(r.acts));
     assert.ok(r.acts.quake && r.acts.quake[2] > r.acts.slam[2], 'a longer warning stretches the pose (quake > slam)');
     assert.strictEqual(r.rage, 'broar', 'enraged = the roar'); assert.ok(r.ends, 'the pose ends');
-    assert.strictEqual(r.plainActs, 5, 'an ordinary monster keeps its five actions'); assert.strictEqual(r.bossActs, 13, 'a boss gets eight more (v314: breath, spin, vanish, phase)');
+    assert.strictEqual(r.plainActs, 7, 'an ordinary monster keeps its own actions (v342: + fidget and sleep)'); assert.strictEqual(r.bossActs, 15, 'a boss gets eight more (v314: breath, spin, vanish, phase)');
     assert.ok(r.differ >= 3, 'the pose moves through different frames'); assert.ok(r.human.every(v => v === true), 'a human boss draws its poses: ' + r.human);
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no page errors');

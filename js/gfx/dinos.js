@@ -47,6 +47,9 @@ const DINO = (() => {
     const X = globalThis.BPX; if (X){ o.hd = (X.head || 0) * 2.6; o.jaw = Math.max(o.jaw, X.jaw || 0); if (X.spread != null) o.flap = Math.max(-1, Math.min(1, X.spread)); o.tailK = X.tail || 0; }
     if (X && X.hurt){ o.lun = X.lun * 1.3; o.tilt = X.tilt; o.eyes = 'hurt'; o.hd = (X.head || 0) * 4.4; o.jaw = Math.max(o.jaw, X.jaw || 0); }   // (v340) HURT_POSE: the head is thrown up hard, the jaw opens
     { const H = globalThis.HURTX; if (act === 'hurt' && H) o.eyes = H.k > .55 ? 'closed' : H.k > 0 ? 'hurt' : 'open'; }
+    { const FI = act === 'idle' && globalThis.FIDX, SL = act === 'idle' && globalThis.SLEEPX;   // (v342) a fidget: nose to the ground; asleep: crouched low, head down, eyes shut
+      if (FI){ const k = FI.k, bump = Math.sin(Math.PI * Math.min(1, Math.max(0, (k - .1) / .8))); o.hd = -1.8 * bump; o.jaw = .1 + .15 * Math.abs(Math.sin(k * 20)) * bump; if (k > .48 && k < .56) o.eyes = 'closed'; }
+      if (SL){ o.hd = -2; o.bob = -2.4; o.jaw = .12; o.eyes = 'closed'; o.flap = -1; } }
     return o;
   }
   const fallPre = (cx, o, h) => { if (o.fall) cx.pre = p => { const q = rotZ([p[0], p[1] - h, p[2]], o.fall); return [q[0], Math.max(.5, q[1] + h - o.fall * h * .45), q[2]]; }; };

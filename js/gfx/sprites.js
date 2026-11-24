@@ -402,7 +402,7 @@ const ACTIONS = {
   idle:{n:6, fps:5, loop:true, th:'ยืน'}, walk:{n:8, fps:12, loop:true, th:'เดิน'}, attack:{n:5, fps:12, th:'โจมตี', dur:[.7, 1.55, .5, 1.3, .95]},
   skill:{n:5, fps:10, th:'ใช้สกิล', dur:[.6, 1.6, .55, 1.35, .9]}, cast:{n:4, fps:8, loop:true, th:'ร่ายเวท'}, roll:{n:6, fps:14, th:'กลิ้งหลบ'},
   capture:{n:6, fps:10, th:'จับสัตว์'}, rideIdle:{n:4, fps:5, loop:true, th:'ขี่ (หยุด)'}, ride:{n:6, fps:11, loop:true, th:'ขี่ (วิ่ง)'},
-  hurt:{n:2, fps:8, th:'โดนตี'}, die:{n:4, fps:6, th:'ล้ม'}, sit:{n:4, fps:3, loop:true, th:'นั่งพับเพียบ'},
+  hurt:{n:5, fps:16, th:'โดนตี', dur:[.6, 1, 1.2, 1, .8]}, die:{n:7, fps:9, th:'ล้ม', dur:[.7, .9, 1, 1, .9, 1.1, 1.4]}, sit:{n:4, fps:3, loop:true, th:'นั่งพับเพียบ'},   // (v342) hurt and death as the monsters have them
   // ---------- skill poses (each skill names one in SKILL_ACT, js/data/jobs.js) ----------
   punch:{n:6, fps:14, th:'หมัดชุด'}, knee:{n:5, fps:11, th:'เข่าลอย'}, kick:{n:6, fps:14, th:'เตะตัด'}, spinkick:{n:8, fps:16, th:'จระเข้ฟาดหาง'},
   uppercut:{n:6, fps:12, th:'หนุมานถวายแหวน'}, teep:{n:5, fps:12, th:'ถีบ'}, ramwai:{n:8, fps:6, th:'รำไหว้ครู'}, wai:{n:6, fps:8, th:'ไหว้'},
@@ -419,6 +419,9 @@ const MOB_ACTIONS = {
   idle:{n:4, fps:5, loop:true, th:'ยืน'}, walk:{n:4, fps:8, loop:true, th:'เดิน'}, attack:{n:4, fps:10, th:'โจมตี'},
   hurt:{n:5, fps:16, th:'โดนตี', dur:[.6, 1, 1.2, 1, .8]}, die:{n:7, fps:10, th:'ล้ม', dur:[.7, .9, 1, 1, .9, 1.1, 1.4]},   // (v340) hurt: struck, reels, shudders, recovers, settles · (v341) die: seven frames, each body its own way (DIEX)
   // (v340) five frames: struck, reels, shudders, recovers, settles (HURT_POSE)
+  // (v342) life at rest: now and then a monster does something of its own (sniffs the ground, pecks, looks round, tastes the air,
+  // shuffles), and at night a calm one sleeps — each body its own way (FIDX / SLEEPX, gfx/beasts.js)
+  fidget:{n:8, fps:8, th:'ทำอย่างอื่น'}, sleep:{n:4, fps:1.6, loop:true, th:'หลับ'},
   // (v304) a boss's skills have poses of their own, eight frames each (see BOSS_POSE); only a boss's sheet carries them (SPR.bossActs)
   bslam:{n:8, fps:10, boss:1, th:'ยกตัวทุบ'}, broar:{n:8, fps:10, boss:1, th:'คำราม'}, bcharge:{n:8, fps:10, boss:1, th:'ย่อแล้วพุ่ง'}, bcast:{n:8, fps:10, boss:1, th:'ร่าย'},
   // (v314) more of them: a breath / spit, a spin, a vanish
@@ -949,6 +952,29 @@ function humanPose(act, f, n, weapon, wk = {}){
     P.bob = .5 * R; P.legL = .05 + .12 * hr; P.legR = -.04 - .14 * hr; P.head = -.13 * R; P.sway = .8 * R;
     if (n > 2){ P.lean = -.42 * R; P.head = -.26 * R; P.armL = .3 + 1.05 * hr; P.elbL = .35 + 1.25 * hr; P.outL = .2 - .35 * hr;   // a monster in a human body: the off hand comes up across the face,
       P.armR = .3 + .55 * hr; P.outR = .3 + .35 * hr; P.elbR = .4 + .5 * hr; P.legL = .1 + .3 * hr; P.legR = -.1 - .35 * hr; P.bob = -.6 * hr; }   // it staggers back a step on bent knees
+    // (v342) what is in the hand stays held the way it is carried: a blade point-down, a staff upright (it used to swing up over the head)
+    if (weapon === 'sword' || weapon === 'dagger') P.wpn = .8 - P.armR * .75; else if (weapon === 'staff') P.wpn = 2.78 - P.armR + .32;
+  } else if (act === 'die' && n > 4){
+    /* (v342) a death in seven frames, by what is in the hand: struck back, the knees give, then down —
+       a blade is planted point-down to hold the body up a moment, then the body slumps forward over it;
+       a staff slips from the hand as the body goes over backwards; a bow, daggers, stars or bare fists: a hand to
+       the chest, onto the knees, then back. A small settle as the body meets the ground. */
+    const k = f / (n - 1), ss = (a, b) => { const t = Math.min(1, Math.max(0, (k - a) / (b - a))); return t * t * (3 - 2 * t); };
+    const st = ss(0, .18) * (1 - ss(.2, .4)), kn = ss(.15, .42), fl = ss(.5, .86) + (k > .86 && k < .97 ? Math.sin((k - .86) / .11 * Math.PI) * .05 : 0);
+    const blade = weapon === 'sword' && !wk.xbow, staff = weapon === 'staff';
+    P.eyes = k < .16 ? 'hurt' : 'closed'; P.lean = -.3 * st; P.head = -.2 * st; P.armL = P.armR = .5 + .3 * st; P.outL = P.outR = .3 + .3 * st; P.elbL = P.elbR = .5;
+    if (kn > .5){ P.kneel = 1; P.bob = -4.5 * Math.min(1, kn * 1.3); } else P.bob = -kn * 3;
+    if (blade){   // planted: the right hand thrusts the blade into the ground in front, the body leans on it, then slumps forward
+      const pl = ss(.15, .45) * (1 - ss(.62, .8));
+      P.armR = .5 + .7 * pl; P.elbR = .5 - .35 * pl; P.outR = .2; P.wpn = .8 - P.armR * .75 - .1 * pl;   // the point stays down: in the ground in front P.lean = -.3 * st + .38 * kn; P.head = -.2 * st - .2 * kn;
+      P.armL = .4 + .6 * kn; P.elbL = .9; P.outL = .15;
+      P.fall = 1.38 * fl; if (fl > .3){ P.armR = .5 + .9 * fl; P.armL = .6 + .8 * fl; P.outL = P.outR = .25; P.wpn = .8 - P.armR * .75; } }
+    else if (staff){   // the staff slips: the arm drops, the staff swings down, the body goes over backwards
+      P.armR = .5 - .3 * kn; P.elbR = .3; P.outR = .5; P.wpn = 2.78 - P.armR + .32 + 1.3 * ss(.3, .7);   // upright, then tipping away P.lean = -.3 * st + .15 * kn - .2 * fl;
+      P.fall = -1.5 * fl; if (fl > .3){ P.armL = P.armR = .6 + 1.7 * fl; P.outL = P.outR = .5; P.legL = .1; P.legR = -.1; } }
+    else {   // a hand to the chest, onto the knees, then back
+      const hc = ss(.05, .3) * (1 - ss(.55, .75)); P.armL = .5 + .55 * hc; P.elbL = .5 + 1.7 * hc; P.outL = .3 - .7 * hc; P.lean = -.3 * st + .25 * kn - .15 * fl;
+      P.fall = -1.5 * fl; if (fl > .3){ P.armL = P.armR = .6 + 1.8 * fl; P.outL = P.outR = .5; P.legL = .1; P.legR = -.1; } }
   } else if (act === 'die'){
     P.eyes = 'closed';
     if (f === 0){ P.lean = -.3; P.armL = P.armR = .7; P.outL = P.outR = .5; P.eyes = 'hurt'; }
@@ -2498,14 +2524,20 @@ function renderFrame(kind, key, act, dir, f, K = kOf(kind, key)){
   let mAct = act, mF = f, mN = A.n; globalThis.BPX = null;
   if (BOSS_POSE[act]){ const pl = bpPlan(mb), q = BOSS_POSE[act](A.n > 1 ? f / (A.n - 1) : 0, pl); cx.post = q.post; mAct = q.act; mF = q.f; mN = MOB_ACTIONS[q.act].n;
     if (mb.native){ globalThis.BPX = q.ext; mAct = 'boss'; mF = 0; mN = 4; } else if (mb.limbs) globalThis.BPX = q.ext; }   // (v314) models that act with their own limbs read the pose's ext
-  if (act === 'die'){ const k = A.n > 1 ? f / (A.n - 1) : 1; globalThis.DIEX = {k, i:f}; mF = Math.min(3, Math.round(k * 3)); mN = 4; }   // (v341) every model reads how far its death has gone (k 0..1); old 4-frame models get the nearest of their frames
+  if (act === 'die'){ const k = A.n > 1 ? f / (A.n - 1) : 1; globalThis.DIEX = {k, i:f}; if (!mb.human){ mF = Math.min(3, Math.round(k * 3)); mN = 4; } }
+  if (act === 'fidget' || act === 'sleep'){ const k = A.n > 1 ? f / (A.n - 1) : 0, pl = mb.human ? 'human' : hurtPlan(mb);   // (v342)
+    if (act === 'fidget'){ globalThis.FIDX = {k, pl}; const look = pl === 'float' ? k * Math.PI : pl === 'slime' || pl === 'heavy' ? 0 : Math.sin(k * Math.PI * 2) * .42, sq = pl === 'slime' ? Math.sin(k * Math.PI * 4) * .08 : 0;
+      cx.post = p => { const q = look ? rotY(p, look) : p; return sq ? [q[0] * (1 + sq), q[1] * (1 - sq), q[2] * (1 + sq)] : q; };   // it looks round (a spirit turns slowly, a jelly wobbles)
+      mAct = 'idle'; mF = Math.min(3, Math.floor(k * 4)); mN = 4; }
+    else { globalThis.SLEEPX = {k, pl, b:Math.sin(k * Math.PI * 2)}; mAct = mb.human ? 'sit' : 'idle'; mF = 0; mN = mb.human ? ACTIONS.sit.n : 4;
+      if (!mb.human){ const b = Math.sin(k * Math.PI * 2) * .025; cx.post = p => [p[0], p[1] * (1 + b), p[2]]; } } }   // breathing   // (v341) every model reads how far its death has gone (k 0..1); old 4-frame models get the nearest of their frames
   if (act === 'hurt'){ const q = HURT_POSE(f, mb.human ? 'human' : hurtPlan(mb), A.n, !!(typeof MOB !== 'undefined' && MOB[key] && MOB[key].boss)); cx.post = q.post;   // (v340)
     if (!mb.human){ mF = f < 2 ? 0 : 1; mN = 2; globalThis.HURTX = {k:q.k, i:q.i}; if (mb.native || mb.limbs) globalThis.BPX = q.ext; } }
   if (mb.human && BOSS_POSE[act]){ const ha = BOSS_HUMAN[act], hn = ACTIONS[ha].n; cx.post = null; mAct = ha; mN = hn; mF = Math.min(hn - 1, Math.round(f / (A.n - 1) * (hn - 1))); }   // a human boss uses the people's own skill poses: slam, shout, lunge, invoke
   if (mb.human){ let HP = humanPose(mAct, mF, mN, mb.human.weapon); const hc = mb.human;   // (v330) a monster swings its own weapon the way a hero would
     if (mAct === 'attack' && hc.weapon === 'sword'){ const f5 = Math.min(4, Math.round(mF / Math.max(1, mN - 1) * 3)); HP = hc.twoHand ? twoHandChop(HP, f5) : hc.spear ? spearThrust(HP, f5) : hc.mace ? maceSmash(HP, f5) : hc.axe ? axeChop1(HP, f5) : HP; }
-    globalThis.DIEX = null; drawHuman(cx, mb.human, HP); const img = finish(F, K); if (mb.human.paint && cx.head) paintHead(img, F, cx); img.wsegs = cx.wsegs || null; return img; }   // (v166) where its weapon is, for the boss weapon glow
-  try { mb.model(cx, mAct, mF, mN); } finally { globalThis.BPX = null; globalThis.HURTX = null; globalThis.DIEX = null; }
+    if (act === 'sleep') HP.eyes = 'closed'; globalThis.DIEX = globalThis.FIDX = globalThis.SLEEPX = null; drawHuman(cx, mb.human, HP); const img = finish(F, K); if (mb.human.paint && cx.head) paintHead(img, F, cx); img.wsegs = cx.wsegs || null; return img; }   // (v166) where its weapon is, for the boss weapon glow
+  try { mb.model(cx, mAct, mF, mN); } finally { globalThis.BPX = null; globalThis.HURTX = null; globalThis.DIEX = null; globalThis.FIDX = null; globalThis.SLEEPX = null; }
   return finish(F, K);
 }
 /* lazy sheet: each action is rasterised the first time it is drawn (or during warm-up) */
