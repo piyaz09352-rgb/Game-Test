@@ -48,7 +48,7 @@ EV.on('draw', () => {
 if (typeof renderSettings === 'function'){ const _rs = renderSettings; renderSettings = function(){ _rs.apply(this, arguments);
   const pane = el('pane-settings'); if (!pane || pane.querySelector('#set-guideArrow')) return;
   const row = document.createElement('label'); row.className = 'set';
-  row.innerHTML = `<span><b>${L('ลูกศรนำทางมือใหม่', 'New-player guide arrow')}</b><small>${L('เลเวล 1–20 · ชี้ไปหามอนที่เหมาะกับเลเวลเมื่อแถวนี้ไม่มี (ในเมืองชี้ไปประตูทุ่งที่เหมาะ)', 'Lv 1–20 · points to monsters of your level when none are near (in town, to the right field gate)')}</small></span><input type="checkbox" id="set-guideArrow" data-set="guideArrow" ${guideOn() ? 'checked' : ''}><i class="sw"></i>`;
+  row.innerHTML = `<span><b>${L('ลูกศรนำทางมือใหม่', 'New-player guide arrow')}</b><small>${L('ช่วยนำทางช่วงแรกของการผจญภัย', 'Helps you find your way early on')}</small></span><input type="checkbox" id="set-guideArrow" data-set="guideArrow" ${guideOn() ? 'checked' : ''}><i class="sw"></i>`;
   const secs = [...pane.querySelectorAll('.sec')], anchor = secs.find(n => /การควบคุม|^Controls?$/.test(n.textContent.trim()));
   if (anchor && anchor.nextSibling) anchor.parentNode.insertBefore(row, anchor.nextSibling); else pane.appendChild(row); }; }
 
@@ -81,7 +81,7 @@ if (typeof updMob === 'function'){ const _um = updMob; updMob = function(m, dt){
         m.warnT = FBOSS.warn; m.tx = null;
         addText(m.x, m.y - MOB_H[m.type] - 30, L('! บอสเห็นคุณแล้ว', '! The boss has seen you'), '#ff5a4a', 16);
         if (typeof SFX !== 'undefined') SFX.play('roar'); if (typeof VFX !== 'undefined') VFX.play('roar', {x:m.x, y:m.y, r:90});
-        if (typeof sysMsg === 'function') sysMsg(L(`${nm(d)} เห็นคุณแล้ว! ถอยออกไปภายใน 2 วินาที หรือเตรียมสู้`, `${nm(d)} has seen you! Back off within 2 seconds or get ready`), 'warn');
+        if (typeof sysMsg === 'function') sysMsg(L(`${nm(d)} เห็นคุณแล้ว!`, `${nm(d)} has seen you!`), 'warn');
         return; }
     } else {
       if (!m.chase) m.chase = {x:m.x, y:m.y};
@@ -90,7 +90,7 @@ if (typeof updMob === 'function'){ const _um = updMob; updMob = function(m, dt){
         m.aggro = false; m.flee = 0; m.charge = null; m.enraged = false; m.furyMsg = false; m.chase = null; m.lostT = 0; m.spotCd = 8; m.hp = m.maxhp;
         m.hx = m.x; m.hy = m.y; m.tx = null; m.wait = 1; m.roamT = 0;
         if (P.target === m){ P.target = null; P.pending = null; }
-        addText(m.x, m.y - MOB_H[m.type] - 24, L('บอสเลิกไล่ กลับไปพักฟื้น', 'The boss gave up and went back to rest'), '#ffd27a', 14); }
+        addText(m.x, m.y - MOB_H[m.type] - 24, L('บอสเลิกไล่แล้ว', 'The boss gave up'), '#ffd27a', 14); }
     }
     if (!m.aggro && m.chase) m.chase = null; if (m.aggro) m.warnT = 0;
   }
@@ -105,6 +105,5 @@ if (typeof dgOpen === 'function'){ const _dgo = dgOpen; dgOpen = function(did){
   if (mates.length || !D || D.tower || did === 'tower' || typeof askConfirm !== 'function' || window.__dgSoloOk) return _dgo.apply(this, arguments);
   const a = arguments, me = this;
   askConfirm(L('ดันเจียนนี้สำหรับปาร์ตี้', 'This dungeon is made for a party'),
-    L(`${nm(D)} ออกแบบให้ลงกัน 2–5 คน · คนเดียวผ่าน 3 ด่านแรกได้ แต่ผู้พิทักษ์ท้ายดันเจียนแข็งแกร่งมาก (เลือดราว 3 เท่าของบอสทุ่ง) · ชวนเพื่อนตั้งปาร์ตี้ได้ที่เมนู ปาร์ตี้`,
-      `${nm(D)} is meant for 2–5 players · alone you can clear the first three waves, but the guardian at the end is very strong (about 3× a field boss's HP) · invite friends from the Party menu`),
+    L('ผู้พิทักษ์ที่รออยู่ข้างในแข็งแกร่งเกินกว่าจะสู้ลำพัง ชวนเพื่อนมาด้วยจะดีกว่า', 'The guardian waiting inside is too strong to face alone. Better bring friends.'),
     L('เข้าคนเดียว', 'Go in alone'), () => _dgo.apply(me, a)); }; }

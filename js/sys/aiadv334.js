@@ -119,6 +119,6 @@ EV.on('map', () => { AIA.map = -1; });
 if (typeof renderSettings === 'function'){ const _rs = renderSettings; renderSettings = function(){ _rs.apply(this, arguments);
   const pane = el('pane-settings'); if (!pane || pane.querySelector('#set-aiAdv')) return;
   const row = document.createElement('label'); row.className = 'set';
-  row.innerHTML = `<span><b>${L('นักผจญภัย AI ในเกม', 'AI adventurers')}</b><small>${L('ตัวละครที่คอมพิวเตอร์เล่น เดินเล่นในเมือง ล่ามอนในทุ่ง มีป้าย «นักผจญภัย AI» · ไม่แย่งมอนที่คุณตี ไม่ได้ EXP/ของ · เห็นแค่ในเครื่องคุณ', 'Computer-run heroes who stroll in town and hunt in the fields, tagged «AI adventurer» · never take your monsters, get no EXP or loot · only on your device')}</small></span><input type="checkbox" id="set-aiAdv" data-set="aiAdv" ${SETTINGS.aiAdv !== false ? 'checked' : ''}><i class="sw"></i>`;
+  row.innerHTML = `<span><b>${L('นักผจญภัย AI ในเกม', 'AI adventurers')}</b><small>${L('นักผจญภัยที่คอมพิวเตอร์เล่น ใช้ชีวิตอยู่ในโลกเดียวกับคุณ', 'Computer-run adventurers who share your world')}</small></span><input type="checkbox" id="set-aiAdv" data-set="aiAdv" ${SETTINGS.aiAdv !== false ? 'checked' : ''}><i class="sw"></i>`;
   const g = pane.querySelector('#set-guideArrow'); const anchor = g ? g.closest('label') : null; if (anchor) anchor.after(row); else pane.appendChild(row); }; }
 document.addEventListener('change', e => { if (e.target && e.target.id === 'set-aiAdv') AIA.map = -1; });
