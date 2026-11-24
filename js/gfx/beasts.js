@@ -57,6 +57,21 @@ const BEAST = (() => {
       o.buckle = ss(0, .22) * (1 - ss(.35, .7) * .6); o.fk = ss(.18, .72) + (k > .72 && k < .9 ? Math.sin((k - .72) / .18 * Math.PI) * .06 : 0);
       o.fall = 1.55 * o.fk; o.bob = -o.buckle * 2.2; o.eyes = k < .2 ? 'hurt' : 'closed'; o.lun = -ss(0, .3) * 1.5;
       o.fold = o.buckle * .85; o.head = -.15 - ss(.3, .9) * .55; o.jaw = .2 + ss(.5, 1) * .2; o.tail = 0; o.curl = 0; o.spread = null; }
+    /* (v342) life at rest (FIDX, a one-second fidget) and sleep (SLEEPX), each body its own way */
+    const FI = act === 'idle' && globalThis.FIDX, SL = act === 'idle' && globalThis.SLEEPX;
+    if (FI){ const k = FI.k, pl = FI.pl, bump = Math.sin(Math.PI * Math.min(1, Math.max(0, (k - .1) / .8)));
+      if (pl === 'quad' || pl === 'biped'){ o.head = -.7 * bump; o.jaw = (.1 + .14 * Math.abs(Math.sin(k * 24))) * bump; o.tail = .5 * Math.sin(k * 14); }   // nose down to the ground, nibbling, a flick of the tail
+      else if (pl === 'bird'){ o.head = -.85 * Math.abs(Math.sin(k * Math.PI * 2)) * bump; }                                            // two pecks at the ground
+      else if (pl === 'serpent'){ o.head = .4 * bump; o.jaw = (k > .35 && k < .45) || (k > .6 && k < .7) ? .65 : 0; }                   // rises and tastes the air
+      else if (pl === 'bug'){ o.hk = .22 * Math.abs(Math.sin(k * Math.PI * 3)); }                                                      // shuffles and settles
+      else if (pl === 'squat'){ o.hk = .45 * bump; }                                                                                  // a turtle draws its head in and out, a frog squats
+      if (k > .48 && k < .56) o.eyes = 'closed'; }                                                                                      // a blink
+    if (SL){ const pl = SL.pl; o.eyes = 'closed'; o.ph = SL.k * Math.PI * 2;
+      if (pl === 'quad' || pl === 'biped'){ o.fold = .9; o.bob = -2.4; o.head = -.62; o.jaw = 0; o.tail = 0; o.buckle = 1; }            // lying down, legs folded under, the head resting low
+      else if (pl === 'bird'){ o.head = -.5; }                                                                                         // the head sunk into the feathers
+      else if (pl === 'bug'){ o.hk = .55; }                                                                                            // hunkered down, legs drawn in
+      else if (pl === 'squat'){ o.hk = .7; }                                                                                           // a turtle in its shell, a frog flat
+      else if (pl === 'serpent'){ o.head = -.65; } }                                                                                   // the head down on its coils
     return o;
   }
   /* two eyes painted on a head ellipsoid (n = surface normal) */
@@ -652,6 +667,7 @@ const BEAST = (() => {
     return (cx, act, f, n) => {
       const ph = f / n * Math.PI * 2; let sq = 1, hop = 0, lun = 0, melt = 0; const o = {eyes:'open'};
       if (act === 'idle') sq = 1 + Math.sin(ph) * .07;
+      if (act === 'idle' && globalThis.SLEEPX){ sq = 1.13 + globalThis.SLEEPX.b * .03; o.eyes = 'closed'; }   // (v342) asleep: settled low, eyes shut
       if (act === 'walk'){ hop = Math.max(0, Math.sin(ph)) * 4; sq = 1 + Math.cos(ph) * .12; }
       if (act === 'attack'){ sq = [1.15, .8, 1.2, 1][f]; lun = [0, -1, 5, 1][f]; hop = [0, 0, 2, 0][f]; }
       if (act === 'hurt'){ const H = globalThis.HURTX, i = H ? H.i : f * 2;   // (v340) struck: it squashes flat, springs up tall, wobbles and settles, shoved back a little
