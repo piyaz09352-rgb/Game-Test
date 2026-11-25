@@ -5,7 +5,7 @@
 - Before saying what the latest version is, or starting work: `git fetch origin` and compare `docs/UPDATES.md` / `?v=` on every branch (`git branch -r`), not only `main`. Work may sit on an unmerged `claude/*` branch (v253–v278 did) — continue from the newest one.
 - The game is played in landscape only (phones held sideways; Settings can turn the picture). Check layouts at PC 1920×1080, laptop 1366×768, tablet landscape 1024×768 and phone landscape 844×390 — not portrait.
 - Every finished version: bump `?v=NNN` in `index.html` for each changed file, then run `node tools/asset-manifest.js` (tests/vbump290.test.js fails if a changed file kept its ?v= — v290 shipped a fix players never got), and add a section to `docs/UPDATES.md`.
-  Then build the FULL game pack `updates/VAYRATHEN-vNNN-full.zip` = `index.html _headers assets audio css js` (what firebase.json hosts; `_headers` = the site's security headers for Netlify)
+  Then build the FULL game pack with `npm run pack` (v347: tools/pack/build.js joins the ~460 scripts into ~50 bundles and the styles into one, comments stripped — 3G load 50 s → 14 s) → `updates/VAYRATHEN-vNNN-full.zip` = `index.html _headers assets audio css js` (what firebase.json hosts; `_headers` = the site's security headers for Netlify). Test the built site too: `OUT_DIR=dir NO_ZIP=1 npm run pack` then `VAY_ROOT=dir npm run test:fast`
   and send it to the owner. The live game is on itch.io (https://vayrathen.itch.io/vayrathen: the owner uploads the zip as the
   browser-played file; `_headers` only matters on Netlify/Firebase Hosting). Never a pack of only the changed files: an upload
   replaces the whole site — a partial pack (v188) left the site without its CSS. Unzip it into an empty folder,

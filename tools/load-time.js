@@ -18,7 +18,7 @@ function serve(){ const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 't
     return new Promise(ok => h2.listen(0, '127.0.0.1', () => ok({ srv: h2, url: `https://127.0.0.1:${h2.address().port}/` }))); }
   return new Promise(ok => srv.listen(0, '127.0.0.1', () => ok({ srv, url: `http://127.0.0.1:${srv.address().port}/` }))); }
 const { chromium, TEST_PASS } = require('../tests/browser');
-const ROOT = path.join(__dirname, '..');
+const ROOT = process.env.SITE ? path.resolve(process.env.SITE) : path.join(__dirname, '..');   // SITE=dir: measure a built pack (tools/pack/build.js)
 const NET = { '3g': { latency: 562, downloadThroughput: 1.6e6 / 8, uploadThroughput: 750e3 / 8 }, '4g': { latency: 170, downloadThroughput: 9e6 / 8, uploadThroughput: 3e6 / 8 } };
 
 (async () => {
