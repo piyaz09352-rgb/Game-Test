@@ -135,16 +135,18 @@ service cloud.firestore {
     // only a GM reads and deletes them; nobody edits one. A small screenshot (a JPEG data URL, under ~180 KB) may come with it.
     function reportOk(id) {
       return id.matches(me() + '_[0-9]{10,16}')
-        && d().keys().hasOnly(['uid', 'name', 'v', 'msg', 'map', 'x', 'y', 'lvl', 'job', 'dev', 'err', 'img', 'at'])
+        && d().keys().hasOnly(['uid', 'name', 'v', 'msg', 'map', 'x', 'y', 'lvl', 'job', 'dev', 'err', 'img', 'ch', 'at'])
         && d().uid == me() && str(d().name, 24) && intIn(d().v, 0, 100000) && str(d().msg, 500)
         && (d().map is int || str(d().map, 24)) && numIn(d().x, -100000, 100000) && numIn(d().y, -100000, 100000)
         && intIn(d().lvl, 0, 300) && str(d().job, 24) && str(d().dev, 200) && str(d().get('err', ''), 2000)
         && (d().get('img', '') == '' || (str(d().img, 240000) && d().img.matches('data:image/jpeg;base64,.*')))
-        && recent(d().at);
+        && str(d().get('ch', ''), 1500) && recent(d().at);
     }
     match /reports/{id} {
       allow read, delete: if isGM();
       allow create: if signedIn() && reportOk(id);
+      // (v346) a GM marks a report answered (the answer itself goes to the player's mailbox)
+      allow update: if isGM() && changed().hasOnly(['rp', 'rpAt']) && str(d().rp, 300) && d().rpAt is int;
     }
 
     // ---------- mail (js/sys/mail.js): the sender writes a letter as themselves; only the recipient (or the sender) reads it;
