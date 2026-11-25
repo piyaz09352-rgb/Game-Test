@@ -12,9 +12,9 @@ const TUT = [
   {t:['เดิน', 'Walk'], d:() => touchUI() ? ['ลากจอยด้านซ้ายเพื่อเดิน หรือแตะพื้นที่อยากไป', 'Drag the left stick to walk, or tap where you want to go'] : ['คลิกพื้นที่อยากไปเพื่อเดิน', 'Click the ground to walk there'], init:s => { s.x = P.x; s.y = P.y; }, done:s => Math.hypot(P.x - s.x, P.y - s.y) > 120},
   {t:['โจมตี', 'Attack'], d:() => touchUI() ? ['แตะเจลลี่น้ำค้าง (ลูกศรสีทองชี้อยู่) หรือกดปุ่มโจมตีใหญ่', 'Tap a Dew Jelly (the gold arrow points at one) or press the big attack button'] : ['คลิกเจลลี่น้ำค้างที่ลูกศรสีทองชี้ ตัวละครจะเดินไปตีเอง', 'Click the Dew Jelly under the gold arrow: your hero walks over and attacks'], ev:'kill', arrow:'mob', hl:'#mobaAct'},
   {t:['เก็บของ', 'Pick up loot'], d:() => touchUI() ? ['แตะของที่ตกบนพื้นเพื่อเก็บ', 'Tap the item on the ground to pick it up'] : ['คลิกของที่ตกบนพื้น หรือกด Z เพื่อเก็บของใกล้ตัว', 'Click the drop on the ground, or press Z for the nearest one'], ev:'pickup', arrow:'loot'},
-  {t:['ค่าสถานะ', 'Stats'], d:() => [`เปิดหน้า Status ${touchUI() ? '(ปุ่มเมนูขวาบน)' : '(กด A)'} แล้วกด + เพิ่ม STR หรือ DEX สักแต้ม`, `Open Status ${touchUI() ? '(menu, top right)' : '(press A)'} and press + on STR or DEX`], hl:'.mb[data-win="stat"]', init:s => { s.p = S.statPts; }, done:s => S.statPts < s.p},
+  {t:['ค่าสถานะ', 'Stats'], d:() => [`เปิดหน้า Status ${touchUI() ? '(ปุ่มเมนูขวาบน)' : '(กด A)'} แล้วกด + เพิ่ม STR หรือ DEX สักแต้ม จากนั้นกด «ยืนยัน»`, `Open Status ${touchUI() ? '(menu, top right)' : '(press A)'}, press + on STR or DEX, then «Confirm»`], hl:'.mb[data-win="stat"]', stat:1, init:s => { s.p = S.statPts; }, done:s => S.statPts < s.p},
   {t:['ยา', 'Potions'], d:() => [`ยาแดงฟื้น HP ${touchUI() ? 'กดปุ่มยาข้างจอย' : 'กดเลข 7 หรือคลิกช่องยาในแถบลัด'} · ลองดื่มสักขวดเมื่อ HP ลด หรือกด "เข้าใจแล้ว"`, `Red Potions restore HP: ${touchUI() ? 'tap the potion button by the stick' : 'press 7 or click the potion slot'} · drink one when hurt, or press "Got it"`], ev:'potion', next:true, hl:'#mobaPot,.hot.pot,[data-hot="6"]'},
-  {t:['เควสต์แรก', 'First quest'], d:['เดินไปหาครูวายรา (ฤๅษีหมวกลายเสือ มีเครื่องหมาย ! ) แล้วกดรับเควสต์บทที่ 0', 'Walk to Master Vayra (the hermit in the tiger hat, with the !) and accept Chapter 0'], arrow:'npc', done:() => !!qState().active || (qState().done || {}).main0},
+  {t:['เควสต์แรก', 'First quest'], d:['เดินไปหาครูวายรา (ฤๅษีหมวกลายเสือ มีเครื่องหมาย ! ) แล้วกดรับเควสต์บทที่ 0', 'Walk to Master Vayra (the hermit in the tiger hat, with the !) and accept Chapter 0'], arrow:'npc', go:'job', done:() => !!qState().active || (qState().done || {}).main0},
   // (v274) the free helper robot: most newcomers never found Uncle Boonma by themselves
   {t:['หุ่นผู้ช่วยเก็บของฟรี', 'A free helper robot'], d:['ไปหาลุงบุญมา คนเลี้ยงสัตว์ (ลูกศรสีทองชี้อยู่) แล้วเลือกรับหุ่นผู้ช่วยฟรี 1 ตัว · มันจะบินไปเก็บของที่ดรอปให้ตลอด', 'Visit Uncle Boonma, the Beast Keeper (the gold arrow points at him), and take a free helper robot · it flies off to pick up your drops for good'],
     arrow:'npc', npc:'beastkeeper', go:'beastkeeper', done:() => !!(S.helperFree || (S.helper && HELPERS[S.helper.k]))},
@@ -48,19 +48,37 @@ function tutShow(){
   if (st.hl) document.querySelectorAll(st.hl).forEach(e => { if (e.offsetParent !== null) e.classList.add('tut-hl'); });
   if (st.hl && st.hl.includes('data-win')){ const rt = el('railTog'); if (rt && el('rail') && el('rail').classList.contains('folded')) rt.classList.add('tut-hl'); }
 }
-document.addEventListener('click', e => { const g = e.target.closest && e.target.closest('[data-tutgo]'); if (!g || !tutOn()) return;   // (v274) walk to the NPC the step talks about
-  if (MAP_ID !== 0){ toast(L('กลับนครอาเรนก่อนนะ (ผู้เฝ้าศาลที่แคมป์วาร์ปกลับฟรี)', 'Go back to Aren first (the camp Shrine Keeper warps you home free)')); return; }
-  const n = NPCS.find(x => x.id === g.dataset.tutgo); if (n){ P.npc = n; P.target = null; P.tx = null; P.cast = null; } });
+/* «พาไป»: walk to the NPC the step talks about. (v346) Out in a field (the tutorial has just sent the newcomer to
+   ทุ่งสุวรรณิน), it first walks them to the gate back to Aren and, once in town, on to the NPC — before, it only said
+   «go back to Aren first» and a newcomer did not know the way (found by tools/first-play.js). */
+const TUTGO = {id:null};
+function tutWalkTo(id){ const n = NPCS.find(x => x.id === id); if (n){ P.npc = n; P.target = null; P.tx = null; P.cast = null; } }
+document.addEventListener('click', e => { const g = e.target.closest && e.target.closest('[data-tutgo]'); if (!g || !tutOn()) return;
+  if (MAP_ID !== 0){ const gate = typeof GATES !== 'undefined' && GATES.find(q => q.to === 0);
+    if (!gate){ toast(L('กลับนครอาเรนก่อนนะ (ผู้เฝ้าศาลที่แคมป์วาร์ปกลับฟรี)', 'Go back to Aren first (the camp Shrine Keeper warps you free)')); return; }
+    TUTGO.id = g.dataset.tutgo; P.npc = null; P.target = null; P.cast = null; P.tx = gate.x; P.ty = gate.y; toast(L('เดินกลับนครอาเรนก่อน แล้วจะพาไปต่อ', 'Walking back to Aren first, then on')); return; }
+  tutWalkTo(g.dataset.tutgo); });
+EV.on('map', () => { if (!TUTGO.id) return; const id = TUTGO.id; if (MAP_ID !== 0 || !tutOn()) return; TUTGO.id = null; setTimeout(() => { if (MAP_ID === 0 && tutOn()) tutWalkTo(id); }, 600); });
 document.addEventListener('click', e => { const t = e.target.closest && e.target.closest('[data-tutnext],[data-tutskip]'); if (!t || !tutOn()) return;
   if (t.dataset.tutskip){ askConfirm(L('ข้ามบทสอน', 'Skip tutorial'), L('ข้ามบทสอนทั้งหมดใช่ไหม? (จะไม่ได้รับรางวัล)', 'Skip the whole tutorial? (no reward)'), L('ข้าม', 'Skip'), () => tutFinish(true)); return; }
   tutGo(S.tut.i + 1); });
 for (const ev of ['kill', 'pickup', 'potion']) EV.on(ev, () => { const st = tutOn(); if (st && st.ev === ev) tutGo(S.tut.i + 1); });
 EV.on('tick', () => { const st = tutOn(); if (!st || PAUSED) { const b = el('tutBox'); if (b && !b.hidden && !tutOn()) b.hidden = true; return; } if (st.done && st.done(S.tut.s || {})) tutGo(S.tut.i + 1);
   const b = el('tutBox'); if (b && b.hidden) tutShow(); });
+/* (v346) the stats step: points pressed with + wait for «ยืนยัน» (statconfirm.js), and newcomers did not see that button —
+   it lights up as soon as there is something to confirm */
+EV.on('tick', () => { const st = tutOn(); if (!st || !st.stat) return; const b = document.querySelector('[data-stpok]'); if (b && !b.classList.contains('tut-hl')) b.classList.add('tut-hl'); });
+/* (v346) the monster the arrow shows: the nearest one a newcomer can beat (no more than 2 levels above the hero, not a
+   pack leader). It used to be simply the nearest, and in the starter field that was sometimes a Lv 9 boar: a Lv 1 hero
+   who followed the arrow was killed in the tutorial (found by tools/first-play.js). Only if none is in sight, the nearest. */
+function tutMob(){ let best = null, bd = 1e9, any = null, ad = 1e9;
+  for (const m of mobs){ if (m.dead || m.def.boss || m.minion) continue; const d = Math.hypot(m.x - P.x, m.y - P.y);
+    if (d < ad){ ad = d; any = m; } if ((m.def.lvl | 0) <= (S.lvl | 0) + 2 && !m.elite && !m.named && !m.nm && d < bd){ bd = d; best = m; } }
+  return best && bd < 900 ? best : any; }
 /* bouncing gold arrow over the thing to click */
 EV.on('draw', () => {
   const st = tutOn(); if (!st || !st.arrow || PAUSED) return; let t = null;
-  if (st.arrow === 'mob'){ let bd = 1e9; for (const m of mobs){ if (m.dead || m.def.boss || m.minion) continue; const d = Math.hypot(m.x - P.x, m.y - P.y); if (d < bd){ bd = d; t = {x:m.x, y:m.y - MOB_H[m.type] - 16}; } } }
+  if (st.arrow === 'mob'){ const m = tutMob(); if (m) t = {x:m.x, y:m.y - MOB_H[m.type] - 16}; }
   else if (st.arrow === 'loot'){ const l = nearestLoot(600); if (l) t = {x:l.x, y:l.y - 24}; }
   else if (st.arrow === 'npc' && MAP_ID === 0){ const n = NPCS.find(n => n.id === (st.npc || 'job')); if (n) t = {x:n.x, y:n.y - 92}; }
   if (!t) return; const x = sx(t.x), y = sy(t.y) - Math.abs(Math.sin(T * 4)) * 10, z = clamp(PX / 2, .5, 2.6);
