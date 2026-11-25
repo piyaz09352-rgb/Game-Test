@@ -41,7 +41,8 @@ function evOnDate(d){
   for (const id in EVENTS){ const E = EVENTS[id], a = E.from[0] * 100 + E.from[1], b = E.to[0] * 100 + E.to[1]; if (a <= b ? md >= a && md <= b : md >= a || md <= b) return id; }
   return null;
 }
-const evLive = () => evOnDate(thNow());                                          // the real festival (tokens, shop, EXP)
+let EV_FORCE = null;   // (v346) tests set a festival to check what it does, on any date
+const evLive = () => EV_FORCE || evOnDate(thNow());                                          // the real festival (tokens, shop, EXP)
 const evShow = () => (SETTINGS.evPreview && EVENTS[SETTINGS.evPreview] ? SETTINGS.evPreview : evLive());   // what the world looks like
 const evName = id => (EVENTS[id] ? L(EVENTS[id].th, EVENTS[id].en) : '');
 function evTok(){ const id = evLive(); ACC.evt = ACC.evt || {}; if (ACC.evt.id !== id){ ACC.evt = {id, n:0}; } return ACC.evt; }
@@ -61,12 +62,18 @@ EV.on('kill', m => {
 const EVB = {slot:-1, m:null};
 EV.on('tick', () => {
   const id = evLive(); if (!id || MAP_ID === 0 || P.dead || (typeof DG !== 'undefined' && DG.active) || (typeof nmSlave === 'function' && nmSlave())) return;
+  if (typeof tutOn === 'function' && tutOn()) return;   // (v346) not while a newcomer is still in the tutorial
   const c = thaiClock(), slot = Math.floor((c.h * 60 + c.m) / 15); if (slot === EVB.slot) return;
   if (EVB.m && !EVB.m.dead) return; EVB.slot = slot;
-  const pool = (MAPS[MAP_ID].mobs || []).filter(t => MOB[t] && !MOB[t].boss); if (!pool.length) return;
+  /* (v346) a monster of the hero's level: it used to be any monster of the map, made an alpha with double HP and set
+     down 260 px away — in the starter fields a Lv 9 boar or Lv 13 lantern beside a Lv 1 newcomer, who died (found by
+     tools/first-play.js during Loy Krathong). Now one no more than 3 levels above the hero (else the weakest), and for
+     heroes under Lv 15 it waits calmly to be challenged instead of charging. */
+  const all = (MAPS[MAP_ID].mobs || []).filter(t => MOB[t] && !MOB[t].boss && !MOB[t].night); if (!all.length) return;
+  const fit = all.filter(t => (MOB[t].lvl | 0) <= (S.lvl | 0) + 3), pool = fit.length ? fit : [all.slice().sort((a, b) => MOB[a].lvl - MOB[b].lvl)[0]];
   const a = Math.random() * 6.28, x = clamp(P.x + Math.cos(a) * 260, 60, W - 60), y = clamp(P.y + Math.sin(a) * 200, 60, H - 60);
   const m = spawnMob(pool[(Math.random() * pool.length) | 0], x, y, {zone:MAPZ}); if (typeof makeElite === 'function') makeElite(m);
-  m.maxhp *= 2; m.hp = m.maxhp; m.evb = id; m.tagTxt = EVENTS[id].sp; EVB.m = m;
+  m.maxhp *= 2; m.hp = m.maxhp; m.evb = id; m.tagTxt = EVENTS[id].sp; EVB.m = m; if ((S.lvl | 0) < 15) m.calm = true;
   VFX.play('bossArrive', {x, y}); banner(L(`${EVENTS[id].sp[0]} ปรากฏตัวใกล้ ๆ เจ้า!`, `A ${EVENTS[id].sp[1]} appears nearby!`));
 });
 

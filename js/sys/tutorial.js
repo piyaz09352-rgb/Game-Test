@@ -87,5 +87,9 @@ EV.on('draw', () => {
   ctx.stroke(); ctx.fill(); ctx.restore();
 });
 /* new characters get the tutorial; switching characters hides any card from the previous one */
-{ const _ng = newGame; newGame = function(...a){ _ng(...a); tutStart(); }; }
+{ const _ng = newGame; newGame = function(...a){ _ng(...a);
+    /* (v346) a new hero starts with full HP and SP: the starting save held 40 HP while a Lv 1 hero has about 80, so every
+       newcomer walked out to the first field at half health (found by tools/first-play.js) */
+    const fill = () => { try { derive(); S.hp = DER.maxhp; S.sp = DER.maxsp; } catch (e) {} }; fill(); setTimeout(fill, 60);   // again once the starter kit (starter.js, a moment later) has raised Max HP
+    tutStart(); }; }
 { const _cg = continueGame; continueGame = function(...a){ _cg(...a); tutShow(); }; }
