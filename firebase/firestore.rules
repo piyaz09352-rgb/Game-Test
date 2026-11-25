@@ -131,6 +131,22 @@ service cloud.firestore {
       allow write: if isGM();   // a GM deletes them at a world reset and restores them from a backup; players never delete
     }
 
+    // ---------- problem reports (js/sys/report346.js): a player writes their own report once (id = their uid + a time);
+    // only a GM reads and deletes them; nobody edits one. A small screenshot (a JPEG data URL, under ~180 KB) may come with it.
+    function reportOk(id) {
+      return id.matches(me() + '_[0-9]{10,16}')
+        && d().keys().hasOnly(['uid', 'name', 'v', 'msg', 'map', 'x', 'y', 'lvl', 'job', 'dev', 'err', 'img', 'at'])
+        && d().uid == me() && str(d().name, 24) && intIn(d().v, 0, 100000) && str(d().msg, 500)
+        && (d().map is int || str(d().map, 24)) && numIn(d().x, -100000, 100000) && numIn(d().y, -100000, 100000)
+        && intIn(d().lvl, 0, 300) && str(d().job, 24) && str(d().dev, 200) && str(d().get('err', ''), 2000)
+        && (d().get('img', '') == '' || (str(d().img, 240000) && d().img.matches('data:image/jpeg;base64,.*')))
+        && recent(d().at);
+    }
+    match /reports/{id} {
+      allow read, delete: if isGM();
+      allow create: if signedIn() && reportOk(id);
+    }
+
     // ---------- mail (js/sys/mail.js): the sender writes a letter as themselves; only the recipient (or the sender) reads it;
     // only the recipient marks it read / takes the attachments (once) / deletes it. System letters and Vayra Coins
     // only ever go to your own box (the game writing to you), so nobody can fake a system letter or mail coins.
