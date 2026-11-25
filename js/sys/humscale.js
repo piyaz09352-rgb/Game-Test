@@ -28,3 +28,5 @@ function humScaleApply(){
   }
 }
 humScaleApply();
+/* (v344) heroes are drawn CHAR_K larger (gfx/sprites.js) and the humanoid monsters with them: their name plates rise to match */
+if (typeof CHAR_K !== 'undefined' && typeof SPR !== 'undefined') for (const k in SPR.MOBS){ const mb = SPR.MOBS[k]; if (mb && mb.human && MOB_H0[k]) MOB_H0[k] = Math.round(MOB_H0[k] * CHAR_K); }

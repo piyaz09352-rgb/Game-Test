@@ -44,7 +44,7 @@ SPR.CHARS.ms_npc = {...SPR.CHARS.novice, name:'NPC', en:'Story NPC'}; delete SPR
   XMOUNT.ms_m_krathong = kr; XCOS.ms_m_krathong = kr;
 }
 // Grandpa Thian's own head: a white head wrap and a white beard (not a wardrobe piece)
-SPR.GEAR_LOOK.ms_x_tathian = {hat:'headwrap', bandMat:SPR.M.ivory != null ? 'ivory' : 'white', beard:'hairWhite', bodyScale:.92};
+SPR.GEAR_LOOK.ms_x_tathian = {hat:'headwrap', bandMat:SPR.M.ivory != null ? 'ivory' : 'white', beard:'hairWhite'};
 /* (v214) the south road's pieces */
 { const M = SPR.M, mm = (n, f = 'white') => (M[n] != null ? n : f), m = n => M[mm(n)];
   const tops = {

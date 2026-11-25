@@ -2151,7 +2151,7 @@ const CHARS = {
   // ages: the villager is a 15-year-old (a little shorter); every class is a young adult of about 18.
   // Modern fantasy look: no ancient helmets or tall hats — spiky anime hair, fitted jackets with trims and zips,
   // boots, gloves, scarves and long coats. A light Thai accent survives in the colours and small details.
-  novice:{name:'ชาวบ้าน', en:'Villager', bodyScale:.9, paint:true, hair:'hairBrown', iris:'irisBr', top:'tech', sleeve:'navy', forearm:'skin', pants:'navy', boots:'leather', bootCuff:'tech', belt:'leather',
+  novice:{name:'ชาวบ้าน', en:'Villager', paint:true, hair:'hairBrown', iris:'irisBr', top:'tech', sleeve:'navy', forearm:'skin', pants:'navy', boots:'leather', bootCuff:'tech', belt:'leather',
     weapon:'dagger', aura:'auraWhite', pouch:true, jag:.22, bangF:14, strands:11, spikes:16, spikeLen:4.8, bangs:true, paintBangs:BANG_SWEEP, crown:4, lockLines:12,
     topTex:n => (n[1] > .42 ? {m:M.navy} : n[2] > .5 && Math.abs(n[0]) < .04 && n[1] > -.4 ? {m:M.steel} : undefined)},
   // นักดาบ: navy fitted jacket with red trim and a steel zip, black gloves, red headband, steel shoulder guard
@@ -2326,7 +2326,7 @@ function applyLook(cfg, lk){
   const f = lk.sex === 'f', list = f ? HAIR_F : HAIR_M, st = {...(list[(lk.hair | 0) % list.length] || {})}, deco = st.deco; delete st.deco;
   if (!cfg.beard) Object.assign(cfg, st);
   // she: big sparkling eyes, rosy cheeks, a ribbon bow or a flower pin, a petite frame
-  if (f){ cfg.lashes = true; cfg.cute = true; cfg.slim = .88; cfg.bodyScale = (cfg.bodyScale || 1) * .96;
+  if (f){ cfg.lashes = true; cfg.cute = true; cfg.slim = .88;   /* (v344) the owner: «why aren't the scales the same?» — she is slimmer, not shorter: one height for every person */
     if (deco) cfg[deco[0]] = deco[1];
     if (cfg.iris === 'irisBr') cfg.iris = 'irisPk';
     if (!cfg.skirt) cfg.skirt = [11.2, 5.6, 6.1, 8.2, cfg.top, cfg.bootCuff || cfg.belt || cfg.top]; }
@@ -2726,7 +2726,7 @@ function lazyQ(sh, e, f){
 const CHAR_K = 1.15;
 function draw(g, sh, act, dir, t, x, y, o = {}){
   // (v305) on the game canvas every figure is drawn larger than the scenery, about its feet (render.js ACTOR)
-  if (!o._as && typeof ACTOR !== 'undefined' && ACTOR.s !== 1 && g.canvas === ACTOR.cv){ const ks = ACTOR.s * (sh.kind === 'char' ? CHAR_K : 1); g.save(); g.translate(x, y); g.scale(ks, ks); g.translate(-x, -y); try { return draw(g, sh, act, dir, t, x, y, {...o, _as:1}); } finally { g.restore(); } }
+  if (!o._as && typeof ACTOR !== 'undefined' && ACTOR.s !== 1 && g.canvas === ACTOR.cv){ const ks = ACTOR.s * (sh.kind === 'char' || (MOBS[sh.key] && MOBS[sh.key].human) ? CHAR_K : 1);   /* (v344) a monster in a human body stands on the heroes' scale too */ g.save(); g.translate(x, y); g.scale(ks, ks); g.translate(-x, -y); try { return draw(g, sh, act, dir, t, x, y, {...o, _as:1}); } finally { g.restore(); } }
   if (!sh.index[act]) act = 'idle';
   let e = strip(sh, act, dir); const fs = sh.fs, K = sh.K, flip = sh.kind === 'mob' && dir > 4; let f = o.frame ?? frameAt(sh, act, t);
   // rasterise on demand, but only ~6 ms per display frame (v83: was 10, and a strip with no ready frame was always
