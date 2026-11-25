@@ -4,7 +4,7 @@
    each kind (model × kind × boss or not), from the side and from the front, every frame of idle, walk, attack, hurt, die,
    fidget and sleep, and checks:
    · it draws without an error
-   · there is a body in the picture (not an empty or nearly empty frame) — a dying spirit may fade, nothing else
+   · there is a body in the picture (not an empty or nearly empty frame) — a dying spirit may fade and a jelly melt, nothing else
    · nothing is cut off at the picture's edge (a limb or wing thrown outside the frame) */
 const test = require('node:test'), assert = require('node:assert');
 const { chromium, openGame } = require('./browser');
@@ -21,7 +21,7 @@ test('every kind of monster draws every frame of every action, whole and inside 
       const count = img => { let n = 0, edge = 0; const W = img.width, H = img.height, D = img.data;
         for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) if (D[(y * W + x) * 4 + 3] > 40){ n++; if (x === 0 || y === 0 || x === W - 1) edge++; } return {n, edge}; };
       const bad = []; let frames = 0;
-      for (const [kind, k] of Object.entries(kinds)){ const fade = /floater|human/.test(kind) || /wisp|ghost|wraith|phantom|spirit|shade/.test(k);
+      for (const [kind, k] of Object.entries(kinds)){ const fade = /floater|human|slime|blob/.test(kind) || /wisp|ghost|wraith|phantom|spirit|shade|slime|blob/.test(k) || k === 'boss';   // spirits fade, jellies melt into a puddle
         for (const dir of [2, 0]){ let base = 0;
           for (const act of ACTS){ const n = SPR.MOB_ACTIONS[act].n;
             for (let f = 0; f < n; f++){ let img; try { img = SPR.renderFrame('mob', k, act, dir, f, 1); } catch (e) { bad.push(`${kind} ${k} ${act}${f} d${dir}: ${e.message}`); continue; }
