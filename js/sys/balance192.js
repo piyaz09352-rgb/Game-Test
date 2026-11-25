@@ -8,7 +8,7 @@
 'use strict';
 const LINE_POW = {   // [tier 1 (Lv <40), tier 2, tier 3, tier 4] · (v324) retuned from a full report after the v323 Auto fixes
   blade:[1.09, 1.1, 0.7, 0.88], rune:[1.65, 0.59, 1.26, 1.1], ranger:[0.6, 0.63, 1.6, 1.4], muay:[0.79, 0.58, 0.71, 0.82],
-  healer:[2.9, 1.6, 2.05, 1.02], rogue:[1.21, 1.3, 1.76, 1.5], summoner:[1.45, 1.08, 1.11, 0.75], occult:[3.21, 3.13, 1.96, 1.4],
+  healer:[2.9, 1.6, 2.05, 1.02], rogue:[1.21, 1.3, 1.76, 1.5], summoner:[1.45, 1.08, 1.06, 0.75], occult:[3.21, 3.13, 1.96, 1.4],
   merchant:[1.6, 1.17, 1.06, 0.95], catfolk:[1.41, 0.79, 0.56, 0.92], dogfolk:[1.53, 1.09, 0.82, 0.88], ninja:[0.23, 1.46, 1.3, 1.5]
 };
 /* (v323) the slot a line uses is its job tier, and the last job is reached around Lv 70, so the fourth slot is never used:
