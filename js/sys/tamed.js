@@ -242,7 +242,7 @@ function petPic(type){
   try { const c = document.createElement('canvas'); c.width = 120; c.height = 120; const g = c.getContext('2d');
     const bg = g.createRadialGradient(60, 70, 4, 60, 70, 80); bg.addColorStop(0, 'rgba(255,230,170,.35)'); bg.addColorStop(1, 'rgba(255,220,150,0)'); g.fillStyle = bg; g.fillRect(0, 0, 120, 120);
     g.fillStyle = 'rgba(0,0,0,.35)'; g.beginPath(); g.ellipse(60, 106, 26, 7, 0, 0, 7); g.fill();
-    const fs = (SPR.MOBS[type] && SPR.MOBS[type].fs) || 60, s = Math.min(2.6, 110 / fs); g.setTransform(s, 0, 0, s, 60, 106); cthMob(g, type, 1);
+    const fs = (SPR.MOBS[type] && SPR.MOBS[type].fs / (SPR.MOBS[type]._room || 1)) || 60, s = Math.min(2.6, 110 / fs); g.setTransform(s, 0, 0, s, 60, 106); cthMob(g, type, 1);
     return (PET_PIC[type] = c.toDataURL()); } catch (e){ return ''; }
 }
 function petCardHTML(){
