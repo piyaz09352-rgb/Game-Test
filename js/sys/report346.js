@@ -6,7 +6,7 @@
    GM window: the reports are listed (newest first), each with its picture; a GM deletes them when done.
    One report per minute per player; offline the button explains that it needs online play. */
 'use strict';
-const RPT = {errs:[], last:0, shot:'', list:null, busy:false};
+const RPT = {errs:[], last:0, shot:'', list:null, busy:false, fresh:0, peekT:0};
 // the last errors the game caught (frame errors, uncaught errors), kept short
 addEventListener('error', e => { RPT.errs.push(String(e.message || e).slice(0, 180)); if (RPT.errs.length > 6) RPT.errs.shift(); });
 { const _ce = console.error; console.error = function(...a){ try { RPT.errs.push(a.map(x => String(x && x.message || x)).join(' ').slice(0, 180)); if (RPT.errs.length > 6) RPT.errs.shift(); } catch (e) {} return _ce.apply(this, a); }; }
@@ -48,8 +48,20 @@ document.addEventListener('click', e => { const b = e.target.closest && e.target
   else if (b.dataset.rpt === 'load') rptLoad();
   else if (b.dataset.rpt === 'del'){ const id = b.dataset.id; NET.db.collection('reports').doc(id).delete().then(() => { RPT.list = (RPT.list || []).filter(r => r.id !== id); reWin('gm'); }).catch(() => toast(L('ลบไม่สำเร็จ', 'Could not delete'))); } });
 
+/* the GM chip shows how many reports came in since the GM last loaded them («GM 3»): checked when GM turns on and every 5 minutes */
+const rptSeen = () => { try { return +localStorage.getItem('vay_rptSeen') || 0; } catch (e) { return 0; } };
+function rptBadge(){ const b = el('gmBtn'); if (!b) return; let n = b.querySelector('.rptn');
+  if (!RPT.fresh || !GM.on){ if (n) n.remove(); return; }
+  if (!n){ n = document.createElement('b'); n.className = 'rptn'; b.appendChild(n); } n.textContent = RPT.fresh > 39 ? '40+' : String(RPT.fresh);
+  b.title = L(`รายงานปัญหาใหม่ ${RPT.fresh} เรื่อง`, `${RPT.fresh} new problem reports`); }
+async function rptPeek(){ if (!GM.on || !rptOk()) return; RPT.peekT = Date.now();
+  try { const q = await NET.db.collection('reports').where('at', '>', rptSeen()).orderBy('at', 'desc').limit(40).get(); RPT.fresh = q.size; } catch (e) {}
+  rptBadge(); }
+{ const _ui = gmUi; gmUi = function(){ const r = _ui.apply(this, arguments); rptBadge(); if (GM.on && Date.now() - RPT.peekT > 60000) rptPeek(); return r; }; }
+setInterval(() => { if (GM.on && Date.now() - RPT.peekT > 300000) rptPeek(); }, 30000);
 /* the GM window: the reports, newest first */
-async function rptLoad(){ if (!rptOk()) return; try { const q = await NET.db.collection('reports').orderBy('at', 'desc').limit(40).get(); RPT.list = q.docs.map(d => ({id:d.id, ...d.data()})); } catch (e) { RPT.list = []; toast(L('โหลดรายงานไม่ได้', 'Could not load reports')); } reWin('gm'); }
+async function rptLoad(){ if (!rptOk()) return; try { const q = await NET.db.collection('reports').orderBy('at', 'desc').limit(40).get(); RPT.list = q.docs.map(d => ({id:d.id, ...d.data()}));
+    const top = RPT.list.reduce((m, x) => Math.max(m, +x.at || 0), 0); if (top){ try { localStorage.setItem('vay_rptSeen', String(Math.max(top, rptSeen()))); } catch (e) {} } RPT.fresh = 0; rptBadge(); } catch (e) { RPT.list = []; toast(L('โหลดรายงานไม่ได้', 'Could not load reports')); } reWin('gm'); }
 if (WIN_RENDER.gm){ const _g = WIN_RENDER.gm; WIN_RENDER.gm = function(){ const r = _g.apply(this, arguments);
     try { const pane = el('pane-gm'); if (!pane || !GM.on || !rptOk()) return r;
       const rows = (RPT.list || []).map(x => `<div class="item rptrow"><div class="nm"><b>${escH(clean(x.name, 24))} · Lv ${x.lvl | 0} · v${x.v | 0} · ${escH(MAPS[x.map] ? nm(MAPS[x.map]) : String(x.map))}</b>
@@ -60,4 +72,5 @@ if (WIN_RENDER.gm){ const _g = WIN_RENDER.gm; WIN_RENDER.gm = function(){ const 
     return r; }; }
 { const st = document.createElement('style'); st.textContent = `#pane-report textarea{width:100%;box-sizing:border-box;border-radius:10px;padding:8px;font:500 14px var(--thai,sans-serif);resize:vertical;margin:6px 0}
   #pane-report .rptimg,#pane-gm .rptimg{display:block;max-width:100%;max-height:160px;border-radius:8px;margin:6px 0;border:1px solid rgba(150,130,220,.45)}
-  #pane-gm .rptrow p{margin:4px 0;white-space:pre-wrap}#pane-gm .rpterr{color:#b03030}`; document.head.appendChild(st); }
+  #pane-gm .rptrow p{margin:4px 0;white-space:pre-wrap}#pane-gm .rpterr{color:#b03030}
+  #gmBtn .rptn{display:inline-block;margin-left:4px;min-width:14px;padding:0 4px;border-radius:8px;background:#d23c3c;color:#fff;font-size:10px;line-height:14px;text-align:center}`; document.head.appendChild(st); }

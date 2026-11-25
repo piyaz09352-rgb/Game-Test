@@ -32,7 +32,7 @@ const LINE_SP = {occult:[.6, 1, 1, 1]};
 for (const id in SKILLS){ const sk = SKILLS[id], ln = typeof NL_LINE_OF !== 'undefined' && NL_LINE_OF[sk.job]; if (!ln || !LINE_SP[ln] || typeof sk.sp !== 'function' || sk._spLine) continue;
   const o = sk.sp; sk._spLine = 1; sk.sp = lv => { const ch = jobChain(), ti = Math.min(3, Math.max(0, ch.length - 2)); return ch[1] === ln ? Math.max(1, Math.round(o(lv) * LINE_SP[ln][ti])) : o(lv); }; }
 /* (v209) summoned beasts hit harder for the summoner line (its own spells barely matter: the beasts do the killing) */
-{ const _d = derive; derive = function(){ const r = _d.apply(this, arguments); if (DER && DER.pas && jobChain()[1] === 'summoner') DER.pas.sumAtk = (DER.pas.sumAtk || 0) + .9; return r; }; }
+{ const _d = derive; derive = function(){ const r = _d.apply(this, arguments); if (DER && DER.pas && jobChain()[1] === 'summoner') DER.pas.sumAtk = (DER.pas.sumAtk || 0) + ((S.lvl || 1) >= 60 && (S.lvl || 1) < 100 ? .7 : .9); return r; }; }   // (v346) a little less at Lv 60–99: the top summoner was 116% there
 
 /* (v324) the lines without INT ran dry: their SP comes back half as fast (js/game/player.js) and their pool is small,
    so at Lv 115 a swordsman, rogue or merchant had spent its SP within 6 s and then only swung — its skills looked
