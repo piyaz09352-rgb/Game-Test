@@ -10,3 +10,4 @@ updates/*-full.zip
 updates/*-test.zip
 # Firebase emulator logs (tools/rules-test)
 *-debug.log
+docs/firstplay/

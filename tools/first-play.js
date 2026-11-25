@@ -76,7 +76,7 @@ fs.mkdirSync(OUT, { recursive: true }); for (const f of fs.readdirSync(OUT)) if 
     await page.waitForTimeout(800); await shot('จบบทสอน', await page.evaluate(() => `Lv ${S.lvl} · เงิน ${S.bia} · ${S.tut && S.tut.done ? 'บทสอนจบ' : 'บทสอนยังไม่จบ'}`));
     await tapSel('#botChip, [data-h6="bot"], .botchip'); await page.waitForTimeout(400);
     if (!(await page.evaluate(() => typeof BOT !== 'undefined' && BOT.on))) await page.evaluate(() => setBot(true));
-    for (let m = 1; m <= 6; m++){ await page.waitForTimeout(60000); await shot(`เล่น Auto นาทีที่ ${m}`, await page.evaluate(() => `Lv ${S.lvl} · แผนที่ ${nm(MAPS[MAP_ID])} · ฆ่า ${(S.stat && S.stat.kills) || '?'} · ${qState().active ? 'มีเควสต์' : 'ไม่มีเควสต์'} · ตาย ${(S.stat && S.stat.deaths) || 0}`)); }
+    for (let m = 1; m <= 6; m++){ await page.waitForTimeout(60000); await page.evaluate(() => { if (typeof leaveRest === 'function') leaveRest(); }); await page.waitForTimeout(400); await shot(`เล่น Auto นาทีที่ ${m}`, await page.evaluate(() => `Lv ${S.lvl} · แผนที่ ${nm(MAPS[MAP_ID])} · ฆ่า ${(typeof stc === 'function' && stc().kills) || 0} · ${qState().active ? 'มีเควสต์' : 'ไม่มีเควสต์'} · ตาย ${(typeof stc === 'function' && stc().deaths) || 0}`)); }
   } catch (e) { await shot('หยุดเพราะ error', String(e.message).slice(0, 160)); steps[steps.length - 1].bad = true; }
   finally {
     let md = `# VAYRATHEN — ผู้เล่นใหม่ 10 นาทีแรก (tools/first-play.js)\n\nจอ ${VW0}×${VH0}${touch ? ' จอสัมผัส' : ''} · ใช้เวลาจริง ${Math.round((Date.now() - t0) / 60000)} นาที · error ${errors.length}\n\n| # | ขั้น | วินาทีที่ | หมายเหตุ |\n|---|---|---|---|\n`;
