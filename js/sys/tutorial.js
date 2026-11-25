@@ -26,6 +26,8 @@ const tutOn = () => S && S.tut && !S.tut.done && TUT[S.tut.i];
 function tutStart(){ S.tut = {i:0, s:{}}; tutShow(); }
 function tutGo(i){
   document.querySelectorAll('.tut-hl').forEach(e => e.classList.remove('tut-hl'));
+  /* (v346) an NPC step done (the quest taken, the free robot chosen): its dialog closes, so the next card can be seen */
+  { const pv = S.tut && TUT[S.tut.i]; if (pv && pv.go && pv.go !== 'fields306' && i > S.tut.i && typeof closeDialog === 'function' && el('dialog') && !el('dialog').hidden) closeDialog(); }
   if (i >= TUT.length){ tutFinish(); return; }
   S.tut.i = i; S.tut.s = {}; const st = TUT[i]; if (st.init) st.init(S.tut.s); SFX.play('tut'); tutShow(); dirty = true;
 }
@@ -65,6 +67,11 @@ document.addEventListener('click', e => { const t = e.target.closest && e.target
 for (const ev of ['kill', 'pickup', 'potion']) EV.on(ev, () => { const st = tutOn(); if (st && st.ev === ev) tutGo(S.tut.i + 1); });
 EV.on('tick', () => { const st = tutOn(); if (!st || PAUSED) { const b = el('tutBox'); if (b && !b.hidden && !tutOn()) b.hidden = true; return; } if (st.done && st.done(S.tut.s || {})) tutGo(S.tut.i + 1);
   const b = el('tutBox'); if (b && b.hidden) tutShow(); });
+/* (v346) the attack step: the big attack button goes for the monster the arrow shows, even when it is further than the
+   button usually looks (320 px) — a newcomer pressed it and only read «no target nearby» */
+if (typeof mobaAction === 'function'){ const _ma = mobaAction; mobaAction = function(kind){ const st = tutOn();
+    if (kind === 'atk' && st && st.arrow === 'mob' && !P.dead && (!P.target || P.target.dead) && !nearestEnemy(320)){ const m = tutMob(); if (m && dist(m, P) < 1600){ botPauseFromManual(); P.target = m; P.tx = null; P.npc = null; return; } }
+    return _ma.apply(this, arguments); }; }
 /* (v346) the stats step: points pressed with + wait for «ยืนยัน» (statconfirm.js), and newcomers did not see that button —
    it lights up as soon as there is something to confirm */
 EV.on('tick', () => { const st = tutOn(); if (!st || !st.stat) return; const b = document.querySelector('[data-stpok]'); if (b && !b.classList.contains('tut-hl')) b.classList.add('tut-hl'); });
@@ -81,7 +88,14 @@ EV.on('draw', () => {
   if (st.arrow === 'mob'){ const m = tutMob(); if (m) t = {x:m.x, y:m.y - MOB_H[m.type] - 16}; }
   else if (st.arrow === 'loot'){ const l = nearestLoot(600); if (l) t = {x:l.x, y:l.y - 24}; }
   else if (st.arrow === 'npc' && MAP_ID === 0){ const n = NPCS.find(n => n.id === (st.npc || 'job')); if (n) t = {x:n.x, y:n.y - 92}; }
-  if (!t) return; const x = sx(t.x), y = sy(t.y) - Math.abs(Math.sin(T * 4)) * 10, z = clamp(PX / 2, .5, 2.6);
+  if (!t) return; const z = clamp(PX / 2, .5, 2.6); let x = sx(t.x), y = sy(t.y) - Math.abs(Math.sin(T * 4)) * 10;
+  /* (v346) a target off the screen: the arrow circles the hero and points the way (a newcomer arriving in the fields saw
+     no monster and no arrow — tools/first-play.js; at the screen's edge it hid behind the HUD cards) */
+  const mx = 44 * z, my = 60 * z;
+  if (x < mx || x > SW - mx || y < my || y > SH - my){ const hx = sx(P.x), hy = sy(P.y) - 34 * z, a = Math.atan2(y - hy, x - hx), R = 92 * z + Math.abs(Math.sin(T * 4)) * 8 * z;
+    ctx.save(); ctx.translate(hx + Math.cos(a) * R, hy + Math.sin(a) * R * .8); ctx.rotate(a + Math.PI / 2 + Math.PI); ctx.fillStyle = '#ffd76a'; ctx.strokeStyle = '#3a1a04'; ctx.lineWidth = 2.5 * z; ctx.shadowColor = 'rgba(255,200,80,.9)'; ctx.shadowBlur = 12 * z;
+    ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(-10 * z, -12 * z); ctx.lineTo(-4 * z, -12 * z); ctx.lineTo(-4 * z, -24 * z); ctx.lineTo(4 * z, -24 * z); ctx.lineTo(4 * z, -12 * z); ctx.lineTo(10 * z, -12 * z); ctx.closePath();
+    ctx.stroke(); ctx.fill(); ctx.restore(); return; }
   ctx.save(); ctx.fillStyle = '#ffd76a'; ctx.strokeStyle = '#3a1a04'; ctx.lineWidth = 2.5 * z; ctx.shadowColor = 'rgba(255,200,80,.9)'; ctx.shadowBlur = 12 * z;
   ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - 10 * z, y - 12 * z); ctx.lineTo(x - 4 * z, y - 12 * z); ctx.lineTo(x - 4 * z, y - 24 * z); ctx.lineTo(x + 4 * z, y - 24 * z); ctx.lineTo(x + 4 * z, y - 12 * z); ctx.lineTo(x + 10 * z, y - 12 * z); ctx.closePath();
   ctx.stroke(); ctx.fill(); ctx.restore();

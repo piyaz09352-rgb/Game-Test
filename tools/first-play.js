@@ -47,7 +47,8 @@ fs.mkdirSync(OUT, { recursive: true }); for (const f of fs.readdirSync(OUT)) if 
         if (j) await drag(j[0], j[1], 60, -10, 1500); else { const p = await page.evaluate(() => [P.x + 200, P.y]); await tapWorld(p[0], p[1]); await page.waitForTimeout(2000); } }
       else if (st.ev === 'kill'){ how = 'แตะมอนที่ลูกศรชี้';
         for (let k = 0; k < 40 && (await tutI()) === i; k++){ const m = await page.evaluate(() => { const m = typeof tutMob === 'function' ? tutMob() : null; return m && [m.x, m.y - 10]; });   // the monster the gold arrow shows
-          if (m && k % 4 === 0) await tapWorld(m[0], m[1]); else if (touch) await tapSel('#mobaAct'); await page.waitForTimeout(700); } }
+          const on = m && await page.evaluate(([x, y]) => { const a = sx(x), b = sy(y); return a > 40 && a < SW - 40 && b > 60 && b < SH - 60; }, m);
+          if (on && k % 3 === 0) await tapWorld(m[0], m[1]); else if (touch) await tapSel('#mobaAct .mo.atk, #mobaAct [data-mo="atk"]'); else await page.keyboard.press('a'); await page.waitForTimeout(700); } }
       else if (st.ev === 'pickup'){ how = 'แตะของที่ตก';
         for (let k = 0; k < 20 && (await tutI()) === i; k++){ const l = await page.evaluate(() => { const l = nearestLoot(600); return l && [l.x, l.y - 4]; }); if (l) await tapWorld(l[0], l[1]); await page.waitForTimeout(900); } }
       else if (st.ev === 'potion'){ how = 'แตะช่องยา'; await page.evaluate(() => { S.hp = Math.max(1, Math.floor(DER.maxhp * .5)); }); for (let k = 0; k < 3 && (await tutI()) === i; k++){ await tapSel('#mobaPot, .hot.pot, [data-hot="6"]'); await page.waitForTimeout(600); } }

@@ -240,7 +240,7 @@ document.addEventListener('click', e => {
     // still open looked stuck)
     WARPING = true; const wg = el('warpGrid'); if (wg) wg.hidden = true; warpCard(true);
     requestAnimationFrame(() => setTimeout(() => { try { warpTo(id); } finally { WARPING = false; warpCard(false); } }, 30)); return; }
-  if (ds.qaccept){ questAccept(ds.qaccept); return; }
+  if (ds.qaccept){ questAccept(ds.qaccept); if (qState().active === ds.qaccept && typeof closeDialog === 'function') closeDialog(); return; }   // (v346) the dialog kept offering «รับเควสต์» after it was taken
   if (ds.qturnin){ questTurnIn(); return; }
   if (ds.btake){ bountyTake(+ds.btake); return; }
   if (ds.bclaim){ bountyClaim(+ds.bclaim); return; }
