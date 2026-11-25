@@ -89,7 +89,7 @@ fs.mkdirSync(OUT, { recursive: true }); for (const f of fs.readdirSync(OUT)) if 
         // Job 10: to Master Vayra (the quest card / «พาไป» path a player follows) and pick the first job
         await shot('ถึง Job 10 — ไปเปลี่ยนอาชีพ', JSON.stringify(st)); await page.evaluate(() => setBot(false));
         await page.evaluate(() => { if (MAP_ID !== 0){ const g = GATES.find(q => q.to === 0); if (g){ TUTGO.id = 'job'; P.tx = g.x; P.ty = g.y; } } else tutWalkTo('job'); });
-        let ok = false; for (let k = 0; k < 120 && !ok; k++){ await page.waitForTimeout(500);
+        let ok = false; for (let k = 0; k < 120 && !ok; k++){ await page.waitForTimeout(500); await page.evaluate(() => { if (typeof leaveRest === 'function') leaveRest(); });   // a person touches the screen now and then
           if (await page.evaluate(() => MAP_ID === 0 && !P.npc && !(el('dialog') && !el('dialog').hidden))) await page.evaluate(() => tutWalkTo('job'));
           if (await page.evaluate(() => !!document.querySelector('#dialog:not([hidden]) [data-job]'))){ await shot('เลือกอาชีพ'); await tapSel('#dialog [data-job]'); await page.waitForTimeout(800);
             await tapSel('#confirm:not([hidden]) .btn.gold, #confirm:not([hidden]) [data-yes]'); await page.waitForTimeout(1500); ok = await page.evaluate(() => S.job !== 'novice'); } }
