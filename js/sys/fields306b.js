@@ -18,7 +18,11 @@ function f306Spawns(){ const [a, b, c] = F306Z();
   addSlots('hare', 6, b); addSlots('kaipa', 10, b); addSlots('kobna', 4, b);
   addSlots('boar', 12, c); addSlots('kaipa', 4, c); addSlots('lantern', 10, c, true); }
 /* Auto roams the part of the fields that suits its level */
-const f306Zone = () => (typeof FIELDS306 !== 'undefined' && MAP_ID === FIELDS306.id ? F306Z()[S.lvl < 6 ? 0 : S.lvl < 10 ? 1 : 2] : null);
+/* (v347) at night the Lv 13 lanterns (they attack on sight) wake in the east part from x 3350, and the middle part reached
+   3450: a Lv 8 hero on Auto was killed there by two of them (tools/first-play.js, LONG=1). At night the middle part ends
+   500 px short of them. */
+const f306Zone = () => { if (typeof FIELDS306 === 'undefined' || MAP_ID !== FIELDS306.id) return null; const z = F306Z(), i = S.lvl < 6 ? 0 : S.lvl < 10 ? 1 : 2;
+  return i >= 1 && S.lvl < 14 && typeof isNight === 'function' && isNight() ? {...z[1], x1:z[2].x0 - 500} : z[i]; };   // up to Lv 13 (the lanterns' own level) at night
 { const _br = bossRecall; bossRecall = function(id){ if (id === 0){ bossTimer = 1e12; return; } return _br.apply(this, arguments); }; }
 const f306Gate = to => (typeof GATES !== 'undefined' ? GATES.find(g => g.to === to) : null);
 function f306Fix(){ if (typeof S === 'undefined' || !S || S._f306) return; const o = S.ms;
@@ -43,7 +47,7 @@ if (typeof EV !== 'undefined') EV.on('draw', () => { const st = typeof tutOn ===
    (Auto never uses a gate by itself — js/sys/botgate.js — so this one walk is led from here) */
 { const _ub = updBot; let said = 0;
   updBot = function(dt){ const r = _ub.apply(this, arguments);
-    if (BOT.on && MAP_ID === 0 && !(BOT.pause > 0) && !P.dead && !(typeof DG !== 'undefined' && DG.active) && !(typeof S !== 'undefined' && S.aq) && typeof FIELDS306 !== 'undefined'){ const gt = f306Gate(FIELDS306.id);
+    if (BOT.on && MAP_ID === 0 && !(BOT.pause > 0) && !P.dead && !BOT.resting && BOT.state !== 'rest' &&   /* (v347) not while it rests to heal in town (bot.js) */ !(typeof DG !== 'undefined' && DG.active) && !(typeof S !== 'undefined' && S.aq) && typeof FIELDS306 !== 'undefined'){ const gt = f306Gate(FIELDS306.id);
       if (gt){ if (T - said > 20){ said = T; toast(L('ในเมืองไม่มีมอนสเตอร์ · Auto พาออกไปทุ่งสุวรรณิน', 'No monsters in town · Auto is heading out to the Suwannin Fields')); }
         P.target = null; P.pending = null; BOT.roam = null; P.tx = gt.x; P.ty = gt.y; BOT.state = 'roam';
         if (Math.hypot(gt.x - P.x, gt.y - P.y) < 70) travel(FIELDS306.id, 0); } }

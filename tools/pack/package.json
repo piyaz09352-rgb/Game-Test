@@ -1,0 +1,6 @@
+{
+  "name": "vayrathen-pack",
+  "private": true,
+  "description": "builds the upload pack (tools/pack/build.js): joins scripts and styles into a few files, strips comments",
+  "dependencies": { "acorn": "8.14.0", "acorn-walk": "8.3.4", "esbuild": "0.24.2" }
+}

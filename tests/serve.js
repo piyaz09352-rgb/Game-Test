@@ -1,7 +1,7 @@
 /* VAYRATHEN — tests/serve.js — a tiny static file server for the browser tests (no dependencies) */
 'use strict';
 const http = require('http'), fs = require('fs'), path = require('path');
-const ROOT = path.resolve(__dirname, '..');
+const ROOT = process.env.VAY_ROOT ? path.resolve(process.env.VAY_ROOT) : path.resolve(__dirname, '..');   // (v347) VAY_ROOT=dir: serve a built pack (tools/pack/build.js) instead of the source
 const TYPES = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.json': 'application/json', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.svg': 'image/svg+xml', '.mp3': 'audio/mpeg' };
 
@@ -15,7 +15,7 @@ function serve(port = 0){
       if (err){ res.writeHead(404); return res.end('not found'); }
       res.writeHead(200, { 'Content-Type': TYPES[path.extname(f)] || 'application/octet-stream' });
       // the live site is on season 2 (login rebuilt); the suite's baseline is season 1 so gm.test.js can raise it to 2 itself
-      if (f.endsWith(path.join('js', 'net', 'firebase-config.js'))) buf = Buffer.from(String(buf).replace('RESET_SEASON = 2;', 'RESET_SEASON = 1;'));
+      if (f.endsWith(path.join('js', 'net', 'firebase-config.js')) || f.includes(path.join('js', 'pk') + path.sep)) buf = Buffer.from(String(buf).replace(/RESET_SEASON ?= ?2;/, 'RESET_SEASON = 1;'));
       res.end(buf);
     });
   });

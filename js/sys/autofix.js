@@ -24,8 +24,9 @@ const AFX = {tgt:null, hp:0, tgtT:0, roamD:0, roamT:0, restT:0, restCd:0, px:0, 
       if (d < AFX.roamD - 20 || !AFX.roamD){ AFX.roamD = d; AFX.roamT = 0; }
       else if ((AFX.roamT += dt) > 5){ BOT.roam = null; AFX.roamD = 0; AFX.roamT = 0; }
     } else { AFX.roamD = 0; AFX.roamT = 0; }
-    // resting: cap it
-    if (BOT.resting){
+    // resting: cap it — (v347) except at home in Aren (no monsters): there it rests until topped up (bot.js), or a hurt
+    // newcomer without potions walked straight back out at 30% HP
+    if (BOT.resting && MAP_ID !== 0){
       const hp = S.hp / DER.maxhp, sp = S.sp / DER.maxsp, spGoal = JOBS[S.job].caster ? .6 : 0;
       AFX.restT += dt;
       if (AFX.restCd > 0 || AFX.restT > 12 || (hp >= .75 && sp >= spGoal)){

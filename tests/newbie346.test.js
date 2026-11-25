@@ -4,7 +4,7 @@
    any monster of the map made an alpha — was set down beside the newcomer (a Lv 13 lantern by the field gate). Checked:
    · a new hero starts with full HP and SP
    · the arrow shows a monster the hero can beat (no more than 2 levels above)
-   · no festival spirit during the tutorial; afterwards one near the hero's level, and calm (it waits to be challenged)
+   · no festival spirit during the tutorial or in a fight (v347); afterwards one near the hero's level, and calm (it waits to be challenged)
    · the first kill leaves loot for the «pick up» step (a kill that dropped nothing left the newcomer stuck)
    · a newcomer led out by «พาไป» who fights what the arrow shows for 45 s is still alive */
 const test = require('node:test'), assert = require('node:assert');
@@ -30,7 +30,13 @@ test('a brand-new hero: full HP, a beatable arrow target, no alpha beside them, 
       let t = 0; while (t < 45 && !P.dead){ const m = tutMob(); if (m && (!P.target || P.target.dead)) P.target = m; await new Promise(r => setTimeout(r, 500)); t += .5; }
       out.alive = !P.dead; out.lvl = S.lvl;
       // after the tutorial: the next spirit is near the hero's level and calm
-      S.tut.done = true; tutShow(); EVB.slot = -1; EVB.m = null; await new Promise(r => setTimeout(r, 600));
+      S.tut.done = true; tutShow(); P.dead = false; S.hp = DER.maxhp; P.target = null; P.cast = null;
+      // (v347) in a fight it waits: a monster chasing the hero
+      for (const m of mobs) if (!m.dead && m.aggro){ m.dead = true; m.deadT = 99; }
+      const foe = spawnMob('dewblob', P.x + 60, P.y, {zone:MAPZ}); foe.aggro = true; foe.calm = false; foe.hp = foe.maxhp = 1e9;
+      EVB.slot = -1; EVB.m = null; await new Promise(r => setTimeout(r, 600)); out.spiritInFight = !!EVB.m;
+      foe.dead = true; foe.deadT = 99; for (const m of mobs) if (!m.dead && m.aggro){ m.dead = true; m.deadT = 99; } S.hp = DER.maxhp;
+      EVB.slot = -1; EVB.m = null; await new Promise(r => setTimeout(r, 600));
       out.spirit = EVB.m ? {lv:EVB.m.def.lvl, calm:!!EVB.m.calm, aggro:!!EVB.m.aggro} : null; out.lvlNow = S.lvl;
       return out; });
     assert.strictEqual(r.hp, r.maxhp, 'full HP at the start'); assert.strictEqual(r.sp, r.maxsp, 'full SP at the start');
@@ -39,7 +45,8 @@ test('a brand-new hero: full HP, a beatable arrow target, no alpha beside them, 
     assert.ok(r.arrowLv >= 1 && r.arrowLv <= 3, 'the arrow shows a monster a Lv 1 hero can beat: Lv ' + r.arrowLv);
     assert.ok(r.lootAfterKill, 'the first kill leaves something for the «pick up loot» step');
     assert.ok(r.alive, `alive after 45 s of fighting (reached Lv ${r.lvl})`);
-    assert.ok(r.spirit, 'a festival spirit comes once the tutorial is over');
+    assert.ok(!r.spiritInFight, 'no festival spirit in the middle of a fight');
+    assert.ok(r.spirit, 'a festival spirit comes once the tutorial is over and it is quiet');
     assert.ok(r.spirit.lv <= r.lvlNow + 3, `the spirit is near the hero's level (Lv ${r.spirit.lv} for a Lv ${r.lvlNow} hero)`);
     assert.ok(r.spirit.calm && !r.spirit.aggro, 'and it waits to be challenged');
   } finally { await close(); }
