@@ -63,6 +63,10 @@ const EVB = {slot:-1, m:null};
 EV.on('tick', () => {
   const id = evLive(); if (!id || MAP_ID === 0 || P.dead || (typeof DG !== 'undefined' && DG.active) || (typeof nmSlave === 'function' && nmSlave())) return;
   if (typeof tutOn === 'function' && tutOn()) return;   // (v346) not while a newcomer is still in the tutorial
+  /* (v347) and only in a quiet moment, like the daily reward window: not in a fight (a monster chasing you within 500 px,
+     a boss on you), not with HP under 60%, not while casting — the slot waits, so it still comes once things calm down */
+  if (S.hp < DER.maxhp * .6 || P.cast || (P.target && !P.target.dead && P.target.def && P.target.def.boss)
+    || mobs.some(m => !m.dead && (m.aggro || (m.def && m.def.boss && m.aggro !== false && Math.hypot(m.x - P.x, m.y - P.y) < 400)) && Math.hypot(m.x - P.x, m.y - P.y) < 500)) return;
   const c = thaiClock(), slot = Math.floor((c.h * 60 + c.m) / 15); if (slot === EVB.slot) return;
   if (EVB.m && !EVB.m.dead) return; EVB.slot = slot;
   /* (v346) a monster of the hero's level: it used to be any monster of the map, made an alpha with double HP and set
