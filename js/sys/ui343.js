@@ -7,7 +7,12 @@
 { const _h6c = typeof h6Chips === 'function' ? h6Chips : null;
   const place = () => { const ch = el('chips'), mc = el('mapCard'), ui = el('ui'); if (!ch || !mc || !ui) return false;
     const inside = ui.classList.contains('h6') && !mc.classList.contains('folded') && mc.offsetWidth > 0;
+    // decide again only when something that matters changed (not every frame: moving it in and out to measure would flicker)
+    const key = [inside, mc.clientWidth, [...ch.children].filter(e => !e.hidden && e.style.display !== 'none').map(e => e.textContent).join('|')].join('/');
+    if (key === place.key) return ch.parentNode === mc; place.key = key;
     if (inside && ch.parentNode !== mc){ mc.appendChild(ch); ch.classList.add('inmap'); }
+    // (v345) more chips than fit across the card (Auto · ออนไลน์ · พักจอ · GM on a phone): they go under the card instead
+    if (inside && ch.offsetWidth > mc.clientWidth - 12){ ui.appendChild(ch); ch.classList.remove('inmap'); return false; }
     else if (!inside && ch.parentNode === mc){ ui.appendChild(ch); ch.classList.remove('inmap'); }
     return inside; };
   if (_h6c) h6Chips = function(){ if (place()) return; return _h6c.apply(this, arguments); };
