@@ -51,6 +51,7 @@ window.addEventListener('resize', () => setTimeout(menuFit, 120));
 document.addEventListener('pointerdown', e => {
   const rl = el('rail'); if (!rl || rl.classList.contains('folded') || RAIL.fold) return;
   if (e.target.closest && e.target.closest('#rail')) return;
+  if (e.target.closest && e.target.closest('[data-h6="menu"], #railTog')) return;   // (v345) the owner: «the window won't close» — the menu button itself folds it on its click (folding here first made that click open it again)
   setRail(true);
 }, true);
 /* the pop-up: a card of its own above everything, under the menu button, springing up once as it opens */

@@ -13,5 +13,6 @@
   Only for a real update (a version with several changes); a small fix needs no pack — just commit and push.
 - Balance: `node tools/balance-report.js 300` (Auto plays every class at Lv 15/45/80/115 → docs/BALANCE.md); `BOSS=1` for solo boss fights → docs/BALANCE_BOSS.md; `LINES=rune,occult` to limit. (Each run keeps the other lines in docs/balance-rows.json; `REPORT_ONLY=1` rebuilds the report.) Tune in js/sys/balance192.js · mobs192.js · boss192.js · economy.js, then re-run.
 - Playtest bots (local only, no live accounts): `npm run playtest` (24 bots from Lv 1, ~25 min) · `npm run playtest:high` (start at Lv 50/100/150) → docs/PLAYTEST.md. Run before a real update; `OUT=path` writes the report elsewhere.
+- UI is checked every version by tests/uiwin345 (all windows × tabs: ✕ closes, no giant pictures, nothing wider than the window) and tests/hudlay345 (HUD at the 4 sizes: pieces on screen, no overlaps, chips tidy, menu opens/closes). When the owner reports a UI fault, add that case to one of them.
 - Tests: `npm run test:fast` (set `CHROMIUM_PATH=/opt/pw-browsers/chromium` in the cloud container).
 - Firebase rules (`firebase/*.rules*`), online code or `_headers`: also `npm run test:rules` (emulators, needs Java: attacks the rules, replays the honest game, plays the real website path). Publishing the rules is the owner's job (Firebase Console), say so.

@@ -21,7 +21,7 @@ function t269Garden(){
   const p = arnPlaza(); if (!p) return;
   for (let i = obstacles.length - 1; i >= 0; i--) if (obstacles[i].t269) obstacles.splice(i, 1);
   for (let i = 0; i < T269_BEDS.length; i += 2){ const [x, y] = arnAt(p, T269_BEDS[i], T269_BEDS[i + 1]); obstacles.push({x, y, r:8, t269:true}); }
-  for (const [fx, fy] of T269_FOUNT){ const [x, y] = arnAt(p, fx, fy); obstacles.push({x, y, r:22, t269:true}); }
+  /* (v345) no fountain, nothing to walk round */ if (typeof ARN_WATER === 'undefined' || ARN_WATER) for (const [fx, fy] of T269_FOUNT){ const [x, y] = arnAt(p, fx, fy); obstacles.push({x, y, r:22, t269:true}); }
   NAV.grid = null;
   // (v272) where you wake / arrive in Aren: on the open golden flower in the middle of the garden (it was at the fountain's back edge)
   if (typeof VSPAWN !== 'undefined'){ const [fx, fy] = arnAt(p, .5, .45); if (!walkable(VSPAWN.x, VSPAWN.y, 12) && walkable(fx, fy, 12)){ VSPAWN.x = Math.round(fx); VSPAWN.y = Math.round(fy); }
