@@ -41,12 +41,15 @@ function tgtCmp(a, b){ const da = dist(a, P), db = dist(b, P); return Math.abs(d
 function pickTarget(){
   const th = threats().filter(m => !BOT.skip.has(m));
   if (th.length) return th.sort(tgtCmp)[0];
-  const all = mobs.filter(m => botOk(m) && dist(m, P) < BOT_CFG.seek), fit = all.filter(botFits);
+  const all = mobs.filter(m => botOk(m) && dist(m, P) < BOT_CFG.seek && botInZone(m) && (!m.evb || botFits(m))), fit = all.filter(botFits);
   return (fit.length ? fit : all).sort(tgtCmp)[0] || null;   // (v320) monsters near its own level first
 }
 /* (v320) Auto picks a fight it can win: a monster more than 5 levels above the hero is left alone while others are about
    (one that attacks is still fought back: threats() come first) */
-const botFits = m => !m.def || !m.def.lvl || m.def.lvl + (m.elite ? 5 : 0) <= S.lvl + 5;   // a pack leader (4× HP, harder hits) counts as 5 levels higher
+const botFits = m => !m.def || !m.def.lvl || m.def.lvl + (m.evb ? 12 : m.elite ? 8 : 0) <= S.lvl + 5;   // a pack leader (4× HP, harder hits) counts as 8 levels higher, a festival spirit (8× HP) as 12 — (v347) at +5 an alpha Lv 9 boar «fitted» a Lv 9 newcomer and killed it
+/* (v347) in the starter fields Auto keeps to the part that suits its level (f306Zone): it used to walk to «the nearest
+   monster it would fight, wherever it is», and at night that led a Lv 8 hero into the Lv 13 lanterns (tools/first-play.js) */
+const botInZone = m => { const z = typeof f306Zone === 'function' && f306Zone(); return !z || (m.x >= z.x0 - 150 && m.x <= z.x1 + 150); };
 /* ---------- Auto skill set (saved per character in S.bot) ----------
    list: the player's own priority order of active skills, each on/off. basic: use normal attacks.
    buff: keep the ticked buffs up. heal: heal skills fire below this HP %. spKeep: SP % kept in reserve. */
@@ -179,10 +182,12 @@ function updBot(dt){
     if (k && (!threats().length || hp < BOT_CFG.retreatHp * .6)){ BOT.state = 'retreat'; if (P.sit) P.sit = false; P.target = null; P.pending = null;
       if (Math.hypot(k.x - P.x, k.y - P.y) < 70){ warpTo(0); return; }
       if (!P.ride && canRideNow()){ P.ride = true; renderHotbar(); } P.tx = k.x; P.ty = k.y + 40; renderBotChip(); return; } }
-  if (hp < BOT_CFG.retreatHp && !hpPot && MAP_ID === 0 && !inVillage(P)){
-    BOT.state = 'retreat'; if (P.sit) P.sit = false;
-    P.target = null; P.pending = null; if (!P.ride && canRideNow() && th.length === 0){ P.ride = true; renderHotbar(); }
-    P.tx = 300; P.ty = 860; renderBotChip(); return;
+  /* (v347) home in Aren, hurt and out of potions: sit down right here and rest until topped up. Aren has had no monsters
+     since v306, but Auto still walked to the old village corner (300, 860) — now beside the gate to the fields — went out
+     at 7% HP, warped home again, and round and round for minutes (tools/first-play.js) */
+  if (MAP_ID === 0 && !th.length && (BOT.resting || (hp < BOT_CFG.retreatHp * 2 && !hpPot))){
+    if (hp < BOT_CFG.restUntilHp){ BOT.resting = true; if (!P.sit){ P.ride = false; P.target = null; P.tx = null; P.npc = null; P.sit = true; renderHotbar(); } BOT.state = 'rest'; renderBotChip(); return; }
+    BOT.resting = false;
   }
   // rest until topped up
   const bs = botSet();
@@ -209,7 +214,7 @@ function updBot(dt){
   if (!BOT.roam || Math.hypot(BOT.roam.x - P.x, BOT.roam.y - P.y) < 30){
     BOT.roam = null;
     {   // head for the nearest monster Auto would fight, wherever it is on the map
-      const ok = mobs.filter(m => botOk(m)), fit = ok.filter(botFits), near = (fit.length ? fit : ok).sort((a, b) => dist(a, P) - dist(b, P)).slice(0, 4);
+      const ok = mobs.filter(m => botOk(m) && botInZone(m)), fit = ok.filter(botFits), near = (fit.length ? fit : ok).sort((a, b) => dist(a, P) - dist(b, P)).slice(0, 4);
       const bm = near.find(m => findPath(P.x, P.y, m.x, m.y)); if (bm) BOT.roam = {x:bm.x, y:bm.y}; }
     for (let i = 0; i < 6 && !BOT.roam; i++){ const q = randIn(zone, 18); if (botAvoid() && botBosses().some(m => Math.hypot(m.x - q.x, m.y - q.y) < BOT_BOSS.near + 100)) continue; if (walkable(q.x, q.y, 18) && findPath(P.x, P.y, q.x, q.y)) BOT.roam = q; }
     if (!BOT.roam){ renderBotChip(); return; }

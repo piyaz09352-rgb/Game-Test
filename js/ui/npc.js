@@ -41,7 +41,7 @@ function openNpc(n){
       const pj = Math.min(100, S.jlvl / j.jobMax * 100);
       body = `<div class="prog"><span>Job Lv ${S.jlvl} / ${j.jobMax}</span><div class="pbar"><i style="width:${pj}%"></i></div></div>
         ${j.tier === 2 || j.tier === 3 ? (need => `<div class="prog"><span>Base Lv ${S.lvl} / ${need}</span><div class="pbar"><i style="width:${Math.min(100, S.lvl / need * 100)}%"></i></div></div>`)(j.tier === 2 ? 40 : 150) : ''}
-        <p class="hint">${block}</p>`;
+        <p class="hint">${block}</p>${/Skill Point|สกิล|เรียน|Learn/.test(block) || (SKILLS.ready && block.includes(skName(SKILLS.ready))) ? `<div class="row"><button class="btn gold sm" data-npcwin="skill">${L('เปิดหน้าต่างสกิล', 'Open Skills')}</button></div>` : ''}`;   // (v347) the newcomer at Job 10 did not know where to learn it
     } else {
       say = L(`${nm(j)}ผู้ยิ่งใหญ่ เจ้าถึงขั้นสูงสุดแล้ว จงปกป้องอาณาจักรวายรา`, `Great ${nm(j)}, you have reached the summit. Protect the realm of Vayra.`);
     }
@@ -104,3 +104,8 @@ function openNpc(n){
     g.imageSmoothingEnabled = false; g.drawImage(c, fs / 2 - 16 * K, sh.anchor[1] - 46 * K, 32 * K, 32 * K, 0, 0, 48, 48); }
 }
 function closeDialog(){ const d = $('#dialog'); clearInterval(d._type); if (!d.hidden) d.hidden = true; if (d.dataset.say) d.dataset.say = ''; }   // (v91) Auto calls this every step: no write when already closed
+/* (v347) a button in an NPC's dialog that opens one of the game's windows (closing the dialog) */
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-npcwin]'); if (!b) return; closeDialog();
+  // from Master Vayra at Job 10: the skill the change needs is shown first, with what it needs before it
+  if (b.dataset.npcwin === 'skill' && typeof SKSEL !== 'undefined' && SKILLS.ready && !skl('ready')) SKSEL = 'ready';
+  if (typeof openWin === 'function') openWin(b.dataset.npcwin); });
