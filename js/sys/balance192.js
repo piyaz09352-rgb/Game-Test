@@ -14,7 +14,7 @@ const LINE_POW = {   // [tier 1 (Lv <40), tier 2, tier 3, tier 4] · (v324) retu
 /* (v323) the slot a line uses is its job tier, and the last job is reached around Lv 70, so the fourth slot is never used:
    a Lv 115 hero still uses the third. The ranger kept pace at Lv 80 (82 % of the average) but fell to 54 % at Lv 115,
    where monster HP outgrows its arrows: from Lv 100 on its damage is raised on top of its slot */
-const LINE_LV100 = {blade:1.58, rune:0.98, healer:0.69, ranger:1.72, rogue:1.08, summoner:1.03, occult:0.67, merchant:0.95, catfolk:1.32, dogfolk:1.13};
+const LINE_LV100 = {blade:1.58, rune:0.98, healer:0.69, ranger:1.72, rogue:1.08, summoner:1.03, occult:0.67, merchant:0.85, catfolk:1.32, dogfolk:1.13};
 function linePow(){
   const ch = jobChain(), line = ch[1]; if (!line || !LINE_POW[line]) return 1;
   return (LINE_POW[line][Math.min(3, Math.max(0, ch.length - 2))] || 1) * ((S.lvl || 1) >= 100 && LINE_LV100[line] || 1);
