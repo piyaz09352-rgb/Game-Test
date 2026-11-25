@@ -402,6 +402,7 @@ const ACTIONS = {
   idle:{n:6, fps:5, loop:true, th:'ยืน'}, walk:{n:8, fps:12, loop:true, th:'เดิน'}, attack:{n:5, fps:12, th:'โจมตี', dur:[.7, 1.55, .5, 1.3, .95]},
   skill:{n:5, fps:10, th:'ใช้สกิล', dur:[.6, 1.6, .55, 1.35, .9]}, cast:{n:4, fps:8, loop:true, th:'ร่ายเวท'}, roll:{n:6, fps:14, th:'กลิ้งหลบ'},
   capture:{n:6, fps:10, th:'จับสัตว์'}, rideIdle:{n:4, fps:5, loop:true, th:'ขี่ (หยุด)'}, ride:{n:6, fps:11, loop:true, th:'ขี่ (วิ่ง)'},
+  cheer:{n:6, fps:7, th:'ฉลองชัย'}, tired:{n:6, fps:4, loop:true, th:'เหนื่อยหอบ'},   // (v344)
   hurt:{n:5, fps:16, th:'โดนตี', dur:[.6, 1, 1.2, 1, .8]}, die:{n:7, fps:9, th:'ล้ม', dur:[.7, .9, 1, 1, .9, 1.1, 1.4]}, sit:{n:4, fps:3, loop:true, th:'นั่งพับเพียบ'},   // (v342) hurt and death as the monsters have them
   // ---------- skill poses (each skill names one in SKILL_ACT, js/data/jobs.js) ----------
   punch:{n:6, fps:14, th:'หมัดชุด'}, knee:{n:5, fps:11, th:'เข่าลอย'}, kick:{n:6, fps:14, th:'เตะตัด'}, spinkick:{n:8, fps:16, th:'จระเข้ฟาดหาง'},
@@ -548,6 +549,21 @@ const GUARD = P => { P.armL = P.armR = 1.05; P.elbL = P.elbR = 1.45; P.outL = P.
 const WAI = (P, up = 0) => { P.armL = P.armR = .92 + up; P.elbL = P.elbR = 1.72; P.outL = P.outR = -.44; P.noWeapon = true; };
 const pick = (a, f) => a[Math.min(f, a.length - 1)];
 const SK_POSE = {
+  /* (v344) a short victory (a boss down, a level up), by what is in the hand: a blade thrust up at the sky, a staff raised
+     and spun once over the head, a bow held up high, bare fists or claws: a wai, then a fist raised. Feet on the ground. */
+  cheer(P, f, n, weapon){ const k = f / (n - 1), up = Math.min(1, k * 2.2) * (k > .85 ? 1 - (k - .85) / .15 * .3 : 1);
+    P.eyes = k > .25 && k < .8 ? 'closed' : 'open'; P.mouth = k > .2 && k < .85 ? 1 : 0; P.head = .12 * up; P.lean = -.06 * up; P.bob = .35 * Math.sin(k * Math.PI);
+    // the raised hand sits beside the head (a chibi's short arm held straight up hides behind the hair), the weapon carries the line on up
+    if (weapon === 'sword' || weapon === 'dagger'){ P.armR = .5 + 2.05 * up; P.elbR = .5 - .2 * up; P.outR = .2 + .4 * up; P.wpn = 1.7 - .25 * up; P.armL = .4 + .2 * up; P.outL = .45; P.elbL = .6; }
+    else if (weapon === 'staff'){ P.armR = .5 + 2.05 * up; P.elbR = .3; P.outR = .2 + .4 * up; P.wpn = 1.7 - .25 * up + Math.sin(k * Math.PI * 2) * .5 * up; P.armL = .5 + 1.6 * up; P.outL = .55; P.elbL = .5; P.glow = up; }
+    else if (weapon === 'bow'){ P.armL = .5 + 1.95 * up; P.elbL = .15; P.outL = .25 + .55 * up; P.armR = .5 + 1.85 * up; P.outR = .25 + .55 * up; P.elbR = .3; }   // the bow held up overhead in both hands
+    else { if (k < .4 && typeof WAI === 'function'){ WAI(P, 0); P.head = .15; P.eyes = 'closed'; }   // a wai first, head bowed…
+      else { const u = Math.min(1, (k - .4) * 4); P.armR = .5 + 1.9 * u; P.elbR = .5 + .9 * u; P.outR = .2 + .55 * u; P.armL = .5 + 1.9 * u; P.elbL = .5 + .9 * u; P.outL = .2 + .55 * u; P.head = .1 * u; } } },   // …then both fists up
+  /* (v344) worn out (low HP, standing): bent over, hands near the knees, the shoulders rising and falling as it pants */
+  tired(P, f, n, weapon){ const b = Math.sin(f / n * Math.PI * 2);
+    P.lean = .34 + b * .03; P.head = -.1 + b * .04; P.bob = -1.2 + b * .25; P.breath = .3 + b * .2; P.mouth = 1; P.eyes = f % 3 === 2 ? 'closed' : 'hurt';
+    P.armL = .6 + b * .04; P.elbL = .9; P.outL = .15; P.armR = .55 + b * .04; P.elbR = .5; P.outR = .25; P.legL = .18; P.legR = -.12;
+    if (weapon === 'sword' || weapon === 'dagger') P.wpn = .8 - P.armR * .75; else if (weapon === 'staff'){ P.armR = .45; P.outR = .5; P.wpn = 2.78 - P.armR + .32; } },
   punch(P, f){ GUARD(P); P.lean = .06;
     if (f === 1){ P.armR = 1.58; P.elbR = .04; P.outR = -.06; P.lean = .14; P.twist = .32; P.legL = .45; }
     if (f === 3){ P.armL = 1.58; P.elbL = .04; P.outL = -.06; P.lean = .16; P.twist = -.36; P.legR = -.36; }
@@ -970,7 +986,7 @@ function humanPose(act, f, n, weapon, wk = {}){
       P.armL = .4 + .6 * kn; P.elbL = .9; P.outL = .15;
       P.fall = 1.38 * fl; if (fl > .3){ P.armR = .5 + .9 * fl; P.armL = .6 + .8 * fl; P.outL = P.outR = .25; P.wpn = .8 - P.armR * .75; } }
     else if (staff){   // the staff slips: the arm drops, the staff swings down, the body goes over backwards
-      P.armR = .5 - .3 * kn; P.elbR = .3; P.outR = .5; P.wpn = 2.78 - P.armR + .32 + 1.3 * ss(.3, .7);   // upright, then tipping away P.lean = -.3 * st + .15 * kn - .2 * fl;
+      P.armR = .5 - .3 * kn; P.elbR = .3; P.outR = .5; P.wpn = 2.78 - P.armR + .32 + 1.3 * ss(.3, .7); P.lean = -.3 * st + .15 * kn - .2 * fl;   // upright, then tipping away
       P.fall = -1.5 * fl; if (fl > .3){ P.armL = P.armR = .6 + 1.7 * fl; P.outL = P.outR = .5; P.legL = .1; P.legR = -.1; } }
     else {   // a hand to the chest, onto the knees, then back
       const hc = ss(.05, .3) * (1 - ss(.55, .75)); P.armL = .5 + .55 * hc; P.elbL = .5 + 1.7 * hc; P.outL = .3 - .7 * hc; P.lean = -.3 * st + .25 * kn - .15 * fl;
@@ -2135,7 +2151,7 @@ const CHARS = {
   // ages: the villager is a 15-year-old (a little shorter); every class is a young adult of about 18.
   // Modern fantasy look: no ancient helmets or tall hats — spiky anime hair, fitted jackets with trims and zips,
   // boots, gloves, scarves and long coats. A light Thai accent survives in the colours and small details.
-  novice:{name:'ชาวบ้าน', en:'Villager', bodyScale:.9, paint:true, hair:'hairBrown', iris:'irisBr', top:'tech', sleeve:'navy', forearm:'skin', pants:'navy', boots:'leather', bootCuff:'tech', belt:'leather',
+  novice:{name:'ชาวบ้าน', en:'Villager', paint:true, hair:'hairBrown', iris:'irisBr', top:'tech', sleeve:'navy', forearm:'skin', pants:'navy', boots:'leather', bootCuff:'tech', belt:'leather',
     weapon:'dagger', aura:'auraWhite', pouch:true, jag:.22, bangF:14, strands:11, spikes:16, spikeLen:4.8, bangs:true, paintBangs:BANG_SWEEP, crown:4, lockLines:12,
     topTex:n => (n[1] > .42 ? {m:M.navy} : n[2] > .5 && Math.abs(n[0]) < .04 && n[1] > -.4 ? {m:M.steel} : undefined)},
   // นักดาบ: navy fitted jacket with red trim and a steel zip, black gloves, red headband, steel shoulder guard
@@ -2310,7 +2326,7 @@ function applyLook(cfg, lk){
   const f = lk.sex === 'f', list = f ? HAIR_F : HAIR_M, st = {...(list[(lk.hair | 0) % list.length] || {})}, deco = st.deco; delete st.deco;
   if (!cfg.beard) Object.assign(cfg, st);
   // she: big sparkling eyes, rosy cheeks, a ribbon bow or a flower pin, a petite frame
-  if (f){ cfg.lashes = true; cfg.cute = true; cfg.slim = .88; cfg.bodyScale = (cfg.bodyScale || 1) * .96;
+  if (f){ cfg.lashes = true; cfg.cute = true; cfg.slim = .88;   /* (v344) the owner: «why aren't the scales the same?» — she is slimmer, not shorter: one height for every person */
     if (deco) cfg[deco[0]] = deco[1];
     if (cfg.iris === 'irisBr') cfg.iris = 'irisPk';
     if (!cfg.skirt) cfg.skirt = [11.2, 5.6, 6.1, 8.2, cfg.top, cfg.bootCuff || cfg.belt || cfg.top]; }
@@ -2705,9 +2721,12 @@ function lazyQ(sh, e, f){
     if (LAZY.length) idle(step, {timeout:200}); };
   idle(step, {timeout:200});
 }
+/* (v343) the owner: the heroes (players, AI adventurers, townsfolk) read small beside their name plates — they are drawn 15%
+   larger than the monsters' scale (monsters keep theirs) */
+const CHAR_K = 1.15;
 function draw(g, sh, act, dir, t, x, y, o = {}){
   // (v305) on the game canvas every figure is drawn larger than the scenery, about its feet (render.js ACTOR)
-  if (!o._as && typeof ACTOR !== 'undefined' && ACTOR.s !== 1 && g.canvas === ACTOR.cv){ g.save(); g.translate(x, y); g.scale(ACTOR.s, ACTOR.s); g.translate(-x, -y); try { return draw(g, sh, act, dir, t, x, y, {...o, _as:1}); } finally { g.restore(); } }
+  if (!o._as && typeof ACTOR !== 'undefined' && ACTOR.s !== 1 && g.canvas === ACTOR.cv){ const ks = ACTOR.s * (sh.kind === 'char' || (MOBS[sh.key] && MOBS[sh.key].human) ? CHAR_K : 1);   /* (v344) a monster in a human body stands on the heroes' scale too */ g.save(); g.translate(x, y); g.scale(ks, ks); g.translate(-x, -y); try { return draw(g, sh, act, dir, t, x, y, {...o, _as:1}); } finally { g.restore(); } }
   if (!sh.index[act]) act = 'idle';
   let e = strip(sh, act, dir); const fs = sh.fs, K = sh.K, flip = sh.kind === 'mob' && dir > 4; let f = o.frame ?? frameAt(sh, act, t);
   // rasterise on demand, but only ~6 ms per display frame (v83: was 10, and a strip with no ready frame was always
@@ -2742,7 +2761,7 @@ function draw(g, sh, act, dir, t, x, y, o = {}){
     else g.drawImage(fr.c, l, dy + fr.y / K, w, fr.c.height / K); }
   const ws = e.ws && e.ws[f]; if (ws && WDRAWS.length < 200) WDRAWS.push({g, x, y, mt:sh.kind === 'mob' && g.getTransform ? g.getTransform() : null, segs:ws.map(([a, b]) => flip ? [2 * x - dx - a.x / K, dy + a.y / K, 2 * x - dx - b.x / K, dy + b.y / K] : [dx + a.x / K, dy + a.y / K, dx + b.x / K, dy + b.y / K])});
   const ss = e.ss && e.ss[f]; if (ss && SDRAWS.length < 200) SDRAWS.push({g, x, y, segs:ss.map(([a, b]) => [dx + a.x / K, dy + a.y / K, Math.max(2, Math.hypot(b.x - a.x, b.y - a.y) / K)])});
-  if (o._as && sh.kind !== 'mob'){ const k = ACTOR.s, fx = v => x + (v - x) * k, fy = v => y + (v - y) * k;   // (v305) a hero's blade and shield, for the glows drawn afterwards in plain map coordinates
+  if (o._as && sh.kind !== 'mob'){ const k = ACTOR.s * (sh.kind === 'char' ? CHAR_K : 1), fx = v => x + (v - x) * k, fy = v => y + (v - y) * k;   // (v305) a hero's blade and shield, for the glows drawn afterwards in plain map coordinates
     if (ws && WDRAWS.length && WDRAWS[WDRAWS.length - 1].x === x){ const d = WDRAWS[WDRAWS.length - 1]; d.segs = d.segs.map(q => [fx(q[0]), fy(q[1]), fx(q[2]), fy(q[3])]); }
     if (ss && SDRAWS.length && SDRAWS[SDRAWS.length - 1].x === x){ const d = SDRAWS[SDRAWS.length - 1]; d.segs = d.segs.map(q => [fx(q[0]), fy(q[1]), q[2] * k]); } }
   g.imageSmoothingEnabled = sm; g.imageSmoothingQuality = sq;

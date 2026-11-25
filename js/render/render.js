@@ -228,7 +228,7 @@ function nameTag(x, y, s, col = '#fff', bg = 'rgba(20,18,30,.72)'){
    Everything scales with the world zoom (PX, which already follows the screen size and the zoom buttons), so the plate keeps
    the same proportion to the character on phones, tablets, laptops and 4K screens. */
 const TAG_Z = () => clamp(PX / 2, .45, 2.8) * (typeof SETTINGS !== 'undefined' && +SETTINGS.uiScale ? clamp(+SETTINGS.uiScale, .7, 1.3) : 1);   // (v132) five UI sizes
-const HEAD_H = ride => (ride ? 58 : 43) * ACTOR.s;          // world units from the feet to just above the hair (riding: the mount lifts you)
+const HEAD_H = ride => (ride ? 58 : 43) * ACTOR.s * (typeof CHAR_K !== 'undefined' ? CHAR_K : 1);   // (v343) heroes are drawn CHAR_K larger          // world units from the feet to just above the hair (riding: the mount lifts you)
 const HERO_NAME = {me:['#fffdf0', '#ffe08a', '#e8a032', 'rgba(255,190,70,', '#3a1a04'], mate:['#f4fff8', '#9ff0c8', '#2fb884', 'rgba(90,240,170,', '#05301e'], other:['#f6f9ff', '#cfe0ff', '#7fa2e8', 'rgba(140,180,255,', '#0c1838']};
 /* draws title / name / guild stacked upward from headY (screen px) and returns the top of the stack.
    The name: a deep outline, a thin gold rim, a gilded gradient fill with a band of light sweeping across it, a pulsing
@@ -293,7 +293,7 @@ function titlePlaque(x, bottom, t, tier, z, pul, star){
       ctx.globalAlpha = .4 + .6 * k; ctx.fillStyle = `hsl(${(i * 72 + T * 60) % 360},100%,80%)`; star(px, py, (1.2 + 1.6 * k) * z); } ctx.restore(); }
   ctx.restore(); return top;
 }
-const NAME_K = 2;   // name, guild and title over a hero's head are drawn twice the base tag size
+const NAME_K = 1.45;   // name, guild and title over a hero's head (v343: the owner found them too big beside the hero — 2 → 1.45)
 function heroName(x, headY, s, kind = 'me', opt = {}){
   const ctx = NCTX || MAINCTX;
   const z = TAG_Z() * NAME_K;
@@ -339,11 +339,11 @@ function heroName(x, headY, s, kind = 'me', opt = {}){
 }
 /* floating numbers: a quick pop, a dark outline and a glow in their own colour; criticals: see drawCrit */
 function drawDmgText(t){
-  const k = t.t / t.life, z = clamp(PX / 2.2, 1.15, 2.6), crit = t.size >= 20 && /!$/.test(t.s), x = sx(t.x), y = sy(t.y);
+  const k = t.t / t.life, z = clamp(PX / 2.2, 1.15, 2.6) * .78, crit = t.size >= 20 && /^[+-]?[\d,.]+!$/.test(t.s), x = sx(t.x), y = sy(t.y);
   ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.lineJoin = 'round';
   if (!crit){
     const pop = k < .1 ? 1.35 - k / .1 * .35 : 1; ctx.globalAlpha = 1 - k * k; ctx.translate(x, y); ctx.scale(pop * z, pop * z);
-    ctx.font = FD(800, t.size); if (t.ring){ ctx.lineWidth = 11; ctx.strokeStyle = t.ring; ctx.strokeText(t.s, 0, 0); } ctx.globalAlpha *= .4; ctx.lineWidth = 8; ctx.strokeStyle = t.col; ctx.strokeText(t.s, 0, 0); ctx.globalAlpha /= .4; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(0,0,0,.85)'; ctx.strokeText(t.s, 0, 0);
+    ctx.font = FD(800, /\d/.test(t.s) ? t.size : Math.min(t.size, 17)); if (t.ring){ ctx.lineWidth = 11; ctx.strokeStyle = t.ring; ctx.strokeText(t.s, 0, 0); } ctx.globalAlpha *= .4; ctx.lineWidth = 8; ctx.strokeStyle = t.col; ctx.strokeText(t.s, 0, 0); ctx.globalAlpha /= .4; ctx.lineWidth = 4; ctx.strokeStyle = 'rgba(0,0,0,.85)'; ctx.strokeText(t.s, 0, 0);
     ctx.fillStyle = t.col; ctx.fillText(t.s, 0, 0); ctx.restore(); return; }   // (v59) no shadowBlur glow: it was one of the costliest things drawn each frame
   drawCrit(t, k, z, x, y);
 }

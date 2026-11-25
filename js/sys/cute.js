@@ -181,14 +181,14 @@ EV.on('map', () => { CUTE.map = -1; CUTE.parts = []; });
 /* ---------- 3) springy damage numbers with a cream outline ---------- */
 { const _dt = drawDmgText;
   drawDmgText = function(t){
-    const crit = t.size >= 20 && /!$/.test(t.s); if (crit || !cuteOn()) return _dt(t);
-    const k = t.t / t.life, z = clamp(PX / 2.2, 1.15, 2.6), x = sx(t.x), y = sy(t.y);
+    const crit = t.size >= 20 && /^[+-]?[\d,.]+!$/.test(t.s); if (crit || !cuteOn()) return _dt(t);
+    const k = t.t / t.life, z = clamp(PX / 2.2, 1.15, 2.6) * .78, x = sx(t.x), y = sy(t.y);   // (v343) smaller
     // elastic pop: overshoot, settle, then drift up a touch and fade
     const e = Math.min(1, k / .22), pop = k < .22 ? 1 + Math.sin(e * Math.PI * 1.5) * .45 * (1 - e) + (1 - e) * .3 : 1, rise = k * 10 * z;
     const ouch = t.col === '#ff8a80';
     ctx.save(); ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic'; ctx.lineJoin = 'round';
     ctx.globalAlpha = k > .65 ? 1 - (k - .65) / .35 : 1; ctx.translate(x + (ouch && k < .2 ? Math.sin(k * 90) * 2 : 0), y - rise); ctx.scale(pop * z, pop * z * (k < .08 ? .85 + k * 1.9 : 1));
-    ctx.font = FD(900, t.size);
+    ctx.font = FD(900, /\d/.test(t.s) ? t.size : Math.min(t.size, 17));   // (v343) words (Miss, status names) smaller than numbers
     if (t.ring){ ctx.lineWidth = 12; ctx.strokeStyle = t.ring; ctx.strokeText(t.s, 0, 0); }
     ctx.lineWidth = 5; ctx.strokeStyle = 'rgba(40,20,30,.85)'; ctx.strokeText(t.s, 0, 0);
     ctx.lineWidth = 2.2; ctx.strokeStyle = ouch ? '#ffe0e0' : 'rgba(255,248,232,.95)'; ctx.strokeText(t.s, 0, 0);

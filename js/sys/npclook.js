@@ -5,7 +5,7 @@
    the elders, a walking stick here and there — nothing a player class or the costume shop gives you. */
 'use strict';
 
-const NPCF = {lashes:true, cute:true, slim:.88, bodyScale:.94};
+const NPCF = {lashes:true, cute:true, slim:.88};   // (v344) the same height as everyone
 const NPC_UNIQUE = {
   beastkeeper:{hair:'hairAsh', beard:'hairAsh', top:'brownCl', sleeve:'skin', forearm:'skin', pants:'kram', boots:'wood', belt:'rope', hat:'leaf', spikes:6, spikeLen:1.8, weapon:'staff'},
   healer_oon:{...NPCF, hair:'hairBlack', iris:'irisBr', top:'white', sleeve:'white', pants:'rose', boots:'wood', belt:'gold', skirt:[11.2, 5.6, 6.1, 8.2, 'rose', 'white'], bun:true, hairpin:'rose', sideLocks:6, necklace:true},
