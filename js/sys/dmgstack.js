@@ -26,6 +26,12 @@ const droNum = s => typeof s === 'string' && s.length < 14 && /^[^\d]{0,3}[\d,]+
     t.size = crit ? 30 : size && size <= 24 ? Math.max(14, Math.min(size, 18)) : 22;   // (v343) smaller: they covered the fight
     if (hurt) t.col = '#ff4d4d'; else if (heal) t.col = '#3fd46a';
     t.life = crit ? 1.3 : 1.05;
+    /* (v346) the whole screen holds at most 18 numbers (12 when the game has turned effects down for a slow phone):
+       poison ticks on a pack put 25–30 on screen at once and the drawing of them alone halved the frame rate
+       (tools/skill-fps.js, the rogue's skills). The oldest ordinary numbers go first; criticals stay. */
+    const cap = typeof feelQ === 'function' && feelQ() < 1 ? 12 : 18;
+    let live = 0; for (const u of texts) if (u.stk && u.t < u.life) live++;
+    for (let i = 0; live > cap && i < texts.length; ){ const u = texts[i]; if (u.stk && u.t < u.life && !u.stk.crit && u !== t){ texts.splice(i, 1); live--; } else i++; }
   };
 }
 

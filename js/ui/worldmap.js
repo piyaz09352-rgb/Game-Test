@@ -34,7 +34,7 @@ function martNext(){
 function mobArtNow(key){
   if (MOB_ART[key] !== undefined) return MOB_ART[key];
   let url = '';
-  try { if (SPR.MOBS[key]){ const im = SPR.renderFrame('mob', key, 'idle', 1, 0, Math.min(.55, 44 / ((SPR.MOBS[key].fs || 64) * (SPR.MOBS[key].scale || 1)), typeof GFX !== 'undefined' && GFX.k || 1)), c = document.createElement('canvas'); c.width = im.width; c.height = im.height; c.getContext('2d').putImageData(im, 0, 0);
+  try { if (SPR.MOBS[key]){ const im = SPR.renderFrame('mob', key, 'idle', 1, 0, Math.min(.55, 44 / ((SPR.MOBS[key].fs || 64) / (SPR.MOBS[key]._room || 1) * (SPR.MOBS[key].scale || 1)), typeof GFX !== 'undefined' && GFX.k || 1)), c = document.createElement('canvas'); c.width = im.width; c.height = im.height; c.getContext('2d').putImageData(im, 0, 0);
       const d = im.data; let x0 = im.width, y0 = im.height, x1 = 0, y1 = 0;
       for (let y = 0; y < im.height; y++) for (let x = 0; x < im.width; x++) if (d[(y * im.width + x) * 4 + 3] > 20){ if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
       if (x1 > x0){ const w = x1 - x0 + 1, h = y1 - y0 + 1, o = document.createElement('canvas'); o.width = w; o.height = h; o.getContext('2d').drawImage(c, x0, y0, w, h, 0, 0, w, h); url = o.toDataURL(); } } } catch (e) { url = ''; }

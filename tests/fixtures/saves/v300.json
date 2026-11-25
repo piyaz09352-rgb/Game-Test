@@ -1,0 +1,27 @@
+{
+ "ver": "v300",
+ "made": "2026-11-25",
+ "acc": "oldsave_v300",
+ "expect": {
+  "lvl": 42,
+  "job": "blade",
+  "bia": 123456,
+  "weapon": "w_sword0",
+  "armor": "a_cotton",
+  "red": 37,
+  "map": 1,
+  "v": 2
+ },
+ "storage": {
+  "vayrathen-settings-v1": "{\"turn\":false,\"lang\":\"th\",\"gfx\":\"auto\",\"showFps\":false,\"control\":\"auto\",\"dmgNumbers\":true,\"shake\":true,\"nightFx\":true,\"nameTags\":true,\"oName\":true,\"oTitle\":true,\"oGuild\":true,\"oDmg\":true,\"oPet\":true,\"oSum\":true,\"oFx\":true,\"uiScale\":1,\"botHp\":45,\"autoSave\":true,\"autoLoot\":false,\"sfx\":true,\"musicVol\":35,\"sfxVol\":60,\"kite\":true,\"bgRun\":true,\"keepAwake\":true,\"restMin\":5,\"sharp\":2,\"rotV\":2,\"vis\":{\"b\":100,\"s\":160,\"c\":108,\"w\":0},\"evPreview\":\"\"}",
+  "vayrathen-arch1-purged": "1",
+  "vayrathen-ui-v1": "{\"open\":{},\"min\":{},\"pos\":{},\"fold\":{},\"hide\":false}",
+  "vayrathen-account": "{\"v\":1,\"id\":\"345837\",\"name\":\"oldsave_v300\",\"created\":1795589099827,\"at\":1795589101496,\"coins\":38,\"wardrobe\":{},\"bank\":{\"inv\":{},\"inst\":{},\"bia\":0},\"streak\":{\"day\":0,\"n\":0},\"v28\":1,\"season\":1,\"pw\":{\"s\":\"dfa4997393d38917f69193c2a0f3a819\",\"h\":\"4e46df8e02895d9acbcb348b716ffea530b9f67f7779231640a18b685463793f\",\"it\":150000},\"lh\":[{\"t\":1795589099869,\"d\":\"Chrome · Linux\",\"k\":\"0a8bb245d5a2\"}],\"goneHeads\":1,\"mntGone\":{},\"mntRwd\":{},\"login\":{\"d\":-1,\"n\":0},\"achC\":{\"tut\":1,\"lv10\":1,\"lv30\":1,\"job2\":1,\"rich\":1}}",
+  "vayrathen-authwait": "{\"n\":0,\"t\":0,\"l\":0}",
+  "vayrathen-proto-v1": "{\"v\":2,\"lvl\":42,\"jlvl\":20,\"exp\":6408,\"jexp\":0,\"job\":\"blade\",\"stats\":{\"str\":30,\"agi\":20,\"vit\":25,\"int\":1,\"dex\":1,\"luk\":1},\"statPts\":381,\"skPts\":4,\"skills\":{\"swordmastery\":3,\"warcry\":3,\"waveslash\":3,\"charge\":3,\"quake\":3},\"hot\":[null,null,null,null,null,null],\"inv\":{\"redpot\":37,\"mount1\":1,\"bluepot\":12,\"jelly\":9,\"m_bamboomonkey\":4},\"cards\":{},\"slots\":{},\"refine\":0,\"bia\":123456,\"hp\":620,\"sp\":65,\"x\":1200,\"y\":774,\"vxv\":1,\"worldT\":1.4000000000000001,\"pet\":null,\"map\":1,\"visited\":{\"0\":1,\"1\":1},\"gear\":{\"armor\":\"a_cotton\",\"head\":\"k_novice_h~e13skd7v\",\"ammo\":null,\"weapon\":\"w_sword0\",\"acc\":\"k_novice_x~e13scpzi\",\"shoes\":\"sh_0~e1365xkd\"},\"look\":{\"sex\":\"m\",\"hair\":0,\"color\":\"\",\"eye\":\"\"},\"ach\":{\"tut\":1795589101384,\"lv10\":1795589101436,\"lv30\":1795589101472,\"job2\":1795589101495,\"rich\":1795589101496},\"ms\":{\"done\":{}},\"st\":{},\"_sk8\":1,\"_sfx2\":1,\"_s6Done\":1,\"_rg4\":1,\"_rg3\":1,\"_rg2\":1,\"_clDone\":1,\"_sockV\":1,\"_rlDone\":1,\"name\":\"Old300\",\"season\":1,\"savedAt\":1795589105288,\"tut\":{\"done\":true,\"i\":99},\"slv\":1,\"inst\":{\"sh_0~e1365xkd\":{\"b\":\"sh_0\",\"r\":0,\"q\":{\"def\":1.069,\"flee\":0.934,\"movePct\":0.953},\"o\":[[\"mdef\",1]],\"st\":{\"def\":1,\"flee\":1,\"movePct\":0.02,\"mdef\":1}},\"k_novice_h~e13skd7v\":{\"b\":\"k_novice_h\",\"r\":0,\"q\":{\"def\":1.035,\"hp\":1.064},\"o\":[[\"castPct\",0.017]],\"st\":{\"def\":1,\"hp\":10,\"castPct\":0.017}},\"k_novice_x~e13scpzi\":{\"b\":\"k_novice_x\",\"r\":0,\"q\":{\"luk\":0.936,\"hp\":1.041},\"o\":[[\"hpPct\",0.02]],\"st\":{\"luk\":1,\"hp\":15,\"hpPct\":0.02}}},\"skb\":{},\"gv\":2,\"rfv\":1,\"kitv\":1,\"kits\":{\"novice\":1},\"spv\":2,\"kit4\":1,\"album\":{},\"tower\":{\"best\":0,\"runs\":0},\"quest\":{\"main\":0,\"active\":\"main0\",\"prog\":{},\"done\":{},\"bounty\":{},\"v\":2},\"daily\":{\"day\":20782,\"tasks\":[{\"k\":\"killAny\",\"have\":0,\"done\":false,\"claimed\":false,\"n\":40},{\"k\":\"potion\",\"have\":0,\"done\":false,\"claimed\":false,\"n\":10},{\"k\":\"killT\",\"have\":0,\"done\":false,\"claimed\":false,\"m\":0,\"t\":\"boar\",\"e\":\"earth\",\"n\":20}],\"bonus\":false},\"side\":{\"i\":0,\"active\":false,\"prog\":{}},\"weekly\":{\"wk\":2969,\"tasks\":[{\"k\":\"killAny\",\"n\":600,\"have\":0,\"done\":false,\"claimed\":false},{\"k\":\"pvp\",\"n\":3,\"have\":0,\"done\":false,\"claimed\":false},{\"k\":\"wboss\",\"n\":1,\"have\":0,\"done\":false,\"claimed\":false},{\"k\":\"skill\",\"n\":500,\"have\":0,\"done\":false,\"claimed\":false}],\"chest\":false},\"tl\":{\"day\":20782,\"n\":0},\"tour\":{\"v\":{},\"done\":0},\"title\":\"tut\",\"mem\":{\"lvl\":{\"v\":42,\"t\":1795589101491}},\"twk\":{\"w\":2969,\"f\":0,\"pub\":0},\"fame\":{\"mine\":{},\"tried\":{},\"got\":{},\"titles\":{}}}",
+  "vayrathen-dev": "0a8bb245d5a2",
+  "vayrathen-auth": "345837:dfa4997393d3|1798181099869",
+  "vay-rail-fold": "1",
+  "vayrathen-slot": "0"
+ }
+}

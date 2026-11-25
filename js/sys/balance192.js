@@ -8,7 +8,7 @@
 'use strict';
 const LINE_POW = {   // [tier 1 (Lv <40), tier 2, tier 3, tier 4] · (v324) retuned from a full report after the v323 Auto fixes
   blade:[1.09, 1.1, 0.7, 0.88], rune:[1.65, 0.59, 1.26, 1.1], ranger:[0.6, 0.63, 1.6, 1.4], muay:[0.79, 0.58, 0.71, 0.82],
-  healer:[2.9, 1.6, 2.05, 1.02], rogue:[1.21, 1.3, 1.76, 1.5], summoner:[1.45, 1.08, 1.11, 0.75], occult:[3.21, 3.13, 1.96, 1.4],
+  healer:[2.9, 1.6, 2.05, 1.02], rogue:[1.21, 1.3, 1.76, 1.5], summoner:[1.45, 1.08, 1.06, 0.75], occult:[3.21, 3.13, 1.96, 1.4],
   merchant:[1.6, 1.17, 1.06, 0.95], catfolk:[1.41, 0.79, 0.56, 0.92], dogfolk:[1.53, 1.09, 0.82, 0.88], ninja:[0.23, 1.46, 1.3, 1.5]
 };
 /* (v323) the slot a line uses is its job tier, and the last job is reached around Lv 70, so the fourth slot is never used:
@@ -32,7 +32,7 @@ const LINE_SP = {occult:[.6, 1, 1, 1]};
 for (const id in SKILLS){ const sk = SKILLS[id], ln = typeof NL_LINE_OF !== 'undefined' && NL_LINE_OF[sk.job]; if (!ln || !LINE_SP[ln] || typeof sk.sp !== 'function' || sk._spLine) continue;
   const o = sk.sp; sk._spLine = 1; sk.sp = lv => { const ch = jobChain(), ti = Math.min(3, Math.max(0, ch.length - 2)); return ch[1] === ln ? Math.max(1, Math.round(o(lv) * LINE_SP[ln][ti])) : o(lv); }; }
 /* (v209) summoned beasts hit harder for the summoner line (its own spells barely matter: the beasts do the killing) */
-{ const _d = derive; derive = function(){ const r = _d.apply(this, arguments); if (DER && DER.pas && jobChain()[1] === 'summoner') DER.pas.sumAtk = (DER.pas.sumAtk || 0) + .9; return r; }; }
+{ const _d = derive; derive = function(){ const r = _d.apply(this, arguments); if (DER && DER.pas && jobChain()[1] === 'summoner') DER.pas.sumAtk = (DER.pas.sumAtk || 0) + ((S.lvl || 1) >= 60 && (S.lvl || 1) < 100 ? .7 : .9); return r; }; }   // (v346) a little less at Lv 60–99: the top summoner was 116% there
 
 /* (v324) the lines without INT ran dry: their SP comes back half as fast (js/game/player.js) and their pool is small,
    so at Lv 115 a swordsman, rogue or merchant had spent its SP within 6 s and then only swung — its skills looked

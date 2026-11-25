@@ -46,9 +46,9 @@ function cthRender(id){
     else if (k === 'wing'){ floor(CTH_H - 12, 20); const s = 1.75; g.setTransform(s, 0, 0, s, CTH_W / 2, CTH_H - 14);
       drawWings(g, typeof dyeId === 'function' ? dyeId(id) : id, 0, 0, 5, .55, {part:'back'}); cthHero(g, gear, 5); drawWings(g, typeof dyeId === 'function' ? dyeId(id) : id, 0, 0, 5, .55, {part:'front'}); }
     else if (k === 'mount'){ const M = XCOS[id];
-      if (M.kind === 'beast'){ const fs = (SPR.MOBS[M.mob] && SPR.MOBS[M.mob].fs) || 80, sc = Math.min(2.4, 130 / fs); floor(CTH_H - 14, 30); g.setTransform(sc, 0, 0, sc, CTH_W / 2, CTH_H - 14); cthMob(g, M.mob, 1); }
+      if (M.kind === 'beast'){ const fs = (SPR.MOBS[M.mob] && SPR.MOBS[M.mob].fs / (SPR.MOBS[M.mob]._room || 1)) || 80, sc = Math.min(2.4, 130 / fs); floor(CTH_H - 14, 30); g.setTransform(sc, 0, 0, sc, CTH_W / 2, CTH_H - 14); cthMob(g, M.mob, 1); }
       else { const s = 2.2; g.setTransform(s, 0, 0, s, CTH_W / 2, CTH_H - 16); drawMountX(g, M, 0, 0, 1, .4, false, 'under'); g.translate(0, -M.lift); cthHero(g, gear, 1); } }
-    else if (k === 'pet'){ const M = XCOS[id], fs = (SPR.MOBS[M.mob] && SPR.MOBS[M.mob].fs) || 60, s = Math.min(2.6, 118 / fs); floor(CTH_H - 14, 22);
+    else if (k === 'pet'){ const M = XCOS[id], fs = (SPR.MOBS[M.mob] && SPR.MOBS[M.mob].fs / (SPR.MOBS[M.mob]._room || 1)) || 60, s = Math.min(2.6, 118 / fs); floor(CTH_H - 14, 22);
       g.setTransform(s, 0, 0, s, CTH_W / 2, CTH_H - 14 - (M.fly ? 8 : 0)); cthMob(g, M.mob, 1); }
     else return null;
   } catch (e) { return null; }

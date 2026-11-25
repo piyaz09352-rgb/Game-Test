@@ -31,7 +31,8 @@ if (typeof TUT !== 'undefined'){ const i = TUT.findIndex(s => s.arrow === 'mob')
     d:['ในเมืองไม่มีมอนสเตอร์ · เดินออกประตูทิศตะวันออก (ลูกศรสีทองชี้อยู่) ไปทุ่งสุวรรณิน หรือกด «พาไป»', 'There are no monsters in town · walk out of the east gate (the gold arrow points at it) to the Suwannin Fields, or press «Take me there»']}); }
 document.addEventListener('click', e => { const g = e.target.closest && e.target.closest('[data-tutgo]'); if (!g || typeof tutOn !== 'function' || !tutOn()) return;
   const want = g.dataset.tutgo === 'fields306' ? (MAP_ID === 0 ? FIELDS306.id : null) : (MAP_ID === FIELDS306.id ? 0 : null); if (want == null) return;
-  const gt = f306Gate(want); if (!gt) return; e.stopPropagation(); P.npc = null; P.target = null; P.cast = null; P.tx = gt.x; P.ty = gt.y; }, true);
+  const gt = f306Gate(want); if (!gt) return; e.stopPropagation(); if (want === 0 && typeof TUTGO !== 'undefined') TUTGO.id = g.dataset.tutgo;   /* (v346) once in Aren, on to the NPC (tutorial.js) */
+  P.npc = null; P.target = null; P.cast = null; P.tx = gt.x; P.ty = gt.y; }, true);
 if (typeof EV !== 'undefined') EV.on('draw', () => { const st = typeof tutOn === 'function' && tutOn(); if (!st || PAUSED) return;
   const gt = st.arrow === 'gate306' && MAP_ID === 0 ? f306Gate(FIELDS306.id) : st.arrow === 'npc' && MAP_ID === FIELDS306.id ? f306Gate(0) : null; if (!gt) return;
   const x = clamp(sx(gt.x), 40, SW - 40), y = clamp(sy(gt.y - 60), 70, SH - 60) - Math.abs(Math.sin(T * 4)) * 10, z = clamp(PX / 2, .5, 2.6);

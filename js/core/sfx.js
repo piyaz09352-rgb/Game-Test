@@ -214,9 +214,11 @@ const SFX = (() => {
     if (last[name] && now - last[name] < .04) return; last[name] = now; FX[name](now + .005, o); }
   /* monster voice: body type decides the sound, size and boss decide pitch and weight */
   const MOB_ARCH = {dewblob:'slime', hare:'quad', boar:'quad', lantern:'floater', boss:'slime'};
-  function mob(kind, m){ if (!m || !m.def) return; const a0 = (typeof SPECIES_ARCH !== 'undefined' && SPECIES_ARCH[m.type]) || MOB_ARCH[m.type] || 'quad', arch = a0 === 'fish' ? 'serpent' : a0 === 'cave' ? 'quad' : a0 === 'sky' ? 'floater' : a0 === 'land' ? 'quad' : a0;   // (v294) fish use the serpent voice
+  function voice(kind, m){ const a0 = (typeof SPECIES_ARCH !== 'undefined' && SPECIES_ARCH[m.type]) || MOB_ARCH[m.type] || 'quad', arch = a0 === 'fish' ? 'serpent' : a0 === 'cave' ? 'quad' : a0 === 'sky' ? 'floater' : a0 === 'land' ? 'quad' : a0;   // (v294) fish use the serpent voice
+    return (kind === 'atk' ? 'ma_' : kind === 'shot' ? 'm_shot' : 'mh_') + (kind === 'shot' ? '' : arch); }
+  function mob(kind, m){ if (!m || !m.def) return;
     const sz = m.def.size, p = (sz === 'l' ? .7 : sz === 'm' ? .88 : 1.1) * (m.def.boss ? .75 : 1), v = m.def.boss ? 1.4 : 1;
-    const name = (kind === 'atk' ? 'ma_' : kind === 'shot' ? 'm_shot' : 'mh_') + (kind === 'shot' ? '' : arch); play(name, {p, v}); }
+    play(voice(kind, m), {p, v}); }
   /* which voices to use: weapon type for basic attacks, element for spells */
   const WPN = w => ({sword:'sword', dagger:'dagger', staff:'staff', fist:'fist', bow:'bow', shuriken:'star'})[w] || 'sword';
   const EL = e => (['fire', 'water', 'wind', 'earth', 'holy', 'shadow', 'poison'].includes(e) ? e : 'neutral');
@@ -274,7 +276,7 @@ const SFX = (() => {
       next += e; step++;
     }
   }
-  return {muteMusic:v => { muted = !!v; }, raw:() => { const a = ac; return a && fxg ? {ac:a, out:fxg, nb:noiseBuf, vol:vol()} : null; }, play, mob, music, swing:w => play('atk_' + WPN(w)), hit:w => play('hit_' + WPN(w)), spell:e => play('sp_' + EL(e)), impact:e => play('im_' + EL(e)), WPN, EL, setVolume:applyVol, unlock:() => ctx(), levelUp:() => play('levelUp'), jobUp:() => play('jobUp')};
+  return {has:n => !!FX[n], voice, muteMusic:v => { muted = !!v; }, raw:() => { const a = ac; return a && fxg ? {ac:a, out:fxg, nb:noiseBuf, vol:vol()} : null; }, play, mob, music, swing:w => play('atk_' + WPN(w)), hit:w => play('hit_' + WPN(w)), spell:e => play('sp_' + EL(e)), impact:e => play('im_' + EL(e)), WPN, EL, setVolume:applyVol, unlock:() => ctx(), levelUp:() => play('levelUp'), jobUp:() => play('jobUp')};
 })();
 /* the browser only lets audio start after a click or key */
 ['pointerdown', 'keydown'].forEach(ev => window.addEventListener(ev, () => SFX.unlock(), {once:true, capture:true}));

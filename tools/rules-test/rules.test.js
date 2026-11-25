@@ -88,6 +88,35 @@ test('market: list, buy once, collect once, no stealing', async () => {
   await assertSucceeds(db(A).doc('market/bbbbbb1').delete());
 });
 
+test('problem reports: written once as yourself, read only by the GM, never edited', async () => {
+  const id = A + '_' + now(), rep = (o = {}) => ({ uid: A, name: 'Alice', v: 346, msg: 'the menu will not close', map: 3, x: 100, y: 200, lvl: 42, job: 'swordsman', dev: '844x390 iPhone', err: '', img: 'data:image/jpeg;base64,AAAA', at: now(), ...o });
+  await assertSucceeds(db(A).doc('reports/' + id).set(rep()));
+  await assertFails(db(B).doc('reports/' + B + '_' + now()).set(rep()));                  // as someone else
+  await assertFails(db(A).doc('reports/' + B + '_' + now()).set(rep({ uid: B })));         // in someone else's name
+  await assertFails(db(A).doc('reports/' + A + '_x').set(rep()));                          // a made-up id
+  await assertFails(db(A).doc('reports/' + A + '_' + (now() + 1)).set(rep({ msg: 'x'.repeat(600) })));
+  await assertFails(db(A).doc('reports/' + A + '_' + (now() + 2)).set(rep({ img: 'javascript:alert(1)' })));
+  await assertFails(db(A).doc('reports/' + A + '_' + (now() + 3)).set(rep({ img: 'data:image/jpeg;base64,' + 'A'.repeat(250000) })));
+  await assertFails(db(A).doc('reports/' + A + '_' + (now() + 4)).set(rep({ admin: true })));
+  await assertFails(db(A).doc('reports/' + id).get());                                     // players cannot read reports, not even their own
+  await assertFails(db(B).collection('reports').get());
+  await assertFails(db(A).doc('reports/' + id).update({ msg: 'changed' }));
+  await assertFails(db(A).doc('reports/' + id).delete());
+  await assertSucceeds(db(GM).collection('reports').get());
+  // (v346) the hero's snapshot rides along (short); a GM marks it answered, nobody else, nothing else
+  const id2 = A + '_' + (now() + 5);
+  await assertSucceeds(db(A).doc('reports/' + id2).set(rep({ ch: '{"j":"blade","l":42}' })));
+  await assertFails(db(A).doc('reports/' + A + '_' + (now() + 6)).set(rep({ ch: 'x'.repeat(1600) })));
+  await assertFails(db(A).doc('reports/' + id2).update({ rp: 'fixed', rpAt: now() }));
+  await assertFails(db(GM).doc('reports/' + id2).update({ msg: 'rewritten' }));
+  await assertFails(db(GM).doc('reports/' + id2).update({ rp: 'x'.repeat(400), rpAt: now() }));
+  await assertSucceeds(db(GM).doc('reports/' + id2).update({ rp: 'fixed next version, thanks', rpAt: now() }));
+  // the answer reaches the player as a letter from the team, which they read and delete like any letter
+  await assertSucceeds(db(GM).doc('mail/gmr' + now() + 'ab12cd').set({ to: A, tn: 'Alice', from: GM, fn: 'ทีมงาน VAYRATHEN', s: 'ตอบเรื่องที่คุณแจ้งปัญหา', m: 'fixed next version', z: 0, c: 0, sys: 0, at: now(), rd: 0, taken: false }));
+  await assertSucceeds(db(A).collection('mail').where('to', '==', A).get());
+  await assertSucceeds(db(GM).doc('reports/' + id).delete());
+});
+
 test('mail: as yourself, no fake system letters, no coins, attachments taken once', async () => {
   await assertFails(db(C).doc('mail/m000001').set(letter()));                           // writing as Alice
   await assertFails(db(A).doc('mail/m000002').set(letter({ c: 500 })));                 // mailing Vayra Coins
