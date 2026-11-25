@@ -35,17 +35,17 @@ const W344_SHY = /deer|hare|rabbit|squirrel|fowl|egret|sheep|ram|goat|serow|munt
 const w344Free = m => m && !m.dead && m.def && !m.def.boss && !m.elite && !m.wb && !m.dg && !m.tw && !m.inv && !m.minion && !m.dummy && !m.pvp && !(typeof nmSlave === 'function' && nmSlave() && !m.mine);
 const w344Kin = (m, r) => mobs.filter(o => o !== m && !o.dead && o.type === m.type && w344Free(o) && Math.hypot(o.x - m.x, o.y - m.y) < r);
 if (typeof applyDamage === 'function'){ const _ad = applyDamage; applyDamage = function(m, res){ const r = _ad.apply(this, arguments);
-    try { if (w344Free(m) && res && res.dmg > 0){ m.shyOff = 1;
+    try { if (w344Free(m) && res && res.dmg > 0){ m.shyOff = 1; if (m.fleeTo && T - m.fleeTo.t0 > .35){ m.fleeTo = null; m.aggro = true; }
         if (!m.callT || T - m.callT > 4){ m.callT = T; for (const o of w344Kin(m, 190).slice(0, 2)) if (!o.aggro){ o.aggro = true; o.calledT = T; } }   // a cry: kin close by come
-        if (m.hp > 0 && m.hp < m.maxhp * .2 && !m.fledOnce){ const kin = w344Kin(m, 520).filter(o => Math.hypot(o.x - P.x, o.y - P.y) > Math.hypot(m.x - P.x, m.y - P.y));
-          if (kin.length){ m.fledOnce = 1; const k = kin[0]; m.fleeTo = {x:k.x, y:k.y, t:2.4}; } } } } catch (e) {}
+        if (!globalThis.NOFLEE && m.hp > 0 && m.hp < m.maxhp * .2 && !m.fledOnce && Math.hypot(m.x - P.x, m.y - P.y) < 80){   /* it runs from a blade at its throat; from an arrow at range there is nowhere to run */ const kin = w344Kin(m, 520).filter(o => Math.hypot(o.x - P.x, o.y - P.y) > Math.hypot(m.x - P.x, m.y - P.y));
+          if (kin.length){ m.fledOnce = 1; const k = kin[0]; m.fleeTo = {x:k.x, y:k.y, t:1.6, t0:T}; } } } } catch (e) {}
     return r; }; }
 if (typeof updMob === 'function'){ const _um = updMob; updMob = function(m, dt){
     if (m.fleeTo && !m.dead){ const f = m.fleeTo; f.t -= dt; const d = Math.hypot(f.x - m.x, f.y - m.y);
       if (f.t <= 0 || d < 24 || (m.st && (m.st.stun > 0 || m.st.freeze > 0))){ m.fleeTo = null; m.aggro = true; }
       else { const sp = (m.def.speed || 40) * 1.25 * dt, nx = m.x + (f.x - m.x) / d * sp, ny = m.y + (f.y - m.y) / d * sp; if (walkable(nx, ny, m.def.r || 10)){ m.x = nx; m.y = ny; } else { m.fleeTo = null; m.aggro = true; }
         m.moving = true; m.dir = SPR.dirFromVec(f.x - m.x, f.y - m.y); m.atkT = 9; if (m.flash > 0) m.flash -= dt; return; } }
-    if (!m.aggro && !m.shyOff && w344Free(m) && W344_SHY.test(m.type) && !P.dead){ const d = Math.hypot(m.x - P.x, m.y - P.y);
+    if (!globalThis.NOSHY && !m.aggro && !m.shyOff && w344Free(m) && W344_SHY.test(m.type) && !P.dead && P.target !== m){   /* the one you are going for does not bolt (it would only drag the chase out) */ const d = Math.hypot(m.x - P.x, m.y - P.y);
       if (d < 85 && (!m.shyT || T - m.shyT > 2.5)){ m.shyT = T; const a = Math.atan2(m.y - P.y, m.x - P.x) + (Math.random() - .5) * .6, r = 90 + Math.random() * 40;
         m.tx = clamp(m.x + Math.cos(a) * r, m.zone.x0, m.zone.x1); m.ty = clamp(m.y + Math.sin(a) * r, m.zone.y0, m.zone.y1); m.wait = 0; m.bolt = .9; } }
     if (m.bolt > 0){ m.bolt -= dt; const sp0 = m.def.speed; m.def.speed = sp0 * 2.1; try { return _um.apply(this, arguments); } finally { m.def.speed = sp0; } }

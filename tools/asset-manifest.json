@@ -350,7 +350,7 @@
 "js/sys/stylecal.js":{"v":165,"sha":"6fbc2ead4c5cfd04"},
 "js/sys/nofl.js":{"v":160,"sha":"746e2945c049b408"},
 "js/sys/economy.js":{"v":294,"sha":"424cff79f667cccf"},
-"js/sys/balance192.js":{"v":213,"sha":"18a87020d9320674"},
+"js/sys/balance192.js":{"v":214,"sha":"3993e022bbfa4ebe"},
 "js/sys/mobs192.js":{"v":326,"sha":"180c7ed2f84a14d4"},
 "js/sys/boss192.js":{"v":274,"sha":"6352fffe2ef2bd96"},
 "js/sys/linefx192.js":{"v":192,"sha":"99f9412c1a89b72d"},
@@ -477,4 +477,4 @@
 "js/sys/life342.js":{"v":3,"sha":"c893b6079941eb39"},
 "js/sys/hud326.js":{"v":15,"sha":"bf69186fdcaf31a3"},
 "js/sys/ui343.js":{"v":3,"sha":"fc2d4903692397e4"},
-"js/sys/world344.js":{"v":2,"sha":"4a3e7b9de7d9441e"}}
+"js/sys/world344.js":{"v":3,"sha":"6c2c5e52078d332b"}}

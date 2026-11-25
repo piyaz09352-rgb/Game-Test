@@ -19,6 +19,7 @@ async function main(){
   const rows = [];
   try {
     await enterWorld(page, 'Balance', 'balance');
+    if (process.env.NOFLEE) await page.evaluate(() => { globalThis.NOFLEE = 1; });   // (v345) measure without the packs' flee (world344.js)
     let lines = await page.evaluate(() => Object.keys(JOBS).filter(k => JOBS[k].parent === 'novice'));
     if (process.env.LINES) lines = lines.filter(l => process.env.LINES.split(',').includes(l));   // e.g. LINES=rune,occult
     for (const line of lines) for (const lv of (process.env.LV ? process.env.LV.split(',').map(Number) : process.env.BOSS ? [45, 80, 115] : LEVELS)){
