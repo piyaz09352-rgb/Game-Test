@@ -5,6 +5,7 @@
    · a new hero starts with full HP and SP
    · the arrow shows a monster the hero can beat (no more than 2 levels above)
    · no festival spirit during the tutorial; afterwards one near the hero's level, and calm (it waits to be challenged)
+   · the first kill leaves loot for the «pick up» step (a kill that dropped nothing left the newcomer stuck)
    · a newcomer led out by «พาไป» who fights what the arrow shows for 45 s is still alive */
 const test = require('node:test'), assert = require('node:assert');
 const { chromium, openGame, enterWorld } = require('./browser');
@@ -22,6 +23,9 @@ test('a brand-new hero: full HP, a beatable arrow target, no alpha beside them, 
       await new Promise(r => setTimeout(r, 1500)); out.inField = MAP_ID === FIELDS306.id; out.spiritInTut = !!EVB.m;
       // the arrow
       S.tut.i = TUT.findIndex(s => s.arrow === 'mob'); tutShow(); const a = tutMob(); out.arrowLv = a ? a.def.lvl : -1;
+      // the first kill always leaves something to pick up (the next step), even from a monster that dropped nothing
+      for (const l of LOOT.splice(0)) {}
+      { const m = spawnMob('dewblob', P.x + 30, P.y, {zone:MAPZ}); m.def = {...m.def, drops:[]}; applyDamage(m, {dmg:1e7, crit:false}); await new Promise(r => setTimeout(r, 400)); out.lootAfterKill = !!nearestLoot(500); out.stepNow = S.tut.i; }
       // fight what the arrow shows for 45 s
       let t = 0; while (t < 45 && !P.dead){ const m = tutMob(); if (m && (!P.target || P.target.dead)) P.target = m; await new Promise(r => setTimeout(r, 500)); t += .5; }
       out.alive = !P.dead; out.lvl = S.lvl;
@@ -33,6 +37,7 @@ test('a brand-new hero: full HP, a beatable arrow target, no alpha beside them, 
     assert.ok(r.tut && r.inField, 'the tutorial led into the first field');
     assert.ok(!r.spiritInTut, 'no festival spirit during the tutorial');
     assert.ok(r.arrowLv >= 1 && r.arrowLv <= 3, 'the arrow shows a monster a Lv 1 hero can beat: Lv ' + r.arrowLv);
+    assert.ok(r.lootAfterKill, 'the first kill leaves something for the «pick up loot» step');
     assert.ok(r.alive, `alive after 45 s of fighting (reached Lv ${r.lvl})`);
     assert.ok(r.spirit, 'a festival spirit comes once the tutorial is over');
     assert.ok(r.spirit.lv <= r.lvlNow + 3, `the spirit is near the hero's level (Lv ${r.spirit.lv} for a Lv ${r.lvlNow} hero)`);

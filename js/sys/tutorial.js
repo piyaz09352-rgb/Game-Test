@@ -64,6 +64,11 @@ EV.on('map', () => { if (!TUTGO.id) return; const id = TUTGO.id; if (MAP_ID !== 
 document.addEventListener('click', e => { const t = e.target.closest && e.target.closest('[data-tutnext],[data-tutskip]'); if (!t || !tutOn()) return;
   if (t.dataset.tutskip){ askConfirm(L('ข้ามบทสอน', 'Skip tutorial'), L('ข้ามบทสอนทั้งหมดใช่ไหม? (จะไม่ได้รับรางวัล)', 'Skip the whole tutorial? (no reward)'), L('ข้าม', 'Skip'), () => tutFinish(true)); return; }
   tutGo(S.tut.i + 1); });
+/* (v346) the first kill in the tutorial always leaves something on the ground: the next step is «pick up loot», and
+   when the first monster dropped nothing a newcomer stood there with nothing to pick up (tools/first-play.js) */
+EV.on('kill', m => { const st = tutOn(); if (!st || !m || (st.ev !== 'kill' && st.ev !== 'pickup')) return;
+  if (nearestLoot(500)) return; const d = (m.def && m.def.drops && m.def.drops[0] && m.def.drops[0][0]) || 'jelly';
+  if (ITEMS[d]) setTimeout(() => { if (tutOn() && !nearestLoot(500)) dropLoot(d, m.x, m.y); }, 120); });
 for (const ev of ['kill', 'pickup', 'potion']) EV.on(ev, () => { const st = tutOn(); if (st && st.ev === ev) tutGo(S.tut.i + 1); });
 EV.on('tick', () => { const st = tutOn(); if (!st || PAUSED) { const b = el('tutBox'); if (b && !b.hidden && !tutOn()) b.hidden = true; return; } if (st.done && st.done(S.tut.s || {})) tutGo(S.tut.i + 1);
   const b = el('tutBox'); if (b && b.hidden) tutShow(); });
