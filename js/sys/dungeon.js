@@ -16,13 +16,9 @@ const DG = {active:false, entering:false, code:'', did:'', lv:1, pc:1, wave:0, w
 const DG_TIME = 15 * 60;
 /* a monster scaled to level lv for a party of pc: same for every player, so mirrors match the host */
 function dgDef(type, code){
-  /* (v348) a party of one meets a lighter guardian (HP ×1.6 instead of ×3.3, plain hits ×0.8, boss blows and skills ×0.6): alone at the dungeon's level, every
-     class on Auto reached the guardian and then died to it every few seconds until the time ran out (DUNGEON=1 node
-     tools/balance-report.js → docs/BALANCE_DUNGEON.md). Parties of 2–5 are as before. */
-  const lv = Math.floor(code / 10), pc = clamp(code % 10, 1, 5), b = MOB[type], k = lv / Math.max(1, b.lvl), boss = !!b.boss, solo = boss && pc === 1,
-    hpMul = solo ? 1.6 : (boss ? 3.3 : 1) * (1 + (pc - 1) * (boss ? .7 : .35)), am = solo ? .8 : 1;
-  return {...b, lvl:lv, hp:Math.max(30, Math.round(b.hp * k * k * hpMul)), atk:[Math.max(1, Math.round(b.atk[0] * k * am)), Math.max(2, Math.round(b.atk[1] * k * am))], def:Math.round(b.def * k),
-    exp:Math.max(1, Math.round(b.exp * k * 1.6)), jexp:Math.max(1, Math.round(b.jexp * k * 1.6)), drops:b.drops || [], card:b.card, cardRate:b.cardRate, aggro:true, dg:true, dmgMul:solo ? .6 : 1};   // (v348) dmgMul: every hit it lands, after all the boss layers (mobs.js mobAttack)
+  const lv = Math.floor(code / 10), pc = clamp(code % 10, 1, 5), b = MOB[type], k = lv / Math.max(1, b.lvl), boss = !!b.boss, hpMul = (boss ? 3.3 : 1) * (1 + (pc - 1) * (boss ? .7 : .35));
+  return {...b, lvl:lv, hp:Math.max(30, Math.round(b.hp * k * k * hpMul)), atk:[Math.max(1, Math.round(b.atk[0] * k)), Math.max(2, Math.round(b.atk[1] * k))], def:Math.round(b.def * k),
+    exp:Math.max(1, Math.round(b.exp * k * 1.6)), jexp:Math.max(1, Math.round(b.jexp * k * 1.6)), drops:b.drops || [], card:b.card, cardRate:b.cardRate, aggro:true, dg:true};
 }
 const dgInfo = () => DUNGEONS.find(d => d.id === DG.did);
 function dgEnter(did, code, lv, pc){

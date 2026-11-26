@@ -22,8 +22,8 @@ async function main(){
     if (process.env.NOFLEE) await page.evaluate(() => { globalThis.NOFLEE = 1; });   // (v345) measure without the packs' flee (world344.js)
     let lines = await page.evaluate(() => Object.keys(JOBS).filter(k => JOBS[k].parent === 'novice'));
     if (process.env.LINES) lines = lines.filter(l => process.env.LINES.split(',').includes(l));   // e.g. LINES=rune,occult
-    if (process.env.DUNGEON){ const dgs = await page.evaluate(() => DUNGEONS.filter(d => d.id !== 'tower').map(d => [d.id, d.min]));
-      const drows = []; for (const [did, min] of dgs) for (const line of lines){ const r = await page.evaluate(simOne, { line, lv: min + 5, sec: 0, dungeon: did }); drows.push(r); console.log(JSON.stringify(r)); }
+    if (process.env.DUNGEON){ const dgs = (await page.evaluate(() => DUNGEONS.filter(d => d.id !== 'tower').map(d => [d.id, d.min]))).filter(([id]) => !process.env.DGS || process.env.DGS.split(',').includes(id));   // DGS=meru,badan limits the dungeons
+      const drows = []; for (const [did, min] of dgs) for (const line of lines){ const r = await page.evaluate(simOne, { line, lv: min + 5, sec: 0, dungeon: did, aiParty: process.env.AI === '1' }); r.ai = process.env.AI === '1'; drows.push(r); console.log(JSON.stringify(r)); }
       fs.writeFileSync(path.join(__dirname, '..', 'docs', 'BALANCE_DUNGEON.md'), dungeonReport(drows)); return; }
     for (const line of lines) for (const lv of (process.env.LV ? process.env.LV.split(',').map(Number) : process.env.BOSS ? [45, 80, 115] : LEVELS)){
       const r = await page.evaluate(simOne, { line, lv, sec: SIM_SEC, boss: !!process.env.BOSS, bossType: process.env.BOSSTYPE || '' });
@@ -47,7 +47,7 @@ function writeOut(rows, errors){
 }
 
 /* runs inside the game page */
-async function simOne({ line, lv, sec, boss: bossMode, bossType, dungeon }){
+async function simOne({ line, lv, sec, boss: bossMode, bossType, dungeon, aiParty }){
   const kids = j => Object.keys(JOBS).filter(k => JOBS[k].parent === j);
   let job = line; const tier = lv < 40 ? 1 : lv < 70 ? 2 : lv < 100 ? 3 : 4;
   for (let t = 1; t < tier; t++){ const k = kids(job)[0]; if (!k) break; job = k; }
@@ -80,12 +80,13 @@ async function simOne({ line, lv, sec, boss: bossMode, bossType, dungeon }){
   derive(); S.hp = DER.maxhp; S.sp = DER.maxsp;
   /* (v348) DUNGEON=1: alone into a party dungeon at its own level, Auto on (skills and all), until the guardian falls or the
      dungeon's time runs out; deaths are counted (the hero is put back on its feet in place to see whether it could finish) */
-  if (dungeon){ const D = DUNGEONS.find(d => d.id === dungeon); dgEnter(D.id, 'bal' + Math.floor(Math.random() * 1e6), lv, 1);
+  if (dungeon){ const D = DUNGEONS.find(d => d.id === dungeon); dgEnter(D.id, 'bal' + Math.floor(Math.random() * 1e6), lv, 1); if (aiParty) DG.aiParty = true;   // AI=1: with the three AI adventurers the gate offers to a player with no party (aiadv334.js)
     for (let k = 0; k < 200 && (DG.entering || typeof LD !== 'undefined' && LD.busy); k++) await new Promise(r => setTimeout(r, 50));
     let t = 0, deaths = 0, hpLow = 1; const t0 = T; setBot(true); const stepT = .05;
     while (DG.active && !DG.done && t < DG_TIME){ advance(stepT, false); t += stepT; if (!BOT.on) setBot(true); hpLow = Math.min(hpLow, S.hp / DER.maxhp);
       if (P.dead || S.hp <= 0){ deaths++; P.dead = false; S.hp = DER.maxhp; S.sp = DER.maxsp; setBot(true); } }
-    const r = {dungeon:D.id, dname:D.th, line, lineName:JOBS[line].name, job, jobName:JOBS[job].name, lv, done:!!DG.done, sec:Math.round(t), wave:DG.wave, deaths, hpLow:Math.round(hpLow * 100), pots:300 - (S.inv[potId] || 0)};
+    const gb = mobs.find(m => m.dg && m.def.boss && !m.dead), left = gb ? Math.round(gb.hp / gb.maxhp * 100) : 0, alive = mobs.filter(m => m.dg && !m.dead).length;
+    const r = {dungeon:D.id, dname:D.th, line, lineName:JOBS[line].name, job, jobName:JOBS[job].name, lv, done:!!DG.done, sec:Math.round(t), wave:DG.wave, deaths, hpLow:Math.round(hpLow * 100), pots:300 - (S.inv[potId] || 0), bossLeft:left, alive};
     setBot(false); if (DG.active) dgExit(); for (let k = 0; k < 100 && typeof LD !== 'undefined' && LD.busy; k++) await new Promise(r => setTimeout(r, 50)); return r; }
   // the field map whose monsters are closest to this level
   let mapId = 1, gapBest = 1e9;
@@ -135,10 +136,10 @@ async function simOne({ line, lv, sec, boss: bossMode, bossType, dungeon }){
 }
 
 function dungeonReport(rows){
-  let s = `# รายงานดันเจียน: คนเดียว ใช้ Auto (tools/balance-report.js · DUNGEON=1)\n\nสร้างเมื่อ ${new Date().toISOString().slice(0, 16).replace('T', ' ')} · เลเวล = ขั้นต่ำของดันเจียน +5 · อาชีพ ค่าสถานะ สกิล ของ ยา เหมือนรายงานสมดุล · ตายแล้วลุกที่เดิม (นับครั้ง) · เวลาดันเจียน 15 นาที (ปาร์ตี้ 1 คน)\n\n`;
+  let s = `# รายงานดันเจียน: ${rows[0] && rows[0].ai ? 'ผู้เล่นคนเดียว + นักผจญภัย AI 3 คน (ตัวเลือกที่ประตูดันเจียนเสนอ) · AI=1' : 'คนเดียว ไม่มีปาร์ตี้'} ใช้ Auto (tools/balance-report.js · DUNGEON=1)\n\nสร้างเมื่อ ${new Date().toISOString().slice(0, 16).replace('T', ' ')} · เลเวล = ขั้นต่ำของดันเจียน +5 · อาชีพ ค่าสถานะ สกิล ของ ยา เหมือนรายงานสมดุล · ตายแล้วลุกที่เดิม (นับครั้ง) · เวลาดันเจียน 15 นาที (ปาร์ตี้ 1 คน)\n\n`;
   for (const did of [...new Set(rows.map(r => r.dungeon))]){ const rs = rows.filter(r => r.dungeon === did), ok = rs.filter(r => r.done);
-    s += `## ${rs[0].dname} (Lv ${rs[0].lv}) — ผ่าน ${ok.length}/${rs.length} สาย\n\n| สาย | อาชีพ | ผ่าน | เวลา | ด่านที่ถึง | ตาย | HP ต่ำสุด | ยาที่ใช้ |\n|---|---|---|---|---|---|---|---|\n`;
-    for (const r of rs) s += `| ${r.lineName} | ${r.jobName} | ${r.done ? 'ผ่าน' : '**ไม่ผ่าน**'} | ${Math.floor(r.sec / 60)}:${String(r.sec % 60).padStart(2, '0')} | ${Math.min(4, r.wave)}/4 | ${r.deaths} | ${r.hpLow}% | ${r.pots} |\n`;
+    s += `## ${rs[0].dname} (Lv ${rs[0].lv}) — ผ่าน ${ok.length}/${rs.length} สาย\n\n| สาย | อาชีพ | ผ่าน | เวลา | ด่านที่ถึง | ผู้พิทักษ์เหลือเลือด | ตาย | HP ต่ำสุด | ยาที่ใช้ |\n|---|---|---|---|---|---|---|---|---|\n`;
+    for (const r of rs) s += `| ${r.lineName} | ${r.jobName} | ${r.done ? 'ผ่าน' : '**ไม่ผ่าน**'} | ${Math.floor(r.sec / 60)}:${String(r.sec % 60).padStart(2, '0')} | ${Math.min(4, r.wave)}/4 | ${r.done ? '-' : (r.bossLeft ?? '?') + '%'} | ${r.deaths} | ${r.hpLow}% | ${r.pots} |\n`;
     s += '\n'; }
   return s; }
 function bossReport(rows){
