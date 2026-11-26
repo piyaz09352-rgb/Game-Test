@@ -15,9 +15,20 @@ DUNGEONS.forEach(d => { d.name = d.th; });
 const DG = {active:false, entering:false, code:'', did:'', lv:1, pc:1, wave:0, waveT:0, t0:0, done:false, ret:null, exitT:0, invite:null};
 const DG_TIME = 15 * 60;
 /* a monster scaled to level lv for a party of pc: same for every player, so mirrors match the host */
+/* (v348) a guardian's HP is ×3.3 a field boss's of the dungeon's level, as designed. It used to be its own HP shrunk by
+   (level ratio)², which hit that only for some: the Naga King (Lv 259 at home) came out at 12× a Lv 45 field boss, the Elder
+   Pop 14×, Vessavana 12× — and four dungeons could not be cleared in their 15 minutes even with the three AI adventurers
+   (the guardian kept 52–98% of its HP: DUNGEON=1 AI=1 node tools/balance-report.js). The typical field boss of a level is
+   the middle one of the bosses within 10 levels of it. */
+const DG_REFHP = {};
+function dgBossRef(lv){ if (DG_REFHP[lv]) return DG_REFHP[lv];
+  const all = Object.keys(MOB).filter(k => MOB[k].boss && !MOB[k].wb && MOB[k].hp > 0).map(k => MOB[k]);
+  let near = all.filter(b => Math.abs(b.lvl - lv) <= 10); if (!near.length) near = all.slice().sort((a, b) => Math.abs(a.lvl - lv) - Math.abs(b.lvl - lv)).slice(0, 3);
+  const hs = near.map(b => b.hp * Math.pow(lv / Math.max(1, b.lvl), 2)).sort((a, b) => a - b);
+  return (DG_REFHP[lv] = hs[hs.length >> 1] || 1000); }
 function dgDef(type, code){
   const lv = Math.floor(code / 10), pc = clamp(code % 10, 1, 5), b = MOB[type], k = lv / Math.max(1, b.lvl), boss = !!b.boss, hpMul = (boss ? 3.3 : 1) * (1 + (pc - 1) * (boss ? .7 : .35));
-  return {...b, lvl:lv, hp:Math.max(30, Math.round(b.hp * k * k * hpMul)), atk:[Math.max(1, Math.round(b.atk[0] * k)), Math.max(2, Math.round(b.atk[1] * k))], def:Math.round(b.def * k),
+  return {...b, lvl:lv, hp:Math.max(30, Math.round((boss ? dgBossRef(lv) : b.hp * k * k) * hpMul)), atk:[Math.max(1, Math.round(b.atk[0] * k)), Math.max(2, Math.round(b.atk[1] * k))], def:Math.round(b.def * k),
     exp:Math.max(1, Math.round(b.exp * k * 1.6)), jexp:Math.max(1, Math.round(b.jexp * k * 1.6)), drops:b.drops || [], card:b.card, cardRate:b.cardRate, aggro:true, dg:true};
 }
 const dgInfo = () => DUNGEONS.find(d => d.id === DG.did);
