@@ -82,6 +82,7 @@ async function start(data){
   document.addEventListener('visibilitychange', () => { if (document.hidden && !PAUSED && SETTINGS.autoSave) save(); });
   window.claude?.hot?.snapshot?.(() => ({S}));
   initUI(); applySettings(); applyControlMode(); showTitle(); netInit();
+  bootDone();
   matchMedia('(pointer:coarse)').addEventListener?.('change', applyControlMode);
   window.__vay = {P, get mobs(){ return mobs; }, cam, get S(){ return S; }};
   dirty = true;
@@ -89,7 +90,7 @@ async function start(data){
 }
 // show any startup error on screen instead of a silent black canvas
 function showFatal(msg){
-  const t = document.getElementById('title'); if (!t) return;
+  bootDone(); const t = document.getElementById('title'); if (!t) return;
   t.hidden = false; t.classList.remove('out');
   t.querySelector('.title-card').innerHTML = `<p class="t-eyebrow">${L('เกิดข้อผิดพลาด', 'Something went wrong')}</p><p class="t-sub" style="margin:10px 0">${String(msg).slice(0, 300).replace(/[&<>"']/g, c => '&#' + c.charCodeAt(0) + ';')}</p><div class="t-btns"><button class="tbtn gold" data-reload="1">โหลดใหม่</button></div>`;
   const rb = t.querySelector('[data-reload]'); if (rb) rb.addEventListener('click', () => location.reload());
@@ -102,3 +103,5 @@ cv.addEventListener('contextrestored', () => { try { repaintMap(); } catch (err)
 const boot = () => window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
 { let booted = false; const go = () => { if (booted) return; if (document.readyState === 'loading'){ document.addEventListener('DOMContentLoaded', go, {once:true}); return; } booted = true; boot(); };   // (v236) never before every script has run (job lines register late)
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(go); setTimeout(go, 2500); }   // never wait more than 2.5 s for fonts
+/* (v348) the loading screen in index.html fades out once the title is up (or an error is shown) */
+function bootDone(){ const b = document.getElementById('boot'); if (!b) return; b.classList.add('done'); setTimeout(() => b.remove(), 500); }

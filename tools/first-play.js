@@ -94,12 +94,12 @@ fs.mkdirSync(OUT, { recursive: true }); for (const f of fs.readdirSync(OUT)) if 
       if (!LONG) continue;
       await page.evaluate(() => { for (const b of document.querySelectorAll('.win:not([hidden]) .btn.gold')) if (b.offsetWidth && /รับ|Claim/.test(b.textContent)) b.click(); for (const x of WIN_IDS) if (UIS.open[x]) closeWin(x); });
       if (m % 5 === 0 && await spendSkills()) await page.evaluate(() => setBot(true));
-      const st = await page.evaluate(() => ({lv:S.lvl, jl:S.jlvl, job:S.job, q:qState().active, main:qState().main, dead:P.dead, map:MAP_ID, block:JOBS[S.job].next ? jobChangeBlock() : 'max', bot:BOT.on}));
+      const st = await page.evaluate(() => ({lv:S.lvl, jl:S.jlvl, job:S.job, q:qState().active, main:qState().main, dead:P.dead, map:MAP_ID, block:JOBS[S.job].next ? jobChangeBlock() : 'max', jm:JOBS[S.job].jobMax || 99, bot:BOT.on}));
       if (!st.bot) await page.evaluate(() => setBot(true));
       if (st.lv === lastLv){ if (++still >= 8){ await shot('⚠ เลเวลไม่ขึ้น 8 นาที', JSON.stringify(st)); steps[steps.length - 1].bad = true; still = 0; } } else { lastLv = st.lv; still = 0; }
       if (st.dead){ await shot('ตาย', JSON.stringify(st)); await tapSel('[data-dth="town"]'); await page.waitForTimeout(1500); await page.evaluate(() => setBot(true)); }
       if (/Skill Point|สกิล|เรียน/.test(st.block)) await spendSkills();
-      if (!st.block || /Skill Point|สกิล|เรียน/.test(st.block) && st.jl >= (JOBS[st.job].jobMax || 99)){
+      if (!st.block || /Skill Point|สกิล|เรียน/.test(st.block) && st.jl >= st.jm){
         // the job change: to Master Vayra (in Aren) and pick the first job offered
         await shot(`พร้อมเปลี่ยนอาชีพ (${st.job})`, JSON.stringify(st)); await page.evaluate(() => setBot(false));
         await page.evaluate(() => { if (MAP_ID !== 0){ const g = GATES.find(q => q.to === 0); if (g){ TUTGO.id = 'job'; P.tx = g.x; P.ty = g.y; } else if (typeof warpTo === 'function') warpTo(0); } else tutWalkTo('job'); });

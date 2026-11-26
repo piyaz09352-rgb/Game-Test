@@ -40,6 +40,19 @@
   · ถ้าเปิดจากไฟล์ zip: คลิกขวาที่ไฟล์ zip → <b>แตกไฟล์ทั้งหมด (Extract All)</b> แล้วเปิด <code>index.html</code> ในโฟลเดอร์ที่แตกออกมา<br>
   · ถ้าเป็นเว็บ: อัปขึ้นให้ครบทั้งโฟลเดอร์ (<code>index.html</code> คู่กับ <code>assets</code> <code>audio</code> <code>css</code> <code>js</code>)<br><br>
   <small>Game files are missing: extract the whole zip (Extract All) and open index.html from the extracted folder, or upload the whole folder.</small></div>
+<!-- (v348) a loading screen that shows at once (no files needed): on a phone's 3G the game takes ~14 s to start and the
+     page stood empty (light blue, one stray button) — players thought it was broken. js/main.js fades it out when the
+     title is ready; it never covers the «files missing» notice above. -->
+<style>#boot{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(180deg,#9fd6f5 0%,#cfeaf7 55%,#f6efd9 100%);font-family:Mali,Pridi,sans-serif;color:#3a2a10;transition:opacity .45s}
+#boot.done{opacity:0;pointer-events:none}#filesMissing[style]~#boot{display:none}
+#boot b{font:800 clamp(30px,6vw,56px)/1 Cinzel,Georgia,serif;letter-spacing:.12em;color:#b8860b;text-shadow:0 2px 0 #fff4c8,0 4px 14px rgba(120,80,0,.25)}
+#boot i{font-style:normal;font-size:clamp(14px,2.4vw,20px);color:#5a3f12}
+#boot .bt{width:min(360px,70vw);height:8px;border-radius:6px;background:rgba(255,255,255,.65);box-shadow:inset 0 1px 2px rgba(0,0,0,.15);overflow:hidden;margin-top:8px}
+#boot .bt span{display:block;width:38%;height:100%;border-radius:6px;background:linear-gradient(90deg,#f3c45a,#d99a2b);animation:bootbar 1.6s ease-in-out infinite}
+#boot small{font-size:clamp(11px,1.8vw,14px);color:#6a5530}
+@keyframes bootbar{0%{transform:translateX(-110%)}100%{transform:translateX(290%)}}
+@media (prefers-reduced-motion:reduce){#boot .bt span{animation:none;width:100%;opacity:.6}}</style>
+<div id="boot" role="status" aria-live="polite"><b>VAYRATHEN</b><i>อาณาจักรวายรา</i><div class="bt"><span></span></div><small>กำลังโหลดเกม… ครั้งแรกบนเน็ตมือถืออาจใช้เวลาสักครู่</small></div>
 <div class="rotate" id="rotate" role="alert">
   <div class="rot-card">
     <svg class="rot-ic" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="8" width="24" height="44" rx="4"/><path d="M29 46h6"/><path d="M50 22a18 18 0 016 14M56 36l-4-3M56 36l3-4"/></svg>
@@ -245,7 +258,7 @@
 <script src="js/sys/wboss.js?v=272"></script>
 <script src="js/sys/wboss2.js?v=111"></script>
 <script src="js/sys/netmob.js?v=293"></script>
-<script src="js/sys/dungeon.js?v=279"></script>
+<script src="js/sys/dungeon.js?v=280"></script>
 <script src="js/sys/pvp.js?v=111"></script>
 <script src="js/sys/social2.js?v=304"></script>
 <script src="js/sys/tutorial.js?v=281"></script>
@@ -431,7 +444,7 @@
 <script src="js/sys/towerparty.js?v=255"></script>
 <script src="js/sys/festival213.js?v=213"></script>
 <script src="js/sys/featureoff.js?v=213"></script>
-<script src="js/main.js?v=304"></script>
+<script src="js/main.js?v=305"></script>
 <script src="js/sys/smooth3.js?v=112"></script>
 <script src="js/sys/perf4.js?v=222"></script>
 <script src="js/sys/touchequip.js?v=237"></script>

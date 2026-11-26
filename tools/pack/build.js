@@ -1,4 +1,6 @@
 /* VAYRATHEN — tools/pack/build.js — (v347) the upload pack, quicker to load
+   (v348) MINI=1 also shortens names inside functions (esbuild never renames a script's top-level names): measured only
+   4% smaller, so it is off by default.
    The game is ~460 script files and ~22 style sheets. A phone on 3G spent most of its wait (tools/load-time.js) asking for
    them one by one. The pack joins them into a few files and drops the comments and spaces (the code itself is not
    renamed or changed), so the browser fetches ~20 files instead of ~500. The source stays as it is: this only builds
@@ -80,7 +82,7 @@ const cssGroups = []; { let g = null;
   for (const g of jsGroups){
     const outs = [];
     for (const f of g.files){ bytes0 += Buffer.byteLength(f.src);
-      const r = await esbuild.transform(f.src, { loader: 'js', minifyWhitespace: true, minifySyntax: false, minifyIdentifiers: false, legalComments: 'none', charset: 'utf8', target: 'esnext', sourcefile: f.file });
+      const r = await esbuild.transform(f.src, { loader: 'js', minifyWhitespace: true, minifySyntax: process.env.MINI === '1', minifyIdentifiers: process.env.MINI === '1', legalComments: 'none', charset: 'utf8', target: 'esnext', sourcefile: f.file });   // (v348) MINI=1 also shortens names inside functions: only 4% smaller, so off by default
       let code = r.code.trim();
       // the bundle's own directive covers it; a strict file's directive inside a bundle would be a plain string
       if (g.strict) code = code.replace(/^(["'])use strict\1;?/, '');
