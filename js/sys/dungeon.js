@@ -16,13 +16,13 @@ const DG = {active:false, entering:false, code:'', did:'', lv:1, pc:1, wave:0, w
 const DG_TIME = 15 * 60;
 /* a monster scaled to level lv for a party of pc: same for every player, so mirrors match the host */
 function dgDef(type, code){
-  /* (v348) a party of one meets a lighter guardian (HP ×1.6 instead of ×3.3, hits ×0.8): alone at the dungeon's level, every
+  /* (v348) a party of one meets a lighter guardian (HP ×1.6 instead of ×3.3, plain hits ×0.8, boss blows and skills ×0.6): alone at the dungeon's level, every
      class on Auto reached the guardian and then died to it every few seconds until the time ran out (DUNGEON=1 node
      tools/balance-report.js → docs/BALANCE_DUNGEON.md). Parties of 2–5 are as before. */
   const lv = Math.floor(code / 10), pc = clamp(code % 10, 1, 5), b = MOB[type], k = lv / Math.max(1, b.lvl), boss = !!b.boss, solo = boss && pc === 1,
     hpMul = solo ? 1.6 : (boss ? 3.3 : 1) * (1 + (pc - 1) * (boss ? .7 : .35)), am = solo ? .8 : 1;
   return {...b, lvl:lv, hp:Math.max(30, Math.round(b.hp * k * k * hpMul)), atk:[Math.max(1, Math.round(b.atk[0] * k * am)), Math.max(2, Math.round(b.atk[1] * k * am))], def:Math.round(b.def * k),
-    exp:Math.max(1, Math.round(b.exp * k * 1.6)), jexp:Math.max(1, Math.round(b.jexp * k * 1.6)), drops:b.drops || [], card:b.card, cardRate:b.cardRate, aggro:true, dg:true};
+    exp:Math.max(1, Math.round(b.exp * k * 1.6)), jexp:Math.max(1, Math.round(b.jexp * k * 1.6)), drops:b.drops || [], card:b.card, cardRate:b.cardRate, aggro:true, dg:true, dmgMul:solo ? .6 : 1};   // (v348) dmgMul: every hit it lands, after all the boss layers (mobs.js mobAttack)
 }
 const dgInfo = () => DUNGEONS.find(d => d.id === DG.did);
 function dgEnter(did, code, lv, pc){
@@ -63,6 +63,11 @@ function dgReward(){
   banner(L(`ผ่าน${D.th}! ออกอัตโนมัติใน 45 วินาที`, `${D.en} cleared! Leaving in 45 seconds`)); DG.exitT = 45; dgLabel(); save();
 }
 EV.on('kill', m => dgKilled(m));
+/* (v348) what the guardian (or anything) summons inside a dungeon is scaled to the dungeon too: the cave stands on Chiang Dao
+   (now a Lv 210+ map), and the Lv 15 cave's guardian called Lv 220 bats and spirits that hit for 450 (DUNGEON=1 report) */
+if (typeof HK !== 'undefined' && HK.spawn) HK.spawn.push((m, opt) => { if (typeof DG === 'undefined' || !DG.active || !opt || !opt.minion || m.dg || !MOB[m.type]) return;
+  const src = mobs.find(b => b.dg && !b.dead && b.dgc) ; const code = src ? src.dgc : DG.lv * 10 + DG.pc;
+  m.def = dgDef(m.type, code); m.maxhp = m.hp = m.def.hp; m.dg = true; m.dgc = code; m.split = true; });
 EV.on('map', () => { if (DG.active && !DG.entering){ DG.active = false; } });
 EV.on('tick', dt => {
   if (!DG.active || PAUSED) return;
