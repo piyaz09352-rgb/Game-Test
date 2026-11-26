@@ -76,42 +76,50 @@ fs.mkdirSync(OUT, { recursive: true }); for (const f of fs.readdirSync(OUT)) if 
     await page.waitForTimeout(800); await shot('จบบทสอน', await page.evaluate(() => `Lv ${S.lvl} · เงิน ${S.bia} · ${S.tut && S.tut.done ? 'บทสอนจบ' : 'บทสอนยังไม่จบ'}`));
     await tapSel('#botChip, [data-h6="bot"], .botchip'); await page.waitForTimeout(400);
     if (!(await page.evaluate(() => typeof BOT !== 'undefined' && BOT.on))) await page.evaluate(() => setBot(true));
-    const MIN = +process.env.MIN || 6, LONG = process.env.LONG === '1';
-    let lastLv = 0, still = 0;
-    for (let m = 1; m <= (LONG ? 60 : MIN); m++){ await page.waitForTimeout(60000); await page.evaluate(() => { if (typeof leaveRest === 'function') leaveRest(); }); await page.waitForTimeout(400); if (!LONG || m % 3 === 0) await shot(`เล่น Auto นาทีที่ ${m}`, await page.evaluate(() => `Lv ${S.lvl} · แผนที่ ${nm(MAPS[MAP_ID])} · ฆ่า ${(typeof stc === 'function' && stc().kills) || 0} · ${qState().active ? 'มีเควสต์' : 'ไม่มีเควสต์'} · ตาย ${(typeof stc === 'function' && stc().deaths) || 0}`));
+    const MIN = +process.env.MIN || 6, LONG = process.env.LONG === '1', TO = process.env.TO || 'job1';   // TO=job2: on to the second job change (Base Lv 40)
+    let lastLv = 0, still = 0, changes = 0;
+    if (LONG) await page.evaluate(() => { const b = botSet(); b.autoStat = true; });   // an engaged player turns on «spend stat points for me»
+    // like a player who opens the skill window now and then: points into the first skills that take them, then confirm
+    const spendSkills = async () => { if (!(await page.evaluate(() => S.skPts > 0))) return false;
+      await page.evaluate(() => { for (const x of WIN_IDS) if (UIS.open[x]) closeWin(x); openWin('skill'); }); await page.waitForTimeout(500);
+      for (let g = 0; g < 40; g++){ const left = await page.evaluate(() => S.skPts - (typeof skPending === 'function' ? skPending() : 0)); if (left <= 0) break;
+        const ids = await page.evaluate(() => [...document.querySelectorAll('#pane-skill [data-sksel]')].map(b => b.dataset.sksel));
+        let did = false; for (const id of ['firstaid', 'stone', 'ready', ...ids]){ if (!(await tapSel(`#pane-skill [data-sksel="${id}"]`))) continue;
+          const plus = await page.evaluate(() => { const b = [...document.querySelectorAll('#pane-skill button')].find(b => b.textContent.trim() === '+' && b.offsetWidth && !b.disabled); if (!b) return null; const r = b.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; });
+          if (plus){ await tap(plus[0], plus[1]); did = true; break; } }
+        if (!did) break; }
+      await tapSel('#pane-skill [data-skok]'); await page.waitForTimeout(400); await page.evaluate(() => { for (const x of WIN_IDS) if (UIS.open[x]) closeWin(x); }); return true; };
+    for (let m = 1; m <= (LONG ? (TO === 'job2' ? 200 : 60) : MIN); m++){ await page.waitForTimeout(60000); await page.evaluate(() => { if (typeof leaveRest === 'function') leaveRest(); }); await page.waitForTimeout(400);
+      if (!LONG || m % (TO === 'job2' ? 6 : 3) === 0) await shot(`เล่น Auto นาทีที่ ${m}`, await page.evaluate(() => `Lv ${S.lvl} · ${nm(JOBS[S.job])} Job ${S.jlvl} · ${nm(MAPS[MAP_ID])} · ฆ่า ${(typeof stc === 'function' && stc().kills) || 0} · ตาย ${(typeof stc === 'function' && stc().deaths) || 0} · ยา ${typeof botPotCount === 'function' ? botPotCount() : '?'} · ${qState().active ? 'เควสต์ ' + (QUESTS.find(q => q.id === qState().active) || {title:['?']}).title[0] : 'ไม่มีเควสต์'}`));
       if (!LONG) continue;
-      // like a person: windows that popped up are closed (a reward claimed first)
       await page.evaluate(() => { for (const b of document.querySelectorAll('.win:not([hidden]) .btn.gold')) if (b.offsetWidth && /รับ|Claim/.test(b.textContent)) b.click(); for (const x of WIN_IDS) if (UIS.open[x]) closeWin(x); });
-      const st = await page.evaluate(() => ({lv:S.lvl, jl:S.jlvl, job:S.job, q:qState().active, main:qState().main, dead:P.dead, map:MAP_ID}));
-      if (st.lv === lastLv){ if (++still >= 6){ await shot('⚠ เลเวลไม่ขึ้น 6 นาที', JSON.stringify(st)); steps[steps.length - 1].bad = true; still = 0; } } else { lastLv = st.lv; still = 0; }
-      if (st.dead){ await shot('ตาย', JSON.stringify(st)); await tapSel('[data-dth="town"]'); await page.waitForTimeout(1500); }
-      if (st.job === 'novice' && st.jl >= 10){
-        // Job 10: to Master Vayra (the quest card / «พาไป» path a player follows) and pick the first job
-        await shot('ถึง Job 10 — ไปเปลี่ยนอาชีพ', JSON.stringify(st)); await page.evaluate(() => setBot(false));
-        await page.evaluate(() => { if (MAP_ID !== 0){ const g = GATES.find(q => q.to === 0); if (g){ TUTGO.id = 'job'; P.tx = g.x; P.ty = g.y; } } else tutWalkTo('job'); });
-        let ok = false; for (let k = 0; k < 120 && !ok; k++){ await page.waitForTimeout(500); await page.evaluate(() => { if (typeof leaveRest === 'function') leaveRest();   // a person touches the screen now and then
-            // and on the way fights back what attacks, and drinks a potion when low
+      if (m % 5 === 0 && await spendSkills()) await page.evaluate(() => setBot(true));
+      const st = await page.evaluate(() => ({lv:S.lvl, jl:S.jlvl, job:S.job, q:qState().active, main:qState().main, dead:P.dead, map:MAP_ID, block:JOBS[S.job].next ? jobChangeBlock() : 'max', bot:BOT.on}));
+      if (!st.bot) await page.evaluate(() => setBot(true));
+      if (st.lv === lastLv){ if (++still >= 8){ await shot('⚠ เลเวลไม่ขึ้น 8 นาที', JSON.stringify(st)); steps[steps.length - 1].bad = true; still = 0; } } else { lastLv = st.lv; still = 0; }
+      if (st.dead){ await shot('ตาย', JSON.stringify(st)); await tapSel('[data-dth="town"]'); await page.waitForTimeout(1500); await page.evaluate(() => setBot(true)); }
+      if (/Skill Point|สกิล|เรียน/.test(st.block)) await spendSkills();
+      if (!st.block || /Skill Point|สกิล|เรียน/.test(st.block) && st.jl >= (JOBS[st.job].jobMax || 99)){
+        // the job change: to Master Vayra (in Aren) and pick the first job offered
+        await shot(`พร้อมเปลี่ยนอาชีพ (${st.job})`, JSON.stringify(st)); await page.evaluate(() => setBot(false));
+        await page.evaluate(() => { if (MAP_ID !== 0){ const g = GATES.find(q => q.to === 0); if (g){ TUTGO.id = 'job'; P.tx = g.x; P.ty = g.y; } else if (typeof warpTo === 'function') warpTo(0); } else tutWalkTo('job'); });
+        const job0 = st.job; let ok = false;
+        for (let k = 0; k < 240 && !ok; k++){ await page.waitForTimeout(500);
+          await page.evaluate(() => { if (typeof leaveRest === 'function') leaveRest();
             if (P.dead){ const b = document.querySelector('[data-dth="town"]'); if (b) b.click(); return; }
             const foe = mobs.find(m => !m.dead && m.aggro && Math.hypot(m.x - P.x, m.y - P.y) < 260);
             if (foe && (!P.target || P.target.dead)){ P.target = foe; P.npc = null; P.tx = null; window.__fpResume = 1; }
             if (!foe && window.__fpResume){ window.__fpResume = 0; if (MAP_ID !== 0){ const g = GATES.find(q => q.to === 0); if (g){ TUTGO.id = 'job'; P.tx = g.x; P.ty = g.y; } } else tutWalkTo('job'); }
-            if (S.hp < DER.maxhp * .4 && P.itemCd <= 0){ const id = ['orangepot', 'redpot'].find(k => S.inv[k] > 0); if (id) useItem(id); } });
-          if (await page.evaluate(() => MAP_ID === 0 && !P.npc && !(el('dialog') && !el('dialog').hidden))) await page.evaluate(() => tutWalkTo('job'));
-          // blocked by skills: the dialog's «เปิดหน้าต่างสกิล», then points into what «พร้อมออกเดินทาง» needs, itself, and the rest; confirm
-          if (await page.evaluate(() => !!document.querySelector('#dialog:not([hidden]) [data-npcwin="skill"]'))){ await shot('ครูวายรา: ต้องเรียนสกิลก่อน'); await tapSel('#dialog [data-npcwin="skill"]'); await page.waitForTimeout(600); await shot('หน้าต่างสกิล (เลือกสกิลที่ต้องใช้ให้แล้ว)');
-            for (let g = 0; g < 30; g++){ const left = await page.evaluate(() => S.skPts - (typeof skPending === 'function' ? skPending() : 0)); if (left <= 0) break;
-              const ids = await page.evaluate(() => [...document.querySelectorAll('#pane-skill [data-sksel]')].map(b => b.dataset.sksel));
-              const order = ['firstaid', 'stone', 'ready', ...ids]; let did = false;
-              for (const id of order){ if (!(await tapSel(`#pane-skill [data-sksel="${id}"]`))) continue;
-                const plus = await page.evaluate(() => { const b = [...document.querySelectorAll('#pane-skill button')].find(b => b.textContent.trim() === '+' && b.offsetWidth && !b.disabled); if (!b) return null; const r = b.getBoundingClientRect(); return [r.x + r.width / 2, r.y + r.height / 2]; });
-                if (plus){ await tap(plus[0], plus[1]); did = true; break; } }
-              if (!did) break; }
-            await shot('กด + แล้ว'); await tapSel('#pane-skill [data-skok]'); await page.waitForTimeout(500);
-            await page.evaluate(() => { for (const x of WIN_IDS) if (UIS.open[x]) closeWin(x); tutWalkTo('job'); }); }
+            if (S.hp < DER.maxhp * .4 && P.itemCd <= 0){ const id = ['whitepot', 'orangepot', 'redpot'].find(k => S.inv[k] > 0); if (id) useItem(id); } });
+          // a map with no gate home (deeper in the world): the shrine keeper's free warp, as a player would
+          if (k === 20 && await page.evaluate(() => MAP_ID !== 0 && !GATES.find(q => q.to === 0))) await page.evaluate(() => { if (typeof warpTo === 'function') warpTo(0); });
+          if (await page.evaluate(() => MAP_ID === 0 && !P.npc && !P.tx && !(el('dialog') && !el('dialog').hidden))) await page.evaluate(() => tutWalkTo('job'));
+          if (await page.evaluate(() => !!document.querySelector('#dialog:not([hidden]) [data-npcwin="skill"]'))){ await shot('ครูวายรา: ต้องเรียนสกิลก่อน'); await tapSel('#dialog [data-npcwin="skill"]'); await page.waitForTimeout(500); await spendSkills(); await page.evaluate(() => tutWalkTo('job')); }
           if (await page.evaluate(() => !!document.querySelector('#dialog:not([hidden]) [data-job]'))){ await shot('เลือกอาชีพ'); await tapSel('#dialog [data-job]'); await page.waitForTimeout(800);
-            await tapSel('#confirm:not([hidden]) .btn.gold, #confirm:not([hidden]) [data-yes]'); await page.waitForTimeout(1500); ok = await page.evaluate(() => S.job !== 'novice'); } }
-        await shot(ok ? 'เปลี่ยนอาชีพแล้ว' : '⚠ เปลี่ยนอาชีพไม่สำเร็จ', await page.evaluate(() => `${S.job} · Lv ${S.lvl} · Job ${S.jlvl} · ${Math.round((Date.now() - window.__fp0) / 60000)} นาทีจากสร้างตัว`)); if (!ok) steps[steps.length - 1].bad = true;
-        break; }
+            await tapSel('#confirm:not([hidden]) .btn.gold, #confirm:not([hidden]) [data-yes]'); await page.waitForTimeout(1500); ok = await page.evaluate(j => S.job !== j, job0); } }
+        await shot(ok ? 'เปลี่ยนอาชีพแล้ว' : '⚠ เปลี่ยนอาชีพไม่สำเร็จ', await page.evaluate(() => `${nm(JOBS[S.job])} · Lv ${S.lvl} · Job ${S.jlvl} · ${Math.round((Date.now() - window.__fp0) / 60000)} นาทีจากสร้างตัว`)); if (!ok){ steps[steps.length - 1].bad = true; break; }
+        changes++; if (TO !== 'job2' || changes >= 2) break;
+        await page.evaluate(() => { const c = el('confirm'); if (c) c.hidden = true; closeDialog(); setBot(true); }); }
     }
   } catch (e) { await shot('หยุดเพราะ error', String(e.message).slice(0, 160)); steps[steps.length - 1].bad = true; }
   finally {

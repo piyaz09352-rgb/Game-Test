@@ -87,7 +87,7 @@ function aqGo(x, y){ if (P.sit){ P.sit = false; renderHotbar(); } BOT.resting = 
         if (want && dist(want, P) > BOT_CFG.seek * 1.5 && !fighting){ BOT.roam = {x:want.x, y:want.y}; } }
       const r = _ub.apply(this, arguments); if (BOT.state === 'roam' || BOT.state === 'hunt') BOT.state = 'quest'; renderBotChip(); return r; }
     AQ.types = null;
-    if (fighting || low || BOT.resting) return _ub.apply(this, arguments);   // fight back, drink, rest first
+    if (fighting || low || BOT.resting || (MAP_ID === 0 && typeof botBuyWant === 'function' && botBuyWant())) return _ub.apply(this, arguments);   // fight back, drink, rest first — (v348) and buy potions in town
     BOT.think -= dt; if (BOT.think > 0) return; BOT.think = .25; closeDialog();
     BOT.state = 'quest';
     if (p.map !== MAP_ID){ const hop = qgNextHop(MAP_ID, p.map), gt = hop != null && GATES.find(x => x.to === hop);
