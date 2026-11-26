@@ -23,7 +23,7 @@ test('starter fields: zones by danger; a new hero on Auto survives', { skip, tim
       // Auto's choice with a weak and a strong monster about as close
       for (const m of mobs) m.dead = true; mobs = mobs.filter(m => !m.dead);   /* only the two below, so the choice is between them */
       S.lvl = 2; P.x = g.x + 300; P.y = g.y;   /* (v347) inside the Lv 2 part of the fields: Auto keeps to its own part (bot.js botInZone) */
-      const weak = spawnMob('dewblob', P.x + 90, P.y, {zone:MAPZ}), strong = spawnMob('lantern', P.x + 80, P.y + 10, {zone:MAPZ}); strong.aggro = false; S.lvl = 2;
+      const weak = spawnMob('dewblob', P.x + 90, P.y, {zone:MAPZ}), strong = spawnMob('lantern', P.x - 160, P.y + 10, {zone:MAPZ});   /* (v348) closer to the hero than the weak one, but over BOT_DANGER.near from it: Auto also skips a monster standing next to one far above its level */ strong.aggro = false; S.lvl = 2;
       const pick = pickTarget(); weak.dead = strong.dead = true;
       return {slots, deaths, kills, lv:S.lvl, pick:pick && pick.type}; });
     assert.ok(r.slots.dewblob.maxX < 2000 && r.slots.kobna.minX < 2000, 'the weakest by the west gate: ' + JSON.stringify(r.slots.dewblob));

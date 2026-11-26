@@ -20,7 +20,9 @@ const toOwnText = e => { for (const n of e.childNodes) if (n.nodeType === 3 && n
 function toWant(e){
   if (!e || e.nodeType !== 1 || e.tagName === 'CANVAS' || e.tagName === 'SCRIPT' || e.tagName === 'STYLE') return null;
   if (!toOwnText(e) && e.tagName !== 'INPUT' && e.tagName !== 'BUTTON') return false;
-  try { return toWhite(getComputedStyle(e).color); } catch (err) { return false; }
+  /* (v348) what is painted is the fill colour when a theme sets one: the sunlit theme paints dark ink over a white
+     `color`, and the outline then turned dark numbers into black blobs (the quest bars «0/30», the owner's screenshot) */
+  try { const cs = getComputedStyle(e), f = cs.webkitTextFillColor; return toWhite(f && !/^rgba\(0, 0, 0, 0\)$/.test(f) ? f : cs.color); } catch (err) { return false; }
 }
 function toApply(list){
   const want = list.map(toWant);

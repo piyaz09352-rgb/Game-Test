@@ -140,7 +140,7 @@ function renderHotbar(){
   $('#hotbar').innerHTML = hb.map((h, i) => {
     if (!h) return `<button class="hk empty" disabled aria-label="${L('ช่องว่าง', 'Empty slot')}"><kbd>${i + 1}</kbd></button>`;
     if (h.k === 'skill'){ const s = SKILLS[h.id]; return `<button class="hk ico sk-${s.elem || 'neutral'}" data-hot="${i}" title="${skName(s)}">${skillIcon(h.id)}<kbd>${i + 1}</kbd><b>${skShort(s)}</b><span class="lv">${skl(h.id)}</span><i class="cdv" data-cd="${h.id}"></i></button>`; }
-    return `<button class="hk ico${i === 6 ? ' first-item' : ''}" data-hot="${i}" ${S.inv[h.id] ? '' : 'disabled'} title="${nm(ITEMS[h.id])}">${itemIcon(h.id)}<kbd>${i + 1}</kbd><b>${nm(ITEMS[h.id])}</b><span class="lv">${S.inv[h.id] || 0}</span></button>`;
+    return `<button class="hk ico${i === 6 ? ' first-item' : ''}" data-hot="${i}" ${S.inv[h.id] ? '' : 'disabled'} title="${nm(ITEMS[h.id])}">${itemIcon(h.id)}<kbd>${i + 1}</kbd><b>${nm(ITEMS[h.id])}</b><span class="lv">${slotCount(S.inv[h.id])}</span></button>`;
   }).join('') + `<span class="hsep"></span>`
     + `<button class="hk${P.ride ? ' on' : ''}" data-move="ride" title="${L('ขี่สัตว์ขี่ เร็วขึ้น 30%', 'Ride your mount, 30% faster')}"><kbd>R</kbd><b>${P.ride ? L('ลง', 'Off') : L('ขี่', 'Ride')}</b></button>`
     + `<button class="hk" data-move="capture" title="${L('จับมอนที่ HP ไม่เกิน 30% มาเป็น Pet', 'Capture a monster at 30% HP or less as a pet')}"><kbd>T</kbd><b>${L('จับ', 'Catch')}</b></button>`

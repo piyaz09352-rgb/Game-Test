@@ -130,15 +130,23 @@ EV.on('tick', () => { const on = goldOn(); if (on && !GOLD.was && S && S.lvl){ b
 /* ---------- the strip under the invasion bar ---------- */
 function gobBar(w){
   let b = GOB.bar; if (!b){ const host = document.getElementById('wrap'); if (!host) return; b = GOB.bar = document.createElement('div'); b.id = 'evBar274'; host.appendChild(b);
-    const st = document.createElement('style'); st.textContent = `#evBar274{position:absolute;top:calc(env(safe-area-inset-top,0px) + 40px);left:50%;transform:translateX(-50%);z-index:29;display:flex;gap:6px;pointer-events:none}
-      #evBar274[hidden]{display:none}#evBar274 .eb{display:flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;font:700 clamp(10px,1.4vw,13px)/1.2 Sarabun,"Noto Sans Thai",sans-serif;box-shadow:0 2px 8px rgba(0,0,0,.3);white-space:nowrap}
-      #evBar274 .eb.gold{background:linear-gradient(#fff2b0,#e8b030);color:#4a2a00;border:1px solid #fff6d0}#evBar274 .eb.gob{background:rgba(30,50,10,.82);color:#e8ffc0;border:1px solid #9ad84a}
-      #evBar274 .eb button{pointer-events:auto;padding:1px 9px;border-radius:999px;border:1px solid #ffd27a;background:linear-gradient(#ffcf6a,#e08a20);color:#3a1a04;font:800 inherit;cursor:pointer}`; document.head.appendChild(st); }
+    /* (v348) small chips at the very top, between the player card and the top-right buttons; they move under a banner
+       while one is up (the owner: «ป้ายใหญ่เกินไป» — the old strip sat on the player card on phones) */
+    const st = document.createElement('style'); st.textContent = `#evBar274{position:absolute;top:calc(env(safe-area-inset-top,0px) + 6px);left:50%;transform:translateX(-50%);z-index:29;display:flex;flex-wrap:wrap;justify-content:center;gap:4px;max-width:min(460px,calc(100% - 480px));pointer-events:none;transition:opacity .2s}
+      #evBar274[hidden]{display:none}#evBar274 .eb{display:flex;align-items:center;gap:4px;height:20px;box-sizing:border-box;padding:0 8px;border-radius:999px;font:700 11px/1 Sarabun,"Noto Sans Thai",sans-serif;box-shadow:0 1px 4px rgba(0,0,0,.25);white-space:nowrap;min-width:0}
+      #evBar274 .eb i{font-style:normal;overflow:hidden;text-overflow:ellipsis;min-width:0;max-width:130px}
+      #evBar274 .eb.gold{background:#ffe9a0;color:#3d2400;border:1px solid #d9a52c}#evBar274 .eb.gob{background:rgba(24,40,8,.88);color:#eaffc8;border:1px solid #8cc63f}
+      #evBar274 .eb button{pointer-events:auto;height:16px;padding:0 8px;margin-right:-5px;border-radius:999px;border:0;background:#ffcf6a;color:#2e1400;font:800 11px/1 Sarabun,"Noto Sans Thai",sans-serif;cursor:pointer}
+      @media (min-width:1100px){#evBar274 .eb{height:24px;font-size:12.5px;padding:0 10px}#evBar274 .eb button{height:19px;font-size:12px}#evBar274 .eb i{max-width:180px}}`; document.head.appendChild(st); }
   const fmt = m => `${Math.floor(m)}:${String(Math.floor((m % 1) * 60)).padStart(2, '0')}`, gw = goldWindow(); let h = '';
-  if (gw && gw.active) h += `<span class="eb gold">✨ ${L('ชั่วโมงทอง EXP/ดรอป ×2', 'Golden hour EXP/drops ×2')} · ${fmt(gw.left)}</span>`;
+  if (gw && gw.active) h += `<span class="eb gold" title="${L('ชั่วโมงทอง: EXP JOB และดรอป ×2', 'Golden hour: EXP, Job EXP and drops ×2')}">✨ ${L('ชั่วโมงทอง ×2', 'Golden ×2')} · ${fmt(gw.left)}</span>`;
   if (w && w.active && !(S.gobDone && S.gobDone[w.key])){ const id = gobMap(w.key);
-    if (id >= 0) h += `<span class="eb gob">💰 ${L('ก็อบลินขนสมบัติ', 'Treasure Goblin')} · ${MAP_ID === id ? L('อยู่ในแผนที่นี้!', 'on this map!') : nm(MAPS[id])} · ${fmt(w.left)}${MAP_ID !== id ? ` <button data-gobgo="${id}">${L('ไป', 'Go')}</button>` : ''}</span>`; }
+    if (id >= 0) h += `<span class="eb gob" title="${L('ก็อบลินขนสมบัติ', 'Treasure Goblin')}">💰 ${L('ก็อบลิน', 'Goblin')} · <i>${MAP_ID === id ? L('แผนที่นี้!', 'this map!') : nm(MAPS[id])}</i> · ${fmt(w.left)}${MAP_ID !== id ? ` <button data-gobgo="${id}">${L('ไป', 'Go')}</button>` : ''}</span>`; }
   if (b._h !== h){ b._h = h; b.innerHTML = h; } b.hidden = !h;
+  // a banner (top middle) is up: sit just under it, else at the very top
+  if (h){ const bn = document.getElementById('banner'), host = b.parentNode; let top = 6;
+    if (bn && !bn.hidden && bn.classList.contains('show') && host){ const r = bn.getBoundingClientRect(), hr = host.getBoundingClientRect(); if (r.height) top = Math.round(r.bottom - hr.top + 4); }
+    if (b._top !== top){ b._top = top; b.style.top = top === 6 ? '' : top + 'px'; } }
 }
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-gobgo]'); if (!b) return; const id = +b.dataset.gobgo; if (id < 0 || id === MAP_ID) return;
   if (typeof DG !== 'undefined' && DG.active){ toast(L('ออกจากดันเจี้ยนก่อนนะ', 'Leave the dungeon first')); return; }
