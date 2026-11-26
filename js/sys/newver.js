@@ -5,7 +5,9 @@
    · another online player's lobby line carries their version (gv): a higher one means a newer game is out
    · the GM's game writes server/version {v} when it is newer than what is stored; every game listens to that one
      document (one read when it changes)
-   Then a banner at the top says so, with a button that reloads the page (saving first). */
+   Then a banner at the top says so, with a button that reloads the page (saving first).
+   (v348) The banner no longer shows the numbers: they are the files' ?v= numbers (v395), not the release names players
+   know (v348) — the owner asked «อันนี้คืออะไร». */
 'use strict';
 
 const GAMEV = (() => { let v = 0; for (const s of document.scripts){ const m = /[?&]v=(\d+)/.exec(s.src || ''); if (m) v = Math.max(v, +m[1]); } return v; })();
@@ -13,7 +15,7 @@ const NV = {seen:0, shown:false, t:0, sub:null};
 function nvShow(v){
   if (!GAMEV || !(v > GAMEV) || NV.shown) return; NV.shown = true; NV.seen = v;
   const b = document.createElement('div'); b.id = 'nvBar';
-  b.innerHTML = `<span>✨ ${L(`มีเกมเวอร์ชันใหม่แล้ว (v${v}) · คุณยังเล่น v${GAMEV} อยู่`, `A new version is out (v${v}) · you are on v${GAMEV}`)}</span><button class="btn sm gold" id="nvGo">${L('โหลดเวอร์ชันใหม่', 'Load it')}</button><button class="ibtn" id="nvX" aria-label="${L('ปิด', 'Close')}">✕</button>`;
+  b.innerHTML = `<span>✨ ${L('มีอัปเดตเกมใหม่แล้ว · กดโหลดใหม่เพื่อเล่นเวอร์ชันล่าสุด', 'A game update is out · reload to play the newest version')}</span><button class="btn sm gold" id="nvGo">${L('โหลดเวอร์ชันใหม่', 'Load it')}</button><button class="ibtn" id="nvX" aria-label="${L('ปิด', 'Close')}">✕</button>`;
   document.body.appendChild(b);
   el('nvX').onclick = () => b.remove();
   el('nvGo').onclick = () => {

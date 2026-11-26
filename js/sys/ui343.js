@@ -24,9 +24,12 @@
         hudPut(ch, m, M.bottom - U.top + 3 * k, 'r'); const C2 = brect(ch);
         const hit = [...document.querySelectorAll('#ui .mo')].some(b => { if (!b.offsetWidth) return false; const B = brect(b); return B.left < C2.right && B.right > C2.left && B.top < C2.bottom && B.bottom > C2.top; });
         if (!hit) return r;
-        // still under a button at the right: under the card's left edge (the wheel's top button is at its right)
-        hudPut(ch, Math.round(U.right - M.left - C2.width), M.bottom - U.top + 3 * k, 'r'); const C3 = brect(ch);
-        const hit2 = C3.left < M.left - 2 || [...document.querySelectorAll('#ui .mo')].some(b => { if (!b.offsetWidth) return false; const B = brect(b); return B.left < C3.right && B.right > C3.left && B.top < C3.bottom && B.bottom > C3.top; });
+        // still under a button at the right: under the card, ending just left of the buttons in that strip (it may reach
+        // a little past the card's left edge when four chips are showing)
+        const y0 = M.bottom + 3 * k, y1 = y0 + C2.height; let edge = M.right;
+        for (const b of document.querySelectorAll('#ui .mo')){ if (!b.offsetWidth) continue; const B = brect(b); if (B.top < y1 && B.bottom > y0 && B.right > M.left - 120 && B.left < M.right) edge = Math.min(edge, B.left - 4 * k); }
+        hudPut(ch, Math.round(U.right - edge), M.bottom - U.top + 3 * k, 'r'); const C3 = brect(ch);
+        const hit2 = C3.left < M.left - 110 || [...document.querySelectorAll('#ui .mo')].some(b => { if (!b.offsetWidth) return false; const B = brect(b); return B.left < C3.right && B.right > C3.left && B.top < C3.bottom && B.bottom > C3.top; });
         if (hit2) return _h6c.apply(this, arguments); } }
     return r; };
   if (typeof h6Layout === 'function'){ const _l = h6Layout; h6Layout = function(){ const r = _l.apply(this, arguments); try { place(); } catch (e) {} return r; }; }
