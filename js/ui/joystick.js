@@ -31,6 +31,8 @@ const ATK_ICON = {
   fist:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M7 11V8.5a1.5 1.5 0 013 0V8a1.5 1.5 0 013 0v.5a1.5 1.5 0 013 0V10a1.5 1.5 0 013 0v4c0 4-2.5 6.5-6 6.5H12c-3 0-5-2-5-5z"/><path d="M7 13c-1.5 0-2.5-1-2.5-2.5S6 8 7 8.5"/><path d="M2 5l2 1.5M5 2.5L6.2 4.5" opacity=".7"/></svg>',
   bow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3c9 2 13 8 15 15"/><path d="M6 3l15 15" stroke-width="1" opacity=".7"/><path d="M3 21L14 10M14 10l-1-3.5M14 10l3.5 1"/></svg>'
 };
+/* (v348) a slot shows a count of 4+ digits short (5501 → 5.5k) so it fits beside the Auto badge; the full count is in the bag */
+const slotCount = n => (n = n | 0) >= 10000 ? Math.floor(n / 1000) + 'k' : n >= 1000 ? Math.floor(n / 100) / 10 + 'k' : String(n);
 function renderMoba(){
   const box = el('mobaAct'); if (!box || !el('ui').classList.contains('moba')) return;
   const skillBtn = (id, i) => id && skl(id)
@@ -40,7 +42,7 @@ function renderMoba(){
     <button class="mo atk w-${JOBS[S.job].weapon.type}" data-mo="atk" aria-label="${L('โจมตี', 'Attack')}"><i class="atkaura"></i>${ATK_ICON[JOBS[S.job].weapon.type] || icon.atk}</button>
     ${S.hot.map(skillBtn).join('')}`;
   // potions sit beside the joystick (left thumb), HP above SP, each showing its own bottle and count
-  const hp = bestHp(), sp = bestSp(), pb = (k, id) => `<button class="mo pot ${k}" data-mo="${k === 'hp' ? 'pot' : 'potsp'}" aria-label="${nm(ITEMS[id])}" title="${nm(ITEMS[id])}" ${S.inv[id] ? '' : 'disabled'}>${itemArt(id, true)}<em>${S.inv[id] || 0}</em></button>`;
+  const hp = bestHp(), sp = bestSp(), pb = (k, id) => `<button class="mo pot ${k}" data-mo="${k === 'hp' ? 'pot' : 'potsp'}" aria-label="${nm(ITEMS[id])}" title="${nm(ITEMS[id])}" ${S.inv[id] ? '' : 'disabled'}>${itemArt(id, true)}<em>${slotCount(S.inv[id])}</em></button>`;
   if (el('mobaPot')) el('mobaPot').innerHTML = pb('hp', hp) + pb('sp', sp);
   el('mobaUtil').innerHTML = `
     <button class="mu${P.ride ? ' on' : ''}" data-mo="ride" aria-label="${L('ขี่พาหนะ', 'Ride')}">${icon.ride}</button>

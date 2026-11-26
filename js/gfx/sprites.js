@@ -1335,10 +1335,18 @@ function drawHuman(cx, cfg, P){
     }
   }
   cx.head = {hc, skinG, hairG0, hairG1:gid, P, cfg, hatTop:['wizard', 'cap', 'mala', 'lomphok', 'hermit', 'ngob', 'helm', 'crown', 'mechHelm'].includes(cfg.hat)};
-  if (cfg.backHair){ G(); for (let i = 0; i <= 6; i++){ const k = i / 6; ell(cx, add(hc, upper([sw * k * 1.4, -2 - k * (cfg.backLen || 9), -6.5 - k * 1.5 - Math.abs(sw) * k])), (cfg.backW || 8.6) - k * 2.4, 4.5, M[cfg.hair], {tex:n => (Math.sin(Math.atan2(n[0], -n[2]) * 9) > .6 ? {dt:1} : undefined)}); } }
+  /* (v348) long hair down the back. It was seven outlined balls stacked with stripes — from behind a ribbed sausage (the
+     owner: «ผมแบบนี้ไม่ได้สวยเลย»). Now a smooth sheet (many close steps, no stripes) that drapes onto the back, under five
+     tapering locks that fan out a little and end in soft points, each lock its own piece so the strands read */
+  if (cfg.backHair){ const L = cfg.backLen || 9, W = cfg.backW || 8.6, hm = M[cfg.hair];
+    G(); for (let i = 0; i <= 18; i++){ const k = i / 18; ell(cx, add(hc, upper([sw * k * 1.2, -2 - k * L * .82, -6.8 + k * 1.4 - Math.abs(sw) * k])), W - k * 2.2, 3 - k * .9, hm); }
+    for (let j = 0; j < 5; j++){ const t = j / 4 - .5, mid = 1 - Math.abs(t) * 2, len = L * (.95 + .14 * mid) + 1;
+      G(); cap(cx, add(hc, upper([t * W * 1.3, 2, -8.4 + Math.abs(t) * 2.6])), add(hc, upper([t * (W - 1) * 1.2 + sw * 1.5, -2 - len, -7.4 - mid * .5 - Math.abs(sw) * 1.1])), 2.6 - Math.abs(t) * .5, .32, hm, {}); } }
   if (cfg.ponytail){ G(); for (let i = 0; i <= 8; i++){ const k = i / 8; ell(cx, add(hc, upper([sw * k * 3, 4 - k * 11 + Math.abs(sw) * k * 2, -10.5 - Math.sin(k * 2.5) * 3 - Math.abs(sw) * k * 2])), 3.4 - k * 1.4, 3.4 - k * 1.4, M[cfg.hair]); } }
-  if (cfg.sideLocks){ const len = cfg.sideLocks; for (const sd of [-1, 1]){ G(); for (let i = 0; i <= 7; i++){ const k = i / 7;
-      ell(cx, add(hc, upper([sd * (9.7 - k * .4) + sw * k * .8, 1.6 - k * len, 3 - k * 1.6])), 2.7 - k * 1, 2.7 - k * 1, M[cfg.hair], {tex:n => (Math.sin(n[1] * 8 + k * 5) > .6 ? {dt:1} : undefined)}); } } }
+  /* (v348) the locks beside the face: one smooth tapering lock with a soft point (it was eight striped balls — ribbed like the back) */
+  if (cfg.sideLocks){ const len = cfg.sideLocks; for (const sd of [-1, 1]){ G();
+      cap(cx, add(hc, upper([sd * 9.7, 1.6, 3])), add(hc, upper([sd * 9.2 + sw * .8, 1.6 - len * .55, 2.1])), 2.7, 2.2, M[cfg.hair], {});
+      cap(cx, add(hc, upper([sd * 9.2 + sw * .8, 1.6 - len * .55, 2.1])), add(hc, upper([sd * 9.1 + sw * .9, .6 - len, 1.2])), 2.2, .45, M[cfg.hair], {}); } }
   if (cfg.hairpin){ G(); const pc = add(hc, upper([7.6, 7.4, 6.2])); for (let a = 0; a < 5; a++) ell(cx, add(pc, [Math.cos(a * 1.26) * 1.3, Math.sin(a * 1.26) * 1.3, .4]), 1.1, 1.1, M[cfg.hairpin]); G(); ell(cx, add(pc, [0, 0, .9]), .8, .8, M.gold); }
   if (cfg.ribbon){ const rc = M[cfg.ribbon], bp = add(hc, upper([0, 9.4, -7.6])); for (const sd of [-1, 1]){ G(); ell(cx, add(bp, [sd * 3.4, .6, -.4]), 3.4, 2.4, rc, {rz:1.6, tex:n => (Math.abs(n[0]) < .25 ? {dt:1} : undefined)}); G(); cap(cx, add(bp, [sd * .8, -.6, -.6]), add(bp, [sd * 2.4, -5.4, -1.4]), 1, .7, rc, {}); }
     G(); ell(cx, bp, 1.4, 1.4, M.gold); }

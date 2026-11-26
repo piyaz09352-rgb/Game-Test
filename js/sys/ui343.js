@@ -6,7 +6,7 @@
 'use strict';
 { const _h6c = typeof h6Chips === 'function' ? h6Chips : null;
   const place = () => { const ch = el('chips'), mc = el('mapCard'), ui = el('ui'); if (!ch || !mc || !ui) return false;
-    const inside = ui.classList.contains('h6') && !mc.classList.contains('folded') && mc.offsetWidth > 0;
+    const inside = false;   // (v348) the owner: «ปรับให้อยู่ใต้แผนที่จะสวยกว่า» — the chips sit under the minimap card again (js below)
     // decide again only when something that matters changed (not every frame: moving it in and out to measure would flicker)
     const key = [inside, mc.clientWidth, [...ch.children].filter(e => !e.hidden && e.style.display !== 'none').map(e => e.textContent).join('|')].join('/');
     if (key === place.key) return ch.parentNode === mc; place.key = key;
@@ -15,7 +15,23 @@
     if (inside && ch.offsetWidth > mc.clientWidth - 12){ ui.appendChild(ch); ch.classList.remove('inmap'); return false; }
     else if (!inside && ch.parentNode === mc){ ui.appendChild(ch); ch.classList.remove('inmap'); }
     return inside; };
-  if (_h6c) h6Chips = function(){ if (place()) return; return _h6c.apply(this, arguments); };
+  if (_h6c) h6Chips = function(){ if (place()) return; const r = _h6c.apply(this, arguments);
+    // (v348) on a phone the skill wheel's top button sits just under the card: a tighter gap keeps the chips under the
+    // card (where the owner wants them) instead of out in the field beside it
+    const ui = el('ui'), ch = el('chips'), mc = el('mapCard');
+    if (ui && ch && mc && ch.offsetWidth && typeof hudPut === 'function' && typeof brect === 'function'){ const U = brect(ui), M = brect(mc), C = brect(ch);
+      if (C.right <= M.left + 2){ const k = (U.height / (ui.offsetHeight || 1)) || 1, m = Math.max(6, Math.round(U.right - M.right));
+        hudPut(ch, m, M.bottom - U.top + 3 * k, 'r'); const C2 = brect(ch);
+        const hit = [...document.querySelectorAll('#ui .mo')].some(b => { if (!b.offsetWidth) return false; const B = brect(b); return B.left < C2.right && B.right > C2.left && B.top < C2.bottom && B.bottom > C2.top; });
+        if (!hit) return r;
+        // still under a button at the right: under the card, ending just left of the buttons in that strip (it may reach
+        // a little past the card's left edge when four chips are showing)
+        const y0 = M.bottom + 3 * k, y1 = y0 + C2.height; let edge = M.right;
+        for (const b of document.querySelectorAll('#ui .mo')){ if (!b.offsetWidth) continue; const B = brect(b); if (B.top < y1 && B.bottom > y0 && B.right > M.left - 120 && B.left < M.right) edge = Math.min(edge, B.left - 4 * k); }
+        hudPut(ch, Math.round(U.right - edge), M.bottom - U.top + 3 * k, 'r'); const C3 = brect(ch);
+        const hit2 = C3.left < M.left - 110 || [...document.querySelectorAll('#ui .mo')].some(b => { if (!b.offsetWidth) return false; const B = brect(b); return B.left < C3.right && B.right > C3.left && B.top < C3.bottom && B.bottom > C3.top; });
+        if (hit2) return _h6c.apply(this, arguments); } }
+    return r; };
   if (typeof h6Layout === 'function'){ const _l = h6Layout; h6Layout = function(){ const r = _l.apply(this, arguments); try { place(); } catch (e) {} return r; }; }
   EV.on('tick', () => { try { place(); } catch (e) {} }); }
 

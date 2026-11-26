@@ -47,7 +47,7 @@ if (typeof EV !== 'undefined') EV.on('draw', () => { const st = typeof tutOn ===
    (Auto never uses a gate by itself — js/sys/botgate.js — so this one walk is led from here) */
 { const _ub = updBot; let said = 0;
   updBot = function(dt){ const r = _ub.apply(this, arguments);
-    if (BOT.on && MAP_ID === 0 && !(BOT.pause > 0) && !P.dead && !BOT.resting && BOT.state !== 'rest' &&   /* (v347) not while it rests to heal in town (bot.js) */ !(typeof DG !== 'undefined' && DG.active) && !(typeof S !== 'undefined' && S.aq) && typeof FIELDS306 !== 'undefined'){ const gt = f306Gate(FIELDS306.id);
+    if (BOT.on && MAP_ID === 0 && !(BOT.pause > 0) && !P.dead && !BOT.resting && BOT.state !== 'rest' && BOT.state !== 'shop' && !(typeof botBuyWant === 'function' && botBuyWant()) &&   /* (v347) not while it rests to heal in town (bot.js) */ !(typeof DG !== 'undefined' && DG.active) && !(typeof S !== 'undefined' && S.aq) && typeof FIELDS306 !== 'undefined'){ const gt = f306Gate(FIELDS306.id);
       if (gt){ if (T - said > 20){ said = T; toast(L('ในเมืองไม่มีมอนสเตอร์ · Auto พาออกไปทุ่งสุวรรณิน', 'No monsters in town · Auto is heading out to the Suwannin Fields')); }
         P.target = null; P.pending = null; BOT.roam = null; P.tx = gt.x; P.ty = gt.y; BOT.state = 'roam';
         if (Math.hypot(gt.x - P.x, gt.y - P.y) < 70) travel(FIELDS306.id, 0); } }

@@ -22,11 +22,51 @@ html body #ui#ui.ui.h6 #mapCard #chips.inmap > *{ font-size:.66em !important; pa
 html body #ui#ui.ui.h6.moba #mapCard #chips.inmap > *{ font-size:.6em !important; padding:0 4px !important; }
 /* (v345) the market's «วางขาย» tab: the bag grid there had no style of its own, so each item picture grew to the window's
    full width. A grid of small slots like the bag's, and the listing form in the window's own light colours. */
-#pane-market .tbag{ display:grid; grid-template-columns:repeat(auto-fill, minmax(52px, 1fr)); gap:6px; max-height:46vh; overflow:auto; padding:2px; }
-#pane-market .tbag .bslot{ position:relative; width:auto !important; height:auto !important; aspect-ratio:1; padding:4px; border-radius:10px; border:1px solid rgba(150,130,220,.45); background:rgba(255,255,255,.85); cursor:pointer; overflow:hidden; }
+/* (v348) the rows have a fixed height: a slot with aspect-ratio and overflow:hidden has no minimum height, so a long bag
+   in a box of limited height squeezed every row flat and the slots piled on each other (the owner's screenshot) */
+#pane-market .tbag{ display:grid; grid-template-columns:repeat(auto-fill, 54px); grid-auto-rows:54px; justify-content:start; gap:6px; max-height:min(46vh, 360px); overflow:auto; padding:2px; }
+@media (max-height:500px){ #pane-market .tbag{ grid-template-columns:repeat(auto-fill, 46px); grid-auto-rows:46px; gap:5px; max-height:calc(100vh - 150px); } }
+#pane-market .tbag .bslot{ position:relative; width:100% !important; height:100% !important; min-width:0; min-height:0; box-sizing:border-box; padding:4px; border-radius:10px; border:1px solid rgba(150,130,220,.45); background:rgba(255,255,255,.85); cursor:pointer; overflow:hidden; }
 #pane-market .tbag .bslot svg, #pane-market .tbag .bslot img{ width:100% !important; height:100% !important; display:block; }
 #pane-market .tbag .bslot.sel{ outline:3px solid #f0b840; outline-offset:-1px; }
-#pane-market .tbag .bslot em{ position:absolute; right:3px; bottom:1px; font:700 11px var(--thai, sans-serif); font-style:normal; color:#2a2050; text-shadow:0 0 2px #fff, 0 0 2px #fff; }
+#pane-market .tbag .bslot em{ position:absolute; right:2px; bottom:2px; z-index:3; min-width:14px; height:14px; padding:0 4px; box-sizing:border-box; border-radius:999px; background:rgba(22,16,44,.85); font:800 10px/14px var(--thai, sans-serif); font-style:normal; text-align:center; color:#fff; text-shadow:none; }
 #pane-market .mksell{ background:rgba(255,255,255,.75) !important; box-shadow:inset 0 0 0 1px rgba(150,130,220,.45) !important; }
 #pane-market .mksell label, #pane-market .mksell small, #pane-market .mksell .nm{ color:#2a2050 !important; }
 #pane-market .mksell .bico{ width:44px; height:44px; flex:0 0 44px; }
+
+/* (v348) slot labels follow one contrast rule (the owner: «เปลี่ยนสีตัวหนังสือเป็นสีดำ มันอ่านไม่ออก» / «ใช้หลักการของสี»):
+   a light pill carries dark text, a dark pill carries light text — never white on the cream pill, and no black outline
+   (the .wout outline and the PC white text were stacked on top of the cream pill from sunlit.css) */
+html body #ui.ui .hk.ico > b, html body #ui.ui .hk.ico > b.wout, html body #ui.ui.h6pc #dock #hotbar > .hk.ico > b,
+html body #ui.ui.h6pc #hotbar > .hk.ico > b, html body #ui.ui .mo.sk:not(.empty) > b, html body #ui.ui .mo.sk:not(.empty) > b.wout{
+  color:#1b1530 !important; -webkit-text-fill-color:#1b1530 !important; text-shadow:none !important; -webkit-text-stroke:0 !important;
+  background:#fffaf0 !important; font-weight:700 !important; }
+/* counts and skill levels: a small dark pill with light text, kept inside the round slot */
+html body #ui.ui .hk.ico > .lv, html body #ui.ui .hk.ico > .lv.wout, html body #ui.ui .mo.pot > em{
+  color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:none !important; -webkit-text-stroke:0 !important;
+  background:rgba(22,16,44,.88) !important; border-radius:999px !important; padding:0 4px !important; min-width:14px; box-sizing:border-box;
+  font:800 10px/14px Sarabun, system-ui, sans-serif !important; height:14px; text-align:center; max-width:calc(100% - 6px); overflow:hidden; }
+/* a potion's count (5501 shows as 5.5k) sits at the slot's top right, clear of the Auto «A» badge on the left */
+html body #ui.ui #hotbar > .hk.h6pot > .lv{ position:absolute !important; top:3px !important; right:3px !important; left:auto !important; bottom:auto !important; max-width:none !important; z-index:5; }
+/* the round touch potion is clipped at its edge and has no name strip: its count sits inside at the bottom */
+html body #ui.ui .mo.pot > em{ position:absolute !important; bottom:1px !important; left:50% !important; right:auto !important; top:auto !important; transform:translateX(-50%) !important; max-width:none !important; z-index:5; }
+/* (v348) a button that cannot be pressed yet still has to be readable: a flat grey button with mid-grey text (about 4.5:1),
+   not the whole button faded to 60% (its text fell to ~1.6:1 — «รับรางวัล» in the quest window) */
+html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .btn[disabled], html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .btn:disabled{ filter:none !important; opacity:1 !important; background:#ebe8f3 !important; border-color:#d6d1e6 !important;
+  color:#625c80 !important; -webkit-text-fill-color:#625c80 !important; text-shadow:none !important; box-shadow:none !important; cursor:default; }
+/* (v348) a chosen tab or row: one rule everywhere. A theme gave the chosen tab white text, another gave every window button
+   a white face — white on white, then outlined in black (wiki, achievements, equipment…). Chosen tab = deep violet face,
+   white text; chosen row = pale violet face with a violet edge, dark text. (The «:is(#h6z…)» prefix outranks hud330's own five-id prefix.) */
+html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win button.on:not(.ibtn):not(.mo), html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win .wktab.on, html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win [data-tab].on, html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win [data-mktab].on, html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win .sdtab.on{
+  background:linear-gradient(#7a5cf0, #5b3fd0) !important; border-color:#4a2fb8 !important; color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win button.on:not(.ibtn):not(.mo) *, html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win .wktab.on *, html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win [data-tab].on *, html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win [data-mktab].on *{
+  color:#fff !important; -webkit-text-fill-color:#fff !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win .wkrow.on, html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win .item.on, html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win .row.on, html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win li.on{
+  background:#ece6ff !important; box-shadow:inset 0 0 0 2px #7a5cf0 !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win .wkrow.on *, html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win .item.on *, html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win .row.on *, html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win li.on *{
+  color:#221a4a !important; -webkit-text-fill-color:#221a4a !important; text-shadow:none !important; }
+/* titles: a white card edged in the tier's colour, the name in that colour darkened enough to read (the dark see-through
+   cards of the old dark theme turned grey on the light window, with orange and silver names on them) */
+html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win .tlrow:not(.on){ background:#fff !important; box-shadow:inset 0 0 0 1.5px color-mix(in srgb, var(--tc, #8a7ac0) 70%, #fff) !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win .tlrow:not(.on) b{ color:color-mix(in srgb, var(--tc, #5a4a90) 55%, #000) !important; -webkit-text-fill-color:color-mix(in srgb, var(--tc, #5a4a90) 55%, #000) !important; text-shadow:none !important; }
+html:is(#h6z#h6z#h6z#h6z#h6z#h6z, html) body .win .tlrow:not(.on) small{ color:#4e4870 !important; -webkit-text-fill-color:#4e4870 !important; text-shadow:none !important; }

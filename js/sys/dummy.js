@@ -1,5 +1,5 @@
 /* VAYRATHEN — js/sys/dummy.js — straw training dummies (หุ่นฟางทดสอบดาเมจ)
-   Three straw dummies stand well apart in the training yard just north of Aren, by the north road. Hit them with
+   Three straw dummies stand on the grass just inside Aren's east gate (v348; they were in the far north-east corner). Hit them with
    anything: they never die, never fight back and give nothing, but each one keeps score above its head —
    damage per second over the last few seconds, the biggest hit, and the total — and resets after a quiet spell.
    They wobble when struck. They are your own (not shared online), so everyone can test at the same time. */
@@ -7,7 +7,9 @@
 
 MOB.dummy = {name:'หุ่นฟางทดสอบ', en:'Straw Training Dummy', lvl:1, hp:1e9, atk:[0, 0], def:0, elem:'neutral', race:'formless', size:'m', exp:0, jexp:0, speed:0, delay:999, r:12, drops:[], card:null, cardRate:0};
 MOB_H0.dummy = 44;
-const DUMMY_SPOTS = () => [[VC + 360, 230], [VC + 470, 280], [VC + 420, 170]];   // (v60) outside the round town, north-east
+/* (v348) the open grass just inside the east gate, south of the gate road — every newcomer walks past it on the way out to
+   the Suwannin Fields. They used to stand in the far north-east corner behind the temple spire, where nobody went. */
+const DUMMY_SPOTS = () => [[1950, 790], [2045, 842], [1965, 908]].map(([x, y]) => { for (let k = 0; k < 12 && typeof walkable === 'function' && !walkable(x, y, 14); k++) y += 12; return [x, y]; });
 const DUMMY_WIN = 5;
 function dummySpawn(){
   if (MAP_ID !== 0) return;

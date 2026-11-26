@@ -29,7 +29,7 @@
 <link rel="stylesheet" href="css/hud330.css?v=8">
 <link rel="stylesheet" href="css/hud330-pc.css?v=1">
 <link rel="stylesheet" href="css/hud330-touch.css?v=2">
-<link rel="stylesheet" href="css/hud343.css?v=2">
+<link rel="stylesheet" href="css/hud343.css?v=3">
 <!-- (v188) opened without its folders (index.html double-clicked inside the zip, or only some files uploaded): no CSS loads,
      so the "turn your device" notice showed as a giant icon. Keep it hidden without CSS, and say what to do instead. -->
 <style>.rotate{display:none}#filesMissing{display:none}</style>
@@ -40,6 +40,19 @@
   · ถ้าเปิดจากไฟล์ zip: คลิกขวาที่ไฟล์ zip → <b>แตกไฟล์ทั้งหมด (Extract All)</b> แล้วเปิด <code>index.html</code> ในโฟลเดอร์ที่แตกออกมา<br>
   · ถ้าเป็นเว็บ: อัปขึ้นให้ครบทั้งโฟลเดอร์ (<code>index.html</code> คู่กับ <code>assets</code> <code>audio</code> <code>css</code> <code>js</code>)<br><br>
   <small>Game files are missing: extract the whole zip (Extract All) and open index.html from the extracted folder, or upload the whole folder.</small></div>
+<!-- (v348) a loading screen that shows at once (no files needed): on a phone's 3G the game takes ~14 s to start and the
+     page stood empty (light blue, one stray button) — players thought it was broken. js/main.js fades it out when the
+     title is ready; it never covers the «files missing» notice above. -->
+<style>#boot{position:fixed;inset:0;z-index:2147483000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:linear-gradient(180deg,#9fd6f5 0%,#cfeaf7 55%,#f6efd9 100%);font-family:Mali,Pridi,sans-serif;color:#3a2a10;transition:opacity .45s}
+#boot.done{opacity:0;pointer-events:none}#filesMissing[style]~#boot{display:none}
+#boot b{font:800 clamp(30px,6vw,56px)/1 Cinzel,Georgia,serif;letter-spacing:.12em;color:#b8860b;text-shadow:0 2px 0 #fff4c8,0 4px 14px rgba(120,80,0,.25)}
+#boot i{font-style:normal;font-size:clamp(14px,2.4vw,20px);color:#5a3f12}
+#boot .bt{width:min(360px,70vw);height:8px;border-radius:6px;background:rgba(255,255,255,.65);box-shadow:inset 0 1px 2px rgba(0,0,0,.15);overflow:hidden;margin-top:8px}
+#boot .bt span{display:block;width:38%;height:100%;border-radius:6px;background:linear-gradient(90deg,#f3c45a,#d99a2b);animation:bootbar 1.6s ease-in-out infinite}
+#boot small{font-size:clamp(11px,1.8vw,14px);color:#6a5530}
+@keyframes bootbar{0%{transform:translateX(-110%)}100%{transform:translateX(290%)}}
+@media (prefers-reduced-motion:reduce){#boot .bt span{animation:none;width:100%;opacity:.6}}</style>
+<div id="boot" role="status" aria-live="polite"><b>VAYRATHEN</b><i>อาณาจักรวายรา</i><div class="bt"><span></span></div><small>กำลังโหลดเกม… ครั้งแรกบนเน็ตมือถืออาจใช้เวลาสักครู่</small></div>
 <div class="rotate" id="rotate" role="alert">
   <div class="rot-card">
     <svg class="rot-ic" viewBox="0 0 64 64" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="20" y="8" width="24" height="44" rx="4"/><path d="M29 46h6"/><path d="M50 22a18 18 0 016 14M56 36l-4-3M56 36l3-4"/></svg>
@@ -154,7 +167,7 @@
 
 <!-- scripts load in dependency order: gfx → core → data → world → game → render → ui → main -->
 <script>globalThis.__SPR_DOM = true;</script>
-<script src="js/gfx/sprites.js?v=368"></script>
+<script src="js/gfx/sprites.js?v=369"></script>
 <script src="js/gfx/beasts.js?v=342"></script>
 <script src="js/gfx/variety.js?v=158"></script>
 <script src="js/gfx/dinos.js?v=157"></script>
@@ -199,7 +212,7 @@
 <script src="js/game/items.js?v=111"></script>
 <script src="js/game/loot.js?v=111"></script>
 <script src="js/game/actions.js?v=288"></script>
-<script src="js/game/bot.js?v=344"></script>
+<script src="js/game/bot.js?v=345"></script>
 <script src="js/game/player.js?v=112"></script>
 <script src="js/game/effects.js?v=132"></script>
 <script src="js/render/vfx.js?v=287"></script>
@@ -219,7 +232,7 @@
 <script src="js/ui/icons.js?v=184"></script>
 <script src="js/ui/skicons2.js?v=161"></script>
 <script src="js/ui/itemart.js?v=306"></script>
-<script src="js/ui/panels.js?v=331"></script>
+<script src="js/ui/panels.js?v=332"></script>
 <script src="js/ui/warpgrid.js?v=328"></script>
 <script src="js/ui/bag.js?v=306"></script>
 <script src="js/ui/cards.js?v=111"></script>
@@ -227,7 +240,7 @@
 <script src="js/ui/hud.js?v=259"></script>
 <script src="js/ui/menu.js?v=333"></script>
 <script src="js/ui/keys.js?v=328"></script>
-<script src="js/ui/joystick.js?v=328"></script>
+<script src="js/ui/joystick.js?v=329"></script>
 <script src="js/game/save.js?v=236"></script>
 <script src="js/sys/core.js?v=111"></script>
 <script src="js/net/maproute.js?v=185"></script>
@@ -245,7 +258,7 @@
 <script src="js/sys/wboss.js?v=272"></script>
 <script src="js/sys/wboss2.js?v=111"></script>
 <script src="js/sys/netmob.js?v=293"></script>
-<script src="js/sys/dungeon.js?v=279"></script>
+<script src="js/sys/dungeon.js?v=284"></script>
 <script src="js/sys/pvp.js?v=111"></script>
 <script src="js/sys/social2.js?v=304"></script>
 <script src="js/sys/tutorial.js?v=281"></script>
@@ -289,7 +302,7 @@
 <script src="js/sys/visual.js?v=111"></script>
 <script src="js/sys/statfix.js?v=241"></script>
 <script src="js/sys/cute.js?v=158"></script>
-<script src="js/sys/dummy.js?v=111"></script>
+<script src="js/sys/dummy.js?v=112"></script>
 <script src="js/sys/dlgmove.js?v=238"></script>
 <script src="js/sys/dlgmorph.js?v=192"></script>
 <script src="js/sys/compare.js?v=111"></script>
@@ -376,7 +389,7 @@
 <script src="js/sys/bossplus.js?v=297"></script>
 <script src="js/sys/bagplus.js?v=111"></script>
 <script src="js/sys/menutrim.js?v=111"></script>
-<script src="js/sys/textoutline.js?v=111"></script>
+<script src="js/sys/textoutline.js?v=112"></script>
 <script src="js/sys/sunread.js?v=274"></script>
 <script src="js/sys/steady.js?v=111"></script>
 <script src="js/sys/equip6.js?v=111"></script>
@@ -431,7 +444,7 @@
 <script src="js/sys/towerparty.js?v=255"></script>
 <script src="js/sys/festival213.js?v=213"></script>
 <script src="js/sys/featureoff.js?v=213"></script>
-<script src="js/main.js?v=304"></script>
+<script src="js/main.js?v=305"></script>
 <script src="js/sys/smooth3.js?v=112"></script>
 <script src="js/sys/perf4.js?v=222"></script>
 <script src="js/sys/touchequip.js?v=237"></script>
@@ -442,7 +455,7 @@
 <script src="js/sys/jobfx.js?v=126"></script>
 <script src="js/sys/tutfold.js?v=127"></script>
 <script src="js/sys/changelog.js?v=127"></script>
-<script src="js/sys/changelog272.js?v=398"></script>
+<script src="js/sys/changelog272.js?v=399"></script>
 <script src="js/sys/bossnature.js?v=279"></script>
 <script src="js/sys/inspect.js?v=125"></script>
 <script src="js/sys/petnet.js?v=136"></script>
@@ -479,7 +492,7 @@
 <script src="js/sys/nanguard.js?v=184"></script>
 <script src="js/sys/sharp.js?v=186"></script>
 <script src="js/sys/livequota.js?v=186"></script>
-<script src="js/sys/newver.js?v=186"></script>
+<script src="js/sys/newver.js?v=187"></script>
 <script src="js/sys/coat.js?v=273"></script>
 <script src="js/sys/humscale.js?v=167"></script>
 <script src="js/sys/bossact.js?v=298"></script>
@@ -500,10 +513,11 @@
 <script src="js/sys/bossfx302.js?v=333"></script>
 <script src="js/sys/bosspose304.js?v=337"></script>
 <script src="js/sys/motionfx314.js?v=1"></script>
-<script src="js/sys/fields306b.js?v=343"></script>
+<script src="js/sys/fields306b.js?v=344"></script>
 <script src="js/sys/autostat322.js?v=2"></script>
 <script src="js/sys/poses325.js?v=2"></script>
 <script src="js/sys/mobarms325.js?v=2"></script>
+<script src="js/sys/bosssize348.js?v=2"></script>
 <script src="js/sys/skillsig277.js?v=289"></script>
 <script src="js/sys/skillsig283.js?v=297"></script>
 <script src="js/sys/rogmer203.js?v=203"></script>
@@ -521,7 +535,7 @@
 <script src="js/ui/qguide218.js?v=218"></script>
 <script src="js/ui/storytalk220.js?v=220"></script>
 <script src="js/sys/heavyhit220.js?v=222"></script>
-<script src="js/sys/autoquest220.js?v=288"></script>
+<script src="js/sys/autoquest220.js?v=289"></script>
 <script src="js/world/townlife221.js?v=337"></script>
 <script src="js/sys/marketgear221.js?v=221"></script>
 <script src="js/world/npcclear222.js?v=269"></script>
@@ -584,7 +598,7 @@
 <script src="js/world/rich280.js?v=306"></script>
 <script src="js/world/links280.js?v=294"></script>
 <script src="js/sys/sovbond274.js?v=274"></script>
-<script src="js/sys/events274.js?v=342"></script>
+<script src="js/sys/events274.js?v=343"></script>
 <script src="js/sys/bagsell279.js?v=288"></script>
 <script src="js/sys/mount279.js?v=288"></script>
 <script src="js/ui/skicons283.js?v=302"></script>
@@ -612,6 +626,7 @@
 <script src="js/sys/feel341.js?v=2"></script>
 <script src="js/sys/life342.js?v=3"></script>
 <script src="js/sys/hud326.js?v=15"></script>
-<script src="js/sys/ui343.js?v=3"></script>
+<script src="js/sys/ui343.js?v=4"></script>
 <script src="js/sys/world344.js?v=3"></script>
 <script src="js/sys/report346.js?v=3"></script>
+<script src="js/sys/ink348.js?v=2"></script>

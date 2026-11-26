@@ -29,11 +29,28 @@ const botAvoid = () => !S.bot || S.bot.avoidBoss !== false;
 const botBosses = () => mobs.filter(m => !m.dead && !m.vanish && m.def.boss);   // real bosses only
 const botSafeSpot = () => (MAP_ID === 0 ? {x:VSPAWN.x, y:VSPAWN.y} : CAMP ? {x:CAMP.x, y:CAMP.y} : null);
 function botShun(m){
+  if (botDanger(m) || botDangers().some(d => d !== m && dist(m, d) < BOT_DANGER.near)) return true;   // (v348) on every map
   if (!botAvoid()) return false;
   if (m.def.boss) return true;
   for (const b of botBosses()) if (dist(m, b) < BOT_BOSS.near) return true;
   return false;
 }
+/* (v348) Auto buys potions in town (see the town branch of updBot) */
+const BOT_POTS = [['redpot', 1], ['orangepot', 15], ['whitepot', 50], ['elixirpot', 100]];
+const botPotCount = () => BOT_POTS.reduce((a, [id]) => a + (S.inv[id] | 0), 0);
+const botPotBest = () => { let b = null; for (const [id, lv] of BOT_POTS) if (ITEMS[id] && ITEMS[id].buy && S.lvl >= lv) b = id; return b; };
+const botBuyWant = () => { const B = S.bot || {}; if (B.autoBuy === false || BOT.boughtT > T - 30) return false; const id = botPotBest(); return !!id && botPotCount() < 10 && S.bia * .3 >= ITEMS[id].buy * 5; };
+function botBuy(){ const id = botPotBest(); BOT.boughtT = T; if (!id) return; const price = ITEMS[id].buy, n = Math.min(30 - botPotCount(), Math.floor(S.bia * .3 / price)); if (n < 1) return;
+  S.bia -= price * n; addItem(id, n); log(L(`Auto ซื้อ ${nm(ITEMS[id])} ×${n}`, `Auto bought ${nm(ITEMS[id])} ×${n}`), 'g'); toast(L(`Auto ซื้อยา ${nm(ITEMS[id])} ×${n}`, `Auto bought ${nm(ITEMS[id])} ×${n}`)); dirty = true; }
+/* (v348) monsters a hero must not wander into: they attack on sight and are more than 3 levels above it (a pack leader
+   counts 8 more). The first-play bot (tools/first-play.js) saw Auto walk a Lv 8 newcomer into Lv 13 night lanterns. Auto
+   does not pick them, does not fight right beside one (a fight there pulls it in) and does not roam towards them; one that
+   attacks is still fought back (threats() come first). Not bosses — those have their own rules above. */
+const BOT_DANGER = {near:240, roam:300};
+const botDanger = m => !!(m && !m.dead && !m.vanish && m.def && !m.def.boss && m.def.aggro && !m.aggro && !m.calm && (m.def.lvl | 0) + (m.elite ? 8 : 0) > (S.lvl | 0) + 3);
+let BOT_DCACHE = {t:-1, list:[]};
+const botDangers = () => { if (BOT_DCACHE.t !== T){ BOT_DCACHE = {t:T, list:mobs.filter(botDanger)}; } return BOT_DCACHE.list; };
+const botNearDanger = (x, y, r = BOT_DANGER.roam) => botDangers().some(d => Math.hypot(d.x - x, d.y - y) < r);
 const botOk = m => !(m.dead || m.vanish || m.dummy || inVillage(m) || BOT.skip.has(m) || (m.def.boss && S.lvl < 22 && !(typeof DG !== 'undefined' && DG.active)) || botShun(m));
 /* who comes first: the closest; two about as close (within TGT_TIE px) → the one with less HP (v30) */
 const TGT_TIE = 20;
@@ -63,6 +80,7 @@ function botSet(){
   const b = S.bot || (S.bot = {list:[], basic:true, buff:true, heal:60, spKeep:10});
   if (b.sit == null) Object.assign(b, {sit:true, sitHp:50, sitSp:15});
   if (b.avoidBoss == null) b.avoidBoss = true;
+  if (b.autoBuy == null) b.autoBuy = true;   // (v348)
   if (b.potHpOn == null) Object.assign(b, {potHpOn:true, potHp:(typeof SETTINGS !== 'undefined' && SETTINGS.botHp) || 45, potSpOn:true, potSp:20});
   const owned = ownedSkillIds().filter(id => skl(id) && !BOT_SKIP.includes(SKILLS[id].type));
   b.list = b.list.filter(e => owned.includes(e.id));
@@ -182,6 +200,13 @@ function updBot(dt){
     if (k && (!threats().length || hp < BOT_CFG.retreatHp * .6)){ BOT.state = 'retreat'; if (P.sit) P.sit = false; P.target = null; P.pending = null;
       if (Math.hypot(k.x - P.x, k.y - P.y) < 70){ warpTo(0); return; }
       if (!P.ride && canRideNow()){ P.ride = true; renderHotbar(); } P.tx = k.x; P.ty = k.y + 40; renderBotChip(); return; } }
+  /* (v348) home in Aren with fewer than 10 HP potions: Auto walks to Auntie Buakham and buys the best potion for its level
+     (red → orange Lv 15 → white Lv 50 → elixir Lv 100) with at most 30% of its money. Newcomers on Auto ran out, and
+     only ever rested. Setting «ซื้อยาเองในเมือง» (S.bot.autoBuy), on by default. */
+  if (MAP_ID === 0 && !th.length && botBuyWant()){ const n = NPCS.find(x => x.id === 'shop');
+    if (n){ BOT.state = 'shop'; if (P.sit){ P.sit = false; renderHotbar(); } P.target = null; P.pending = null;
+      if (Math.hypot(n.x - P.x, n.y - P.y) < 60){ botBuy(); P.tx = null; } else { P.npc = null; P.tx = n.x; P.ty = n.y + 30; }
+      renderBotChip(); return; } }
   /* (v347) home in Aren, hurt and out of potions: sit down right here and rest until topped up. Aren has had no monsters
      since v306, but Auto still walked to the old village corner (300, 860) — now beside the gate to the fields — went out
      at 7% HP, warped home again, and round and round for minutes (tools/first-play.js) */
@@ -215,8 +240,8 @@ function updBot(dt){
     BOT.roam = null;
     {   // head for the nearest monster Auto would fight, wherever it is on the map
       const ok = mobs.filter(m => botOk(m) && botInZone(m)), fit = ok.filter(botFits), near = (fit.length ? fit : ok).sort((a, b) => dist(a, P) - dist(b, P)).slice(0, 4);
-      const bm = near.find(m => findPath(P.x, P.y, m.x, m.y)); if (bm) BOT.roam = {x:bm.x, y:bm.y}; }
-    for (let i = 0; i < 6 && !BOT.roam; i++){ const q = randIn(zone, 18); if (botAvoid() && botBosses().some(m => Math.hypot(m.x - q.x, m.y - q.y) < BOT_BOSS.near + 100)) continue; if (walkable(q.x, q.y, 18) && findPath(P.x, P.y, q.x, q.y)) BOT.roam = q; }
+      const bm = near.find(m => !botNearDanger(m.x, m.y) && findPath(P.x, P.y, m.x, m.y)); if (bm) BOT.roam = {x:bm.x, y:bm.y}; }
+    for (let i = 0; i < 6 && !BOT.roam; i++){ const q = randIn(zone, 18); if (botAvoid() && botBosses().some(m => Math.hypot(m.x - q.x, m.y - q.y) < BOT_BOSS.near + 100)) continue; if (botNearDanger(q.x, q.y)) continue; if (walkable(q.x, q.y, 18) && findPath(P.x, P.y, q.x, q.y)) BOT.roam = q; }
     if (!BOT.roam){ renderBotChip(); return; }
   }
   P.tx = BOT.roam.x; P.ty = BOT.roam.y;
@@ -284,6 +309,7 @@ function renderAuto(){
     ${tg('autoStat', L('อัปสเตตัสให้อัตโนมัติ', 'Spend stat points for me'), L('ระหว่างเปิด Auto ใช้แต้มสเตตัสที่เหลือกับสเตตัสหลักของอาชีพ (ปิดไว้ถ้าอยากอัปเอง)', 'While Auto is on, spend leftover stat points on your class\'s main stats (leave off to spend them yourself)'))}
     <div class="sec">${L('กินยาอัตโนมัติ', 'Potions')}</div>
     ${tg('potHpOn', L('กินยา HP อัตโนมัติ', 'Drink HP potions'), L('ใช้ยาแดง/ส้ม/ขาว/อีลิกเซอร์ที่ดีที่สุดในกระเป๋า', 'Uses the best red/orange/white/elixir in your bag'))}
+    ${tg('autoBuy', L('ซื้อยาเองในเมือง', 'Buy potions in town'), L('ยาเหลือไม่ถึง 10 ขวด Auto ไปซื้อที่ป้าบัวคำ (ใช้เงินไม่เกิน 30%)', 'Under 10 potions: Auto buys from Auntie Buakham (at most 30% of your money)'))}
     ${b.potHpOn ? `<label class="set"><span><b>${L('กินยา HP เมื่อต่ำกว่า', 'Drink below HP')}</b><small id="a-potHp-v">${b.potHp}%</small></span><input type="range" data-arng="potHp" min="10" max="90" step="5" value="${b.potHp}"></label>` : ''}
     ${tg('potSpOn', L('กินยา SP อัตโนมัติ', 'Drink SP potions'), L('ใช้ยาฟ้าที่ดีที่สุดในกระเป๋า', 'Uses the best blue potion in your bag'))}
     ${b.potSpOn ? `<label class="set"><span><b>${L('กินยา SP เมื่อต่ำกว่า', 'Drink below SP')}</b><small id="a-potSp-v">${b.potSp}%</small></span><input type="range" data-arng="potSp" min="5" max="90" step="5" value="${b.potSp}"></label>` : ''}
