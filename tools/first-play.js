@@ -76,6 +76,8 @@ fs.mkdirSync(OUT, { recursive: true }); for (const f of fs.readdirSync(OUT)) if 
     await page.waitForTimeout(800); await shot('จบบทสอน', await page.evaluate(() => `Lv ${S.lvl} · เงิน ${S.bia} · ${S.tut && S.tut.done ? 'บทสอนจบ' : 'บทสอนยังไม่จบ'}`));
     await tapSel('#botChip, [data-h6="bot"], .botchip'); await page.waitForTimeout(400);
     if (!(await page.evaluate(() => typeof BOT !== 'undefined' && BOT.on))) await page.evaluate(() => setBot(true));
+    // (v350) AQ=1: the player also turns on «ออโต้เควสต์» (the quest window's switch), as a newcomer who wants the story done
+    if (process.env.AQ === '1') await page.evaluate(() => { S.aq = true; dirty = true; });
     const MIN = +process.env.MIN || 6, LONG = process.env.LONG === '1', TO = process.env.TO || 'job1';   // TO=job2: on to the second job change (Base Lv 40)
     let lastLv = 0, still = 0, changes = 0;
     if (LONG) await page.evaluate(() => { const b = botSet(); b.autoStat = true; });   // an engaged player turns on «spend stat points for me»
@@ -96,6 +98,7 @@ fs.mkdirSync(OUT, { recursive: true }); for (const f of fs.readdirSync(OUT)) if 
       if (m % 5 === 0 && await spendSkills()) await page.evaluate(() => setBot(true));
       const st = await page.evaluate(() => ({lv:S.lvl, jl:S.jlvl, job:S.job, q:qState().active, main:qState().main, dead:P.dead, map:MAP_ID, block:JOBS[S.job].next ? jobChangeBlock() : 'max', jm:JOBS[S.job].jobMax || 99, bot:BOT.on}));
       if (!st.bot) await page.evaluate(() => setBot(true));
+      if (process.env.AQ === '1') await page.evaluate(() => { if (!S.aq && !qState().active && curMain() && S.lvl >= curMain().lv - 2) S.aq = true; else if (!S.aq && qState().active) S.aq = true; });   // keep it on (it stops itself at a level wall)
       if (st.lv === lastLv){ if (++still >= 8){ await shot('⚠ เลเวลไม่ขึ้น 8 นาที', JSON.stringify(st)); steps[steps.length - 1].bad = true; still = 0; } } else { lastLv = st.lv; still = 0; }
       if (st.dead){ await shot('ตาย', JSON.stringify(st)); await tapSel('[data-dth="town"]'); await page.waitForTimeout(1500); await page.evaluate(() => setBot(true)); }
       if (/Skill Point|สกิล|เรียน/.test(st.block)) await spendSkills();
