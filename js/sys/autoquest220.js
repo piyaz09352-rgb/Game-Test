@@ -49,7 +49,12 @@ function aqPlanFor(tr){
     if (!q.active){ if (S.lvl < Q.lv - 2) return {mode:'stop', th:`บทต่อไปต้อง Lv ${Q.lv}`, en:`the next chapter needs Lv ${Q.lv}`}; return {mode:'talk', map:Q.map, npc:giver, act:() => questAccept(Q.id)}; }
     if (questReady(Q)) return {mode:'talk', map:Q.map, npc:giver, act:() => questTurnIn()};
     const g = Q.goals.find(x => goalNow(x) < x.n);
-    if (g.k === 'boss') return {mode:'stop', th:`ต้องปราบบอส ${nm(MOB[g.t])} (แนะนำไปกับปาร์ตี้)`, en:`the boss ${nm(MOB[g.t])} must fall (bring a party)`};
+    // (v349) the chapter's boss: with three AI adventurers (storyboss349.js) Auto goes for it on the boss's own map
+    if (g.k === 'boss'){ const bm = MAPS.findIndex(m => m && m.boss === g.t && !m.town);
+      if (bm < 0 || typeof sbCall !== 'function') return {mode:'stop', th:`ต้องปราบบอส ${nm(MOB[g.t])} (แนะนำไปกับปาร์ตี้)`, en:`the boss ${nm(MOB[g.t])} must fall (bring a party)`};
+      if (S.lvl < MOB[g.t].lvl - 3) return {mode:'stop', th:`บอส ${nm(MOB[g.t])} Lv ${MOB[g.t].lvl}: เก็บเลเวลถึง Lv ${MOB[g.t].lvl - 3} ก่อน แล้ว Auto จะชวนนักผจญภัย AI ไปด้วยกัน`, en:`boss ${nm(MOB[g.t])} Lv ${MOB[g.t].lvl}: reach Lv ${MOB[g.t].lvl - 3} first, then Auto brings AI adventurers`};
+      if (MAP_ID === bm && !AIC.field && !(typeof sbMates === 'function' && sbMates())) sbCall(true);
+      return {mode:'hunt', map:bm, types:[g.t], item:null}; }
     const t = g.k === 'item' ? aqSource(g.t, Q.map) : g.t; return {mode:'hunt', map:Q.map, types:t ? [t] : null, item:g.k === 'item' ? g.t : null};
   }
   const s = msS(), c = s.cur, arc = MS_ARCS.find(a => a.id === tr.id);

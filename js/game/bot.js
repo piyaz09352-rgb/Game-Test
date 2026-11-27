@@ -25,7 +25,7 @@ function threats(){ return mobs.filter(m => !m.dead && m.aggro && dist(m, P) < 1
 /* "avoid bosses" (on by default): Auto never hits a boss, keeps away from monsters standing near one,
    never wanders near one, and runs away when a boss comes close. Pack alphas (หัวหน้าฝูง) are NOT avoided: Auto fights them. */
 const BOT_BOSS = {near:300, flee:260};
-const botAvoid = () => !S.bot || S.bot.avoidBoss !== false;
+const botAvoid = () => (!S.bot || S.bot.avoidBoss !== false) && !(typeof aicFieldOn === 'function' && aicFieldOn());   // (v349) not with an AI party called for a story boss
 const botBosses = () => mobs.filter(m => !m.dead && !m.vanish && m.def.boss);   // real bosses only
 const botSafeSpot = () => (MAP_ID === 0 ? {x:VSPAWN.x, y:VSPAWN.y} : CAMP ? {x:CAMP.x, y:CAMP.y} : null);
 function botShun(m){
@@ -51,7 +51,7 @@ const botDanger = m => !!(m && !m.dead && !m.vanish && m.def && !m.def.boss && m
 let BOT_DCACHE = {t:-1, list:[]};
 const botDangers = () => { if (BOT_DCACHE.t !== T){ BOT_DCACHE = {t:T, list:mobs.filter(botDanger)}; } return BOT_DCACHE.list; };
 const botNearDanger = (x, y, r = BOT_DANGER.roam) => botDangers().some(d => Math.hypot(d.x - x, d.y - y) < r);
-const botOk = m => !(m.dead || m.vanish || m.dummy || inVillage(m) || BOT.skip.has(m) || (m.def.boss && S.lvl < 22 && !(typeof DG !== 'undefined' && DG.active)) || botShun(m));
+const botOk = m => !(m.dead || m.vanish || m.dummy || inVillage(m) || BOT.skip.has(m) || (m.def.boss && S.lvl < 22 && !(typeof DG !== 'undefined' && DG.active) && !(typeof aicFieldOn === 'function' && aicFieldOn())) || botShun(m));
 /* who comes first: the closest; two about as close (within TGT_TIE px) → the one with less HP (v30) */
 const TGT_TIE = 20;
 function tgtCmp(a, b){ const da = dist(a, P), db = dist(b, P); return Math.abs(da - db) <= TGT_TIE ? (a.hp - b.hp) || (da - db) : da - db; }

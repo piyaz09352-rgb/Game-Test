@@ -144,29 +144,38 @@ if (typeof ghostAt === 'function'){ const _ga = ghostAt; ghostAt = function(p){ 
 /* Going into a dungeon without a party, the gatekeeper now offers three AI adventurers of your level to come along.
    They follow you, fight beside you (each about as strong as you), and their blows count as your party's: the
    guardian falls to the team and the reward is yours as usual. They stay in the dungeon when you leave. */
-const AIC = {list:[], on:false};
+const AIC = {list:[], on:false, field:null};
+/* (v349) the party is called in a dungeon (dgOpen's question) or for a story boss out in the field (storyboss349.js);
+   in the field the adventurers fight only that boss, its summons and whatever is attacking you — not your hunting */
+const aicParty = () => (typeof DG !== 'undefined' && DG.active && DG.aiParty) || !!(AIC.field && typeof aicFieldOn === 'function' && aicFieldOn());
+const aicFoeOk = m => { if (!m || !m.def) return false; if (typeof DG !== 'undefined' && DG.active) return true; const f = AIC.field; if (!f) return false;
+  return m.type === f.boss || !!m.minion || (m.aggro && !m.def.boss && Math.hypot(m.x - P.x, m.y - P.y) < 400); };
 function aicSpawn(){ AIC.list = []; const r = aiaRng((Date.now() / 1000) | 0), own = jobChain()[1];
   for (let i = 0; i < 3; i++){ let h = aiaHero(r, Math.max(1, S.lvl)); for (let k = 0; k < 4 && h.line === own; k++) h = aiaHero(r, Math.max(1, S.lvl));
     const a = Math.PI * 2 * i / 3; AIC.list.push({name:AIA_NAMES[(r() * AIA_NAMES.length) | 0], lv:S.lvl, ...h, x:P.x + Math.cos(a) * 40, y:P.y + Math.sin(a) * 30, dir:0, animT:r() * 3, act:'idle', moving:false, hitCd:1 + i * .3, foe:null, spd:70, fade:0}); }
   AIC.on = true; }
 function aicUpd(dt){
-  if (!AIC.on) return; if (!(typeof DG !== 'undefined' && DG.active) || !DG.aiParty){ AIC.on = false; AIC.list = []; return; }
+  if (!AIC.on) return; if (!aicParty()){ AIC.on = false; AIC.list = []; return; }
   const pow = Math.max(DER.atk || 0, DER.matk || 0);
   AIC.list.forEach((a, i) => { a.animT += dt; a.hitCd -= dt; a.fade = Math.min(1, a.fade + dt * 1.5);
     if (a.foe && (a.foe.dead || !mobs.includes(a.foe))) a.foe = null;
     if (a.foe && a.foe.def && a.foe.def.boss && mobs.some(m => !m.dead && !m.def.boss && Math.hypot(m.x - P.x, m.y - P.y) < 300)) a.foe = null;   // guards on you first, like a real party
-    if (!a.foe){ let best = null, bd = 1e9; for (const m of mobs){ if (m.dead || m.vanish) continue; const d = Math.hypot(m.x - P.x, m.y - P.y) + (m.def && m.def.boss ? 400 : 0); if (d < bd && d < 800){ bd = d; best = m; } } a.foe = best; }
-    const tx = a.foe ? a.foe.x : P.x + Math.cos(i * 2.1) * 46, ty = a.foe ? a.foe.y : P.y + Math.sin(i * 2.1) * 34, reach = a.foe ? (a.ranged ? 130 : 30) : 20;
+    if (a.foe && !aicFoeOk(a.foe)) a.foe = null;
+    if (!a.foe){ let best = null, bd = 1e9; for (const m of mobs){ if (m.dead || m.vanish || !aicFoeOk(m)) continue; const d = Math.hypot(m.x - P.x, m.y - P.y) + (m.def && m.def.boss ? 400 : 0); if (d < bd && d < 800){ bd = d; best = m; } } a.foe = best; }
+    const tx = a.foe ? a.foe.x : P.x + Math.cos(i * 2.1) * 46, ty = a.foe ? a.foe.y : P.y + Math.sin(i * 2.1) * 34, reach = a.foe ? (a.ranged ? 130 : 30) + ((a.foe.def && a.foe.def.r) || 0) * .8 : 20;   // (v349) to the edge of a big body, not its middle
     const d = Math.hypot(tx - a.x, ty - a.y);
     if (d > reach){ const ox = a.x, oy = a.y; navTo(a, tx, ty, a.spd * (d > 300 ? 1.6 : 1), dt, reach - 4); if (a.navFail){ a.navFail = false; a.x = P.x; a.y = P.y; }
       a.moving = Math.hypot(a.x - ox, a.y - oy) > .01; if (a.moving) a.dir = SPR.dirFromVec(a.x - ox, a.y - oy); a.act = a.moving ? 'walk' : 'idle'; }
     else if (a.foe){ a.moving = false; a.dir = SPR.dirFromVec(a.foe.x - a.x, a.foe.y - a.y);
-      if (a.hitCd <= 0){ a.hitCd = 1 + Math.random() * .4; a.act = 'attack'; a.animT = 0; const m = a.foe, dmg = Math.max(1, Math.round(pow * (1.05 + Math.random() * .3)));
+      if (a.hitCd <= 0){ a.hitCd = 1 + Math.random() * .4; a.act = 'attack'; a.animT = 0; const m = a.foe; let dmg = Math.max(1, Math.round(pow * (1.05 + Math.random() * .3)));
+        // (v349) against a story boss out in the field they fight like real party members with their skills: a party of
+        // four brings it down in about five minutes (their basic blows alone took far longer, and the hero ran dry of potions)
+        if (AIC.field && m.def && m.def.boss && !(typeof DG !== 'undefined' && DG.active)) dmg = Math.max(dmg, Math.round(m.maxhp * .0025 * (.9 + Math.random() * .2)));
         m.hp -= dmg; m.flash = .12; m.hurtT = .2; if (typeof addText === 'function') addText(m.x, m.y - (MOB_H[m.type] || 30) - 6, String(dmg), '#bfe8ff', 11);
         if (m.hp <= 0 && !m.dead){ m.hp = 0; killMob(m); if (typeof dgKilled === 'function') dgKilled(m); a.foe = null; } }
       else if (a.animT > .45) a.act = 'idle'; }
     else { a.moving = false; a.act = 'idle'; } }); }
-EV.on('tick', dt => { try { if (typeof DG !== 'undefined' && DG.active && DG.aiParty && !AIC.on && !DG.entering) aicSpawn(); aicUpd(dt); } catch (e) { if (!AIC.err){ AIC.err = true; console.warn('aiparty', e); } } });
+EV.on('tick', dt => { try { if (aicParty() && !AIC.on && !(typeof DG !== 'undefined' && DG.entering)) aicSpawn(); aicUpd(dt); } catch (e) { if (!AIC.err){ AIC.err = true; console.warn('aiparty', e); } } });
 { const _dg = drawGhostsInto; drawGhostsInto = function(ents, g){ _dg.apply(this, arguments); if (!AIC.on) return;
     for (const a of AIC.list){ const x = a.x - cam.x, y = a.y - cam.y; if (x < -60 || x > VW + 60 || y < -80 || y > VH + 40) continue; const sh = heroSheet(a.job, a.gear, a.look); if (!sh) continue; const act = sh.index[a.act] ? a.act : 'idle';
       ents.push({y:a.y, f:() => { g.save(); g.globalAlpha *= a.fade; shadowW(g, x, y, 9); SPR.draw(g, sh, act, a.dir, a.animT, x, y); g.restore(); }}); } }; }
@@ -174,6 +183,6 @@ EV.on('tick', dt => { try { if (typeof DG !== 'undefined' && DG.active && DG.aiP
     for (const a of AIC.list){ const x = sx(a.x), y = sy(a.y); if (x < -100 || x > SW + 100 || y < -80 || y > SH + 80) continue; const z = clamp(PX / 2, .5, 2.6);
       nameTag(x, sy(a.y - HEAD_H(false)) - 6 * z, `AI · ${a.name} Lv${a.lv}`, '#dff6ff', 'rgba(24,60,96,.82)'); } }; }
 // with three companions beside you the dungeon's monsters spread their blows over the whole team: you take a share of them
-if (typeof HK !== 'undefined' && HK.atkMul) HK.atkMul.push((m, mult) => (AIC.on && AIC.list.length && typeof DG !== 'undefined' && DG.active && DG.aiParty ? mult * .4 : mult));
+if (typeof HK !== 'undefined' && HK.atkMul) HK.atkMul.push((m, mult) => (AIC.on && AIC.list.length && aicParty() && aicFoeOk(m) ? mult * (AIC.field && !(typeof DG !== 'undefined' && DG.active) ? .15 : .4) : mult));
 // a boss's real blows go through bossPunch (bosshard.js), not the monster damage hook above: the same share applies
-if (typeof bossPunch === 'function'){ const _bp = bossPunch; bossPunch = function(){ const v = _bp.apply(this, arguments); return AIC.on && AIC.list.length && typeof DG !== 'undefined' && DG.active && DG.aiParty ? Math.max(1, Math.round(v * .4)) : v; }; }
+if (typeof bossPunch === 'function'){ const _bp = bossPunch; bossPunch = function(){ const v = _bp.apply(this, arguments); return AIC.on && AIC.list.length && aicParty() ? Math.max(1, Math.round(v * (AIC.field && !(typeof DG !== 'undefined' && DG.active) ? .15 : .4))) : v; }; }
