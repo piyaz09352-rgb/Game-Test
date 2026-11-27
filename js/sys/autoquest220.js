@@ -55,7 +55,10 @@ function aqPlanFor(tr){
       if (S.lvl < MOB[g.t].lvl - 3) return {mode:'stop', th:`บอส ${nm(MOB[g.t])} Lv ${MOB[g.t].lvl}: เก็บเลเวลถึง Lv ${MOB[g.t].lvl - 3} ก่อน แล้ว Auto จะชวนนักผจญภัย AI ไปด้วยกัน`, en:`boss ${nm(MOB[g.t])} Lv ${MOB[g.t].lvl}: reach Lv ${MOB[g.t].lvl - 3} first, then Auto brings AI adventurers`};
       if (MAP_ID === bm && !AIC.field && !(typeof sbMates === 'function' && sbMates())) sbCall(true);
       return {mode:'hunt', map:bm, types:[g.t], item:null}; }
-    const t = g.k === 'item' ? aqSource(g.t, Q.map) : g.t; return {mode:'hunt', map:Q.map, types:t ? [t] : null, item:g.k === 'item' ? g.t : null};
+    // (v350) the chapter's monsters may live on another map than the chapter's own (chapter 0 is the city, its monsters
+    // moved out to the Suwannin Fields in v337): hunt where they are — Auto quest stood in town for good
+    const home = MAPS[Q.map] && MAPS[Q.map].mobs && MAPS[Q.map].mobs.length ? Q.map : (MAPS.findIndex(m => m && !m.town && m.mobs && m.mobs.includes(g.k === 'item' ? (aqSource(g.t, Q.map) || g.t) : g.t)));
+    const hm = home >= 0 ? home : Q.map, t = g.k === 'item' ? aqSource(g.t, hm) : g.t; return {mode:'hunt', map:hm, types:t ? [t] : null, item:g.k === 'item' ? g.t : null};
   }
   const s = msS(), c = s.cur, arc = MS_ARCS.find(a => a.id === tr.id);
   if (!c){ const nx = arc.maps.find(m => !s.done[m]); if (nx == null) return {mode:'stop', th:'จบสายนี้แล้ว', en:'this road is complete'};

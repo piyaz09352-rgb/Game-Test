@@ -15,7 +15,8 @@ test('story boss: the card says it is a party fight, the offer, AI adventurers o
       const q = qState(); q.active = null; q.main = 0;
       // the giver's card before the chapter is taken
       out.card = questDialog(NPCS.find(n => n.id === 'job') || {id:'job'}).h.includes('Lv ' + MOB.boss.lvl);
-      q.active = 'main0'; q.prog = { 'kill:dewblob': 8, 'kill:hare': 8 }; S.inv.jelly = 5;
+      q.active = 'main0'; q.prog = {}; const ph = aqPlanFor({ kind: 'main' }); out.huntField = ph.mode === 'hunt' && ph.map === FIELDS306.id;   // (v350) chapter 0's monsters live in the fields, not in the city
+      q.prog = { 'kill:dewblob': 8, 'kill:hare': 8 }; S.inv.jelly = 5;
       out.goal = !!sbGoal() && sbGoal().map === FIELDS306.id;
       // on the boss's map, next to it: the offer
       loadMap(FIELDS306.id); await new Promise(r => setTimeout(r, 800));
@@ -40,7 +41,7 @@ test('story boss: the card says it is a party fight, the offer, AI adventurers o
       q.prog['boss:boss'] = 0; S.aq = true; const p = aqPlanFor({ kind: 'main' }); out.auto = p.mode === 'hunt' && p.map === FIELDS306.id && p.types[0] === 'boss';
       S.lvl = 10; const p2 = aqPlanFor({ kind: 'main' }); out.tooLow = p2.mode === 'stop';
       return out; });
-    assert.deepStrictEqual(r, { card: true, goal: true, offer: true, closesAway: true, noAskOnAuto: true, askAgain: true, party: true, ignoresHunt: true, boss: true, away: true, gone: true, auto: true, tooLow: true });
+    assert.deepStrictEqual(r, { card: true, huntField: true, goal: true, offer: true, closesAway: true, noAskOnAuto: true, askAgain: true, party: true, ignoresHunt: true, boss: true, away: true, gone: true, auto: true, tooLow: true });
   } finally { await close(); }
   assert.deepStrictEqual(errors, [], 'no runtime errors');
 });
