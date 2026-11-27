@@ -489,7 +489,7 @@ function render(){
   }
   VFX.drawOver(g, cam.x, cam.y);
   if (typeof LIVE !== 'undefined') LIVE.drawOver(g);   // birds, butterflies, fireflies, leaves, smoke, cloud shadows
-  const target = isNight() && !(typeof twmOn === 'function' && twmOn()) && !(typeof heavenHere === 'function' && heavenHere()) ? .58 : 0;   // (v297) heaven has no night: it shines by its own light   // (v264) indoors in the tower: no night veil (it dulled the hall's own fire and light)
+  const target = isNight() && !(typeof twmOn === 'function' && twmOn()) && !(typeof heavenHere === 'function' && heavenHere()) && !(typeof caveOn === 'function' && caveOn()) ? .58 : 0;   // (v350) no night inside the cave (cave350.js)   // (v297) heaven has no night: it shines by its own light   // (v264) indoors in the tower: no night veil (it dulled the hall's own fire and light)
   nightA += ((SETTINGS.nightFx ? target : 0) - nightA) * .02;
   if (nightA > .01){
     nctx.setTransform(1, 0, 0, 1, 0, 0); nctx.globalCompositeOperation = 'source-over'; nctx.clearRect(0, 0, night.width, night.height); nctx.setTransform(night.width / VW, 0, 0, night.height / VH, 0, 0);
@@ -558,7 +558,7 @@ function drawWeather(g){
   if (B.tint){ g.fillStyle = B.tint; g.fillRect(0, 0, VW, VH); }
   if (B.fx === 'dark'){
     nctx.setTransform(1, 0, 0, 1, 0, 0); nctx.globalCompositeOperation = 'source-over'; nctx.clearRect(0, 0, night.width, night.height); nctx.setTransform(night.width / VW, 0, 0, night.height / VH, 0, 0);
-    nctx.fillStyle = `rgba(8,6,16,${B.fxA + (isNight() ? .15 : 0)})`; nctx.fillRect(0, 0, VW, VH);
+    nctx.fillStyle = `rgba(8,6,16,${B.fxA + (isNight() && !(typeof caveOn === 'function' && caveOn()) ? .15 : 0)})`; nctx.fillRect(0, 0, VW, VH);
     nctx.globalCompositeOperation = 'destination-out';
     const hole = (x, y, r, a) => { if (x < -r || y < -r || x > VW + r || y > VH + r) return; nctx.globalAlpha = a; nctx.drawImage(holeSpr(), x - r, y - r, r * 2, r * 2); nctx.globalAlpha = 1; };
     hole(P.x - cam.x, P.y - cam.y - 18, 140, .95);

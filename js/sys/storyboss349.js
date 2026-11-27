@@ -23,15 +23,23 @@ function sbCall(quiet){ const s = sbGoal(); if (!s) return false; AIC.field = {b
   if (typeof WIN_RENDER !== 'undefined' && WIN_RENDER.quest && UIS.open.quest) try { WIN_RENDER.quest(); } catch (e) {}
   return true; }
 /* the offer, once per boss, when you come near it on its map with nobody in your party */
-function sbAsk(m){ const d = el('confirm'); if (!d || !d.hidden) return; SB.asked.add(m);
+function sbAsk(m){ const d = el('confirm'); if (!d || !d.hidden) return; SB.asked.add(m); SB.open = {m, map:MAP_ID, at:Date.now()};
   d.innerHTML = `<h3>${L('บอสตัวนี้สำหรับปาร์ตี้', 'This boss is a party fight')}</h3><p>${L(`${nm(MOB[m.type])} Lv ${MOB[m.type].lvl} แข็งแกร่งเกินกว่าจะสู้ลำพัง ชวนเพื่อนมาด้วย หรือให้นักผจญภัย AI 3 คนช่วย (พวกเขาตีเฉพาะบอสนี้กับมอนที่ตีเรา แล้วแยกย้ายเมื่อบอสล้ม)`, `${nm(MOB[m.type])} Lv ${MOB[m.type].lvl} is too strong to face alone. Bring friends, or let three AI adventurers help (they fight only this boss and what attacks you, and leave once it falls)`)}</p>
     <div class="row"><button class="btn" data-sb="no">${L('สู้เอง', 'Fight alone')}</button><button class="btn gold" data-sb="ai">${L('ชวนนักผจญภัย AI 3 คน', 'Bring 3 AI adventurers')}</button></div>`;
-  d.hidden = false; d.onclick = e => { const b = e.target.closest('[data-sb]'); if (!b) return; d.hidden = true; d.onclick = null; if (b.dataset.sb === 'ai') sbCall(); };
+  d.hidden = false; d.onclick = e => { const b = e.target.closest('[data-sb]'); if (!b) return; d.hidden = true; d.onclick = null; SB.open = null; if (b.dataset.sb === 'ai') sbCall(); };
   const ai = d.querySelector('[data-sb="ai"]'); if (ai) ai.focus(); }
-EV.on('tick', dt => { if ((SB.t += dt) < .5) return; SB.t = 0; if (!S || !S.lvl || P.dead || AIC.field) return;
+/* (v349.1) the question never outstays its moment: it closes when you leave the boss's map, walk away from the boss, or
+   after 30 s (left open, it sat over the town and every window behind it — the newcomer bot found it there an hour later) */
+function sbClose(){ const d = el('confirm'); if (d && SB.open && d.querySelector('[data-sb]')){ d.hidden = true; d.onclick = null; } SB.open = null; }
+// checked on a real-time clock: the game's own tick does not run while a map loads or the game is paused
+setInterval(() => { try { if (SB.open){ const o = SB.open; if (MAP_ID !== o.map || Date.now() - o.at > 30000 || o.m.dead || Math.hypot(o.m.x - P.x, o.m.y - P.y) > 900 || P.dead) sbClose(); } } catch (e) {} }, 400);
+EV.on('tick', dt => { if ((SB.t += dt) < .5) return; SB.t = 0;
+  if (!S || !S.lvl || P.dead || AIC.field) return;
   const s = sbGoal(); if (!s || MAP_ID !== s.map || sbMates()) return;
   const m = mobs.find(x => !x.dead && !x.vanish && x.type === s.type && x.def && x.def.boss); if (!m || SB.asked.has(m) || Math.hypot(m.x - P.x, m.y - P.y) > 650) return;
   if (BOT.on && typeof aqOn === 'function' && aqOn()){ SB.asked.add(m); sbCall(); return; }   // Auto quest: it calls them itself
+  if (BOT.on) return;   // plain Auto keeps away from bosses: no question over a hero left on Auto
+  const dg = el('dialog'); if ((dg && !dg.hidden) || (typeof WIN_IDS !== 'undefined' && WIN_IDS.some(x => UIS.open[x]))) return;   // not over a conversation or a window
   sbAsk(m); });
 /* the quest window and the chapter card: name the boss, its level, and the party button */
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-sbcall]'); if (!b) return; if (sbCall()) b.disabled = true; });
