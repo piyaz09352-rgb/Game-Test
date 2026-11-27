@@ -70,7 +70,7 @@
 "js/render/vfx.js":{"v":287,"sha":"645c25d3714e57f4"},
 "js/render/telegraph278.js":{"v":286,"sha":"e2f5174aed1761cc"},
 "js/sys/stdfont.js":{"v":111,"sha":"7ebfca2e9065ff79"},
-"js/render/render.js":{"v":338,"sha":"18bd9bc46043c771"},
+"js/render/render.js":{"v":339,"sha":"621881101d4e1041"},
 "js/render/namecache.js":{"v":111,"sha":"cd61f6c8e9e46630"},
 "js/sys/mobscale.js":{"v":112,"sha":"29489f7f06c28f39"},
 "js/game/perf.js":{"v":111,"sha":"b15980c9c498e0a3"},
@@ -307,7 +307,7 @@
 "js/sys/jobfx.js":{"v":126,"sha":"ac13b74234494a83"},
 "js/sys/tutfold.js":{"v":127,"sha":"1e510ee1ed4ec762"},
 "js/sys/changelog.js":{"v":127,"sha":"0509d4ccdd277a38"},
-"js/sys/changelog272.js":{"v":400,"sha":"b41e1cd79ee2cd54"},
+"js/sys/changelog272.js":{"v":401,"sha":"4e8a501c134fb477"},
 "js/sys/bossnature.js":{"v":279,"sha":"dab626b53dac17e4"},
 "js/sys/inspect.js":{"v":125,"sha":"7bfd122f80df54a5"},
 "js/sys/petnet.js":{"v":136,"sha":"3f84ce0bd40d9a52"},
@@ -465,6 +465,7 @@
 "js/world/towns318.js":{"v":2,"sha":"986f6118153aa9f7"},
 "js/world/landmarks320.js":{"v":3,"sha":"4c51cb84a1a3bf53"},
 "js/world/naraka296.js":{"v":321,"sha":"f3a5ab309523d25a"},
+"js/world/cave350.js":{"v":1,"sha":"437d50ba8b2f3ad4"},
 "js/world/heaven297.js":{"v":327,"sha":"a0ac0ae86e1b8eb0"},
 "js/world/lands298.js":{"v":327,"sha":"40b1c8ddfd735351"},
 "js/sys/free298.js":{"v":329,"sha":"bdd352195f0467fa"},
@@ -481,4 +482,4 @@
 "js/sys/world344.js":{"v":3,"sha":"6c2c5e52078d332b"},
 "js/sys/report346.js":{"v":3,"sha":"08ccbef188fbb823"},
 "js/sys/ink348.js":{"v":2,"sha":"4a086e7d28ce33d1"},
-"js/sys/storyboss349.js":{"v":1,"sha":"ed92cfa644acfe3d"}}
+"js/sys/storyboss349.js":{"v":2,"sha":"37423747d475f9b7"}}

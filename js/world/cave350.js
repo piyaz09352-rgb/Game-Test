@@ -116,7 +116,10 @@ if (typeof loadMap === 'function'){ const _lm = loadMap; loadMap = function(id){
 if (BIOME.cave){ BIOME.cave.floor = {kind:'cracks', n:22};
   // the floor a shade lighter than the rock around it, and the dark a little less deep, so the walls read as walls
   BIOME.cave.base = ['#4c463e', '#544d44', '#5c554a']; BIOME.cave.fxA = .5; }
-if (typeof cuteBuild === 'function'){ const _cb = cuteBuild; cuteBuild = function(){ const r = _cb.apply(this, arguments); if (caveOn()){ let i = 0; CUTE.decor = CUTE.decor.filter(d => d.k !== 'glowmush' ? !['flower', 'bud', 'grass', 'tuft'].includes(d.k) : caveDist(d.x, d.y) < 110 && (i++ % 4 === 0)); } return r; }; }
+// (filtered when drawn: other files rebuild the decorations after any build hook)
+if (typeof cuteDecor === 'function'){ const _cd = cuteDecor; cuteDecor = function(g){ if (CUTE.map !== MAP_ID) cuteBuild();
+    if (caveOn() && CUTE._cv !== CUTE.decor){ let i = 0, j = 0; CUTE.decor = CUTE.decor.filter(d => d.k === 'glowmush' ? caveDist(d.x, d.y) < 110 && (i++ % 5 === 0) : d.k === 'wisp' ? (j++ % 4 === 0) : !['flower', 'bud', 'grass', 'tuft', 'butterfly'].includes(d.k)); CUTE._cv = CUTE.decor; }
+    return _cd.apply(this, arguments); }; }
 
 /* ---------- solid rock for everyone ---------- */
 { const _w = walkable; walkable = function(x, y, r = 12){ if (caveOn() && caveDist(x, y) < r) return false; return _w.apply(this, arguments); }; }
@@ -167,3 +170,47 @@ function caveOver(g){
   g.lineTo(VW, 0); g.closePath(); g.fill();
   const vg = g.createLinearGradient(0, 0, 0, 70); vg.addColorStop(0, 'rgba(8,8,10,.55)'); vg.addColorStop(1, 'rgba(8,8,10,0)'); g.fillStyle = vg; g.fillRect(0, 0, VW, 70);
 }
+
+/* ---------- the way in: on the maps next door, the gateway into the cave is a cave mouth in a rock face ---------- */
+const caveGate = gt => !!(gt && CAVE_MAPS.has(gt.to)) && !CAVE_MAPS.has(MAP_ID);
+function cvMouth(ctx, gt, cx, cy){
+  const x = gt.x - cx, y = gt.y - cy - 4, t = T;
+  ctx.save(); ctx.globalCompositeOperation = 'source-over'; ctx.globalAlpha = 1;
+  ctx.fillStyle = 'rgba(20,18,16,.35)'; ctx.beginPath(); ctx.ellipse(x, y + 6, 78, 22, 0, 0, 7); ctx.fill();
+  // the rock face: grey limestone, a lit left side, cracks, a little moss
+  const face = [[-74, 8], [-66, -44], [-44, -80], [-10, -96], [26, -88], [56, -66], [72, -30], [76, 8]];
+  ctx.fillStyle = '#5e574c'; ctx.beginPath(); face.forEach(([a, b], i) => i ? ctx.lineTo(x + a, y + b) : ctx.moveTo(x + a, y + b)); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#7a7264'; ctx.beginPath(); ctx.moveTo(x - 74, y + 8); ctx.lineTo(x - 66, y - 44); ctx.lineTo(x - 44, y - 80); ctx.lineTo(x - 10, y - 96); ctx.lineTo(x - 22, y - 42); ctx.lineTo(x - 32, y + 8); ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = 'rgba(30,26,22,.55)'; ctx.lineWidth = 1.2; for (const [a, b, c, d] of [[-52, -52, -32, -66], [32, -62, 52, -42], [-12, -84, 4, -72], [42, -22, 62, -12]]){ ctx.beginPath(); ctx.moveTo(x + a, y + b); ctx.lineTo(x + c, y + d); ctx.stroke(); }
+  ctx.fillStyle = 'rgba(80,120,60,.55)'; for (const [a, b, r] of [[-60, -20, 6], [-48, -60, 5], [50, -50, 5], [64, -10, 6]]){ ctx.beginPath(); ctx.ellipse(x + a, y + b, r, r * .6, 0, 0, 7); ctx.fill(); }
+  // the mouth: dark inside, a faint cool glow of crystals far within
+  const mg = ctx.createRadialGradient(x, y - 10, 4, x, y - 18, 46); mg.addColorStop(0, `rgba(90,170,190,${.55 + .1 * Math.sin(t * 1.3)})`); mg.addColorStop(.35, 'rgba(30,50,60,.95)'); mg.addColorStop(.75, '#0e0d0c'); mg.addColorStop(1, '#080707');
+  ctx.fillStyle = mg; ctx.beginPath(); ctx.moveTo(x - 38, y + 8); ctx.quadraticCurveTo(x - 40, y - 46, x, y - 54); ctx.quadraticCurveTo(x + 40, y - 46, x + 38, y + 8); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#4a443a'; for (let i = 0; i < 7; i++){ const px = x - 30 + i * 10, b = y - 48 + Math.abs(i - 3) * 4; ctx.beginPath(); ctx.moveTo(px - 4, b); ctx.lineTo(px + 4, b); ctx.lineTo(px, b + 12 + (i % 2) * 5); ctx.closePath(); ctx.fill(); }   // stalactites at the lip
+  ctx.restore();
+}
+function cvMouthAbove(ctx, gt, cx, cy){ const x = gt.x - cx, y = gt.y - cy - 4, t = T;
+  ctx.save(); ctx.globalCompositeOperation = 'lighter'; const gl = ctx.createRadialGradient(x, y - 16, 0, x, y - 16, 60); gl.addColorStop(0, `rgba(110,190,210,${.16 + .04 * Math.sin(t * 1.7)})`); gl.addColorStop(1, 'rgba(110,190,210,0)'); ctx.fillStyle = gl; ctx.fillRect(x - 60, y - 76, 120, 120);
+  ctx.globalCompositeOperation = 'source-over'; for (let i = 0; i < 3; i++){ const k = (t * .12 + i / 3) % 1; ctx.fillStyle = `rgba(200,215,220,${.14 * (1 - k)})`; ctx.beginPath(); ctx.arc(x - 20 + i * 20 + Math.sin(t * .6 + i) * 6, y - 30 - k * 40, 10 + k * 14, 0, 7); ctx.fill(); }   // cool air breathing out
+  ctx.restore(); }
+// inside the cave the way out is daylight at the end of the tunnel
+function cvDaylight(ctx, gt, cx, cy){ const x = gt.x - cx, y = gt.y - cy - 10, t = T; ctx.save(); ctx.globalCompositeOperation = 'lighter';
+  const gl = ctx.createRadialGradient(x, y, 4, x, y, 120); gl.addColorStop(0, `rgba(255,246,220,${.5 + .05 * Math.sin(t)})`); gl.addColorStop(.4, 'rgba(255,240,200,.22)'); gl.addColorStop(1, 'rgba(255,240,200,0)'); ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(x, y, 120, 0, 7); ctx.fill(); ctx.restore(); }
+if (typeof wgGround === 'function'){ const _g = wgGround; wgGround = function(ctx, gt){ if (caveGate(gt)) return cvMouth.apply(this, arguments); const r = _g.apply(this, arguments); if (caveOn()) try { cvDaylight.apply(this, arguments); } catch (e) {} return r; }; }
+if (typeof wgAbove === 'function'){ const _a = wgAbove; wgAbove = function(ctx, gt){ return caveGate(gt) ? cvMouthAbove.apply(this, arguments) : _a.apply(this, arguments); }; }
+
+/* ---------- the sound of the cave: water dripping somewhere, and its echo ---------- */
+{ let next = 0; EV.on('tick', () => { if (!caveOn() || PAUSED || document.hidden || T < next) return; next = T + 1.2 + Math.random() * 3.2;
+    const R = typeof SFX !== 'undefined' && SFX.raw ? SFX.raw() : null; if (!R) return; const ac = R.ac, base = 900 + Math.random() * 900, far = .35 + Math.random() * .65;
+    for (const [dl, vg] of [[0, 1], [.19, .38], [.4, .16], [.66, .07]]){ const o = ac.createOscillator(), g = ac.createGain(), t0 = ac.currentTime + dl;
+      o.type = 'sine'; o.frequency.setValueAtTime(base, t0); o.frequency.exponentialRampToValueAtTime(base * .45, t0 + .09);
+      g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(.05 * far * vg, t0 + .004); g.gain.exponentialRampToValueAtTime(.0001, t0 + .16);
+      o.connect(g); g.connect(R.out); o.start(t0); o.stop(t0 + .18); } }); }
+
+/* ---------- the shrine camp underground: no garden (bushes, flower boxes, trees), rock and crystals in their place ---------- */
+if (typeof campPlace === 'function'){ const _cp = campPlace; campPlace = function(){ const r = _cp.apply(this, arguments); if (!caveOn()) return r;
+    try { const plant = typeof NRK_PLANTS !== 'undefined' ? NRK_PLANTS : new Set(['tree', 'bush', 'flowerbed', 'hedge', 'flowers', 'camptree', 'deadtree', 'flowerbush', 'frangipani']);
+      const gone = []; for (let i = PROPS.length - 1; i >= 0; i--){ const p = PROPS[i]; if (plant.has(p.type) || /flower|hedge|bush|tree|planter/.test(p.type)){ gone.push(p); PROPS.splice(i, 1); const k = obstacles.findIndex(o => o.prop === p); if (k >= 0) obstacles.splice(k, 1); } }
+      const rr = caveRng(CAVE.id * 13 + 5); for (const p of gone.slice(0, 10)) if (caveDist(p.x, p.y) > 30 && typeof addProp === 'function') addProp(rr() < .55 ? 'stalag' : 'crystal', p.x, p.y, Math.floor(rr() * 2));
+      NAV.grid = null; } catch (e) { console.warn('cave350 camp', e); }
+    return r; }; }
